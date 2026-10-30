@@ -39,7 +39,12 @@ namespace GateRush.Cameras
             if ((kb != null && kb.vKey.wasPressedThisFrame) || (pad != null && pad.leftShoulder.wasPressedThisFrame))
                 views.Cycle();
 
-            if (_touchY == null) return;
+            // A cached control can outlive its device (XR runtime restarts): rebind instead of throwing.
+            if (_touchY == null || !_touchY.device.added)
+            {
+                _dirty = _touchY != null;
+                return;
+            }
             if (_touchY.isPressed)
             {
                 _heldFor += Time.unscaledDeltaTime;

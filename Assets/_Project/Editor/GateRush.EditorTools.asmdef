@@ -11,6 +11,7 @@
         "GateRush.Race",
         "GateRush.Game",
         "GateRush.Track",
+        "GateRush.TrackEditor",
         "Unity.XR.Interaction.Toolkit",
         "Unity.TextMeshPro",
         "UnityEngine.UI",

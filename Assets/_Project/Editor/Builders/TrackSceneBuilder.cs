@@ -108,6 +108,7 @@ namespace GateRush.EditorTools.Builders
             cso.FindProperty("gogglesScreen").objectReferenceValue = views.Screen;
             cso.FindProperty("vignette").objectReferenceValue = views.Vignette;
             cso.FindProperty("losStand").objectReferenceValue = views.LosStand;
+            cso.FindProperty("editor").objectReferenceValue = BuildEditor(views.Origin, trackPrefabs, trackLayer);
             cso.FindProperty("keyboardGamepad").objectReferenceValue = keyboardPad;
             cso.FindProperty("touch").objectReferenceValue = touch;
             cso.FindProperty("radio").objectReferenceValue = radio;
@@ -119,6 +120,55 @@ namespace GateRush.EditorTools.Builders
             AddToBuildSettings(path);
             AssetDatabase.SaveAssets();
             return path;
+        }
+
+        public const string EditorUiLayerName = "EditorUI";
+
+        /// <summary>Inactive track editor (enabled by TrackSceneController when a track is opened for editing) + aim-pose hands.</summary>
+        private static GateRush.TrackEditor.TrackEditorController BuildEditor(Unity.XR.CoreUtils.XROrigin origin, TrackPrefabs prefabs, int trackLayer)
+        {
+            int uiLayer = EnsureLayer(EditorUiLayerName, 11);
+            var offset = origin.CameraFloorOffsetObject.transform;
+            var left = Hand(offset, "Left");
+            var right = Hand(offset, "Right");
+
+            var go = new GameObject("Track Editor");
+            var line = go.AddComponent<LineRenderer>();
+            line.sharedMaterial = GateRush.EditorTools.Builders.Materials.Unlit("EditorPointer", new Color(0.4f, 0.9f, 1f), false);
+            line.widthMultiplier = 0.006f;
+            line.enabled = false;
+
+            var editor = go.AddComponent<GateRush.TrackEditor.TrackEditorController>();
+            var so = new SerializedObject(editor);
+            so.FindProperty("prefabs").objectReferenceValue = prefabs;
+            so.FindProperty("markerMaterial").objectReferenceValue = GateRush.EditorTools.Builders.Materials.Unlit("EditorMarker", Color.white, false);
+            so.FindProperty("panelMaterial").objectReferenceValue = GateRush.EditorTools.Builders.Materials.Unlit("EditorPanel", Color.white, false);
+            so.FindProperty("xrOrigin").objectReferenceValue = origin.transform;
+            so.FindProperty("head").objectReferenceValue = origin.Camera;
+            so.FindProperty("leftHand").objectReferenceValue = left;
+            so.FindProperty("rightHand").objectReferenceValue = right;
+            so.FindProperty("pointerLine").objectReferenceValue = line;
+            so.FindProperty("pointerMask").intValue = 1 << trackLayer;
+            so.FindProperty("editorUiLayer").intValue = uiLayer;
+            so.ApplyModifiedPropertiesWithoutUndo();
+            go.SetActive(false);
+            return editor;
+        }
+
+        /// <summary>A Touch controller's aim pose (pointer position/rotation).</summary>
+        private static Transform Hand(Transform parent, string hand)
+        {
+            string device = $"<XRController>{{{hand}Hand}}";
+            var go = new GameObject($"{hand} Hand");
+            go.transform.SetParent(parent, false);
+            var tpd = go.AddComponent<UnityEngine.InputSystem.XR.TrackedPoseDriver>();
+            tpd.positionInput = new UnityEngine.InputSystem.InputActionProperty(new UnityEngine.InputSystem.InputAction($"{hand} Aim Position",
+                UnityEngine.InputSystem.InputActionType.Value, device + "/pointerPosition", expectedControlType: "Vector3"));
+            tpd.rotationInput = new UnityEngine.InputSystem.InputActionProperty(new UnityEngine.InputSystem.InputAction($"{hand} Aim Rotation",
+                UnityEngine.InputSystem.InputActionType.Value, device + "/pointerRotation", expectedControlType: "Quaternion"));
+            tpd.trackingStateInput = new UnityEngine.InputSystem.InputActionProperty(new UnityEngine.InputSystem.InputAction($"{hand} Tracking State",
+                UnityEngine.InputSystem.InputActionType.Value, device + "/trackingState", expectedControlType: "Integer"));
+            return go.transform;
         }
 
         private static RaceSession BuildRace(QuadVehicle quad, Transform startPad, Transform ghostVisual)
@@ -228,6 +278,7 @@ namespace GateRush.EditorTools.Builders
             public GogglesScreen Screen;
             public ComfortVignette Vignette;
             public Transform LosStand;
+            public Unity.XR.CoreUtils.XROrigin Origin;
         }
 
         /// <summary>XR rig, goggles room + curved screen, comfort vignette, LOS stand and the view-mode manager.</summary>
@@ -288,7 +339,7 @@ namespace GateRush.EditorTools.Builders
             iso.FindProperty("gogglesScreen").objectReferenceValue = screen;
             iso.ApplyModifiedPropertiesWithoutUndo();
 
-            return new ViewRefs { Manager = views, Screen = screen, Vignette = comfort, LosStand = stand };
+            return new ViewRefs { Manager = views, Screen = screen, Vignette = comfort, LosStand = stand, Origin = origin };
         }
 
         private static void BuildOverlay(QuadVehicle quad, Camera fpvCamera, RaceSession race, ControllerHotplugGuard guard)

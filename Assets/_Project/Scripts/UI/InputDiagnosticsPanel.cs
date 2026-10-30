@@ -103,7 +103,8 @@ namespace GateRush.UI
                 _touchA = right?.TryGetChildControl<ButtonControl>("primaryButton");
                 _touchB = right?.TryGetChildControl<ButtonControl>("secondaryButton");
             }
-            if (_touchStick != null)
+            if (_touchStick != null && !_touchStick.device.added) _touchDirty = true;
+            else if (_touchStick != null)
             {
                 Vector2 s = _touchStick.ReadValue();
                 if (!_stickLatched && s.magnitude > 0.7f)
@@ -114,8 +115,8 @@ namespace GateRush.UI
                 }
                 else if (s.magnitude < 0.3f) _stickLatched = false;
             }
-            save |= _touchA != null && _touchA.wasPressedThisFrame;
-            toggleHz |= _touchB != null && _touchB.wasPressedThisFrame;
+            save |= _touchA != null && _touchA.device.added && _touchA.wasPressedThisFrame;
+            toggleHz |= _touchB != null && _touchB.device.added && _touchB.wasPressedThisFrame;
 
             if (dx != 0 && _devices.Count > 0)
             {

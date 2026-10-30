@@ -38,43 +38,110 @@ namespace GateRush.Game
         [Tooltip("Moved next to the track's spawn so the line-of-sight pilot stands by the pad.")]
         [SerializeField] private Transform losStand;
 
+        [Header("Track editor")]
+        [SerializeField] private GateRush.TrackEditor.TrackEditorController editor;
+
         private string _appliedQuadId;
+        private bool _testFlying;
 
         public LoadedTrack Track { get; private set; }
+        public bool Editing => editor != null && editor.isActiveAndEnabled && !_testFlying;
 
         private void Start()
         {
             var settings = SaveSystem.Settings;
             ApplySettings(settings);
-            LoadTrack(settings.TrackId);
-            if (views != null) views.Apply((ViewMode)settings.Camera.ViewMode);
             SaveSystem.SettingsChanged += ApplySettings;
             if (radioProvider != null) radioProvider.Changed += OnRadioChanged;
+
+            var edit = GameFlow.TakePendingEdit();
+            if (edit != null && editor != null)
+            {
+                editor.TestFlyRequested += TestFly;
+                editor.ExitRequested += GameFlow.Menu;
+                EnterEditor(edit);
+                return;
+            }
+            if (editor != null) editor.gameObject.SetActive(false);
+            LoadTrack(settings.TrackId);
+            if (views != null) views.Apply((ViewMode)settings.Camera.ViewMode);
         }
 
         private void OnDestroy()
         {
             SaveSystem.SettingsChanged -= ApplySettings;
             if (radioProvider != null) radioProvider.Changed -= OnRadioChanged;
+            SceneSwitcher.MenuOverride = null;
+            if (Time.timeScale == 0f) Time.timeScale = 1f;
         }
 
         private void OnRadioChanged() => ApplySettings(SaveSystem.Settings);
 
+        // ---------- editor / test fly ----------
+
+        private void EnterEditor(TrackData data)
+        {
+            _testFlying = false;
+            SceneSwitcher.MenuOverride = null;
+            UnloadTrack();
+            Time.timeScale = 1f;
+            race.gameObject.SetActive(false);
+            vehicle.gameObject.SetActive(false);
+            if (views != null)
+            {
+                // Stand in the world (line of sight) and let the editor move the rig.
+                views.Apply(ViewMode.LineOfSight);
+                views.enabled = false;
+            }
+            editor.Begin(data);
+            Debug.Log($"[GateRush] Editing track '{data.Name}' ({data.Environment})");
+        }
+
+        private void TestFly(TrackData data)
+        {
+            editor.End();
+            editor.gameObject.SetActive(false);
+            _testFlying = true;
+            vehicle.gameObject.SetActive(true);
+            race.gameObject.SetActive(true);
+            LoadData(data);
+            if (views != null)
+            {
+                views.enabled = true;
+                views.Apply((ViewMode)SaveSystem.Settings.Camera.ViewMode);
+            }
+            // While test-flying, the menu button goes back to the editor instead of the main menu.
+            SceneSwitcher.MenuOverride = () =>
+            {
+                EnterEditor(data);
+                return true;
+            };
+            Debug.Log($"[GateRush] Test-flying '{data.Name}' (menu button returns to the editor)");
+        }
+
+        private void UnloadTrack()
+        {
+            if (Track != null && Track.Root != null) Destroy(Track.Root.gameObject);
+            Track = null;
+        }
+
+        // ---------- racing ----------
+
         private void LoadTrack(string trackId)
         {
-            var entry = tracks.Find(trackId);
-            var data = tracks.Load(entry);
-            if (data == null || data.Environment != environment)
-            {
-                entry = tracks.FirstFor(environment);
-                data = tracks.Load(entry);
-            }
+            var data = GameFlow.Resolve(tracks, trackId);
+            if (data == null || data.Environment != environment) data = tracks.Load(tracks.FirstFor(environment));
             if (data == null)
             {
                 Debug.LogError($"[GateRush] No track available for environment '{environment}'");
                 return;
             }
+            LoadData(data);
+        }
 
+        private void LoadData(TrackData data)
+        {
+            UnloadTrack();
             var errors = data.Validate(trackPrefabs.GateTypes(), trackPrefabs.PropTypes());
             foreach (var e in errors) Debug.LogWarning($"[GateRush] Track '{data.Id}': {e}");
 

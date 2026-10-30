@@ -75,8 +75,10 @@ namespace GateRush.UI
             UiKit.Button(p, "Settings", new Vector2(Margin, y), new Vector2(half, 90f), ShowSettings);
             UiKit.Button(p, "Radio setup", new Vector2(Margin + half + 30f, y), new Vector2(half, 90f), ShowRadio);
             y -= 120f;
-            UiKit.Button(p, "Input diagnostics", new Vector2(Margin, y), new Vector2(half, 90f), () => { CommitIfDirty(); GameFlow.Diagnostics(); });
-            UiKit.Button(p, "Quit", new Vector2(Margin + half + 30f, y), new Vector2(half, 90f), GameFlow.Quit);
+            UiKit.Button(p, "Track editor", new Vector2(Margin, y), new Vector2(half, 90f), ShowEditorHome);
+            UiKit.Button(p, "Input diagnostics", new Vector2(Margin + half + 30f, y), new Vector2(half, 90f), () => { CommitIfDirty(); GameFlow.Diagnostics(); });
+            y -= 120f;
+            UiKit.Button(p, "Quit", new Vector2(Margin, y), new Vector2(half, 90f), GameFlow.Quit);
 
             UiKit.Label(p, "Point with a controller and pull the trigger. In flight, the left menu button returns here.",
                 new Vector2(Margin, -(Height - 100f)), new Vector2(ContentWidth, 60f), 26f, TextAlignmentOptions.MidlineLeft, UiKit.DimTextColor);
@@ -86,16 +88,17 @@ namespace GateRush.UI
         {
             if (_summary == null) return;
             var quad = quads.Find(S.QuadId);
-            var track = tracks.Find(S.TrackId) ?? (tracks.Tracks.Count > 0 ? tracks.Tracks[0] : null);
+            var track = GameFlow.Resolve(tracks, S.TrackId);
+            string trackName = track != null ? track.Name : tracks.Tracks.Count > 0 ? tracks.Tracks[0].DisplayName : "-";
             _summary.text = $"Pilot  <color=#fff>{S.PilotName}</color>\n" +
                             $"Quad   <color=#fff>{(quad != null ? quad.DisplayName : "-")}</color>\n" +
-                            $"Track  <color=#fff>{(track != null ? track.DisplayName : "-")}</color>";
+                            $"Track  <color=#fff>{trackName}</color>";
         }
 
         private void Fly()
         {
             CommitIfDirty();
-            string id = tracks.Find(S.TrackId) != null ? S.TrackId : tracks.Tracks[0].Id;
+            string id = GameFlow.Resolve(tracks, S.TrackId) != null ? S.TrackId : tracks.Tracks[0].Id;
             GameFlow.Race(tracks, id);
         }
 
@@ -129,36 +132,56 @@ namespace GateRush.UI
             BackButton(p);
         }
 
+        private const int TracksPerPage = 5;
+        private int _trackPage;
+
         private void ShowTracks()
         {
             var p = NewPage("Choose track");
             var board = new LocalLeaderboard();
             board.Load(LocalLeaderboard.DefaultPath);
-            float y = -140f;
-            foreach (var t in tracks.Tracks)
+
+            // Built-in tracks first, then your own (newest first).
+            var rows = new System.Collections.Generic.List<(string id, string name, string info)>();
+            foreach (var t in tracks.Tracks) rows.Add((t.Id, t.DisplayName, t.Description));
+            foreach (var u in GateRush.Track.TrackLibrary.Default.LoadAll())
+                rows.Add((u.Id, u.Name, $"Your track: {EnvironmentName(u.Environment)}, {u.Gates.Count} gates, {u.Laps} laps"));
+
+            int pages = Mathf.Max(1, (rows.Count + TracksPerPage - 1) / TracksPerPage);
+            _trackPage = Mathf.Clamp(_trackPage, 0, pages - 1);
+            float y = -130f;
+            for (int i = _trackPage * TracksPerPage; i < rows.Count && i < (_trackPage + 1) * TracksPerPage; i++)
             {
-                var entry = t;
-                var tb = board.Board(entry.Id);
+                var row = rows[i];
+                var tb = board.Board(row.id);
                 string record = tb.BestLap > 0f
                     ? string.Format(CultureInfo.InvariantCulture, "Lap record {0:F2}s ({1})", tb.BestLap, tb.BestLapPilot)
                     : "No lap record yet";
-                var b = UiKit.Button(p, "", new Vector2(Margin, y), new Vector2(ContentWidth - 300f, 170f), () =>
+                var b = UiKit.Button(p, "", new Vector2(Margin, y), new Vector2(ContentWidth - 250f, 125f), () =>
                 {
-                    S.TrackId = entry.Id;
+                    S.TrackId = row.id;
                     _dirty = true;
                     ShowTracks();
                 });
                 var label = b.GetComponentInChildren<TMP_Text>();
                 label.alignment = TextAlignmentOptions.MidlineLeft;
-                label.fontSize = 28f;
-                label.text = $"<size=40><b>{entry.DisplayName}</b></size>   <color=#ffb347>{record}</color>\n<color=#bbb>{entry.Description}</color>";
-                if (entry.Id == S.TrackId) UiKit.SetButtonColor(b, UiKit.SelectedColor);
-                UiKit.Button(p, "Fly", new Vector2(Margin + ContentWidth - 270f, y), new Vector2(270f, 170f), () =>
+                label.fontSize = 26f;
+                label.text = $"<size=36><b>{row.name}</b></size>   <color=#ffb347>{record}</color>\n<color=#bbb>{row.info}</color>";
+                if (row.id == S.TrackId) UiKit.SetButtonColor(b, UiKit.SelectedColor);
+                UiKit.Button(p, "Fly", new Vector2(Margin + ContentWidth - 230f, y), new Vector2(230f, 125f), () =>
                 {
                     CommitIfDirty();
-                    GameFlow.Race(tracks, entry.Id);
-                }, 40f);
-                y -= 190f;
+                    GameFlow.Race(tracks, row.id);
+                }, 38f);
+                y -= 140f;
+            }
+
+            if (pages > 1)
+            {
+                float py = -(Height - 110f);
+                UiKit.Button(p, "<", new Vector2(Width - Margin - 420f, py), new Vector2(90f, 70f), () => { _trackPage = (_trackPage - 1 + pages) % pages; ShowTracks(); });
+                UiKit.Label(p, $"{_trackPage + 1}/{pages}", new Vector2(Width - Margin - 320f, py), new Vector2(120f, 70f), 30f, TextAlignmentOptions.Center);
+                UiKit.Button(p, ">", new Vector2(Width - Margin - 190f, py), new Vector2(90f, 70f), () => { _trackPage = (_trackPage + 1) % pages; ShowTracks(); });
             }
             BackButton(p);
         }

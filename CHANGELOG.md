@@ -1,5 +1,14 @@
 # Changelog
 
+## M7: Track editor (VR), 2026-10-30
+- `GateRush.Track`: `TrackEditModel` (editing ops, snapping, race order, reverse, laps, undo/redo, dirty tracking) and `TrackLibrary` (user tracks as JSON files, unique ids, import of shared files, duplicate built-ins, delete).
+- `GateRush.TrackEditor`: `TrackEditorController` (pointer, select/drag/rotate/scale, add/delete, locomotion + snap turn, wrist panel, save/test-fly/exit, desktop fallback), `TrackEditorView` (gates, props, spawn marker, order labels, course line, selection highlight), `EditorHandle`, `EditorButton`.
+- Scene flow: `GameFlow.Edit` / `Resolve` (built-in or user tracks), edit mode + test fly in `TrackSceneController`, `SceneSwitcher.MenuOverride`.
+- Menu: **Track editor** page (new track per environment, copy a built-in, your tracks with Edit / Fly / Delete, share folder), user tracks in Choose track (paged).
+- Builders: editor object + aim-pose hands + `EditorUI` layer in every track scene.
+- Fixes: stale XR controls guarded with `device.added`; race HUD tolerates an inactive race.
+- 16 new tests (119 total). Play-mode check: new track → add gates/prop → snap/rotate/scale → reorder → save → test fly → back to editor → exit → listed in Choose track → race it.
+- No APK built (user preference).
 ## M6: RC radio + BetaFPV support, 2026-10-30
 - Generic radio path (`GateRush.Input`): `IChannelReader` with `InputSystemChannelReader` (any joystick/HID, canonical channel order, unprocessed values) and `AndroidChannelReader`; `RadioDeviceProvider` (selection, presets, calibrations, hot-plug); `RcRadioSource` (switch arming, absolute mode switch, reset switch); `RadioMapping` math (asymmetric centred axes, full-range throttle, 2/3-position switches); `SwitchArming`.
 - `ControllerPreset` / `ControllerPresetLibrary` + 6 BetaFPV presets (all unverified) built by `PresetBuilder`.

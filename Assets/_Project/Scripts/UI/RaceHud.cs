@@ -57,7 +57,8 @@ namespace GateRush.UI
 
         private void LateUpdate()
         {
-            if (session == null) return;
+            // The race object can be inactive (track editor) before RaceSession.Awake has run.
+            if (session == null || session.Timer == null) return;
             var timer = session.Timer;
             double now = session.Now;
 

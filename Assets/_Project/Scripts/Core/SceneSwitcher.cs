@@ -19,6 +19,12 @@ namespace GateRush.Core
 
         public string MenuScene => menuScene;
 
+        /// <summary>
+        /// Optional handler for the menu button; return true to consume the press (e.g. "back to the editor"
+        /// while test-flying a track). Cleared automatically when its owner scene unloads.
+        /// </summary>
+        public static System.Func<bool> MenuOverride;
+
         private void OnEnable() => InputSystem.onDeviceChange += OnDeviceChange;
         private void OnDisable() => InputSystem.onDeviceChange -= OnDeviceChange;
 
@@ -36,10 +42,13 @@ namespace GateRush.Core
             }
 
             var kb = Keyboard.current;
-            bool pressed = (_menu != null && _menu.wasPressedThisFrame)
+            if (_menu != null && !_menu.device.added) _dirty = true;
+            bool pressed = (_menu != null && _menu.device.added && _menu.wasPressedThisFrame)
                            || (kb != null && (kb.f1Key.wasPressedThisFrame || kb.escapeKey.wasPressedThisFrame))
                            || (Gamepad.current != null && Gamepad.current.rightStickButton.wasPressedThisFrame);
             if (!pressed || SceneManager.GetActiveScene().name == menuScene) return;
+            if (MenuOverride != null && MenuOverride()) return;
+            MenuOverride = null;
             SceneManager.LoadScene(menuScene);
         }
     }

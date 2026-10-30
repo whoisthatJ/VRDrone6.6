@@ -307,7 +307,7 @@ namespace GateRush.Race
             }
             return (Keyboard.current != null && Keyboard.current.tKey.wasPressedThisFrame)
                    || (Gamepad.current != null && Gamepad.current.leftStickButton.wasPressedThisFrame)
-                   || (_touchRestart != null && _touchRestart.wasPressedThisFrame);
+                   || (_touchRestart != null && _touchRestart.device.added && _touchRestart.wasPressedThisFrame);
         }
     }
 }

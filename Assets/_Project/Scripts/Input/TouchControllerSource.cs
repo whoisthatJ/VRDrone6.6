@@ -29,8 +29,8 @@ namespace GateRush.Input
         {
             get
             {
-                if (_dirty) Bind();
-                return _leftStick != null && _rightStick != null;
+                if (_dirty || (_leftStick != null && !_leftStick.device.added) || (_rightStick != null && !_rightStick.device.added)) Bind();
+                return _leftStick != null && _rightStick != null && _leftStick.device.added && _rightStick.device.added;
             }
         }
 

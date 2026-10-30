@@ -1,4 +1,5 @@
 using GateRush.Core;
+using GateRush.Track;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -10,11 +11,38 @@ namespace GateRush.Game
         public const string MenuScene = "Menu";
         public const string DiagnosticsScene = "InputDiagnostics";
 
+        /// <summary>A track handed to the next track scene to open in the editor (consumed on load).</summary>
+        public static TrackData PendingEdit { get; private set; }
+
+        public static TrackData TakePendingEdit()
+        {
+            var t = PendingEdit;
+            PendingEdit = null;
+            return t;
+        }
+
+        /// <summary>Built-in track from the catalog, or a user track from the library.</summary>
+        public static TrackData Resolve(TrackCatalog catalog, string trackId)
+        {
+            if (TrackLibrary.IsUserId(trackId))
+            {
+                try
+                {
+                    return TrackLibrary.Default.Load(trackId);
+                }
+                catch (System.Exception e) when (e is System.IO.IOException || e is System.ArgumentException)
+                {
+                    Debug.LogWarning($"[GateRush] User track '{trackId}' unreadable: {e.Message}");
+                    return null;
+                }
+            }
+            return catalog.Load(catalog.Find(trackId));
+        }
+
         /// <summary>Selects a track, saves the choice and loads its environment scene.</summary>
         public static bool Race(TrackCatalog catalog, string trackId)
         {
-            var entry = catalog.Find(trackId);
-            var data = catalog.Load(entry);
+            var data = Resolve(catalog, trackId);
             if (data == null)
             {
                 Debug.LogWarning($"[GateRush] Unknown track '{trackId}'");
@@ -29,6 +57,21 @@ namespace GateRush.Game
 
             SaveSystem.Settings.TrackId = trackId;
             SaveSystem.Commit();
+            PendingEdit = null;
+            SceneManager.LoadScene(scene);
+            return true;
+        }
+
+        /// <summary>Opens a track (new, user or a copy of a built-in) in the VR track editor.</summary>
+        public static bool Edit(TrackCatalog catalog, TrackData track)
+        {
+            string scene = catalog.SceneFor(track.Environment);
+            if (string.IsNullOrEmpty(scene))
+            {
+                Debug.LogWarning($"[GateRush] No scene for environment '{track.Environment}'");
+                return false;
+            }
+            PendingEdit = track;
             SceneManager.LoadScene(scene);
             return true;
         }
