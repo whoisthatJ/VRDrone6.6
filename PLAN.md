@@ -83,7 +83,7 @@ Tests/EditMode/   Flight model and rates tests
 | M1 ✅ | Flight model (headless) | `QuadSimulator` + rates + PID + mixer + motors + drag; EditMode tests pass (hover equilibrium, rate step response, rates math matches the Betaflight formula, determinism) |
 | M2 ✅ | Flyable in editor | Flat test field, quad flies with gamepad/keyboard in Acro and Angle, FPV camera with tilt; debug overlay of rates and motors |
 | M3 ✅ (headset check pending) | Quest + VR views | Goggles mode, LOS mode, Immersive mode; Touch controller Mode 2 mapping; arming switch; stable 72/90 fps |
-| M4 | Racing | Gate prefabs (standard race-gate sizes), checkpoints, lap timer, 3-lap race, results, best lap + ghost replay, local leaderboard |
+| M4 ✅ | Racing | Gate prefabs (standard race-gate sizes), checkpoints, lap timer, 3-lap race, results, best lap + ghost replay, local leaderboard |
 | M5 | Content + settings | 3 quad classes (5" race, 5" freestyle, whoop), 3 tracks (indoor hangar, outdoor field, industrial), rates/camera/physics settings UI, save/load |
 | M6 | RC radio + **BetaFPV** support | Generic HID joystick over USB-C OTG and Bluetooth; diagnostics screen (✅ moved to M3); calibration wizard; BetaFPV presets (LR2 SIM, LR3, LR4 USB/BT) auto-applied by device name; Android axis fallback plugin; hot-plug handling; on headset: an LR2 SIM (USB) and an LR4 (Bluetooth) can arm and fly a full lap |
 | M7 | Track editor (VR) | Place, rotate and scale gates with controllers, snap, set checkpoint order, save/load JSON, share by file |
@@ -134,6 +134,15 @@ Tests/EditMode/   Flight model and rates tests
 | 2026-10-30 | Immersive view moves the XR Origin each `LateUpdate` so the head sits on the drone with uptilt; vignette is a camera-attached transparent URP Unlit quad with a generated radial mask (no post-processing) | §6 budget: no post in the eye buffer |
 | 2026-10-30 | Without an XR device (Editor), Goggles/Immersive show the drone camera on the main display and LOS uses the rig camera looking at the quad | Desktop testing |
 | 2026-10-30 | APK builds are started with `BuildScript.BuildQuestDeferred()` (via MCP eval) and report to `Builds/build-result.txt` | The CLI build can't run while the Editor has the project open, and a blocking eval would time out |
+| 2026-10-30 | Race rules: gate 0 is start/finish; after GO the pilot flies gate 0 (holeshot), 1 … N-1, then 0 again = lap. Lap 1 runs from GO (includes the launch). Wrong gates don't count and show "MISSED GATE"; the pilot must go back | Common timing convention; simple to explain |
+| 2026-10-30 | Gate timing uses the sim position each frame, a segment-vs-opening test in the gate's forward direction, and interpolates the crossing time inside the frame | Accurate to well under a frame without trigger colliders (the quad isn't a Rigidbody) |
+| 2026-10-30 | Gate sizes: `Square` 1.52 m (5 ft, the common race-gate opening), `Large` 2 m, `Hurdle` 3 × 1.5 m open-bottom. Prefabs built from code (`GateBuilder`) into `Prefabs/Gates/`; frames collide (TrackGeometry). Next gate green, the one after orange | Original geometry, standard sizes |
+| 2026-10-30 | Start: arming on the pad starts a 3-2-1 countdown with the quad held (`QuadVehicle.HoldAtSpawn`); disarming cancels. Crash/reset mid-race respawns 2.5 m before the last gate passed, held until re-armed + throttle > 0.12; the clock keeps running | Comfort countdown from §2; no free time for crashes |
+| 2026-10-30 | Ghosts: the best lap is recorded at 30 Hz (preallocated, no GC) and replayed from the start of each lap; best ghost per track + quad saved to `persistentDataPath/ghosts/*.ghost` (binary) | Local first, as planned |
+| 2026-10-30 | Local leaderboard: top 10 races per track by total time + the track lap record, JSON at `persistentDataPath/leaderboard.json`. Pilot name is "Pilot" until the M5 settings | §1 local leaderboard first |
+| 2026-10-30 | Race HUD lives on the OSD canvas (drone camera), so it shows in Goggles view and on the desktop; Immersive/LOS don't show it yet (world/head-locked HUD planned for M8) | Keep M4 scope |
+| 2026-10-30 | Restart race: T / gamepad left-stick click / left Touch stick click | Free buttons |
+| 2026-10-30 | `RaceAutopilot` (Angle mode, drives a `ScriptedInputSource`) for automated race smoke tests and a future attract/demo mode. It's not precise enough for 1.52 m gates every lap: the M4 smoke test scaled the gates 2.5× | Tooling, not gameplay |
 | 2026-10-30 | Unity CLI is 1.0.0-beta.6 and not signed in (license is active). It wasn't needed: the live Editor is driven through the Unity Editor MCP | — |
 
 ## 9. Notes for tuning

@@ -119,7 +119,7 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1 &1406752025
+--- !u!1 &371963349
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -127,11 +127,11 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 1406752030}
-  - component: {fileID: 1406752029}
-  - component: {fileID: 1406752028}
-  - component: {fileID: 1406752027}
-  - component: {fileID: 1406752026}
+  - component: {fileID: 371963354}
+  - component: {fileID: 371963353}
+  - component: {fileID: 371963352}
+  - component: {fileID: 371963351}
+  - component: {fileID: 371963350}
   m_Layer: 0
   m_Name: App
   m_TagString: Untagged
@@ -139,13 +139,13 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1406752026
+--- !u!114 &371963350
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1406752025}
+  m_GameObject: {fileID: 371963349}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b879abd6632b69a478c550b474bdb947, type: 3}
@@ -153,26 +153,26 @@ MonoBehaviour:
   m_EditorClassIdentifier: GateRush.Core::GateRush.Core.SceneSwitcher
   flightScene: Track_TestField
   diagnosticsScene: InputDiagnostics
---- !u!114 &1406752027
+--- !u!114 &371963351
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1406752025}
+  m_GameObject: {fileID: 371963349}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 40b5f521d9846254a8a336035e2afd8c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: GateRush.Core::GateRush.Core.PerfLogger
   intervalSeconds: 5
---- !u!114 &1406752028
+--- !u!114 &371963352
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1406752025}
+  m_GameObject: {fileID: 371963349}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 61bca5332c00123469379d6371d9f153, type: 3}
@@ -180,26 +180,26 @@ MonoBehaviour:
   m_EditorClassIdentifier: GateRush.Core::GateRush.Core.XrDisplayConfig
   targetRefreshRate: 72
   foveationLevel: 1
---- !u!114 &1406752029
+--- !u!114 &371963353
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1406752025}
+  m_GameObject: {fileID: 371963349}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e435c5c6d98419940ae8a04b1ffe19df, type: 3}
   m_Name: 
   m_EditorClassIdentifier: GateRush.Core::GateRush.Core.AppBootstrap
   firstScene: Track_TestField
---- !u!4 &1406752030
+--- !u!4 &371963354
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1406752025}
+  m_GameObject: {fileID: 371963349}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
@@ -212,4 +212,4 @@ Transform:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
-  - {fileID: 1406752030}
+  - {fileID: 371963354}

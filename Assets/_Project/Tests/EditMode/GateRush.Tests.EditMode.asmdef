@@ -4,6 +4,7 @@
     "references": [
         "GateRush.Flight",
         "GateRush.Input",
+        "GateRush.Race",
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner"
     ],

@@ -1,5 +1,6 @@
 using GateRush.Cameras;
 using GateRush.Input;
+using GateRush.Race;
 using GateRush.UI;
 using GateRush.Vehicle;
 using TMPro;
@@ -61,8 +62,11 @@ namespace GateRush.EditorTools.Builders
             srcs.GetArrayElementAtIndex(1).objectReferenceValue = touch;
             rso.ApplyModifiedPropertiesWithoutUndo();
 
+            GateBuilder.BuildAll();
+            var race = BuildRace(quad, spawn, track.transform, mats);
+
             var fpv = quad.GetComponentInChildren<FpvCamera>();
-            BuildOverlay(quad, fpv.GetComponent<Camera>());
+            BuildOverlay(quad, fpv.GetComponent<Camera>(), race);
             BuildViews(quad, fpv, mats, roomLayer, quadLayer);
 
             EditorSceneManager.SaveScene(scene, ScenePath);
@@ -88,33 +92,109 @@ namespace GateRush.EditorTools.Builders
             for (int x = -4; x <= 4; x++)
             for (int z = -4; z <= 4; z++)
             {
-                if (x == 0 && z <= 1 && z >= -1) continue;
                 float h = 3f + (float)rng.NextDouble() * 9f;
                 var pos = new Vector3(x * 25f + (float)rng.NextDouble() * 8f - 4f, h * 0.5f, z * 25f + (float)rng.NextDouble() * 8f - 4f);
+                // Keep the race line clear.
+                if (NearCourse(pos, 9f)) continue;
                 Box(parent, $"Pillar {x},{z}", pos, new Vector3(1.2f, h, 1.2f), mats.Pillar, layer);
             }
 
-            // Simple 1.5 m square arches as fly-through references (real race gates come in M4).
-            for (int i = 0; i < 6; i++)
-            {
-                float angle = i * 60f * Mathf.Deg2Rad;
-                var centre = new Vector3(Mathf.Sin(angle) * 40f, 0f, Mathf.Cos(angle) * 40f + 10f);
-                var rot = Quaternion.Euler(0f, i * 60f + 90f, 0f);
-                Arch(parent, $"Arch {i}", centre, rot, 1.5f, mats.Accent, layer);
-            }
         }
 
-        private static void Arch(Transform parent, string name, Vector3 basePos, Quaternion rot, float opening, Material mat, int layer)
+        // ---------- race course ----------
+
+        private struct CourseGate
         {
-            var root = new GameObject(name).transform;
-            root.SetParent(parent, false);
-            root.SetPositionAndRotation(basePos, rot);
-            const float t = 0.1f;
-            float half = opening * 0.5f + t * 0.5f;
-            Box(root, "Left", new Vector3(-half, opening * 0.5f + 0.5f, 0f), new Vector3(t, opening + 1f, t), mat, layer, true);
-            Box(root, "Right", new Vector3(half, opening * 0.5f + 0.5f, 0f), new Vector3(t, opening + 1f, t), mat, layer, true);
-            Box(root, "Top", new Vector3(0f, opening + 1f + t * 0.5f, 0f), new Vector3(opening + 2f * t, t, t), mat, layer, true);
-            Box(root, "Bottom", new Vector3(0f, 1f - t * 0.5f, 0f), new Vector3(opening + 2f * t, t, t), mat, layer, true);
+            public Vector3 Position;
+            public GateKind Kind;
+            public CourseGate(float x, float y, float z, GateKind kind) { Position = new Vector3(x, y, z); Kind = kind; }
+        }
+
+        // ~285 m loop. Gate 0 is start/finish, straight ahead of the pad. Gate 2 floats 3 m up.
+        private static readonly CourseGate[] Course =
+        {
+            new CourseGate(0f, 0f, 14f, GateKind.Square),
+            new CourseGate(22f, 0f, 45f, GateKind.Square),
+            new CourseGate(55f, 3f, 62f, GateKind.Square),
+            new CourseGate(88f, 0f, 42f, GateKind.Hurdle),
+            new CourseGate(82f, 0f, 2f, GateKind.Large),
+            new CourseGate(52f, 0f, -26f, GateKind.Square),
+            new CourseGate(16f, 0f, -32f, GateKind.Large),
+            new CourseGate(-18f, 0f, -12f, GateKind.Square),
+        };
+
+        /// <summary>True if p (XZ) is within <paramref name="clearance"/> of the course line or the pad.</summary>
+        private static bool NearCourse(Vector3 p, float clearance)
+        {
+            var q = new Vector2(p.x, p.z);
+            if (q.magnitude < clearance) return true;
+            for (int i = 0; i < Course.Length; i++)
+            {
+                var a = new Vector2(Course[i].Position.x, Course[i].Position.z);
+                var b = new Vector2(Course[(i + 1) % Course.Length].Position.x, Course[(i + 1) % Course.Length].Position.z);
+                var ab = b - a;
+                float t = Mathf.Clamp01(Vector2.Dot(q - a, ab) / ab.sqrMagnitude);
+                if (Vector2.Distance(q, a + ab * t) < clearance) return true;
+            }
+            return false;
+        }
+
+        private static Gate[] BuildCourse(Transform parent)
+        {
+            var gates = new Gate[Course.Length];
+            for (int i = 0; i < Course.Length; i++)
+            {
+                var c = Course[i];
+                Vector3 heading = i == 0
+                    ? Vector3.forward
+                    : Course[(i + 1) % Course.Length].Position - Course[i - 1].Position;
+                heading.y = 0f;
+
+                var go = (GameObject)PrefabUtility.InstantiatePrefab(GateBuilder.Load(c.Kind), parent);
+                go.name = $"Gate {i} ({c.Kind})";
+                go.transform.SetPositionAndRotation(c.Position, Quaternion.LookRotation(heading.normalized, Vector3.up));
+                gates[i] = go.GetComponent<Gate>();
+            }
+            return gates;
+        }
+
+        private static RaceSession BuildRace(QuadVehicle quad, Transform startPad, Transform track, Materials mats)
+        {
+            var gates = BuildCourse(track);
+
+            var raceGo = new GameObject("Race");
+            var ghosts = raceGo.AddComponent<GhostSystem>();
+            var ghostVisual = BuildGhostVisual(mats);
+            var gso = new SerializedObject(ghosts);
+            gso.FindProperty("ghostVisual").objectReferenceValue = ghostVisual;
+            gso.ApplyModifiedPropertiesWithoutUndo();
+
+            var session = raceGo.AddComponent<RaceSession>();
+            var so = new SerializedObject(session);
+            so.FindProperty("vehicle").objectReferenceValue = quad;
+            so.FindProperty("ghosts").objectReferenceValue = ghosts;
+            so.FindProperty("startPad").objectReferenceValue = startPad;
+            so.FindProperty("trackId").stringValue = "Test Field";
+            var arr = so.FindProperty("gates");
+            arr.arraySize = gates.Length;
+            for (int i = 0; i < gates.Length; i++) arr.GetArrayElementAtIndex(i).objectReferenceValue = gates[i];
+            so.ApplyModifiedPropertiesWithoutUndo();
+            return session;
+        }
+
+        /// <summary>A see-through copy of the quad's silhouette for ghost replays (visible in FPV, no colliders).</summary>
+        private static Transform BuildGhostVisual(Materials mats)
+        {
+            var root = new GameObject("Ghost Quad").transform;
+            Part(root, PrimitiveType.Cube, "Body", Vector3.zero, new Vector3(0.06f, 0.04f, 0.16f), Quaternion.identity, mats.Ghost);
+            Part(root, PrimitiveType.Cube, "Arm A", Vector3.zero, new Vector3(0.03f, 0.01f, 0.26f), Quaternion.Euler(0f, 45f, 0f), mats.Ghost);
+            Part(root, PrimitiveType.Cube, "Arm B", Vector3.zero, new Vector3(0.03f, 0.01f, 0.26f), Quaternion.Euler(0f, -45f, 0f), mats.Ghost);
+            for (int i = 0; i < 4; i++)
+            {
+                var p = GateRush.Flight.Mixer.MotorPosition(i, 0.078f, 0.078f);
+                Part(root, PrimitiveType.Cylinder, $"Prop {i}", new Vector3(p.x, 0.02f, p.z), new Vector3(0.13f, 0.002f, 0.13f), Quaternion.identity, mats.Ghost);
+            }
+            return root;
         }
 
         private static GameObject Box(Transform parent, string name, Vector3 pos, Vector3 size, Material mat, int layer, bool local = false)
@@ -260,7 +340,7 @@ namespace GateRush.EditorTools.Builders
             iso.ApplyModifiedPropertiesWithoutUndo();
         }
 
-        private static void BuildOverlay(QuadVehicle quad, Camera fpvCamera)
+        private static void BuildOverlay(QuadVehicle quad, Camera fpvCamera, RaceSession race)
         {
             var canvasGo = new GameObject("Debug Overlay", typeof(Canvas), typeof(CanvasScaler));
             var canvas = canvasGo.GetComponent<Canvas>();
@@ -288,6 +368,52 @@ namespace GateRush.EditorTools.Builders
             bars.arraySize = 4;
             string[] names = { "RR", "FR", "RL", "FL" };
             for (int i = 0; i < 4; i++) bars.GetArrayElementAtIndex(i).objectReferenceValue = MotorBar(canvasGo.transform, i, names[i]);
+            so.ApplyModifiedPropertiesWithoutUndo();
+
+            BuildRaceHud(canvasGo.transform, race);
+        }
+
+        private static void BuildRaceHud(Transform canvas, RaceSession race)
+        {
+            var lap = Label(canvas, "Lap Info", 0, 28);
+            var lrt = (RectTransform)lap.transform;
+            lrt.anchorMin = lrt.anchorMax = lrt.pivot = new Vector2(1f, 1f);
+            lrt.anchoredPosition = new Vector2(-24f, -20f);
+            lrt.sizeDelta = new Vector2(700f, 80f);
+            lap.alignment = TextAlignmentOptions.TopRight;
+
+            var centre = Label(canvas, "Centre", 0, 72);
+            var crt = (RectTransform)centre.transform;
+            crt.anchorMin = crt.anchorMax = crt.pivot = new Vector2(0.5f, 0.5f);
+            crt.anchoredPosition = new Vector2(0f, 160f);
+            crt.sizeDelta = new Vector2(1400f, 120f);
+            centre.alignment = TextAlignmentOptions.Center;
+            centre.fontStyle = FontStyles.Bold;
+            centre.text = "";
+
+            var panel = new GameObject("Results", typeof(RectTransform), typeof(Image));
+            panel.transform.SetParent(canvas, false);
+            var prt = (RectTransform)panel.transform;
+            prt.anchorMin = prt.anchorMax = prt.pivot = new Vector2(0.5f, 0.5f);
+            prt.anchoredPosition = new Vector2(0f, -110f);
+            prt.sizeDelta = new Vector2(1200f, 470f);
+            panel.GetComponent<Image>().color = new Color(0f, 0f, 0f, 0.6f);
+            var results = Label(panel.transform, "Results Text", 0, 26);
+            var rrt = (RectTransform)results.transform;
+            rrt.anchorMin = Vector2.zero;
+            rrt.anchorMax = Vector2.one;
+            rrt.offsetMin = new Vector2(30f, 20f);
+            rrt.offsetMax = new Vector2(-30f, -20f);
+            results.alignment = TextAlignmentOptions.TopLeft;
+            panel.SetActive(false);
+
+            var hud = canvas.gameObject.AddComponent<RaceHud>();
+            var so = new SerializedObject(hud);
+            so.FindProperty("session").objectReferenceValue = race;
+            so.FindProperty("lapInfo").objectReferenceValue = lap;
+            so.FindProperty("centre").objectReferenceValue = centre;
+            so.FindProperty("resultsPanel").objectReferenceValue = panel;
+            so.FindProperty("resultsText").objectReferenceValue = results;
             so.ApplyModifiedPropertiesWithoutUndo();
         }
 
@@ -350,7 +476,7 @@ namespace GateRush.EditorTools.Builders
 
         private struct Materials
         {
-            public Material Ground, Pillar, Accent, Frame, PropFront, PropRear, Screen, Vignette;
+            public Material Ground, Pillar, Accent, Frame, PropFront, PropRear, Screen, Vignette, Ghost, GateFrame;
         }
 
         private static DataAssets EnsureDataAssets(int trackMask)
@@ -405,6 +531,9 @@ namespace GateRush.EditorTools.Builders
                 PropRear = Mat("PropRear", new Color(0.15f, 0.15f, 0.15f)),
                 Screen = UnlitMat("GogglesScreen", Color.white, false),
                 Vignette = UnlitMat("Vignette", Color.black, true),
+                Ghost = UnlitMat("Ghost", new Color(0.3f, 0.85f, 1f, 0.35f), true),
+                // Lit, colour driven per gate state by Gate.SetVisualState.
+                GateFrame = Mat("GateFrame", new Color(0.55f, 0.55f, 0.6f)),
             };
         }
 

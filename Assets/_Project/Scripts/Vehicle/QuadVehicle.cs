@@ -48,6 +48,12 @@ namespace GateRush.Vehicle
             set => spawnPoint = value;
         }
 
+        /// <summary>
+        /// While true the quad is pinned to its spawn point (motors follow arming, but nothing moves).
+        /// Used for the start countdown and for checkpoint respawns in the air.
+        /// </summary>
+        public bool HoldAtSpawn { get; set; }
+
         private void Awake()
         {
             ApplyProfile();
@@ -107,6 +113,12 @@ namespace GateRush.Vehicle
                 return;
             }
 
+            if (HoldAtSpawn)
+            {
+                Hold(pilot.Arm);
+                return;
+            }
+
             QuadSimulator.Advance(ref _state, pilot, _profile, _env, ref _accumulator, Time.deltaTime, ref _collision);
 
             if (_state.Position.y < _collision.Settings.OutOfBoundsY) _collision.Crashed = true;
@@ -124,6 +136,23 @@ namespace GateRush.Vehicle
             }
 
             ApplyPose(Mathf.Clamp01(_accumulator / _env.FixedStep));
+        }
+
+        private void Hold(bool armed)
+        {
+            Transform t = spawnPoint != null ? spawnPoint : transform;
+            _state.Position = CollisionHook.FromUnity(t.position);
+            _state.Orientation = CollisionHook.FromUnity(t.rotation);
+            _state.Velocity = Vec3.Zero;
+            _state.AngularVelocity = Vec3.Zero;
+            _state.Pid = default;
+            _state.Armed = armed;
+            float idle = armed ? _profile.Motors.IdleFraction : 0f;
+            for (int i = 0; i < 4; i++) _state.MotorSpeed[i] = idle;
+            _collision.PrevPosition = _state.Position;
+            _collision.PrevOrientation = _state.Orientation;
+            _accumulator = 0f;
+            ApplyPose(1f);
         }
 
         private void ApplyPose(float alpha)

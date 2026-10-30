@@ -1,5 +1,12 @@
 # Changelog
 
+## M4: Racing, 2026-10-30
+- `GateRush.Race`: `LapTimer` (checkpoint order, holeshot, laps, best lap), `GateCrossing` (forward segment-through-opening test with sub-frame fraction), `Gate` (opening, respawn pose, next/upcoming colours), `RaceSession` (countdown, hold, checkpoint respawn, finish, leaderboard), `GhostTrack` + `GhostSystem` (record/replay/save best lap), `LocalLeaderboard` (top 10 per track + lap record, JSON), `RaceAutopilot` (test pilot).
+- `QuadVehicle.HoldAtSpawn` for the countdown and mid-air checkpoint respawns.
+- Gate prefabs (Square 1.52 m, Large 2 m, Hurdle 3 × 1.5 m) and an 8-gate, ~285 m course on the test field (one floating gate); pillars kept off the race line.
+- `RaceHud`: lap counter, lap/total/best times, countdown, GO, missed gate, lap flash (green on a personal best), results with leaderboard.
+- 18 new tests (lap timing/order, crossing, leaderboard, ghost serialization): 50 total.
+- Play-mode check: an autopilot flew a full 3-lap race (gates scaled 2.5×), producing lap times, the best-lap ghost file, leaderboard rank #1 and the results screen. Race, HUD, ghost and vehicle updates measured at 0 bytes allocated per frame.
 ## M3: Quest + VR views, 2026-10-30
 - VR views (`GateRush.Cameras`): `ViewModeManager` (Goggles / Immersive / Line-of-sight, desktop fallback), `GogglesScreen` (curved mono screen, smooth head-follow or fixed, recentre), `ComfortVignette` (rate-based), `ViewModeInput` (Y / V / LB).
 - `TouchControllerSource` (Mode 2, spring-centre hover assist or trigger throttle), `VehicleInputRouter` (priority-based source selection).

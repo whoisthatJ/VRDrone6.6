@@ -8,6 +8,7 @@
         "GateRush.Vehicle",
         "GateRush.Cameras",
         "GateRush.UI",
+        "GateRush.Race",
         "Unity.TextMeshPro",
         "UnityEngine.UI",
         "Unity.InputSystem",

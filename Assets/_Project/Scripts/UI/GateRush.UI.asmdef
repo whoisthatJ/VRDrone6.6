@@ -6,6 +6,7 @@
         "GateRush.Vehicle",
         "GateRush.Input",
         "GateRush.Core",
+        "GateRush.Race",
         "Unity.InputSystem",
         "Unity.TextMeshPro",
         "UnityEngine.UI"

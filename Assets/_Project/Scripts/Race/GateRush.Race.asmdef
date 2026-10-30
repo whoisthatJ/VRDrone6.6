@@ -1,0 +1,19 @@
+{
+    "name": "GateRush.Race",
+    "rootNamespace": "GateRush.Race",
+    "references": [
+        "GateRush.Flight",
+        "GateRush.Input",
+        "GateRush.Vehicle",
+        "Unity.InputSystem"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
