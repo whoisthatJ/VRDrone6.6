@@ -1,0 +1,17 @@
+{
+    "name": "GateRush.Vehicle",
+    "rootNamespace": "GateRush.Vehicle",
+    "references": [
+        "GateRush.Flight",
+        "GateRush.Input"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

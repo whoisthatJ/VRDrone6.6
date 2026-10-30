@@ -81,7 +81,7 @@ Tests/EditMode/   Flight model and rates tests
 |---|---|---|
 | M0 ✅ (headset check pending) | Project bootstrap | Unity 6 URP project, Meta Quest profile, OpenXR + Meta XR Core, Project Setup Tool clean, git + LFS, blank scene runs at 72 Hz on headset |
 | M1 ✅ | Flight model (headless) | `QuadSimulator` + rates + PID + mixer + motors + drag; EditMode tests pass (hover equilibrium, rate step response, rates math matches the Betaflight formula, determinism) |
-| M2 | Flyable in editor | Flat test field, quad flies with gamepad/keyboard in Acro and Angle, FPV camera with tilt; debug overlay of rates and motors |
+| M2 ✅ | Flyable in editor | Flat test field, quad flies with gamepad/keyboard in Acro and Angle, FPV camera with tilt; debug overlay of rates and motors |
 | M3 | Quest + VR views | Goggles mode, LOS mode, Immersive mode; Touch controller Mode 2 mapping; arming switch; stable 72/90 fps |
 | M4 | Racing | Gate prefabs (standard race-gate sizes), checkpoints, lap timer, 3-lap race, results, best lap + ghost replay, local leaderboard |
 | M5 | Content + settings | 3 quad classes (5" race, 5" freestyle, whoop), 3 tracks (indoor hangar, outdoor field, industrial), rates/camera/physics settings UI, save/load |
@@ -120,6 +120,12 @@ Tests/EditMode/   Flight model and rates tests
 | 2026-10-30 | Sim axes use Unity's convention (X right, Y up, Z forward, left-handed). Body rates: X = pitch (nose down +), Y = yaw (right +), Z = roll (left +). Motor order is Betaflight Quad-X, props-in | No conversion in the bridge |
 | 2026-10-30 | `QuadSimulator.Step` has an overload taking `PhysicsSettings`; the 4-argument signature uses `PhysicsSettings.Default` | Keeps the requested signature while allowing gravity/step to be tuned |
 | 2026-10-30 | EditMode tests run inside the open Editor through `GateRush.EditorTools.TestRunnerBridge` (writes `TestResults/editmode.xml`, JUnit) | `unity test` starts a batchmode Editor, which can't open a project that's already open. `unity test` still works when the Editor is closed |
+| 2026-10-30 | Camera code uses namespace/assembly `GateRush.Cameras` (folder stays `Scripts/Camera/`) | A `GateRush.Camera` namespace would shadow `UnityEngine.Camera` inside every `GateRush.*` namespace |
+| 2026-10-30 | Collisions run through a generic `IStepHook` struct passed to `QuadSimulator.Advance<THook>` (`Vehicle/CollisionHook`): one sphere cast per 1 ms sub-step against layer `TrackGeometry` (8), restitution + Coulomb friction, crash above 7 m/s normal impact or below y = -20, respawn after 1.5 s | Keeps collisions out of the engine-free sim without allocating delegates |
+| 2026-10-30 | The pilot's own quad visuals are on layer `LocalQuad` (9), hidden from the FPV camera | Props filled the corners of a 120° view. LOS/spectator cameras will still render it |
+| 2026-10-30 | Arming: Space/Start toggles, only with throttle ≤ 0.05; mode cycles Acro → Angle → Horizon (M / Select). Keyboard throttle ramps with W/S | Matches radio habits; keyboard is only an editor convenience |
+| 2026-10-30 | Gamepad throttle defaults to spring-centre = hover (`ThrottleMapping.SpringCenterHover`); trigger and direct mappings available | §7 risk on spring-centred sticks |
+| 2026-10-30 | `ScriptedInputSource` drives automated play-mode smoke tests through the Unity MCP | Simulated keyboard events from the MCP only reach the Editor's input state, not the player loop, while the Editor window is unfocused |
 | 2026-10-30 | Unity CLI is 1.0.0-beta.6 and not signed in (license is active). It wasn't needed: the live Editor is driven through the Unity Editor MCP | — |
 
 ## 9. Notes for tuning

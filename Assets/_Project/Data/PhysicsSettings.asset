@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 02fce85ed50f61d4ba51d090bcba7b59, type: 3}
+  m_Name: PhysicsSettings
+  m_EditorClassIdentifier: GateRush.Vehicle::GateRush.Vehicle.PhysicsSettingsAsset
+  Simulation:
+    Gravity: 9.81
+    FixedStep: 0.001
+    MaxSubSteps: 16
+  Collision:
+    Radius: 0.12
+    Restitution: 0.3
+    Friction: 0.6
+    CrashSpeed: 7
+    MinBounceSpeed: 1
+    AngularDamping: 0.5
+    RespawnDelay: 1.5
+    OutOfBoundsY: -20
+    TrackGeometry:
+      serializedVersion: 2
+      m_Bits: 256

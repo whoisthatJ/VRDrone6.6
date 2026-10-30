@@ -1,0 +1,83 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 63a57d5e8701c864f9bed683e7db753f, type: 3}
+  m_Name: Race5
+  m_EditorClassIdentifier: GateRush.Vehicle::GateRush.Vehicle.QuadProfileAsset
+  Profile:
+    Name: 5" Race
+    Mass: 0.65
+    Inertia:
+      x: 0.002
+      y: 0.0035
+      z: 0.002
+    ArmX: 0.078
+    ArmZ: 0.078
+    Motors:
+      MaxThrustPerMotor: 15.7
+      YawTorquePerThrust: 0.016
+      TimeConstantUp: 0.03
+      TimeConstantDown: 0.04
+      IdleFraction: 0.05
+      PropPitchSpeed: 55
+      ThrottleCurveExpo: 1
+    Aero:
+      LinearDrag:
+        x: 0.05
+        y: 0.05
+        z: 0.05
+      QuadraticDrag:
+        x: 0.02
+        y: 0.04
+        z: 0.016
+      AngularDrag:
+        x: 0.0004
+        y: 0.0004
+        z: 0.0004
+    Pid:
+      Pitch:
+        P: 0.03
+        I: 0.1
+        D: 0.0004
+        FF: 0
+      Yaw:
+        P: 0.15
+        I: 0.3
+        D: 0
+        FF: 0
+      Roll:
+        P: 0.03
+        I: 0.1
+        D: 0.0004
+        FF: 0
+      ITermLimit: 0.15
+      DTermLowpassHz: 100
+      OutputLimit: 1
+      AirMode: 1
+      LowThrottleCutoff: 0.05
+    AngleMode:
+      MaxAngleDeg: 55
+      AngleGain: 10
+      MaxOuterRateDegPerSec: 400
+    Rates:
+      Type: 0
+      Roll:
+        RcRate: 1
+        Rate: 0.7
+        Expo: 0
+      Pitch:
+        RcRate: 1
+        Rate: 0.7
+        Expo: 0
+      Yaw:
+        RcRate: 1
+        Rate: 0.7
+        Expo: 0

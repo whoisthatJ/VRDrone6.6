@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6353329ff249e3647a62382580830db1, type: 3}
+  m_Name: Default_Betaflight
+  m_EditorClassIdentifier: GateRush.Vehicle::GateRush.Vehicle.RateProfileAsset
+  Rates:
+    Type: 0
+    Roll:
+      RcRate: 1
+      Rate: 0.7
+      Expo: 0
+    Pitch:
+      RcRate: 1
+      Rate: 0.7
+      Expo: 0
+    Yaw:
+      RcRate: 1
+      Rate: 0.7
+      Expo: 0

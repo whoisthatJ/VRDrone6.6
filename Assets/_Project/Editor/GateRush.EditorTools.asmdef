@@ -4,6 +4,12 @@
     "references": [
         "GateRush.Flight",
         "GateRush.Core",
+        "GateRush.Input",
+        "GateRush.Vehicle",
+        "GateRush.Cameras",
+        "GateRush.UI",
+        "Unity.TextMeshPro",
+        "UnityEngine.UI",
         "Unity.InputSystem",
         "Unity.XR.CoreUtils",
         "Unity.XR.Management",

@@ -1,0 +1,17 @@
+{
+    "name": "GateRush.Cameras",
+    "rootNamespace": "GateRush.Cameras",
+    "references": [
+        "GateRush.Flight",
+        "GateRush.Vehicle"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

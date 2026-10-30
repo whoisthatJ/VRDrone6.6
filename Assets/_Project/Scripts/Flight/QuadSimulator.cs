@@ -75,16 +75,34 @@ namespace GateRush.Flight
         public static int Advance(ref QuadState s, in PilotInput input, in QuadProfile p, in PhysicsSettings env,
             ref float accumulator, float frameDt)
         {
+            var none = new NoHook();
+            return Advance(ref s, input, p, env, ref accumulator, frameDt, ref none);
+        }
+
+        /// <summary>
+        /// As <see cref="Advance(ref QuadState, in PilotInput, in QuadProfile, in PhysicsSettings, ref float, float)"/>,
+        /// calling <paramref name="hook"/> after every sub-step (e.g. for collisions). Generic struct hook: no allocations.
+        /// </summary>
+        public static int Advance<THook>(ref QuadState s, in PilotInput input, in QuadProfile p, in PhysicsSettings env,
+            ref float accumulator, float frameDt, ref THook hook) where THook : struct, IStepHook
+        {
             accumulator += frameDt;
             int steps = 0;
             while (accumulator >= env.FixedStep && steps < env.MaxSubSteps)
             {
+                QuadState prev = s;
                 Step(ref s, input, p, env, env.FixedStep);
                 accumulator -= env.FixedStep;
                 steps++;
+                if (!hook.AfterStep(ref s, prev, env.FixedStep)) break;
             }
             if (steps == env.MaxSubSteps && accumulator > env.FixedStep) accumulator = 0f;
             return steps;
+        }
+
+        private struct NoHook : IStepHook
+        {
+            public bool AfterStep(ref QuadState s, in QuadState previous, float dt) => true;
         }
 
         /// <summary>Rate setpoint in body axes (rad/s) for the current flight mode.</summary>

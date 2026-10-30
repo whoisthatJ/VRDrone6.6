@@ -3,6 +3,7 @@
     "rootNamespace": "GateRush.Tests",
     "references": [
         "GateRush.Flight",
+        "GateRush.Input",
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner"
     ],
