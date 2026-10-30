@@ -16,6 +16,12 @@ namespace GateRush.Input
 
         private float _kbThrottle, _kbYaw, _kbPitch, _kbRoll;
 
+        public ThrottleMapping GamepadThrottle
+        {
+            get => gamepadThrottle;
+            set => gamepadThrottle = value;
+        }
+
         public override bool IsConnected => Gamepad.current != null || Keyboard.current != null;
 
         public override int Priority => Gamepad.current != null ? 20 : 1;

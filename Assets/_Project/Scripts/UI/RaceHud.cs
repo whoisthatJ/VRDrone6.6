@@ -123,7 +123,7 @@ namespace GateRush.UI
             sb.AppendLine();
 
             var board = session.Board;
-            sb.AppendLine(Inv($"<b>{board.TrackId}</b>   lap record {board.BestLap:F2} ({board.BestLapPilot})"));
+            sb.AppendLine(Inv($"<b>{session.TrackName}</b>   lap record {board.BestLap:F2} ({board.BestLapPilot})"));
             int shown = Mathf.Min(5, board.Entries.Count);
             for (int i = 0; i < shown; i++)
             {

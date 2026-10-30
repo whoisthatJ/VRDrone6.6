@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bf2426122a92b6a479c7c4056bec270e, type: 3}
+  m_Name: TrackCatalog
+  m_EditorClassIdentifier: GateRush.Game::GateRush.Game.TrackCatalog
+  Tracks:
+  - Id: field
+    DisplayName: Open Field
+    Description: Big outdoor loop with a floating gate and a hurdle. Room to learn.
+    Json: {fileID: 4900000, guid: 2b962c0c5c2525843a77e4114911506d, type: 3}
+  - Id: hangar
+    DisplayName: Hangar 7
+    Description: 'Indoor hall: tight turns between crates, columns and walls. Whoop heaven.'
+    Json: {fileID: 4900000, guid: 2dd414e040841ea4790a3db43389531c, type: 3}
+  - Id: industrial
+    DisplayName: Dockyard
+    Description: Container corridors and a gate above a container stack.
+    Json: {fileID: 4900000, guid: ee31c46cd8b798a40b850617b17648aa, type: 3}
+  Environments:
+  - Environment: field
+    SceneName: Track_Field
+  - Environment: hangar
+    SceneName: Track_Hangar
+  - Environment: industrial
+    SceneName: Track_Industrial

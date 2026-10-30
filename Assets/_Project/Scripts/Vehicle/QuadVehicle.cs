@@ -76,6 +76,20 @@ namespace GateRush.Vehicle
             ApplyProfile();
         }
 
+        /// <summary>
+        /// Uses an already-customised profile (settings: rates, drag/motor scaling) and collision settings
+        /// instead of the assets. Takes effect immediately; call <see cref="Respawn"/> for a clean start.
+        /// </summary>
+        public void Configure(in QuadProfile customProfile, in CollisionSettings collision)
+        {
+            _profile = customProfile;
+            _collision.Settings = collision;
+            HoverThrottle = MotorModel.HoverCommand(_profile.Motors, _profile.Mass * _env.Gravity);
+        }
+
+        /// <summary>Collision settings from the physics asset (defaults if none), as a base for <see cref="Configure"/>.</summary>
+        public CollisionSettings BaseCollision => physics != null ? physics.Collision : CollisionSettings.Default;
+
         public void Respawn()
         {
             Transform t = spawnPoint != null ? spawnPoint : transform;

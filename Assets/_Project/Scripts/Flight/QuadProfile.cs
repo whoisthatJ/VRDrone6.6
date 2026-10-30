@@ -138,6 +138,111 @@ namespace GateRush.Flight
             },
             Rates = RateProfile.BetaflightDefault,
         };
+
+        /// <summary>
+        /// A 5" freestyle quad: heavier (GoPro-class camera), ~7.5:1 thrust-to-weight, more inertia, softer rates.
+        /// Gains follow the same sizing as the race quad: ωn ≈ 40 rad/s on pitch/roll, ζ ≈ 0.7.
+        /// </summary>
+        public static QuadProfile Freestyle5Inch => new QuadProfile
+        {
+            Name = "5\" Freestyle",
+            Mass = 0.75f,
+            Inertia = new Vec3(0.0028f, 0.0048f, 0.0028f),
+            ArmX = 0.08f,
+            ArmZ = 0.08f,
+            Motors = new MotorSettings
+            {
+                MaxThrustPerMotor = 14f,
+                YawTorquePerThrust = 0.016f,
+                TimeConstantUp = 0.035f,
+                TimeConstantDown = 0.045f,
+                IdleFraction = 0.05f,
+                PropPitchSpeed = 45f,
+                ThrottleCurveExpo = 1f,
+            },
+            Aero = new AeroSettings
+            {
+                LinearDrag = new Vec3(0.06f, 0.06f, 0.06f),
+                QuadraticDrag = new Vec3(0.026f, 0.05f, 0.022f),
+                AngularDrag = new Vec3(0.0005f, 0.0005f, 0.0005f),
+            },
+            Pid = new PidSettings
+            {
+                Pitch = new PidGains(0.050f, 0.15f, 0.00087f),
+                Roll = new PidGains(0.050f, 0.15f, 0.00087f),
+                Yaw = new PidGains(0.245f, 0.45f, 0f),
+                ITermLimit = 0.15f,
+                DTermLowpassHz = 90f,
+                OutputLimit = 1f,
+                AirMode = true,
+                LowThrottleCutoff = 0.05f,
+            },
+            AngleMode = new AngleModeSettings
+            {
+                MaxAngleDeg = 55f,
+                AngleGain = 10f,
+                MaxOuterRateDegPerSec = 400f,
+            },
+            Rates = new RateProfile
+            {
+                Type = RatesType.Actual,
+                Roll = new AxisRates(70f, 600f, 0.4f),
+                Pitch = new AxisRates(70f, 600f, 0.4f),
+                Yaw = new AxisRates(70f, 450f, 0.3f),
+            },
+        };
+
+        /// <summary>
+        /// A 65 mm 1S tiny whoop: 32 g, ~3:1 thrust-to-weight, ducted (high drag, low top speed), fast motors.
+        /// </summary>
+        public static QuadProfile Whoop65 => new QuadProfile
+        {
+            Name = "65mm Whoop",
+            Mass = 0.032f,
+            Inertia = new Vec3(0.000020f, 0.000035f, 0.000020f),
+            ArmX = 0.0235f,
+            ArmZ = 0.0235f,
+            Motors = new MotorSettings
+            {
+                MaxThrustPerMotor = 0.245f,
+                YawTorquePerThrust = 0.006f,
+                TimeConstantUp = 0.020f,
+                TimeConstantDown = 0.025f,
+                IdleFraction = 0.06f,
+                PropPitchSpeed = 15f,
+                ThrottleCurveExpo = 1f,
+            },
+            Aero = new AeroSettings
+            {
+                LinearDrag = new Vec3(0.010f, 0.012f, 0.010f),
+                QuadraticDrag = new Vec3(0.0045f, 0.007f, 0.004f),
+                AngularDrag = new Vec3(0.000004f, 0.000004f, 0.000004f),
+            },
+            Pid = new PidSettings
+            {
+                Pitch = new PidGains(0.026f, 0.10f, 0.0001f),
+                Roll = new PidGains(0.026f, 0.10f, 0.0001f),
+                Yaw = new PidGains(0.10f, 0.25f, 0f),
+                ITermLimit = 0.2f,
+                DTermLowpassHz = 100f,
+                OutputLimit = 1f,
+                AirMode = true,
+                LowThrottleCutoff = 0.05f,
+            },
+            AngleMode = new AngleModeSettings
+            {
+                MaxAngleDeg = 45f,
+                AngleGain = 10f,
+                MaxOuterRateDegPerSec = 350f,
+            },
+            Rates = new RateProfile
+            {
+                Type = RatesType.Actual,
+                Roll = new AxisRates(70f, 500f, 0.3f),
+                Pitch = new AxisRates(70f, 500f, 0.3f),
+                Yaw = new AxisRates(70f, 400f, 0.3f),
+            },
+        };
     }
 
     /// <summary>World/environment settings shared by all quads.</summary>

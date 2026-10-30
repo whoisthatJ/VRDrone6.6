@@ -84,7 +84,7 @@ Tests/EditMode/   Flight model and rates tests
 | M2 ✅ | Flyable in editor | Flat test field, quad flies with gamepad/keyboard in Acro and Angle, FPV camera with tilt; debug overlay of rates and motors |
 | M3 ✅ (headset check pending) | Quest + VR views | Goggles mode, LOS mode, Immersive mode; Touch controller Mode 2 mapping; arming switch; stable 72/90 fps |
 | M4 ✅ | Racing | Gate prefabs (standard race-gate sizes), checkpoints, lap timer, 3-lap race, results, best lap + ghost replay, local leaderboard |
-| M5 | Content + settings | 3 quad classes (5" race, 5" freestyle, whoop), 3 tracks (indoor hangar, outdoor field, industrial), rates/camera/physics settings UI, save/load |
+| M5 ✅ | Content + settings | 3 quad classes (5" race, 5" freestyle, whoop), 3 tracks (indoor hangar, outdoor field, industrial), rates/camera/physics settings UI, save/load |
 | M6 | RC radio + **BetaFPV** support | Generic HID joystick over USB-C OTG and Bluetooth; diagnostics screen (✅ moved to M3); calibration wizard; BetaFPV presets (LR2 SIM, LR3, LR4 USB/BT) auto-applied by device name; Android axis fallback plugin; hot-plug handling; on headset: an LR2 SIM (USB) and an LR4 (Bluetooth) can arm and fly a full lap |
 | M7 | Track editor (VR) | Place, rotate and scale gates with controllers, snap, set checkpoint order, save/load JSON, share by file |
 | M8 | Polish + perf | Baked lighting, LODs, FFR, motor audio, crash/prop VFX, analog VTX noise effect, OSD HUD, comfort options |
@@ -143,6 +143,16 @@ Tests/EditMode/   Flight model and rates tests
 | 2026-10-30 | Race HUD lives on the OSD canvas (drone camera), so it shows in Goggles view and on the desktop; Immersive/LOS don't show it yet (world/head-locked HUD planned for M8) | Keep M4 scope |
 | 2026-10-30 | Restart race: T / gamepad left-stick click / left Touch stick click | Free buttons |
 | 2026-10-30 | `RaceAutopilot` (Angle mode, drives a `ScriptedInputSource`) for automated race smoke tests and a future attract/demo mode. It's not precise enough for 1.52 m gates every lap: the M4 smoke test scaled the gates 2.5× | Tooling, not gameplay |
+| 2026-10-30 | Quad classes: `Race5Inch` (650 g, ~10:1), `Freestyle5Inch` (750 g, ~7.5:1, Actual rates), `Whoop65` (32 g, ~3:1, ducted drag). PID gains sized per class from torque authority, inertia and motor lag (ωn ≈ 40 rad/s, ζ ≈ 0.7); every class has hover and rate-step tests | One sizing method instead of hand-tuning by feel; feel tuning comes from headset feedback |
+| 2026-10-30 | Tracks are JSON (`TrackData`: gates in order, props, spawn, laps, environment id). Built-in courses are defined in `CourseLibrary` and written to `Data/Tracks/*.json`; the game only loads the JSON. Gate headings are computed from neighbouring gates | Same format the M7 editor will read/write and share |
+| 2026-10-30 | One scene per **environment** (`Track_Field`, `Track_Hangar`, `Track_Industrial`); `TrackSceneController` loads the selected track's JSON into it at runtime. `Track_TestField` was removed | Environments are static art; courses are data |
+| 2026-10-30 | Settings (`GameSettings`, JSON in `persistentDataPath/settings.json`, atomic save, clamped, missing fields keep defaults): pilot callsign, quad, track, custom rates (Betaflight/Actual) or the quad's own, camera tilt/FOV/view/goggles size/follow, Touch + gamepad throttle mapping, deadband, expo, vignette, 72/90 Hz, crash speed, drag scale, motor-lag scale. Applied live in track scenes (`SaveSystem.SettingsChanged`) | §5 "rates/camera/physics settings UI, save/load" |
+| 2026-10-30 | New `GateRush.Game` assembly (catalogs, `GameFlow`, `TrackSceneController`) sits above Vehicle/Cameras/Race/Track; Core only holds data (`GameSettings`, `SaveSystem`) | Keeps lower assemblies free of cycles |
+| 2026-10-30 | VR menu uses XR Interaction Toolkit 3.6 (already in the project): `XRRayInteractor` lasers on both Touch controllers (aim pose, trigger = click) + `XRUIInputModule` (mouse/gamepad too). Menu UI is built at runtime from code (`UiKit`, no sprites) | Standard XR UI path; less scene YAML |
+| 2026-10-30 | Pilot name is a callsign picked from a list for now | No VR text entry yet (Meta system keyboard needs the Meta SDK) |
+| 2026-10-30 | Boot → Menu; in any scene the left Touch menu button / Esc / F1 / gamepad R-stick click returns to the menu (`SceneSwitcher`) | Replaces the M3 flight↔diagnostics toggle |
+| 2026-10-30 | Builder rule: create the new scene **before** loading assets it references (`EditorSceneManager.NewScene` unloads unused assets). `BootSceneBuilder.BuildAll` verifies every GateRush reference in every scene and fails loudly | A latent bug from M3/M4 that showed up with the new catalogs |
+| 2026-10-30 | Tooling rule: don't write files under `Assets/` while an APK build is running | Files written as a build finished never compiled until their metas were regenerated |
 | 2026-10-30 | Unity CLI is 1.0.0-beta.6 and not signed in (license is active). It wasn't needed: the live Editor is driven through the Unity Editor MCP | — |
 
 ## 9. Notes for tuning

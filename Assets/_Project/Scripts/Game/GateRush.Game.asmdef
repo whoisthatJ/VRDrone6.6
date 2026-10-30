@@ -1,0 +1,22 @@
+{
+    "name": "GateRush.Game",
+    "rootNamespace": "GateRush.Game",
+    "references": [
+        "GateRush.Flight",
+        "GateRush.Core",
+        "GateRush.Input",
+        "GateRush.Vehicle",
+        "GateRush.Cameras",
+        "GateRush.Race",
+        "GateRush.Track"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

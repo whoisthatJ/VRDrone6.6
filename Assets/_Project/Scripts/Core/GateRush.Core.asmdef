@@ -2,6 +2,7 @@
     "name": "GateRush.Core",
     "rootNamespace": "GateRush.Core",
     "references": [
+        "GateRush.Flight",
         "Unity.InputSystem",
         "Unity.XR.MetaOpenXR",
         "Unity.XR.OpenXR"

@@ -5,6 +5,10 @@
         "GateRush.Flight",
         "GateRush.Input",
         "GateRush.Race",
+        "GateRush.Core",
+        "GateRush.Track",
+        "GateRush.Game",
+        "GateRush.Vehicle",
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner"
     ],

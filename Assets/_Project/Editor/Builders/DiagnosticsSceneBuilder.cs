@@ -38,7 +38,8 @@ namespace GateRush.EditorTools.Builders
             var rt = (RectTransform)canvasGo.transform;
             rt.sizeDelta = PanelSize;
             rt.localScale = Vector3.one * CanvasScale;
-            rt.position = new Vector3(0f, 1.5f, 1.3f);
+            // On a root world-space canvas the anchored position drives x/y; set all three through it.
+            rt.anchoredPosition3D = new Vector3(0f, 1.5f, 1.3f);
             canvasGo.GetComponent<CanvasScaler>().dynamicPixelsPerUnit = 3f;
 
             Background(rt);

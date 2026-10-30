@@ -7,16 +7,17 @@ using UnityEngine.SceneManagement;
 namespace GateRush.Core
 {
     /// <summary>
-    /// Temporary scene toggle until the main menu exists (M5): flight ↔ input diagnostics.
-    /// Left Touch menu button, gamepad right-stick click, or F1.
+    /// Back to the main menu from any scene: left Touch menu button, gamepad right-stick click, Esc or F1.
+    /// Lives on the persistent App object.
     /// </summary>
     public sealed class SceneSwitcher : MonoBehaviour
     {
-        [SerializeField] private string flightScene = "Track_TestField";
-        [SerializeField] private string diagnosticsScene = "InputDiagnostics";
+        [SerializeField] private string menuScene = "Menu";
 
         private ButtonControl _menu;
         private bool _dirty = true;
+
+        public string MenuScene => menuScene;
 
         private void OnEnable() => InputSystem.onDeviceChange += OnDeviceChange;
         private void OnDisable() => InputSystem.onDeviceChange -= OnDeviceChange;
@@ -34,13 +35,12 @@ namespace GateRush.Core
                 _menu = XRController.leftHand?.TryGetChildControl<ButtonControl>("menu");
             }
 
+            var kb = Keyboard.current;
             bool pressed = (_menu != null && _menu.wasPressedThisFrame)
-                           || (Keyboard.current != null && Keyboard.current.f1Key.wasPressedThisFrame)
+                           || (kb != null && (kb.f1Key.wasPressedThisFrame || kb.escapeKey.wasPressedThisFrame))
                            || (Gamepad.current != null && Gamepad.current.rightStickButton.wasPressedThisFrame);
-            if (!pressed) return;
-
-            string current = SceneManager.GetActiveScene().name;
-            SceneManager.LoadScene(current == diagnosticsScene ? flightScene : diagnosticsScene);
+            if (!pressed || SceneManager.GetActiveScene().name == menuScene) return;
+            SceneManager.LoadScene(menuScene);
         }
     }
 }

@@ -1,0 +1,331 @@
+using System.Globalization;
+using GateRush.Core;
+using GateRush.Flight;
+using GateRush.Game;
+using GateRush.Race;
+using TMPro;
+using UnityEngine;
+using UnityEngine.UI;
+
+namespace GateRush.UI
+{
+    /// <summary>
+    /// World-space main menu built at runtime: fly, choose quad, choose track, settings (rates, camera, input,
+    /// comfort, physics, pilot), input diagnostics. Edits <see cref="SaveSystem.Settings"/> and commits on leaving a page.
+    /// </summary>
+    public sealed class MenuController : MonoBehaviour
+    {
+        private const float Width = 1600f;
+        private const float Height = 1000f;
+        private const float Margin = 60f;
+        private const float ContentWidth = Width - 2f * Margin;
+
+        private static readonly string[] Callsigns =
+            { "Pilot", "Ace", "Falcon", "Viper", "Comet", "Nova", "Raptor", "Ghost", "Blaze", "Orbit", "Spark", "Drift" };
+
+        [SerializeField] private RectTransform root;
+        [SerializeField] private QuadCatalog quads;
+        [SerializeField] private TrackCatalog tracks;
+
+        private RectTransform _page;
+        private TMP_Text _summary;
+        private string _settingsTab = "Rates";
+        private bool _dirty;
+
+        private GameSettings S => SaveSystem.Settings;
+
+        private void Start()
+        {
+            UiKit.Image(UiKit.Fill(root, "Panel"), UiKit.PanelColor);
+            ShowMain();
+        }
+
+        // ---------- pages ----------
+
+        private RectTransform NewPage(string title)
+        {
+            if (_dirty)
+            {
+                SaveSystem.Commit();
+                _dirty = false;
+            }
+            if (_page != null) Destroy(_page.gameObject);
+            _page = UiKit.Fill(root, "Page " + title);
+            UiKit.Label(_page, title, new Vector2(Margin, -30f), new Vector2(ContentWidth, 80f), 56f, TextAlignmentOptions.MidlineLeft, UiKit.AccentColor);
+            return _page;
+        }
+
+        private void BackButton(RectTransform page, UnityEngine.Events.UnityAction back = null) =>
+            UiKit.Button(page, "Back", new Vector2(Margin, -(Height - 110f)), new Vector2(240f, 70f), back ?? ShowMain);
+
+        private void ShowMain()
+        {
+            var p = NewPage("GATERUSH VR");
+            _summary = UiKit.Label(p, "", new Vector2(Margin, -120f), new Vector2(ContentWidth, 120f), 32f, TextAlignmentOptions.TopLeft, UiKit.DimTextColor);
+            UpdateSummary();
+
+            float y = -260f;
+            UiKit.Button(p, "FLY", new Vector2(Margin, y), new Vector2(ContentWidth, 110f), Fly, 52f);
+            y -= 140f;
+            float half = (ContentWidth - 30f) * 0.5f;
+            UiKit.Button(p, "Choose quad", new Vector2(Margin, y), new Vector2(half, 90f), ShowQuads);
+            UiKit.Button(p, "Choose track", new Vector2(Margin + half + 30f, y), new Vector2(half, 90f), ShowTracks);
+            y -= 120f;
+            UiKit.Button(p, "Settings", new Vector2(Margin, y), new Vector2(half, 90f), ShowSettings);
+            UiKit.Button(p, "Input diagnostics", new Vector2(Margin + half + 30f, y), new Vector2(half, 90f), () => { CommitIfDirty(); GameFlow.Diagnostics(); });
+            y -= 120f;
+            UiKit.Button(p, "Quit", new Vector2(Margin, y), new Vector2(half, 90f), GameFlow.Quit);
+
+            UiKit.Label(p, "Point with a controller and pull the trigger. In flight, the left menu button returns here.",
+                new Vector2(Margin, -(Height - 100f)), new Vector2(ContentWidth, 60f), 26f, TextAlignmentOptions.MidlineLeft, UiKit.DimTextColor);
+        }
+
+        private void UpdateSummary()
+        {
+            if (_summary == null) return;
+            var quad = quads.Find(S.QuadId);
+            var track = tracks.Find(S.TrackId) ?? (tracks.Tracks.Count > 0 ? tracks.Tracks[0] : null);
+            _summary.text = $"Pilot  <color=#fff>{S.PilotName}</color>\n" +
+                            $"Quad   <color=#fff>{(quad != null ? quad.DisplayName : "-")}</color>\n" +
+                            $"Track  <color=#fff>{(track != null ? track.DisplayName : "-")}</color>";
+        }
+
+        private void Fly()
+        {
+            CommitIfDirty();
+            string id = tracks.Find(S.TrackId) != null ? S.TrackId : tracks.Tracks[0].Id;
+            GameFlow.Race(tracks, id);
+        }
+
+        private void CommitIfDirty()
+        {
+            if (!_dirty) return;
+            SaveSystem.Commit();
+            _dirty = false;
+        }
+
+        private void ShowQuads()
+        {
+            var p = NewPage("Choose quad");
+            float y = -140f;
+            foreach (var q in quads.Quads)
+            {
+                var entry = q;
+                var b = UiKit.Button(p, "", new Vector2(Margin, y), new Vector2(ContentWidth, 170f), () =>
+                {
+                    S.QuadId = entry.Id;
+                    _dirty = true;
+                    ShowQuads();
+                });
+                var label = b.GetComponentInChildren<TMP_Text>();
+                label.alignment = TextAlignmentOptions.MidlineLeft;
+                label.fontSize = 30f;
+                label.text = $"<size=40><b>{entry.DisplayName}</b></size>\n<color=#bbb>{entry.Description}</color>";
+                if (entry.Id == S.QuadId) UiKit.SetButtonColor(b, UiKit.SelectedColor);
+                y -= 190f;
+            }
+            BackButton(p);
+        }
+
+        private void ShowTracks()
+        {
+            var p = NewPage("Choose track");
+            var board = new LocalLeaderboard();
+            board.Load(LocalLeaderboard.DefaultPath);
+            float y = -140f;
+            foreach (var t in tracks.Tracks)
+            {
+                var entry = t;
+                var tb = board.Board(entry.Id);
+                string record = tb.BestLap > 0f
+                    ? string.Format(CultureInfo.InvariantCulture, "Lap record {0:F2}s ({1})", tb.BestLap, tb.BestLapPilot)
+                    : "No lap record yet";
+                var b = UiKit.Button(p, "", new Vector2(Margin, y), new Vector2(ContentWidth - 300f, 170f), () =>
+                {
+                    S.TrackId = entry.Id;
+                    _dirty = true;
+                    ShowTracks();
+                });
+                var label = b.GetComponentInChildren<TMP_Text>();
+                label.alignment = TextAlignmentOptions.MidlineLeft;
+                label.fontSize = 28f;
+                label.text = $"<size=40><b>{entry.DisplayName}</b></size>   <color=#ffb347>{record}</color>\n<color=#bbb>{entry.Description}</color>";
+                if (entry.Id == S.TrackId) UiKit.SetButtonColor(b, UiKit.SelectedColor);
+                UiKit.Button(p, "Fly", new Vector2(Margin + ContentWidth - 270f, y), new Vector2(270f, 170f), () =>
+                {
+                    CommitIfDirty();
+                    GameFlow.Race(tracks, entry.Id);
+                }, 40f);
+                y -= 190f;
+            }
+            BackButton(p);
+        }
+
+        // ---------- settings ----------
+
+        private static readonly string[] Tabs = { "Rates", "Camera", "Input", "Comfort", "Physics", "Pilot" };
+
+        private void ShowSettings()
+        {
+            var p = NewPage("Settings");
+            float tabWidth = (ContentWidth - 5f * 12f) / Tabs.Length;
+            for (int i = 0; i < Tabs.Length; i++)
+            {
+                string tab = Tabs[i];
+                var b = UiKit.Button(p, tab, new Vector2(Margin + i * (tabWidth + 12f), -120f), new Vector2(tabWidth, 70f), () =>
+                {
+                    _settingsTab = tab;
+                    ShowSettings();
+                }, 30f);
+                if (tab == _settingsTab) UiKit.SetButtonColor(b, UiKit.SelectedColor);
+            }
+
+            var content = UiKit.Rect(p, "Content", new Vector2(Margin, -220f), new Vector2(ContentWidth, 640f));
+            switch (_settingsTab)
+            {
+                case "Rates": BuildRates(content); break;
+                case "Camera": BuildCamera(content); break;
+                case "Input": BuildInput(content); break;
+                case "Comfort": BuildComfort(content); break;
+                case "Physics": BuildPhysics(content); break;
+                default: BuildPilot(content); break;
+            }
+
+            BackButton(p);
+            UiKit.Button(p, "Reset all to defaults", new Vector2(Width - Margin - 420f, -(Height - 110f)), new Vector2(420f, 70f), () =>
+            {
+                var fresh = new GameSettings { QuadId = S.QuadId, TrackId = S.TrackId, PilotName = S.PilotName };
+                SaveSystem.Replace(fresh);
+                ShowSettings();
+            }, 28f);
+        }
+
+        private void Changed() => _dirty = true;
+
+        private static string F(float v, string fmt) => v.ToString(fmt, CultureInfo.InvariantCulture);
+
+        private void BuildRates(RectTransform c)
+        {
+            var quad = quads.Find(S.QuadId);
+            RateProfile quadRates = quad != null && quad.Profile != null ? quad.Profile.Profile.Rates : RateProfile.BetaflightDefault;
+
+            UiKit.StepperRow(c, "Rates", 0f, new[] { "Quad default", "Custom" }, S.UseCustomRates ? 1 : 0, i =>
+            {
+                S.UseCustomRates = i == 1;
+                if (S.UseCustomRates) S.Rates = quadRates;
+                Changed();
+                ShowSettings();
+            }, ContentWidth);
+            if (!S.UseCustomRates)
+            {
+                UiKit.Label(c, $"Flying {(quad != null ? quad.DisplayName : "the quad")}'s own rates:\n{Describe(quadRates)}",
+                    new Vector2(0f, -100f), new Vector2(ContentWidth, 200f), 30f, TextAlignmentOptions.TopLeft, UiKit.DimTextColor);
+                return;
+            }
+
+            UiKit.StepperRow(c, "Rates type", -75f, new[] { "Betaflight", "Actual" }, (int)S.Rates.Type, i =>
+            {
+                S.Rates = i == 1 ? RateProfile.ActualDefault : RateProfile.BetaflightDefault;
+                Changed();
+                ShowSettings();
+            }, ContentWidth);
+
+            var summary = UiKit.Label(c, Describe(S.Rates), new Vector2(0f, -150f), new Vector2(ContentWidth, 50f), 28f, TextAlignmentOptions.MidlineLeft, UiKit.AccentColor);
+            float y = -210f;
+            AxisSliders(c, "Roll", y, () => S.Rates.Roll, a => { var r = S.Rates; r.Roll = a; S.Rates = r; }, summary);
+            AxisSliders(c, "Pitch", y - 140f, () => S.Rates.Pitch, a => { var r = S.Rates; r.Pitch = a; S.Rates = r; }, summary);
+            AxisSliders(c, "Yaw", y - 280f, () => S.Rates.Yaw, a => { var r = S.Rates; r.Yaw = a; S.Rates = r; }, summary);
+        }
+
+        /// <summary>Three compact sliders for one axis on two rows.</summary>
+        private void AxisSliders(RectTransform c, string axis, float y, System.Func<AxisRates> get, System.Action<AxisRates> set, TMP_Text summary)
+        {
+            bool actual = S.Rates.Type == RatesType.Actual;
+            var a = get();
+            float w = ContentWidth * 0.5f - 20f;
+            var left = UiKit.Rect(c, axis + " A", new Vector2(0f, y), new Vector2(w, 60f));
+            var right = UiKit.Rect(c, axis + " B", new Vector2(w + 40f, y), new Vector2(w, 60f));
+            var below = UiKit.Rect(c, axis + " C", new Vector2(0f, y - 65f), new Vector2(w, 60f));
+
+            void Push(System.Func<AxisRates, AxisRates> edit)
+            {
+                set(edit(get()));
+                Changed();
+                summary.text = Describe(S.Rates);
+            }
+
+            if (actual)
+            {
+                UiKit.SliderRow(left, axis + " centre", 0f, 10f, 400f, a.RcRate, v => F(v, "0"), v => Push(x => { x.RcRate = v; return x; }), w, true);
+                UiKit.SliderRow(right, axis + " max", 0f, 100f, 1998f, a.Rate, v => F(v, "0"), v => Push(x => { x.Rate = v; return x; }), w, true);
+            }
+            else
+            {
+                UiKit.SliderRow(left, axis + " RC rate", 0f, 0.01f, 2.55f, a.RcRate, v => F(v, "0.00"), v => Push(x => { x.RcRate = v; return x; }), w);
+                UiKit.SliderRow(right, axis + " super", 0f, 0f, 0.99f, a.Rate, v => F(v, "0.00"), v => Push(x => { x.Rate = v; return x; }), w);
+            }
+            UiKit.SliderRow(below, axis + " expo", 0f, 0f, 1f, a.Expo, v => F(v, "0.00"), v => Push(x => { x.Expo = v; return x; }), w);
+        }
+
+        private static string Describe(RateProfile r)
+        {
+            float roll = Rates.DegPerSec(r.Type, r.Roll, 1f);
+            float pitch = Rates.DegPerSec(r.Type, r.Pitch, 1f);
+            float yaw = Rates.DegPerSec(r.Type, r.Yaw, 1f);
+            return string.Format(CultureInfo.InvariantCulture, "{0} rates, max roll {1:0} / pitch {2:0} / yaw {3:0} deg/s", r.Type, roll, pitch, yaw);
+        }
+
+        private void BuildCamera(RectTransform c)
+        {
+            var cam = S.Camera;
+            UiKit.SliderRow(c, "Camera tilt", 0f, 0f, 60f, cam.TiltDegrees, v => F(v, "0") + " deg", v => { cam.TiltDegrees = v; Changed(); }, ContentWidth, true);
+            UiKit.SliderRow(c, "FOV (horizontal)", -90f, 90f, 150f, cam.HorizontalFov, v => F(v, "0") + " deg", v => { cam.HorizontalFov = v; Changed(); }, ContentWidth, true);
+            UiKit.StepperRow(c, "View", -180f, new[] { "Goggles (comfortable)", "Immersive (intense)", "Line of sight" }, cam.ViewMode, i => { cam.ViewMode = i; Changed(); }, ContentWidth);
+            UiKit.SliderRow(c, "Goggles screen size", -270f, 30f, 100f, cam.GogglesArcDegrees, v => F(v, "0") + " deg", v => { cam.GogglesArcDegrees = v; Changed(); }, ContentWidth, true);
+            UiKit.StepperRow(c, "Goggles screen", -360f, new[] { "Fixed in the room", "Follows your head" }, cam.GogglesFollow, i => { cam.GogglesFollow = i; Changed(); }, ContentWidth);
+        }
+
+        private void BuildInput(RectTransform c)
+        {
+            var input = S.Input;
+            string[] throttle = { "Full stick (radio-style)", "Centre = hover", "Trigger" };
+            UiKit.StepperRow(c, "Touch throttle", 0f, throttle, input.TouchThrottle, i => { input.TouchThrottle = i; Changed(); }, ContentWidth);
+            UiKit.StepperRow(c, "Gamepad throttle", -90f, throttle, input.GamepadThrottle, i => { input.GamepadThrottle = i; Changed(); }, ContentWidth);
+            UiKit.SliderRow(c, "Stick deadband", -180f, 0f, 0.3f, input.Deadband, v => F(v * 100f, "0") + " %", v => { input.Deadband = v; Changed(); }, ContentWidth);
+            UiKit.SliderRow(c, "Stick expo", -270f, 0f, 1f, input.Expo, v => F(v, "0.00"), v => { input.Expo = v; Changed(); }, ContentWidth);
+            UiKit.Label(c, "RC radios (BetaFPV and others): calibration and presets arrive in M6. Use Input diagnostics to check your radio.",
+                new Vector2(0f, -380f), new Vector2(ContentWidth, 90f), 26f, TextAlignmentOptions.TopLeft, UiKit.DimTextColor);
+        }
+
+        private void BuildComfort(RectTransform c)
+        {
+            var comfort = S.Comfort;
+            UiKit.SliderRow(c, "Vignette (Immersive)", 0f, 0f, 1f, comfort.VignetteStrength, v => F(v * 100f, "0") + " %", v => { comfort.VignetteStrength = v; Changed(); }, ContentWidth);
+            UiKit.StepperRow(c, "Refresh rate", -90f, new[] { "72 Hz", "90 Hz" }, comfort.RefreshRate >= 90f ? 1 : 0, i => { comfort.RefreshRate = i == 1 ? 90f : 72f; Changed(); }, ContentWidth);
+        }
+
+        private void BuildPhysics(RectTransform c)
+        {
+            var ph = S.Physics;
+            UiKit.SliderRow(c, "Crash speed", 0f, 3f, 20f, ph.CrashSpeed, v => F(v, "0.0") + " m/s", v => { ph.CrashSpeed = v; Changed(); }, ContentWidth);
+            UiKit.SliderRow(c, "Air drag", -90f, 0.5f, 2f, ph.DragScale, v => "x" + F(v, "0.00"), v => { ph.DragScale = v; Changed(); }, ContentWidth);
+            UiKit.SliderRow(c, "Motor lag", -180f, 0.5f, 2f, ph.MotorLagScale, v => "x" + F(v, "0.00"), v => { ph.MotorLagScale = v; Changed(); }, ContentWidth);
+            UiKit.Label(c, "Lower drag = floatier and faster. Higher motor lag = softer, slower throttle response.",
+                new Vector2(0f, -280f), new Vector2(ContentWidth, 60f), 26f, TextAlignmentOptions.TopLeft, UiKit.DimTextColor);
+        }
+
+        private void BuildPilot(RectTransform c)
+        {
+            int index = System.Array.IndexOf(Callsigns, S.PilotName);
+            if (index < 0) index = 0;
+            UiKit.StepperRow(c, "Callsign", 0f, Callsigns, index, i => { S.PilotName = Callsigns[i]; Changed(); }, ContentWidth);
+            UiKit.Label(c, "Shown on the leaderboard. (Free text entry comes with a VR keyboard later.)",
+                new Vector2(0f, -100f), new Vector2(ContentWidth, 60f), 26f, TextAlignmentOptions.TopLeft, UiKit.DimTextColor);
+        }
+
+        private void OnDestroy()
+        {
+            if (_dirty) SaveSystem.Commit();
+        }
+    }
+}

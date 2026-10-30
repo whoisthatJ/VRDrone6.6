@@ -1,5 +1,15 @@
 # Changelog
 
+## M5: Content + settings, 2026-10-30
+- **Quad classes**: 5" Race, 5" Freestyle, 65 mm Whoop (`QuadProfile` presets + assets + `QuadCatalog` with visual scale, collision radius, FPV camera offset).
+- **Tracks as JSON**: `GateRush.Track` (`TrackData`, `TrackLoader`, `TrackPrefabs`), built-in courses Open Field, Hangar 7, Dockyard (`Data/Tracks/*.json`), `TrackCatalog`.
+- **Environments**: outdoor field (pillars kept off the race line, tree line), indoor hangar (walls, roof, columns, trusses, emissive lamps, crates), industrial dockyard (container corridors, warehouses, gantry crane, quay, light poles). Prop prefabs: crate, barrel, pillar, wall, three container colours.
+- **Settings + save system**: `GameSettings` / `SaveSystem` (JSON, atomic, clamped), applied live by `TrackSceneController`.
+- **VR main menu** (`Menu` scene): Fly, choose quad, choose track (with lap records), settings tabs (Rates with live max deg/s, Camera, Input, Comfort, Physics, Pilot), input diagnostics, quit. XRI laser pointers + mouse.
+- Scene flow Boot → Menu → Track_*; menu button returns to the menu.
+- `RaceSession.SetCourse` (runtime course), `TrackName`; leaderboard/ghosts keyed by track id.
+- Builders: `PropBuilder`, `CourseLibrary`, `CatalogBuilder`, `EnvironmentBuilder`, `TrackSceneBuilder` (replaces `TestFieldBuilder`), `MenuSceneBuilder`; `BuildAll` verifies scene references.
+- Tests: profile tests for all three classes, settings (round trip, defaults, clamping, file save/load), track JSON (round trip, validation, loader), content (catalogs ↔ JSON ↔ build scenes): 79 total.
 ## M4: Racing, 2026-10-30
 - `GateRush.Race`: `LapTimer` (checkpoint order, holeshot, laps, best lap), `GateCrossing` (forward segment-through-opening test with sub-frame fraction), `Gate` (opening, respawn pose, next/upcoming colours), `RaceSession` (countdown, hold, checkpoint respawn, finish, leaderboard), `GhostTrack` + `GhostSystem` (record/replay/save best lap), `LocalLeaderboard` (top 10 per track + lap record, JSON), `RaceAutopilot` (test pilot).
 - `QuadVehicle.HoldAtSpawn` for the countdown and mid-air checkpoint respawns.

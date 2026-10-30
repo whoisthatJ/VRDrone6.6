@@ -1,0 +1,83 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 63a57d5e8701c864f9bed683e7db753f, type: 3}
+  m_Name: Freestyle5
+  m_EditorClassIdentifier: GateRush.Vehicle::GateRush.Vehicle.QuadProfileAsset
+  Profile:
+    Name: 5" Freestyle
+    Mass: 0.75
+    Inertia:
+      x: 0.0028
+      y: 0.0048
+      z: 0.0028
+    ArmX: 0.08
+    ArmZ: 0.08
+    Motors:
+      MaxThrustPerMotor: 14
+      YawTorquePerThrust: 0.016
+      TimeConstantUp: 0.035
+      TimeConstantDown: 0.045
+      IdleFraction: 0.05
+      PropPitchSpeed: 45
+      ThrottleCurveExpo: 1
+    Aero:
+      LinearDrag:
+        x: 0.06
+        y: 0.06
+        z: 0.06
+      QuadraticDrag:
+        x: 0.026
+        y: 0.05
+        z: 0.022
+      AngularDrag:
+        x: 0.0005
+        y: 0.0005
+        z: 0.0005
+    Pid:
+      Pitch:
+        P: 0.05
+        I: 0.15
+        D: 0.00087
+        FF: 0
+      Yaw:
+        P: 0.245
+        I: 0.45
+        D: 0
+        FF: 0
+      Roll:
+        P: 0.05
+        I: 0.15
+        D: 0.00087
+        FF: 0
+      ITermLimit: 0.15
+      DTermLowpassHz: 90
+      OutputLimit: 1
+      AirMode: 1
+      LowThrottleCutoff: 0.05
+    AngleMode:
+      MaxAngleDeg: 55
+      AngleGain: 10
+      MaxOuterRateDegPerSec: 400
+    Rates:
+      Type: 1
+      Roll:
+        RcRate: 70
+        Rate: 600
+        Expo: 0.4
+      Pitch:
+        RcRate: 70
+        Rate: 600
+        Expo: 0.4
+      Yaw:
+        RcRate: 70
+        Rate: 450
+        Expo: 0.3

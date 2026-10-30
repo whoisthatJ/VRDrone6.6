@@ -6,7 +6,7 @@ namespace GateRush.Core
     /// <summary>Lives in the Boot scene: keeps app-wide services alive and loads the first gameplay scene.</summary>
     public sealed class AppBootstrap : MonoBehaviour
     {
-        [SerializeField] private string firstScene = "Track_TestField";
+        [SerializeField] private string firstScene = "Menu";
 
         private void Awake()
         {

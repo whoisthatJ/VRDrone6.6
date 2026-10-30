@@ -25,8 +25,9 @@ namespace GateRush.EditorTools.Builders
         [MenuItem("GateRush/Builders/Build Gate Prefabs")]
         public static void BuildAll()
         {
-            int layer = LayerMask.NameToLayer(TestFieldBuilder.TrackLayerName);
-            var mat = AssetDatabase.LoadAssetAtPath<Material>("Assets/_Project/Art/Materials/GateFrame.mat");
+            int layer = LayerMask.NameToLayer(TrackSceneBuilder.TrackLayerName);
+            // Lit; colour is driven per gate state by Gate.SetVisualState.
+            var mat = Materials.Lit("GateFrame", new Color(0.55f, 0.55f, 0.6f));
             System.IO.Directory.CreateDirectory(PrefabDir);
             Build(GateKind.Square, new Vector2(1.52f, 1.52f), 1f, true, layer, mat);
             Build(GateKind.Large, new Vector2(2f, 2f), 1f, true, layer, mat);

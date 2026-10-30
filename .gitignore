@@ -116,3 +116,7 @@ InitTestScene*.unity*
 # GateRush
 /TestResults/
 
+# Unity Performance Testing writes these during test runs
+/Assets/Resources/PerformanceTestRun*
+/Assets/Resources.meta
+

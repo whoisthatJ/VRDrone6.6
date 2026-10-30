@@ -40,6 +40,7 @@ namespace GateRush.Race
         [SerializeField] private float wrongGateHintSeconds = 1.5f;
 
         private LapTimer _timer;
+        private string _trackName;
         private readonly LocalLeaderboard _board = new LocalLeaderboard();
         private Transform _checkpointSpawn;
         private RacePhase _phase;
@@ -58,6 +59,8 @@ namespace GateRush.Race
         public RacePhase Phase => _phase;
         public LapTimer Timer => _timer;
         public string TrackId => trackId;
+        /// <summary>Display name (falls back to the id).</summary>
+        public string TrackName => string.IsNullOrEmpty(_trackName) ? trackId : _trackName;
         public int GateCount => gates.Length;
         public double Now => Time.timeAsDouble;
         public float CountdownRemaining => _phase == RacePhase.Countdown ? (float)Math.Max(0, _countdownEnd - Now) : 0f;
@@ -71,6 +74,12 @@ namespace GateRush.Race
         public TrackBoard Board => _board.Board(trackId);
         public GhostSystem Ghosts => ghosts;
 
+        public string PilotName
+        {
+            get => pilotName;
+            set => pilotName = string.IsNullOrWhiteSpace(value) ? "Pilot" : value;
+        }
+
         private void Awake()
         {
             if (string.IsNullOrEmpty(trackId)) trackId = gameObject.scene.name;
@@ -83,9 +92,29 @@ namespace GateRush.Race
 
         private void Start()
         {
-            if (ghosts != null) ghosts.Load(trackId, vehicle.Profile.Name);
             vehicle.Respawned += OnRespawned;
+            ReloadGhost();
             UpdateGateVisuals();
+        }
+
+        /// <summary>Replaces the course (e.g. loaded from track JSON) and resets the race.</summary>
+        public void SetCourse(Gate[] course, Transform pad, string id, int lapCount, string displayName = null)
+        {
+            gates = course ?? new Gate[0];
+            startPad = pad;
+            trackId = string.IsNullOrEmpty(id) ? gameObject.scene.name : id;
+            _trackName = displayName;
+            laps = Mathf.Clamp(lapCount, 1, 10);
+            _timer = new LapTimer(Mathf.Max(1, gates.Length), laps);
+            for (int i = 0; i < gates.Length; i++) gates[i].Order = i;
+            ReloadGhost();
+            Restart();
+        }
+
+        /// <summary>Loads the saved best ghost for the current track and quad (call after the quad changes).</summary>
+        public void ReloadGhost()
+        {
+            if (ghosts != null) ghosts.Load(trackId, vehicle.Profile.Name);
         }
 
         private void OnDestroy()

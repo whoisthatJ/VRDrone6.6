@@ -9,8 +9,17 @@ EditorBuildSettings:
     path: Assets/_Project/Scenes/Boot.unity
     guid: 5e4f0c4264415f64ebb242db0e6ac16d
   - enabled: 1
-    path: Assets/_Project/Scenes/Track_TestField.unity
-    guid: e0802921da5f5f14597fecfa0ee8a43b
+    path: Assets/_Project/Scenes/Menu.unity
+    guid: dc0d3575ca2dae848b4df9e2ed346569
+  - enabled: 1
+    path: Assets/_Project/Scenes/Track_Field.unity
+    guid: abea1887f31e4a44986de9c376a67f30
+  - enabled: 1
+    path: Assets/_Project/Scenes/Track_Hangar.unity
+    guid: c578672daaf7a0c43ab10afa1e11e7dd
+  - enabled: 1
+    path: Assets/_Project/Scenes/Track_Industrial.unity
+    guid: adc026636da73ff4cb6f859b9e389c3c
   - enabled: 1
     path: Assets/_Project/Scenes/InputDiagnostics.unity
     guid: 371b0653f2a7bf846a8d325efb88e3fa

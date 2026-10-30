@@ -1,0 +1,83 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 63a57d5e8701c864f9bed683e7db753f, type: 3}
+  m_Name: Whoop65
+  m_EditorClassIdentifier: GateRush.Vehicle::GateRush.Vehicle.QuadProfileAsset
+  Profile:
+    Name: 65mm Whoop
+    Mass: 0.032
+    Inertia:
+      x: 0.00002
+      y: 0.000035
+      z: 0.00002
+    ArmX: 0.0235
+    ArmZ: 0.0235
+    Motors:
+      MaxThrustPerMotor: 0.245
+      YawTorquePerThrust: 0.006
+      TimeConstantUp: 0.02
+      TimeConstantDown: 0.025
+      IdleFraction: 0.06
+      PropPitchSpeed: 15
+      ThrottleCurveExpo: 1
+    Aero:
+      LinearDrag:
+        x: 0.01
+        y: 0.012
+        z: 0.01
+      QuadraticDrag:
+        x: 0.0045
+        y: 0.007
+        z: 0.004
+      AngularDrag:
+        x: 0.000004
+        y: 0.000004
+        z: 0.000004
+    Pid:
+      Pitch:
+        P: 0.026
+        I: 0.1
+        D: 0.0001
+        FF: 0
+      Yaw:
+        P: 0.1
+        I: 0.25
+        D: 0
+        FF: 0
+      Roll:
+        P: 0.026
+        I: 0.1
+        D: 0.0001
+        FF: 0
+      ITermLimit: 0.2
+      DTermLowpassHz: 100
+      OutputLimit: 1
+      AirMode: 1
+      LowThrottleCutoff: 0.05
+    AngleMode:
+      MaxAngleDeg: 45
+      AngleGain: 10
+      MaxOuterRateDegPerSec: 350
+    Rates:
+      Type: 1
+      Roll:
+        RcRate: 70
+        Rate: 500
+        Expo: 0.3
+      Pitch:
+        RcRate: 70
+        Rate: 500
+        Expo: 0.3
+      Yaw:
+        RcRate: 70
+        Rate: 400
+        Expo: 0.3

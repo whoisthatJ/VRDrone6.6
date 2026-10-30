@@ -1,0 +1,134 @@
+using System;
+using GateRush.Flight;
+using UnityEngine;
+
+namespace GateRush.Core
+{
+    [Serializable]
+    public sealed class CameraPrefs
+    {
+        [Range(0f, 60f)] public float TiltDegrees = 25f;
+        [Range(90f, 150f)] public float HorizontalFov = 120f;
+        /// <summary>0 = Goggles, 1 = Immersive, 2 = Line of sight (GateRush.Cameras.ViewMode).</summary>
+        public int ViewMode;
+        [Range(30f, 100f)] public float GogglesArcDegrees = 60f;
+        /// <summary>0 = Fixed, 1 = Smooth follow (GateRush.Cameras.ScreenFollowMode).</summary>
+        public int GogglesFollow = 1;
+    }
+
+    [Serializable]
+    public sealed class InputPrefs
+    {
+        /// <summary>GateRush.Input.ThrottleMapping for Touch controllers (1 = spring-centre hover, 2 = trigger).</summary>
+        public int TouchThrottle = 1;
+        /// <summary>GateRush.Input.ThrottleMapping for gamepads.</summary>
+        public int GamepadThrottle = 1;
+        [Range(0f, 0.3f)] public float Deadband = 0.02f;
+        [Range(0f, 1f)] public float Expo;
+    }
+
+    [Serializable]
+    public sealed class ComfortPrefs
+    {
+        [Range(0f, 1f)] public float VignetteStrength = 0.7f;
+        /// <summary>72 or 90.</summary>
+        public float RefreshRate = 72f;
+    }
+
+    [Serializable]
+    public sealed class PhysicsPrefs
+    {
+        /// <summary>Normal impact speed that counts as a crash (m/s).</summary>
+        [Range(3f, 20f)] public float CrashSpeed = 7f;
+        /// <summary>Multiplier on the quad's air drag.</summary>
+        [Range(0.5f, 2f)] public float DragScale = 1f;
+        /// <summary>Multiplier on motor spool time (higher = laggier motors).</summary>
+        [Range(0.5f, 2f)] public float MotorLagScale = 1f;
+    }
+
+    /// <summary>Everything the player can change. Saved as JSON by <see cref="SaveSystem"/>.</summary>
+    [Serializable]
+    public sealed class GameSettings
+    {
+        public const int CurrentVersion = 1;
+
+        public int Version = CurrentVersion;
+        public string PilotName = "Pilot";
+        /// <summary>Id in the quad catalog ("race5", "freestyle5", "whoop65").</summary>
+        public string QuadId = "race5";
+        /// <summary>Id in the track catalog.</summary>
+        public string TrackId = "field";
+        /// <summary>When false each quad flies its own default rates.</summary>
+        public bool UseCustomRates;
+        public RateProfile Rates = RateProfile.BetaflightDefault;
+        public CameraPrefs Camera = new CameraPrefs();
+        public InputPrefs Input = new InputPrefs();
+        public ComfortPrefs Comfort = new ComfortPrefs();
+        public PhysicsPrefs Physics = new PhysicsPrefs();
+
+        /// <summary>Brings every value into its valid range (after loading or editing).</summary>
+        public void Clamp()
+        {
+            if (string.IsNullOrWhiteSpace(PilotName)) PilotName = "Pilot";
+            if (PilotName.Length > 20) PilotName = PilotName.Substring(0, 20);
+            if (string.IsNullOrEmpty(QuadId)) QuadId = "race5";
+            if (string.IsNullOrEmpty(TrackId)) TrackId = "field";
+            Camera ??= new CameraPrefs();
+            Input ??= new InputPrefs();
+            Comfort ??= new ComfortPrefs();
+            Physics ??= new PhysicsPrefs();
+
+            Rates.Roll = ClampAxis(Rates.Type, Rates.Roll);
+            Rates.Pitch = ClampAxis(Rates.Type, Rates.Pitch);
+            Rates.Yaw = ClampAxis(Rates.Type, Rates.Yaw);
+
+            Camera.TiltDegrees = Mathf.Clamp(Camera.TiltDegrees, 0f, 60f);
+            Camera.HorizontalFov = Mathf.Clamp(Camera.HorizontalFov, 90f, 150f);
+            Camera.ViewMode = Mathf.Clamp(Camera.ViewMode, 0, 2);
+            Camera.GogglesArcDegrees = Mathf.Clamp(Camera.GogglesArcDegrees, 30f, 100f);
+            Camera.GogglesFollow = Mathf.Clamp(Camera.GogglesFollow, 0, 1);
+
+            Input.TouchThrottle = Mathf.Clamp(Input.TouchThrottle, 0, 2);
+            Input.GamepadThrottle = Mathf.Clamp(Input.GamepadThrottle, 0, 2);
+            Input.Deadband = Mathf.Clamp(Input.Deadband, 0f, 0.3f);
+            Input.Expo = Mathf.Clamp01(Input.Expo);
+
+            Comfort.VignetteStrength = Mathf.Clamp01(Comfort.VignetteStrength);
+            Comfort.RefreshRate = Comfort.RefreshRate >= 81f ? 90f : 72f;
+
+            Physics.CrashSpeed = Mathf.Clamp(Physics.CrashSpeed, 3f, 20f);
+            Physics.DragScale = Mathf.Clamp(Physics.DragScale, 0.5f, 2f);
+            Physics.MotorLagScale = Mathf.Clamp(Physics.MotorLagScale, 0.5f, 2f);
+        }
+
+        private static AxisRates ClampAxis(RatesType type, AxisRates a)
+        {
+            if (type == RatesType.Actual)
+            {
+                a.RcRate = Mathf.Clamp(a.RcRate, 10f, 400f);   // centre sensitivity °/s
+                a.Rate = Mathf.Clamp(a.Rate, a.RcRate, 1998f); // max rate °/s
+            }
+            else
+            {
+                a.RcRate = Mathf.Clamp(a.RcRate, 0.01f, 2.55f);
+                a.Rate = Mathf.Clamp(a.Rate, 0f, 0.99f);
+            }
+            a.Expo = Mathf.Clamp01(a.Expo);
+            return a;
+        }
+
+        public GameSettings Clone() => FromJson(ToJson());
+
+        public string ToJson() => JsonUtility.ToJson(this, true);
+
+        /// <summary>Parses JSON over the defaults, so fields missing from older files keep their default values.</summary>
+        public static GameSettings FromJson(string json)
+        {
+            var s = new GameSettings();
+            if (!string.IsNullOrEmpty(json)) JsonUtility.FromJsonOverwrite(json, s);
+            s.Version = CurrentVersion;
+            s.Clamp();
+            return s;
+        }
+    }
+}

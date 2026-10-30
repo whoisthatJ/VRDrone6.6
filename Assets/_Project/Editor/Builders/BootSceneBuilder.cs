@@ -16,14 +16,62 @@ namespace GateRush.EditorTools.Builders
     {
         public const string ScenePath = "Assets/_Project/Scenes/Boot.unity";
 
-        /// <summary>Builds every scene in build order: Boot, Track_TestField, InputDiagnostics.</summary>
+        /// <summary>
+        /// Builds all content and every scene, then sets the build order:
+        /// Boot, Menu, Track_Field, Track_Hangar, Track_Industrial, InputDiagnostics.
+        /// </summary>
         [MenuItem("GateRush/Builders/Build All Scenes")]
         public static string BuildAll()
         {
-            Build();
-            TestFieldBuilder.Build();
-            DiagnosticsSceneBuilder.Build();
-            return string.Join(", ", System.Array.ConvertAll(EditorBuildSettings.scenes, s => s.path));
+            PropBuilder.BuildAll();      // gate + prop prefabs, TrackPrefabs
+            CatalogBuilder.BuildAll();   // track JSON, quad profiles, catalogs
+            // Persist and re-import the content first: scenes must reference the saved assets, not in-flight copies.
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
+
+            var order = new System.Collections.Generic.List<string> { Build(), MenuSceneBuilder.Build() };
+            foreach (var env in TrackSceneBuilder.Environments) order.Add(TrackSceneBuilder.Build(env));
+            order.Add(DiagnosticsSceneBuilder.Build());
+
+            EditorBuildSettings.scenes = order.ConvertAll(p => new EditorBuildSettingsScene(p, true)).ToArray();
+            AssetDatabase.SaveAssets();
+            VerifySceneReferences(order);
+            return string.Join(", ", order);
+        }
+
+        /// <summary>
+        /// Opens each built scene and fails if any GateRush component has an unassigned object reference
+        /// (e.g. an asset loaded before EditorSceneManager.NewScene, which unloads unused assets).
+        /// </summary>
+        /// <summary>References that are optional by design.</summary>
+        private static readonly System.Collections.Generic.HashSet<string> OptionalReferences = new System.Collections.Generic.HashSet<string>
+        {
+            "QuadVehicle.rates", // pilot rates come from the settings (TrackSceneController)
+        };
+
+        public static void VerifySceneReferences(System.Collections.Generic.IEnumerable<string> scenePaths)
+        {
+            var problems = new System.Collections.Generic.List<string>();
+            foreach (var path in scenePaths)
+            {
+                EditorSceneManager.OpenScene(path);
+                foreach (var mb in Object.FindObjectsByType<MonoBehaviour>(FindObjectsInactive.Include))
+                {
+                    if (mb == null || mb.GetType().Namespace == null || !mb.GetType().Namespace.StartsWith("GateRush")) continue;
+                    var so = new SerializedObject(mb);
+                    var it = so.GetIterator();
+                    bool enter = true;
+                    while (it.NextVisible(enter))
+                    {
+                        enter = false;
+                        if (it.propertyType == SerializedPropertyType.ObjectReference && it.objectReferenceValue == null && it.name != "m_Script"
+                            && !OptionalReferences.Contains(mb.GetType().Name + "." + it.name))
+                            problems.Add($"{System.IO.Path.GetFileNameWithoutExtension(path)}: {mb.GetType().Name}.{it.name}");
+                    }
+                }
+            }
+            if (problems.Count > 0)
+                throw new System.InvalidOperationException("Unassigned scene references (re-run Build All Scenes):\n" + string.Join("\n", problems));
         }
 
         [MenuItem("GateRush/Builders/Build Boot Scene")]

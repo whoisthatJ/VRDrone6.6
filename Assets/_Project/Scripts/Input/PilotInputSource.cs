@@ -32,6 +32,12 @@ namespace GateRush.Input
 
         public bool IsArmed => _armed;
 
+        public StickShaping Shaping
+        {
+            get => shaping;
+            set => shaping = value;
+        }
+
         /// <summary>Reads devices into raw sticks (-1..1 each, throttle already 0..1) and button edges.</summary>
         protected abstract void ReadRaw(out float throttle, out float yaw, out float pitch, out float roll,
             out bool armToggle, out bool modeCycle, out bool reset);

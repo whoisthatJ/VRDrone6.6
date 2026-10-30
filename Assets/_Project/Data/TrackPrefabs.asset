@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee25e03ca3b082c469edcac0fbb7fefc, type: 3}
+  m_Name: TrackPrefabs
+  m_EditorClassIdentifier: GateRush.Track::GateRush.Track.TrackPrefabs
+  Gates:
+  - Type: Square
+    Prefab: {fileID: 1751057744249282918, guid: 61545293cdccbeb4092e71640412a724, type: 3}
+  - Type: Large
+    Prefab: {fileID: 1420179406656756628, guid: 62b22d91c71be824ebf7e58188a3fd9c, type: 3}
+  - Type: Hurdle
+    Prefab: {fileID: 4030512663252119292, guid: 567b960579a6bda48ab8eefd127fa6d9, type: 3}
+  Props:
+  - Type: Crate
+    Prefab: {fileID: 6230052360999783274, guid: 45538f4ce20ee214cad7cb29047cab5f, type: 3}
+  - Type: Barrel
+    Prefab: {fileID: 5405595219815188547, guid: 55593ed8fdc251c46863e05e61e6a589, type: 3}
+  - Type: Pillar
+    Prefab: {fileID: 1021342857849240010, guid: c946b0b8cfc570b4aa6bcbbc99d69a73, type: 3}
+  - Type: Wall
+    Prefab: {fileID: 1987652004973766452, guid: 5a54c40c4a7f2c947909a61211bb15a7, type: 3}
+  - Type: Container
+    Prefab: {fileID: 4500199127035689099, guid: ac0467c7d1212264cb9db48966fb083d, type: 3}
+  - Type: ContainerRed
+    Prefab: {fileID: 9081924862698209770, guid: ab5ed48fe34ea51459b5fbfb00474972, type: 3}
+  - Type: ContainerGreen
+    Prefab: {fileID: 1030122228322098512, guid: 97aba0013eae225428a027212ce147f9, type: 3}
