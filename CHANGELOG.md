@@ -1,5 +1,14 @@
 # Changelog
 
+## M8: Polish + performance, 2026-10-30
+- **Battery**: `BatteryModel` (LiPo curve, sag, drain), packs per quad class, optional thrust sag (`PhysicsSettings.BatterySag`), voltage/current/mAh in `QuadState`.
+- **Motor audio**: procedural `QuadAudio` (blade-pass whine per motor, airflow noise, crash thump, start/lap beeps), 2D in FPV views / 3D in LOS, RPM per quad class.
+- **VFX**: prop-blur discs fading with RPM; pooled spark bursts for crashes and hard bounces (`CrashEffects`).
+- **Analog VTX**: `GateRush/AnalogFeed` shader on the goggles screen + `VtxSignal` (distance, obstacles, crash static), Off / Light / Realistic.
+- **OSD**: Betaflight-style `OsdHud` (voltage/cell, mAh, mode, timer, throttle, speed, altitude, LQ, crosshair, artificial horizon, warnings); debug readout behind a setting; head-locked race HUD for Immersive/LOS (`ViewVisibility`).
+- **Comfort/display**: foveation level, horizon ring (Immersive), motor volume, VTX noise, debug readout, battery sag; new **Feed** settings tab.
+- **Performance**: culling LODGroups on gate/prop prefabs; baked indirect lighting (+ light-probe grids) for all three environments via `LightingBaker` (sun stays realtime for direct light, no shadows); 0 bytes allocated per frame in OSD, prop visuals, VTX signal, audio (incl. the audio callback), crash effects and the vehicle.
+- 5 new battery tests (124 total).
 ## M7: Track editor (VR), 2026-10-30
 - `GateRush.Track`: `TrackEditModel` (editing ops, snapping, race order, reverse, laps, undo/redo, dirty tracking) and `TrackLibrary` (user tracks as JSON files, unique ids, import of shared files, duplicate built-ins, delete).
 - `GateRush.TrackEditor`: `TrackEditorController` (pointer, select/drag/rotate/scale, add/delete, locomotion + snap turn, wrist panel, save/test-fly/exit, desktop fallback), `TrackEditorView` (gates, props, spawn marker, order labels, course line, selection highlight), `EditorHandle`, `EditorButton`.

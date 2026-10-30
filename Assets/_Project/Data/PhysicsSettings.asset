@@ -16,6 +16,7 @@ MonoBehaviour:
     Gravity: 9.81
     FixedStep: 0.001
     MaxSubSteps: 16
+    BatterySag: 0
   Collision:
     Radius: 0.12
     Restitution: 0.3

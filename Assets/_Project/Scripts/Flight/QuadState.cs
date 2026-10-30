@@ -64,6 +64,10 @@ namespace GateRush.Flight
         public Vec3 Setpoint;
         public PidState Pid;
         public bool Armed;
+        /// <summary>Loaded pack voltage (V); 0 until the first step.</summary>
+        public float BatteryVoltage;
+        public float BatteryCurrent;
+        public float BatteryUsedMah;
         /// <summary>Simulated time (s).</summary>
         public double Time;
 

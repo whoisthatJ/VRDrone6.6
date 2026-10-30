@@ -64,6 +64,11 @@ namespace GateRush.EditorTools.Builders
             for (int i = 0; i < renderers.Count; i++) arr.GetArrayElementAtIndex(i).objectReferenceValue = renderers[i];
             so.ApplyModifiedPropertiesWithoutUndo();
 
+            // LOD: thin frames are culled once they are under ~0.4% of screen height (far gates cost nothing).
+            var lod = root.AddComponent<LODGroup>();
+            lod.SetLODs(new[] { new LOD(0.004f, renderers.ToArray()) });
+            lod.RecalculateBounds();
+
             PrefabUtility.SaveAsPrefabAsset(root, PrefabPath(kind));
             Object.DestroyImmediate(root);
         }

@@ -35,6 +35,10 @@ namespace GateRush.Vehicle
         public PilotInput LastInput { get; private set; }
         public bool IsCrashed => _crashed;
         public float LastImpactSpeed => _collision.LastImpactSpeed;
+        public int ImpactCount => _collision.ImpactCount;
+
+        /// <summary>Battery sag on/off (the pack state itself lives in the flight state).</summary>
+        public void SetBatterySag(bool enabled) => _env.BatterySag = enabled;
         public float HoverThrottle { get; private set; }
         public PilotInputSource InputSource
         {

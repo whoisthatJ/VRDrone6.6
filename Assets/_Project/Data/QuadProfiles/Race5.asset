@@ -81,3 +81,9 @@ MonoBehaviour:
         RcRate: 1
         Rate: 0.7
         Expo: 0
+    Battery:
+      Cells: 4
+      CapacityMah: 1300
+      InternalResistance: 0.018
+      MaxCurrent: 120
+      IdleCurrent: 0.6

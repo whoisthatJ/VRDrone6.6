@@ -17,6 +17,73 @@ namespace GateRush.EditorTools.Builders
                 case "industrial": Industrial(parent, layer, grid); break;
                 default: Field(parent, layer, grid); break;
             }
+            ConfigureLighting(environment, parent);
+        }
+
+        // ---------- baked lighting ----------
+
+        /// <summary>
+        /// Baked indirect GI for the static world (sun stays realtime for direct light, no shadows), emissive lamps
+        /// baked in, and a light-probe grid so runtime-loaded gates, props and the quad pick up the bounce light.
+        /// Bake with GateRush/Lighting/Bake All Track Lighting (after building the scenes).
+        /// </summary>
+        private static void ConfigureLighting(string environment, Transform parent)
+        {
+            string path = $"Assets/_Project/Settings/Lighting_{environment}.lighting";
+            var s = UnityEditor.AssetDatabase.LoadAssetAtPath<LightingSettings>(path);
+            if (s == null)
+            {
+                s = new LightingSettings { name = "Lighting_" + environment };
+                UnityEditor.AssetDatabase.CreateAsset(s, path);
+            }
+            s.bakedGI = true;
+            s.realtimeGI = false;
+            s.mixedBakeMode = MixedLightingMode.IndirectOnly;
+            s.lightmapper = LightingSettings.Lightmapper.ProgressiveGPU;
+            s.lightmapResolution = environment == "hangar" ? 4f : 1.5f;
+            s.lightmapMaxSize = 1024;
+            s.lightmapPadding = 2;
+            s.directSampleCount = 16;
+            s.indirectSampleCount = 128;
+            s.environmentSampleCount = 64;
+            s.maxBounces = 2;
+            s.compressLightmaps = true;
+            s.ao = false;
+            // Non-directional: one lightmap texture per atlas, cheapest to sample on Quest.
+            s.directionalityMode = LightmapsMode.NonDirectional;
+            s.lightmapCompression = LightmapCompression.NormalQuality;
+            UnityEditor.EditorUtility.SetDirty(s);
+            UnityEditor.Lightmapping.lightingSettings = s;
+
+            foreach (var light in Object.FindObjectsByType<Light>(FindObjectsSortMode.None))
+                light.lightmapBakeType = LightmapBakeType.Mixed;
+
+            // Huge ground planes get a reduced lightmap share (they are mostly flat and evenly lit).
+            foreach (var r in parent.GetComponentsInChildren<MeshRenderer>())
+            {
+                if (r.gameObject.name != "Ground") continue;
+                var so = new UnityEditor.SerializedObject(r);
+                so.FindProperty("m_ScaleInLightmap").floatValue = environment == "hangar" ? 0.25f : 0.05f;
+                so.ApplyModifiedPropertiesWithoutUndo();
+            }
+
+            // Light probes over the flyable volume.
+            Vector3 min, max;
+            float spacing;
+            switch (environment)
+            {
+                case "hangar": min = new Vector3(-46f, 0.5f, -22f); max = new Vector3(46f, 14f, 22f); spacing = 8f; break;
+                case "industrial": min = new Vector3(-30f, 0.5f, -40f); max = new Vector3(120f, 20f, 110f); spacing = 20f; break;
+                default: min = new Vector3(-60f, 0.5f, -60f); max = new Vector3(120f, 20f, 100f); spacing = 20f; break;
+            }
+            float[] heights = { min.y, 4f, max.y };
+            var positions = new System.Collections.Generic.List<Vector3>();
+            for (float x = min.x; x <= max.x + 0.01f; x += spacing)
+            for (float z = min.z; z <= max.z + 0.01f; z += spacing)
+                foreach (float y in heights) positions.Add(new Vector3(x, y, z));
+            var probes = new GameObject("Light Probes").AddComponent<LightProbeGroup>();
+            probes.transform.SetParent(parent, false);
+            probes.probePositions = positions.ToArray();
         }
 
         // ---------- open field ----------

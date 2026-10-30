@@ -94,6 +94,7 @@ namespace GateRush.Flight
         public PidSettings Pid;
         public AngleModeSettings AngleMode;
         public RateProfile Rates;
+        public BatterySettings Battery;
 
         /// <summary>A 5" race quad. Starting values; tuned by feel later.</summary>
         public static QuadProfile Race5Inch => new QuadProfile
@@ -137,6 +138,7 @@ namespace GateRush.Flight
                 MaxOuterRateDegPerSec = 400f,
             },
             Rates = RateProfile.BetaflightDefault,
+            Battery = BatterySettings.Race4S,
         };
 
         /// <summary>
@@ -190,6 +192,7 @@ namespace GateRush.Flight
                 Pitch = new AxisRates(70f, 600f, 0.4f),
                 Yaw = new AxisRates(70f, 450f, 0.3f),
             },
+            Battery = BatterySettings.Freestyle6S,
         };
 
         /// <summary>
@@ -242,6 +245,7 @@ namespace GateRush.Flight
                 Pitch = new AxisRates(70f, 500f, 0.3f),
                 Yaw = new AxisRates(70f, 400f, 0.3f),
             },
+            Battery = BatterySettings.Whoop1S,
         };
     }
 
@@ -255,6 +259,8 @@ namespace GateRush.Flight
         public float FixedStep;
         /// <summary>Max sub-steps per rendered frame; time beyond this is dropped.</summary>
         public int MaxSubSteps;
+        /// <summary>Motor thrust follows the loaded battery voltage (sag under load, weaker as the pack drains).</summary>
+        public bool BatterySag;
 
         public static PhysicsSettings Default => new PhysicsSettings
         {

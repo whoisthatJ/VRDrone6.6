@@ -41,6 +41,12 @@ namespace GateRush.Game
         [Header("Track editor")]
         [SerializeField] private GateRush.TrackEditor.TrackEditorController editor;
 
+        [Header("Feed, audio, comfort")]
+        [SerializeField] private QuadAudio quadAudio;
+        [SerializeField] private VtxSignal vtx;
+        [SerializeField] private GameObject horizonRing;
+        [SerializeField] private GameObject debugOverlay;
+
         private string _appliedQuadId;
         private bool _testFlying;
 
@@ -53,6 +59,12 @@ namespace GateRush.Game
             ApplySettings(settings);
             SaveSystem.SettingsChanged += ApplySettings;
             if (radioProvider != null) radioProvider.Changed += OnRadioChanged;
+            if (views != null) views.Changed += OnViewChanged;
+            if (race != null)
+            {
+                race.GatePassed += OnGatePassed;
+                race.PhaseChanged += OnPhaseChanged;
+            }
 
             var edit = GameFlow.TakePendingEdit();
             if (edit != null && editor != null)
@@ -71,11 +83,36 @@ namespace GateRush.Game
         {
             SaveSystem.SettingsChanged -= ApplySettings;
             if (radioProvider != null) radioProvider.Changed -= OnRadioChanged;
+            if (views != null) views.Changed -= OnViewChanged;
+            if (race != null)
+            {
+                race.GatePassed -= OnGatePassed;
+                race.PhaseChanged -= OnPhaseChanged;
+            }
             SceneSwitcher.MenuOverride = null;
             if (Time.timeScale == 0f) Time.timeScale = 1f;
         }
 
         private void OnRadioChanged() => ApplySettings(SaveSystem.Settings);
+
+        // ---------- feed / audio / comfort ----------
+
+        private void OnViewChanged(ViewMode mode)
+        {
+            // Motor sound comes from the quad in line of sight, "in your ears" in the FPV views.
+            if (quadAudio != null) quadAudio.SetSpatial(mode == ViewMode.LineOfSight);
+            if (horizonRing != null) horizonRing.SetActive(SaveSystem.Settings.Comfort.HorizonLine && mode == ViewMode.Immersive);
+        }
+
+        private void OnGatePassed(int gate, PassResult result)
+        {
+            if (quadAudio != null && (result == PassResult.LapCompleted || result == PassResult.RaceFinished)) quadAudio.Beep();
+        }
+
+        private void OnPhaseChanged(RacePhase phase)
+        {
+            if (quadAudio != null && phase == RacePhase.Racing) quadAudio.Beep();
+        }
 
         // ---------- editor / test fly ----------
 
@@ -192,7 +229,18 @@ namespace GateRush.Game
             }
 
             var display = FindAnyObjectByType<XrDisplayConfig>();
-            if (display != null && display.TargetRefreshRate != s.Comfort.RefreshRate) display.SetRefreshRate(s.Comfort.RefreshRate);
+            if (display != null)
+            {
+                if (display.TargetRefreshRate != s.Comfort.RefreshRate) display.SetRefreshRate(s.Comfort.RefreshRate);
+                float fov = s.Comfort.Foveation / 3f;
+                if (!Mathf.Approximately(display.FoveationLevel, fov)) display.SetFoveation(fov);
+            }
+
+            if (quadAudio != null) quadAudio.Volume = s.Feed.MotorVolume;
+            if (vtx != null) vtx.Level = (VtxNoiseLevel)s.Feed.VtxNoise;
+            if (debugOverlay != null) debugOverlay.SetActive(s.Feed.ShowDebugOverlay);
+            if (vehicle != null) vehicle.SetBatterySag(s.Physics.BatterySag);
+            if (views != null) OnViewChanged(views.Mode);
 
             if (race != null) race.PilotName = s.PilotName;
         }
@@ -217,6 +265,7 @@ namespace GateRush.Game
             if (quadVisual != null) quadVisual.localScale = Vector3.one * entry.VisualScale;
             if (ghostVisual != null) ghostVisual.localScale = Vector3.one * entry.VisualScale;
             if (fpvCamera != null) fpvCamera.transform.localPosition = entry.CameraOffset;
+            if (quadAudio != null) quadAudio.MaxRpm = entry.MotorRpm;
 
             // A different quad means a different ghost and a fresh start.
             if (_appliedQuadId != null && _appliedQuadId != entry.Id && race != null)

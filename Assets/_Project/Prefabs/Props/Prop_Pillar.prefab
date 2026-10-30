@@ -9,6 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4380783688687012512}
+  - component: {fileID: 2148361145261624479}
   m_Layer: 0
   m_Name: Prop_Pillar
   m_TagString: Untagged
@@ -32,6 +33,26 @@ Transform:
   - {fileID: 7049860178596635179}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!205 &2148361145261624479
+LODGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1021342857849240010}
+  serializedVersion: 3
+  m_LocalReferencePoint: {x: 0, y: 2, z: 0}
+  m_Size: 4
+  m_FadeMode: 0
+  m_AnimateCrossFading: 0
+  m_LastLODIsBillboard: 0
+  m_LODs:
+  - screenRelativeHeight: 0.006
+    fadeTransitionWidth: 0
+    renderers:
+    - renderer: {fileID: 7079892597224182487}
+  m_Enabled: 1
+  m_GlobalIlluminationLOD: 0
 --- !u!1 &1732318861344138801
 GameObject:
   m_ObjectHideFlags: 0

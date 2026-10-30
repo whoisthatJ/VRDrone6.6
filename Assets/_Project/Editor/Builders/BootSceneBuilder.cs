@@ -48,6 +48,8 @@ namespace GateRush.EditorTools.Builders
         private static readonly System.Collections.Generic.HashSet<string> OptionalReferences = new System.Collections.Generic.HashSet<string>
         {
             "QuadVehicle.rates", // pilot rates come from the settings (TrackSceneController)
+            "RaceHud.resultsPanel", // the head-locked HUD has no results panel
+            "RaceHud.resultsText",
         };
 
         public static void VerifySceneReferences(System.Collections.Generic.IEnumerable<string> scenePaths)

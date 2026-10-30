@@ -35,6 +35,8 @@ namespace GateRush.Flight
             Vec3 vBody = q.Conjugate * s.Velocity;
             Vec3 thrustBody = Vec3.Zero;
             Vec3 torqueBody = Vec3.Zero;
+            // Battery sag: thrust follows the loaded pack voltage from the previous step.
+            float voltageScale = env.BatterySag && s.BatteryVoltage > 0f ? BatteryModel.ThrustScale(p.Battery, s.BatteryVoltage) : 1f;
             for (int i = 0; i < 4; i++)
             {
                 float target = MotorModel.TargetSpeed(p.Motors, s.MotorCommand[i], s.Armed);
@@ -44,11 +46,17 @@ namespace GateRush.Flight
                 Vec3 r = Mixer.MotorPosition(i, p.ArmX, p.ArmZ);
                 // Axial inflow (air entering the disc from above) includes rotation of the frame.
                 float inflow = vBody.y + Vec3.Cross(s.AngularVelocity, r).y;
-                float t = MotorModel.Thrust(p.Motors, speed, inflow);
+                float t = MotorModel.Thrust(p.Motors, speed, inflow) * voltageScale;
                 Vec3 f = new Vec3(0f, t, 0f);
                 thrustBody += f;
                 torqueBody += Vec3.Cross(r, f);
                 torqueBody += new Vec3(0f, Mixer.YawSign(i) * p.Motors.YawTorquePerThrust * t, 0f);
+            }
+
+            if (p.Battery.Cells > 0)
+            {
+                s.BatteryCurrent = BatteryModel.Current(p.Battery, s.MotorSpeed, s.Armed);
+                s.BatteryVoltage = BatteryModel.Step(p.Battery, ref s.BatteryUsedMah, s.BatteryCurrent, dt);
             }
 
             Vec3 forceBody = thrustBody + AeroModel.DragForce(p.Aero, vBody);

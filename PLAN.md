@@ -87,7 +87,7 @@ Tests/EditMode/   Flight model and rates tests
 | M5 ✅ | Content + settings | 3 quad classes (5" race, 5" freestyle, whoop), 3 tracks (indoor hangar, outdoor field, industrial), rates/camera/physics settings UI, save/load |
 | M6 ✅ (hardware check pending) | RC radio + **BetaFPV** support | Generic HID joystick over USB-C OTG and Bluetooth; diagnostics screen (✅ moved to M3); calibration wizard; BetaFPV presets (LR2 SIM, LR3, LR4 USB/BT) auto-applied by device name; Android axis fallback plugin; hot-plug handling; on headset: an LR2 SIM (USB) and an LR4 (Bluetooth) can arm and fly a full lap |
 | M7 ✅ (headset check pending) | Track editor (VR) | Place, rotate and scale gates with controllers, snap, set checkpoint order, save/load JSON, share by file |
-| M8 | Polish + perf | Baked lighting, LODs, FFR, motor audio, crash/prop VFX, analog VTX noise effect, OSD HUD, comfort options |
+| M8 ✅ (headset perf check pending) | Polish + perf | Baked lighting, LODs, FFR, motor audio, crash/prop VFX, analog VTX noise effect, OSD HUD, comfort options |
 | M9 | Online (stretch) | Session-based multiplayer race (up to 6–8 pilots), synced start, interpolated remote quads; online leaderboards |
 
 ## 6. Quest performance budget
@@ -168,6 +168,14 @@ Tests/EditMode/   Flight model and rates tests
 | 2026-10-30 | User tracks: `TrackLibrary` = one JSON per track in `persistentDataPath/tracks`, ids `user-<name>` (unique). Sharing = copying files (adb/SideQuest); foreign files are re-keyed by file name so they never clash with built-ins; unreadable files are skipped. Built-ins can be copied and edited; user tracks appear in Choose track and keep their own leaderboard/ghosts | "Share by file" |
 | 2026-10-30 | Cached XR controls are now checked with `device.added` everywhere (view input, Touch source, scene switcher, race restart, diagnostics, editor) | An XR runtime on the dev PC dropped the controllers without a change event and the old controls threw every frame |
 | 2026-10-30 | Workflow rule: never edit scripts while the Editor is in play mode | The resulting domain reload wipes runtime state and looks like a code bug |
+| 2026-10-30 | **Battery**: `BatteryModel` (LiPo open-circuit curve, I·R sag, current ∝ motor speed³, mAh drain); packs per class (4S 1300 race, 6S 1100 freestyle, 1S 300 whoop). With `PhysicsSettings.BatterySag` thrust scales with (V/V_full)². Off by default in the sim (tests), on by default in the game settings | Real punch-outs fade on a sagging pack; deterministic and testable |
+| 2026-10-30 | **Motor audio** is procedural (`QuadAudio`, `OnAudioFilterRead`): per-motor saw at the blade-pass frequency + filtered airflow noise + crash thump + lap/start beeps. No audio assets. 2D in FPV views, 3D at the quad in LOS | No asset pipeline/licensing; reacts to every motor |
+| 2026-10-30 | **VFX**: prop-blur discs that cross-fade with RPM; one pooled particle system (`Emit`) for crash/impact sparks | Pooled, no runtime instantiation |
+| 2026-10-30 | **Analog VTX**: custom URP shader `GateRush/AnalogFeed` on the goggles screen (snow, colour loss, scanlines, line jitter, static bands; single-pass-instanced) driven by `VtxSignal` (distance from the pilot + raycast obstacles, crash burst); Off / Light / Realistic. Only in Goggles view (it is part of the screen, not eye-buffer post) | §6: no post-processing in the eye buffer |
+| 2026-10-30 | **OSD**: Betaflight-style (voltage + per-cell, mAh, mode/DISARMED, armed timer, throttle, speed/altitude, LQ, crosshair, artificial horizon, LOW BATTERY / LINK warnings). Developer readout moved behind a setting. **Head HUD** (lap/time) for Immersive/LOS in XR | OSD only exists inside the FPV feed |
+| 2026-10-30 | **Comfort/display**: foveation Off/Low/Med/High, horizon ring in Immersive, motor volume, VTX noise, debug readout, battery sag (new Feed tab + Comfort/Physics) | §2 comfort extras |
+| 2026-10-30 | **LODs**: gate and prop prefabs get a culling LODGroup (0.4% / 0.6% screen height); static environment geometry is static-batched | Cheap far-field |
+| 2026-10-30 | **Baked lighting**: per-environment LightingSettings (baked indirect, non-directional, compressed, sun Mixed so direct light stays realtime without shadows), emissive lamps baked, light-probe grids for runtime gates/props/quad; `LightingBaker` bakes all three in ~25 s. Rebuilding scenes drops the bake: run *Bake All Track Lighting* after *Build All Scenes* | Quest budget; runtime-loaded tracks can't be lightmapped |
 | 2026-10-30 | Unity CLI is 1.0.0-beta.6 and not signed in (license is active). It wasn't needed: the live Editor is driven through the Unity Editor MCP | — |
 
 ## 9. Notes for tuning

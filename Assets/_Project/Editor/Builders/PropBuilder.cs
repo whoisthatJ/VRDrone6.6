@@ -62,6 +62,11 @@ namespace GateRush.EditorTools.Builders
             r.sharedMaterial = mat;
             r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
 
+            // LOD: culled when smaller than 0.6% of screen height.
+            var lod = root.AddComponent<LODGroup>();
+            lod.SetLODs(new[] { new LOD(0.006f, new[] { r }) });
+            lod.RecalculateBounds();
+
             string path = $"{PrefabDir}/Prop_{type}.prefab";
             var prefab = PrefabUtility.SaveAsPrefabAsset(root, path);
             Object.DestroyImmediate(root);

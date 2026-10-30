@@ -25,6 +25,15 @@ namespace GateRush.Core
             _applied = false;
         }
 
+        public float FoveationLevel => foveationLevel;
+
+        /// <summary>Fixed foveated rendering strength 0..1 (Off/Low/Medium/High = 0, 0.33, 0.67, 1).</summary>
+        public void SetFoveation(float level)
+        {
+            foveationLevel = Mathf.Clamp01(level);
+            _applied = false;
+        }
+
         private void Update()
         {
             if (_applied) return;

@@ -89,8 +89,8 @@ namespace GateRush.EditorTools.Builders
             gso.ApplyModifiedPropertiesWithoutUndo();
 
             var fpv = quad.GetComponentInChildren<FpvCamera>();
-            BuildOverlay(quad, fpv.GetComponent<Camera>(), race, guard);
-            var views = BuildViews(quad, fpv, mats, roomLayer, quadLayer);
+            var views = BuildViews(quad, fpv, mats, roomLayer, quadLayer, trackLayer, race);
+            var debugOverlay = BuildOverlay(quad, fpv.GetComponent<Camera>(), race, guard, views.Vtx);
 
             var controllerGo = new GameObject("Track Scene");
             var controller = controllerGo.AddComponent<TrackSceneController>();
@@ -113,6 +113,10 @@ namespace GateRush.EditorTools.Builders
             cso.FindProperty("touch").objectReferenceValue = touch;
             cso.FindProperty("radio").objectReferenceValue = radio;
             cso.FindProperty("radioProvider").objectReferenceValue = provider;
+            cso.FindProperty("quadAudio").objectReferenceValue = quad.GetComponent<QuadAudio>();
+            cso.FindProperty("vtx").objectReferenceValue = views.Vtx;
+            cso.FindProperty("horizonRing").objectReferenceValue = views.HorizonRing;
+            cso.FindProperty("debugOverlay").objectReferenceValue = debugOverlay;
             cso.ApplyModifiedPropertiesWithoutUndo();
 
             string path = ScenePath(environment);
@@ -247,13 +251,39 @@ namespace GateRush.EditorTools.Builders
             so.FindProperty("spawnPoint").objectReferenceValue = spawn;
             so.ApplyModifiedPropertiesWithoutUndo();
 
+            // Prop blur discs (fade in with RPM) on the same layer as the visuals.
+            var discs = new Renderer[4];
+            for (int i = 0; i < 4; i++)
+            {
+                var disc = Part(visual, PrimitiveType.Cylinder, $"Blur {i}", props[i].localPosition + new Vector3(0f, 0.002f, 0f),
+                    new Vector3(0.13f, 0.0008f, 0.13f), Quaternion.identity, mats.PropBlur);
+                disc.layer = quadLayer;
+                discs[i] = disc.GetComponent<Renderer>();
+            }
+
             var propVisuals = root.AddComponent<PropVisuals>();
             var pso = new SerializedObject(propVisuals);
             pso.FindProperty("vehicle").objectReferenceValue = quad;
             var arr = pso.FindProperty("props");
             arr.arraySize = 4;
             for (int i = 0; i < 4; i++) arr.GetArrayElementAtIndex(i).objectReferenceValue = props[i];
+            var blur = pso.FindProperty("blurDiscs");
+            blur.arraySize = 4;
+            for (int i = 0; i < 4; i++) blur.GetArrayElementAtIndex(i).objectReferenceValue = discs[i];
             pso.ApplyModifiedPropertiesWithoutUndo();
+
+            var audio = root.AddComponent<AudioSource>();
+            audio.spatialBlend = 0f;
+            var quadAudio = root.AddComponent<QuadAudio>();
+            var aso = new SerializedObject(quadAudio);
+            aso.FindProperty("vehicle").objectReferenceValue = quad;
+            aso.ApplyModifiedPropertiesWithoutUndo();
+
+            var fx = root.AddComponent<CrashEffects>();
+            var fso = new SerializedObject(fx);
+            fso.FindProperty("vehicle").objectReferenceValue = quad;
+            fso.FindProperty("particleMaterial").objectReferenceValue = mats.Sparks;
+            fso.ApplyModifiedPropertiesWithoutUndo();
             return quad;
         }
 
@@ -279,10 +309,15 @@ namespace GateRush.EditorTools.Builders
             public ComfortVignette Vignette;
             public Transform LosStand;
             public Unity.XR.CoreUtils.XROrigin Origin;
+            public VtxSignal Vtx;
+            public GameObject HorizonRing;
         }
 
-        /// <summary>XR rig, goggles room + curved screen, comfort vignette, LOS stand and the view-mode manager.</summary>
-        private static ViewRefs BuildViews(QuadVehicle quad, FpvCamera fpv, Materials mats, int roomLayer, int quadLayer)
+        /// <summary>
+        /// XR rig, goggles room + curved analog-feed screen, comfort vignette, horizon ring, LOS stand, VTX signal,
+        /// head-locked race HUD (Immersive/LOS) and the view-mode manager.
+        /// </summary>
+        private static ViewRefs BuildViews(QuadVehicle quad, FpvCamera fpv, Materials mats, int roomLayer, int quadLayer, int trackLayer, RaceSession race)
         {
             var origin = BootSceneBuilder.CreateXrRig();
             origin.transform.position = new Vector3(0f, 0f, -2f);
@@ -339,12 +374,80 @@ namespace GateRush.EditorTools.Builders
             iso.FindProperty("gogglesScreen").objectReferenceValue = screen;
             iso.ApplyModifiedPropertiesWithoutUndo();
 
-            return new ViewRefs { Manager = views, Screen = screen, Vignette = comfort, LosStand = stand, Origin = origin };
+            // Analog video link: pilot (LOS stand) → quad.
+            var vtx = viewsGo.AddComponent<VtxSignal>();
+            var xso = new SerializedObject(vtx);
+            xso.FindProperty("vehicle").objectReferenceValue = quad;
+            xso.FindProperty("receiver").objectReferenceValue = stand;
+            xso.FindProperty("screen").objectReferenceValue = screenRenderer;
+            xso.FindProperty("obstacles").intValue = 1 << trackLayer;
+            xso.ApplyModifiedPropertiesWithoutUndo();
+
+            // Horizon ring (Immersive comfort aid).
+            var ring = new GameObject("Horizon Ring", typeof(LineRenderer));
+            ring.transform.SetParent(viewsGo.transform, false);
+            var line = ring.GetComponent<LineRenderer>();
+            line.sharedMaterial = GateRush.EditorTools.Builders.Materials.Unlit("HorizonLine", new Color(0.75f, 0.85f, 1f, 0.5f), true);
+            line.widthMultiplier = 0.05f;
+            line.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            var hr = ring.AddComponent<HorizonRing>();
+            var hso = new SerializedObject(hr);
+            hso.FindProperty("head").objectReferenceValue = head.transform;
+            hso.ApplyModifiedPropertiesWithoutUndo();
+            ring.SetActive(false);
+
+            BuildHeadHud(viewsGo, views, head, race);
+
+            return new ViewRefs { Manager = views, Screen = screen, Vignette = comfort, LosStand = stand, Origin = origin, Vtx = vtx, HorizonRing = ring };
         }
 
-        private static void BuildOverlay(QuadVehicle quad, Camera fpvCamera, RaceSession race, ControllerHotplugGuard guard)
+        /// <summary>Small world-space race HUD under the head camera, shown only where the FPV OSD can't be seen.</summary>
+        private static void BuildHeadHud(GameObject viewsGo, ViewModeManager views, Camera head, RaceSession race)
         {
-            var canvasGo = new GameObject("Debug Overlay", typeof(Canvas), typeof(CanvasScaler));
+            var canvasGo = new GameObject("Head HUD", typeof(Canvas), typeof(CanvasScaler));
+            canvasGo.transform.SetParent(head.transform, false);
+            var canvas = canvasGo.GetComponent<Canvas>();
+            canvas.renderMode = RenderMode.WorldSpace;
+            var rt = (RectTransform)canvasGo.transform;
+            rt.sizeDelta = new Vector2(1000f, 400f);
+            rt.localScale = Vector3.one * 0.0008f;
+            rt.localPosition = new Vector3(0f, -0.28f, 1.2f);
+            rt.localRotation = Quaternion.Euler(12f, 0f, 0f);
+            canvasGo.GetComponent<CanvasScaler>().dynamicPixelsPerUnit = 3f;
+
+            var lap = Label(canvasGo.transform, "Lap Info", 0, 44);
+            var lrt = (RectTransform)lap.transform;
+            lrt.anchorMin = lrt.anchorMax = lrt.pivot = new Vector2(0.5f, 0f);
+            lrt.anchoredPosition = new Vector2(0f, 20f);
+            lrt.sizeDelta = new Vector2(1000f, 120f);
+            lap.alignment = TextAlignmentOptions.Center;
+            var centre = Label(canvasGo.transform, "Centre", 0, 80);
+            var crt = (RectTransform)centre.transform;
+            crt.anchorMin = crt.anchorMax = crt.pivot = new Vector2(0.5f, 1f);
+            crt.anchoredPosition = Vector2.zero;
+            crt.sizeDelta = new Vector2(1000f, 160f);
+            centre.alignment = TextAlignmentOptions.Center;
+            centre.text = "";
+
+            var hud = canvasGo.AddComponent<RaceHud>();
+            var so = new SerializedObject(hud);
+            so.FindProperty("session").objectReferenceValue = race;
+            so.FindProperty("lapInfo").objectReferenceValue = lap;
+            so.FindProperty("centre").objectReferenceValue = centre;
+            so.ApplyModifiedPropertiesWithoutUndo();
+            canvasGo.SetActive(false);
+
+            var vis = viewsGo.AddComponent<ViewVisibility>();
+            var vso = new SerializedObject(vis);
+            vso.FindProperty("views").objectReferenceValue = views;
+            vso.FindProperty("target").objectReferenceValue = canvasGo;
+            vso.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        /// <summary>FPV OSD canvas (drawn by the drone camera): Betaflight-style OSD, race HUD, hot-plug overlay and the optional debug readout. Returns the debug container.</summary>
+        private static GameObject BuildOverlay(QuadVehicle quad, Camera fpvCamera, RaceSession race, ControllerHotplugGuard guard, VtxSignal vtx)
+        {
+            var canvasGo = new GameObject("OSD", typeof(Canvas), typeof(CanvasScaler));
             var canvas = canvasGo.GetComponent<Canvas>();
             // Drawn by the FPV camera, so it shows inside the goggles feed like an OSD.
             canvas.renderMode = RenderMode.ScreenSpaceCamera;
@@ -354,11 +457,20 @@ namespace GateRush.EditorTools.Builders
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
             scaler.referenceResolution = new Vector2(1920f, 1080f);
 
-            var overlay = canvasGo.AddComponent<FlightDebugOverlay>();
-            var status = Label(canvasGo.transform, "Status", 0, 30);
-            var sticks = Label(canvasGo.transform, "Sticks", 1, 22);
-            var rates = Label(canvasGo.transform, "Rates", 2, 22);
-            var motion = Label(canvasGo.transform, "Motion", 3, 22);
+            // Developer readout lives in its own full-screen container so settings can toggle it.
+            var debugGo = new GameObject("Debug Readout", typeof(RectTransform));
+            debugGo.transform.SetParent(canvasGo.transform, false);
+            var drt = (RectTransform)debugGo.transform;
+            drt.anchorMin = Vector2.zero;
+            drt.anchorMax = Vector2.one;
+            drt.offsetMin = drt.offsetMax = Vector2.zero;
+            drt.anchoredPosition = new Vector2(0f, -150f);
+
+            var overlay = debugGo.AddComponent<FlightDebugOverlay>();
+            var status = Label(debugGo.transform, "Status", 0, 22);
+            var sticks = Label(debugGo.transform, "Sticks", 1, 20);
+            var rates = Label(debugGo.transform, "Rates", 2, 20);
+            var motion = Label(debugGo.transform, "Motion", 3, 20);
 
             var so = new SerializedObject(overlay);
             so.FindProperty("vehicle").objectReferenceValue = quad;
@@ -369,11 +481,66 @@ namespace GateRush.EditorTools.Builders
             var bars = so.FindProperty("motorBars");
             bars.arraySize = 4;
             string[] names = { "RR", "FR", "RL", "FL" };
-            for (int i = 0; i < 4; i++) bars.GetArrayElementAtIndex(i).objectReferenceValue = MotorBar(canvasGo.transform, i, names[i]);
+            for (int i = 0; i < 4; i++) bars.GetArrayElementAtIndex(i).objectReferenceValue = MotorBar(debugGo.transform, i, names[i]);
             so.ApplyModifiedPropertiesWithoutUndo();
+            debugGo.SetActive(false);
 
+            BuildOsd(canvasGo.transform, quad, vtx);
             BuildRaceHud(canvasGo.transform, race);
             BuildHotplugOverlay(canvasGo.transform, guard);
+            return debugGo;
+        }
+
+        /// <summary>Betaflight-style OSD elements around the edges of the feed, crosshair and artificial horizon in the middle.</summary>
+        private static void BuildOsd(Transform canvas, QuadVehicle quad, VtxSignal vtx)
+        {
+            TextMeshProUGUI Osd(string name, Vector2 anchor, Vector2 pos, float size, TextAlignmentOptions align)
+            {
+                var t = Label(canvas, name, 0, size);
+                var rt = (RectTransform)t.transform;
+                rt.anchorMin = rt.anchorMax = rt.pivot = anchor;
+                rt.anchoredPosition = pos;
+                rt.sizeDelta = new Vector2(600f, 90f);
+                t.alignment = align;
+                t.fontStyle = FontStyles.Bold;
+                t.text = "";
+                return t;
+            }
+
+            var battery = Osd("OSD Battery", new Vector2(0f, 1f), new Vector2(40f, -30f), 30, TextAlignmentOptions.TopLeft);
+            var link = Osd("OSD Link", new Vector2(0f, 1f), new Vector2(40f, -110f), 26, TextAlignmentOptions.TopLeft);
+            var mode = Osd("OSD Mode", new Vector2(0.5f, 1f), new Vector2(0f, -30f), 32, TextAlignmentOptions.Top);
+            var timer = Osd("OSD Timer", new Vector2(0.5f, 0f), new Vector2(0f, 40f), 34, TextAlignmentOptions.Bottom);
+            var throttle = Osd("OSD Throttle", new Vector2(0f, 0f), new Vector2(40f, 40f), 28, TextAlignmentOptions.BottomLeft);
+            var motion = Osd("OSD Motion", new Vector2(1f, 0f), new Vector2(-40f, 40f), 28, TextAlignmentOptions.BottomRight);
+            var warning = Osd("OSD Warning", new Vector2(0.5f, 0.5f), new Vector2(0f, -120f), 40, TextAlignmentOptions.Center);
+            warning.color = new Color(1f, 0.35f, 0.25f);
+
+            var cross = Osd("OSD Crosshair", new Vector2(0.5f, 0.5f), Vector2.zero, 44, TextAlignmentOptions.Center);
+            cross.text = "-+-";
+
+            var horizonGo = new GameObject("OSD Horizon", typeof(RectTransform), typeof(Image));
+            horizonGo.transform.SetParent(canvas, false);
+            var hrt = (RectTransform)horizonGo.transform;
+            hrt.anchorMin = hrt.anchorMax = hrt.pivot = new Vector2(0.5f, 0.5f);
+            hrt.sizeDelta = new Vector2(360f, 3f);
+            var img = horizonGo.GetComponent<Image>();
+            img.color = new Color(1f, 1f, 1f, 0.8f);
+            img.raycastTarget = false;
+
+            var osd = canvas.gameObject.AddComponent<OsdHud>();
+            var so = new SerializedObject(osd);
+            so.FindProperty("vehicle").objectReferenceValue = quad;
+            so.FindProperty("vtx").objectReferenceValue = vtx;
+            so.FindProperty("battery").objectReferenceValue = battery;
+            so.FindProperty("mode").objectReferenceValue = mode;
+            so.FindProperty("timer").objectReferenceValue = timer;
+            so.FindProperty("throttle").objectReferenceValue = throttle;
+            so.FindProperty("motion").objectReferenceValue = motion;
+            so.FindProperty("link").objectReferenceValue = link;
+            so.FindProperty("warning").objectReferenceValue = warning;
+            so.FindProperty("horizon").objectReferenceValue = hrt;
+            so.ApplyModifiedPropertiesWithoutUndo();
         }
 
         private static void BuildHotplugOverlay(Transform canvas, ControllerHotplugGuard guard)
@@ -505,7 +672,7 @@ namespace GateRush.EditorTools.Builders
 
         private struct Materials
         {
-            public Material Ground, Pillar, Accent, Frame, PropFront, PropRear, Screen, Vignette, Ghost, GateFrame;
+            public Material Ground, Pillar, Accent, Frame, PropFront, PropRear, Screen, Vignette, Ghost, GateFrame, PropBlur, Sparks;
         }
 
         private static DataAssets EnsureDataAssets(int trackMask)
@@ -558,12 +725,49 @@ namespace GateRush.EditorTools.Builders
                 Frame = Mat("Frame", new Color(0.12f, 0.12f, 0.13f)),
                 PropFront = Mat("PropFront", new Color(0.9f, 0.15f, 0.15f)),
                 PropRear = Mat("PropRear", new Color(0.15f, 0.15f, 0.15f)),
-                Screen = UnlitMat("GogglesScreen", Color.white, false),
+                Screen = FeedMaterial(),
+                PropBlur = UnlitMat("PropBlur", new Color(0.15f, 0.15f, 0.15f, 0.45f), true),
+                Sparks = SparksMaterial(),
                 Vignette = UnlitMat("Vignette", Color.black, true),
                 Ghost = UnlitMat("Ghost", new Color(0.3f, 0.85f, 1f, 0.35f), true),
                 // Lit, colour driven per gate state by Gate.SetVisualState.
                 GateFrame = Mat("GateFrame", new Color(0.55f, 0.55f, 0.6f)),
             };
+        }
+
+        /// <summary>Goggles screen: the drone feed through the analog-video shader.</summary>
+        private static Material FeedMaterial()
+        {
+            string path = $"{MatDir}/GogglesFeed.mat";
+            var m = AssetDatabase.LoadAssetAtPath<Material>(path);
+            if (m == null)
+            {
+                m = new Material(AssetDatabase.LoadAssetAtPath<Shader>("Assets/_Project/Art/Shaders/AnalogFeed.shader"));
+                AssetDatabase.CreateAsset(m, path);
+            }
+            return m;
+        }
+
+        /// <summary>Additive URP particle material (vertex colours drive the spark colour/fade).</summary>
+        private static Material SparksMaterial()
+        {
+            string path = $"{MatDir}/Sparks.mat";
+            var m = AssetDatabase.LoadAssetAtPath<Material>(path);
+            if (m == null)
+            {
+                m = new Material(Shader.Find("Universal Render Pipeline/Particles/Unlit"));
+                AssetDatabase.CreateAsset(m, path);
+            }
+            m.SetFloat("_Surface", 1f);
+            m.SetFloat("_Blend", 2f); // additive
+            m.SetFloat("_SrcBlend", (float)UnityEngine.Rendering.BlendMode.SrcAlpha);
+            m.SetFloat("_DstBlend", (float)UnityEngine.Rendering.BlendMode.One);
+            m.SetFloat("_ZWrite", 0f);
+            m.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
+            m.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
+            m.SetColor("_BaseColor", Color.white);
+            EditorUtility.SetDirty(m);
+            return m;
         }
 
         private static Material UnlitMat(string name, Color color, bool transparent)

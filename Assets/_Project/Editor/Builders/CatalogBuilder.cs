@@ -34,19 +34,19 @@ namespace GateRush.EditorTools.Builders
             {
                 Id = "race5", DisplayName = "5\" Race", Profile = race,
                 Description = "650 g, ~10:1 thrust-to-weight. Light, fast and twitchy: the race class.",
-                VisualScale = 1f, CollisionRadius = 0.12f, CameraOffset = new Vector3(0f, 0.02f, 0.095f),
+                VisualScale = 1f, CollisionRadius = 0.12f, CameraOffset = new Vector3(0f, 0.02f, 0.095f), MotorRpm = 28000f,
             });
             catalog.Quads.Add(new QuadCatalog.Entry
             {
                 Id = "freestyle5", DisplayName = "5\" Freestyle", Profile = free,
                 Description = "750 g with an action cam, ~7.5:1. More momentum, smoother, Actual rates.",
-                VisualScale = 1.05f, CollisionRadius = 0.13f, CameraOffset = new Vector3(0f, 0.025f, 0.1f),
+                VisualScale = 1.05f, CollisionRadius = 0.13f, CameraOffset = new Vector3(0f, 0.025f, 0.1f), MotorRpm = 25000f,
             });
             catalog.Quads.Add(new QuadCatalog.Entry
             {
                 Id = "whoop65", DisplayName = "65mm Whoop", Profile = whoop,
                 Description = "32 g ducted tiny whoop, ~3:1. Slow, floaty and forgiving: great indoors and for learning.",
-                VisualScale = 0.3f, CollisionRadius = 0.045f, CameraOffset = new Vector3(0f, 0.012f, 0.028f),
+                VisualScale = 0.3f, CollisionRadius = 0.045f, CameraOffset = new Vector3(0f, 0.012f, 0.028f), MotorRpm = 45000f,
             });
             EditorUtility.SetDirty(catalog);
             return catalog;

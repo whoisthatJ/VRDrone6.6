@@ -35,6 +35,20 @@ namespace GateRush.Core
         [Range(0f, 1f)] public float VignetteStrength = 0.7f;
         /// <summary>72 or 90.</summary>
         public float RefreshRate = 72f;
+        /// <summary>Fixed foveated rendering: 0 off, 1 low, 2 medium, 3 high.</summary>
+        public int Foveation = 2;
+        /// <summary>World-horizon ring in Immersive view.</summary>
+        public bool HorizonLine = true;
+    }
+
+    [Serializable]
+    public sealed class FeedPrefs
+    {
+        /// <summary>Analog video noise on the goggles feed: 0 off, 1 light, 2 realistic.</summary>
+        public int VtxNoise = 1;
+        [Range(0f, 1f)] public float MotorVolume = 0.6f;
+        /// <summary>Developer readout (sticks, rates, motors) instead of the clean OSD.</summary>
+        public bool ShowDebugOverlay;
     }
 
     [Serializable]
@@ -46,6 +60,8 @@ namespace GateRush.Core
         [Range(0.5f, 2f)] public float DragScale = 1f;
         /// <summary>Multiplier on motor spool time (higher = laggier motors).</summary>
         [Range(0.5f, 2f)] public float MotorLagScale = 1f;
+        /// <summary>Battery voltage sag and drain affect thrust.</summary>
+        public bool BatterySag = true;
     }
 
     /// <summary>Everything the player can change. Saved as JSON by <see cref="SaveSystem"/>.</summary>
@@ -67,6 +83,7 @@ namespace GateRush.Core
         public InputPrefs Input = new InputPrefs();
         public ComfortPrefs Comfort = new ComfortPrefs();
         public PhysicsPrefs Physics = new PhysicsPrefs();
+        public FeedPrefs Feed = new FeedPrefs();
 
         /// <summary>Brings every value into its valid range (after loading or editing).</summary>
         public void Clamp()
@@ -79,6 +96,10 @@ namespace GateRush.Core
             Input ??= new InputPrefs();
             Comfort ??= new ComfortPrefs();
             Physics ??= new PhysicsPrefs();
+            Feed ??= new FeedPrefs();
+            Comfort.Foveation = Mathf.Clamp(Comfort.Foveation, 0, 3);
+            Feed.VtxNoise = Mathf.Clamp(Feed.VtxNoise, 0, 2);
+            Feed.MotorVolume = Mathf.Clamp01(Feed.MotorVolume);
 
             Rates.Roll = ClampAxis(Rates.Type, Rates.Roll);
             Rates.Pitch = ClampAxis(Rates.Type, Rates.Pitch);

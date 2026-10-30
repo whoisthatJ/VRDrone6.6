@@ -19,6 +19,8 @@ namespace GateRush.Vehicle
 
         public bool Crashed;
         public float LastImpactSpeed;
+        /// <summary>Increments on every impact harder than <see cref="CollisionSettings.MinBounceSpeed"/> (effects/audio poll it).</summary>
+        public int ImpactCount;
 
         public bool AfterStep(ref QuadState s, in QuadState previous, float dt)
         {
@@ -43,6 +45,7 @@ namespace GateRush.Vehicle
 
             float impact = -vn;
             LastImpactSpeed = impact;
+            if (impact > Settings.MinBounceSpeed) ImpactCount++;
             if (impact > Settings.CrashSpeed)
             {
                 Crashed = true;

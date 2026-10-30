@@ -188,7 +188,7 @@ namespace GateRush.UI
 
         // ---------- settings ----------
 
-        private static readonly string[] Tabs = { "Rates", "Camera", "Input", "Comfort", "Physics", "Pilot" };
+        private static readonly string[] Tabs = { "Rates", "Camera", "Input", "Feed", "Comfort", "Physics", "Pilot" };
 
         private void ShowSettings()
         {
@@ -211,6 +211,7 @@ namespace GateRush.UI
                 case "Rates": BuildRates(content); break;
                 case "Camera": BuildCamera(content); break;
                 case "Input": BuildInput(content); break;
+                case "Feed": BuildFeed(content); break;
                 case "Comfort": BuildComfort(content); break;
                 case "Physics": BuildPhysics(content); break;
                 default: BuildPilot(content); break;
@@ -327,6 +328,20 @@ namespace GateRush.UI
             var comfort = S.Comfort;
             UiKit.SliderRow(c, "Vignette (Immersive)", 0f, 0f, 1f, comfort.VignetteStrength, v => F(v * 100f, "0") + " %", v => { comfort.VignetteStrength = v; Changed(); }, ContentWidth);
             UiKit.StepperRow(c, "Refresh rate", -90f, new[] { "72 Hz", "90 Hz" }, comfort.RefreshRate >= 90f ? 1 : 0, i => { comfort.RefreshRate = i == 1 ? 90f : 72f; Changed(); }, ContentWidth);
+            UiKit.StepperRow(c, "Foveated rendering", -180f, new[] { "Off", "Low", "Medium", "High" }, comfort.Foveation, i => { comfort.Foveation = i; Changed(); }, ContentWidth);
+            UiKit.StepperRow(c, "Horizon line (Immersive)", -270f, new[] { "Off", "On" }, comfort.HorizonLine ? 1 : 0, i => { comfort.HorizonLine = i == 1; Changed(); }, ContentWidth);
+            UiKit.Label(c, "Higher foveation = faster rendering, blurrier edges. 90 Hz is smoother but needs more headroom.",
+                new Vector2(0f, -380f), new Vector2(ContentWidth, 60f), 26f, TextAlignmentOptions.TopLeft, UiKit.DimTextColor);
+        }
+
+        private void BuildFeed(RectTransform c)
+        {
+            var feed = S.Feed;
+            UiKit.StepperRow(c, "Analog video noise", 0f, new[] { "Off", "Light", "Realistic" }, feed.VtxNoise, i => { feed.VtxNoise = i; Changed(); }, ContentWidth);
+            UiKit.SliderRow(c, "Motor volume", -90f, 0f, 1f, feed.MotorVolume, v => F(v * 100f, "0") + " %", v => { feed.MotorVolume = v; Changed(); }, ContentWidth);
+            UiKit.StepperRow(c, "Debug readout", -180f, new[] { "Off", "On" }, feed.ShowDebugOverlay ? 1 : 0, i => { feed.ShowDebugOverlay = i == 1; Changed(); }, ContentWidth);
+            UiKit.Label(c, "Video noise grows with distance from you and with obstacles between you and the quad, like a real analog link (goggles view).",
+                new Vector2(0f, -290f), new Vector2(ContentWidth, 90f), 26f, TextAlignmentOptions.TopLeft, UiKit.DimTextColor);
         }
 
         private void BuildPhysics(RectTransform c)
@@ -335,8 +350,9 @@ namespace GateRush.UI
             UiKit.SliderRow(c, "Crash speed", 0f, 3f, 20f, ph.CrashSpeed, v => F(v, "0.0") + " m/s", v => { ph.CrashSpeed = v; Changed(); }, ContentWidth);
             UiKit.SliderRow(c, "Air drag", -90f, 0.5f, 2f, ph.DragScale, v => "x" + F(v, "0.00"), v => { ph.DragScale = v; Changed(); }, ContentWidth);
             UiKit.SliderRow(c, "Motor lag", -180f, 0.5f, 2f, ph.MotorLagScale, v => "x" + F(v, "0.00"), v => { ph.MotorLagScale = v; Changed(); }, ContentWidth);
+            UiKit.StepperRow(c, "Battery sag", -270f, new[] { "Off", "On" }, ph.BatterySag ? 1 : 0, i => { ph.BatterySag = i == 1; Changed(); }, ContentWidth);
             UiKit.Label(c, "Lower drag = floatier and faster. Higher motor lag = softer, slower throttle response.",
-                new Vector2(0f, -280f), new Vector2(ContentWidth, 60f), 26f, TextAlignmentOptions.TopLeft, UiKit.DimTextColor);
+                new Vector2(0f, -370f), new Vector2(ContentWidth, 60f), 26f, TextAlignmentOptions.TopLeft, UiKit.DimTextColor);
         }
 
         private void BuildPilot(RectTransform c)

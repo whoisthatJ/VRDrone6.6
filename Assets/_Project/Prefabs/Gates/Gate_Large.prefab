@@ -234,6 +234,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2566529080671608607}
   - component: {fileID: 8594006132447816460}
+  - component: {fileID: 7261051577675560452}
   m_Layer: 0
   m_Name: Gate_Large
   m_TagString: Untagged
@@ -289,6 +290,31 @@ MonoBehaviour:
   nextColor: {r: 0.2, g: 1, b: 0.35, a: 1}
   upcomingColor: {r: 1, g: 0.6, b: 0.1, a: 1}
   passedColor: {r: 0.3, g: 0.3, b: 0.35, a: 1}
+--- !u!205 &7261051577675560452
+LODGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1420179406656756628}
+  serializedVersion: 3
+  m_LocalReferencePoint: {x: 0, y: 1.56, z: 0}
+  m_Size: 3.12
+  m_FadeMode: 0
+  m_AnimateCrossFading: 0
+  m_LastLODIsBillboard: 0
+  m_LODs:
+  - screenRelativeHeight: 0.004
+    fadeTransitionWidth: 0
+    renderers:
+    - renderer: {fileID: 5802531615164449987}
+    - renderer: {fileID: 1045489955675576929}
+    - renderer: {fileID: 2479241697104772168}
+    - renderer: {fileID: 1550285735568333182}
+    - renderer: {fileID: 8458217852846152178}
+    - renderer: {fileID: 5550834173452238778}
+  m_Enabled: 1
+  m_GlobalIlluminationLOD: 0
 --- !u!1 &2386252390999846168
 GameObject:
   m_ObjectHideFlags: 0

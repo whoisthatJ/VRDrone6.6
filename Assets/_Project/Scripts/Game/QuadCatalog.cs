@@ -22,6 +22,8 @@ namespace GateRush.Game
             public float CollisionRadius = 0.12f;
             [Tooltip("FPV camera position relative to the quad centre (m).")]
             public Vector3 CameraOffset = new Vector3(0f, 0.02f, 0.095f);
+            [Tooltip("Motor RPM at full speed, for the motor sound.")]
+            public float MotorRpm = 28000f;
         }
 
         public List<Entry> Quads = new List<Entry>();

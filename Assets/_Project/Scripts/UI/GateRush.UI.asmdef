@@ -9,6 +9,7 @@
         "GateRush.Race",
         "GateRush.Game",
         "GateRush.Track",
+        "GateRush.Cameras",
         "Unity.InputSystem",
         "Unity.TextMeshPro",
         "UnityEngine.UI"

@@ -20,6 +20,7 @@ MonoBehaviour:
     VisualScale: 1
     CollisionRadius: 0.12
     CameraOffset: {x: 0, y: 0.02, z: 0.095}
+    MotorRpm: 28000
   - Id: freestyle5
     DisplayName: 5" Freestyle
     Description: 750 g with an action cam, ~7.5:1. More momentum, smoother, Actual rates.
@@ -27,6 +28,7 @@ MonoBehaviour:
     VisualScale: 1.05
     CollisionRadius: 0.13
     CameraOffset: {x: 0, y: 0.025, z: 0.1}
+    MotorRpm: 25000
   - Id: whoop65
     DisplayName: 65mm Whoop
     Description: '32 g ducted tiny whoop, ~3:1. Slow, floaty and forgiving: great indoors and for learning.'
@@ -34,3 +36,4 @@ MonoBehaviour:
     VisualScale: 0.3
     CollisionRadius: 0.045
     CameraOffset: {x: 0, y: 0.012, z: 0.028}
+    MotorRpm: 45000

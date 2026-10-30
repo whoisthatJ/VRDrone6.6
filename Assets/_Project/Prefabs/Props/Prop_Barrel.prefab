@@ -123,6 +123,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8412365827826654345}
+  - component: {fileID: 6761589379566549877}
   m_Layer: 0
   m_Name: Prop_Barrel
   m_TagString: Untagged
@@ -146,3 +147,23 @@ Transform:
   - {fileID: 8706644361764845357}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!205 &6761589379566549877
+LODGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5405595219815188547}
+  serializedVersion: 3
+  m_LocalReferencePoint: {x: 0.000000029802322, y: 0.45, z: -0.000000059604645}
+  m_Size: 0.9
+  m_FadeMode: 0
+  m_AnimateCrossFading: 0
+  m_LastLODIsBillboard: 0
+  m_LODs:
+  - screenRelativeHeight: 0.006
+    fadeTransitionWidth: 0
+    renderers:
+    - renderer: {fileID: 529196070790545620}
+  m_Enabled: 1
+  m_GlobalIlluminationLOD: 0
