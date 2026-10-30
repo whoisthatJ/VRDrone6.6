@@ -1,0 +1,67 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b4c9bdfcdd678134998a205e30d160c1, type: 3}
+  m_Name: BetaFPV_Generic
+  m_EditorClassIdentifier: GateRush.Input::GateRush.Input.ControllerPreset
+  DisplayName: BetaFPV radio (generic)
+  NamePattern: BETAFPV|LiteRadio
+  Priority: 0
+  Verified: 0
+  UsesGamepadPath: 0
+  Notes: Fallback for other BetaFPV radios.
+  Mapping:
+    Throttle:
+      Channel: 2
+      Invert: 0
+      Range:
+        Min: -1
+        Center: 0
+        Max: 1
+    Yaw:
+      Channel: 3
+      Invert: 0
+      Range:
+        Min: -1
+        Center: 0
+        Max: 1
+    Pitch:
+      Channel: 1
+      Invert: 0
+      Range:
+        Min: -1
+        Center: 0
+        Max: 1
+    Roll:
+      Channel: 0
+      Invert: 0
+      Range:
+        Min: -1
+        Center: 0
+        Max: 1
+    Arm:
+      Channel: 4
+      Position0: -1
+      Position1: 1
+      Position2: 1
+      ThreePosition: 0
+    Mode:
+      Channel: 5
+      Position0: -1
+      Position1: 0
+      Position2: 1
+      ThreePosition: 1
+    Reset:
+      Channel: -1
+      Position0: 0
+      Position1: 1
+      Position2: 1
+      ThreePosition: 0

@@ -1,0 +1,16 @@
+// GateRush VR radio plugin: Android library module included by Unity's Gradle build.
+apply plugin: 'com.android.library'
+
+android {
+    namespace 'com.gaterush.input'
+    compileSdk 34
+
+    defaultConfig {
+        minSdk 32
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+}

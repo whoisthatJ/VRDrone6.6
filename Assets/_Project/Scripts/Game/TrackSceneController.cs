@@ -33,6 +33,8 @@ namespace GateRush.Game
         [SerializeField] private ComfortVignette vignette;
         [SerializeField] private KeyboardGamepadSource keyboardGamepad;
         [SerializeField] private TouchControllerSource touch;
+        [SerializeField] private RcRadioSource radio;
+        [SerializeField] private RadioDeviceProvider radioProvider;
         [Tooltip("Moved next to the track's spawn so the line-of-sight pilot stands by the pad.")]
         [SerializeField] private Transform losStand;
 
@@ -47,9 +49,16 @@ namespace GateRush.Game
             LoadTrack(settings.TrackId);
             if (views != null) views.Apply((ViewMode)settings.Camera.ViewMode);
             SaveSystem.SettingsChanged += ApplySettings;
+            if (radioProvider != null) radioProvider.Changed += OnRadioChanged;
         }
 
-        private void OnDestroy() => SaveSystem.SettingsChanged -= ApplySettings;
+        private void OnDestroy()
+        {
+            SaveSystem.SettingsChanged -= ApplySettings;
+            if (radioProvider != null) radioProvider.Changed -= OnRadioChanged;
+        }
+
+        private void OnRadioChanged() => ApplySettings(SaveSystem.Settings);
 
         private void LoadTrack(string trackId)
         {
@@ -100,10 +109,14 @@ namespace GateRush.Game
             if (vignette != null) vignette.Strength = s.Comfort.VignetteStrength;
 
             var shaping = new StickShaping { Deadband = s.Input.Deadband, Expo = s.Input.Expo };
+            if (radioProvider != null) radioProvider.Backend = (RadioBackend)s.Input.RadioBackend;
+            if (radio != null) radio.Shaping = shaping;
             if (keyboardGamepad != null)
             {
                 keyboardGamepad.Shaping = shaping;
-                keyboardGamepad.GamepadThrottle = (ThrottleMapping)s.Input.GamepadThrottle;
+                // A radio in Xbox mode is a gamepad with a non-centring throttle stick.
+                bool radioPad = radioProvider != null && radioProvider.GamepadPreset != null;
+                keyboardGamepad.GamepadThrottle = radioPad ? ThrottleMapping.Direct : (ThrottleMapping)s.Input.GamepadThrottle;
             }
             if (touch != null)
             {

@@ -25,6 +25,8 @@ namespace GateRush.Core
         public int GamepadThrottle = 1;
         [Range(0f, 0.3f)] public float Deadband = 0.02f;
         [Range(0f, 1f)] public float Expo;
+        /// <summary>GateRush.Input.RadioBackend: 0 = auto, 1 = Input System, 2 = Android raw reader.</summary>
+        public int RadioBackend;
     }
 
     [Serializable]
@@ -92,6 +94,7 @@ namespace GateRush.Core
             Input.GamepadThrottle = Mathf.Clamp(Input.GamepadThrottle, 0, 2);
             Input.Deadband = Mathf.Clamp(Input.Deadband, 0f, 0.3f);
             Input.Expo = Mathf.Clamp01(Input.Expo);
+            Input.RadioBackend = Mathf.Clamp(Input.RadioBackend, 0, 2);
 
             Comfort.VignetteStrength = Mathf.Clamp01(Comfort.VignetteStrength);
             Comfort.RefreshRate = Comfort.RefreshRate >= 81f ? 90f : 72f;

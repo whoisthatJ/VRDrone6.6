@@ -76,8 +76,14 @@ namespace GateRush.EditorTools.Builders
             // On a root world-space canvas the anchored position drives x/y; set all three through it.
             rt.anchoredPosition3D = new Vector3(0f, 1.45f, 1.6f);
 
+            var radio = new GameObject("Radio").AddComponent<GateRush.Input.RadioDeviceProvider>();
+            var rso = new SerializedObject(radio);
+            rso.FindProperty("presets").objectReferenceValue = AssetDatabase.LoadAssetAtPath<GateRush.Input.ControllerPresetLibrary>(PresetBuilder.LibraryPath);
+            rso.ApplyModifiedPropertiesWithoutUndo();
+
             var menu = canvasGo.AddComponent<MenuController>();
             var so = new SerializedObject(menu);
+            so.FindProperty("radio").objectReferenceValue = radio;
             so.FindProperty("root").objectReferenceValue = rt;
             so.FindProperty("quads").objectReferenceValue = AssetDatabase.LoadAssetAtPath<QuadCatalog>(CatalogBuilder.QuadCatalogPath);
             so.FindProperty("tracks").objectReferenceValue = AssetDatabase.LoadAssetAtPath<TrackCatalog>(CatalogBuilder.TrackCatalogPath);

@@ -56,7 +56,7 @@ namespace GateRush.UI
         private static string StatusText(in QuadState s, in PilotInput input, bool crashed)
         {
             if (crashed) return "CRASHED";
-            if (!s.Armed) return "DISARMED  (throttle low + Space/Start to arm)";
+            if (!s.Armed) return "DISARMED  (throttle low, then arm)";
             switch (input.Mode)
             {
                 case FlightMode.Angle: return "ARMED  ANGLE";

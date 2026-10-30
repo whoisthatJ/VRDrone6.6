@@ -183,8 +183,9 @@ namespace GateRush.UI
             }
 
             var device = _devices[_deviceIndex];
-            foreach (var c in device.allControls)
-                if (c.children.Count == 0 && c is AxisControl axis && !c.synthetic) _controls.Add(axis);
+            // Same channel order and numbering as the radio mapping (axes in HID order, then buttons).
+            var reader = new InputSystemChannelReader(device);
+            for (int i = 0; i < reader.ChannelCount; i++) _controls.Add(reader.Control(i));
             _min = new float[_controls.Count];
             _max = new float[_controls.Count];
             for (int i = 0; i < _controls.Count; i++)
@@ -224,7 +225,7 @@ namespace GateRush.UI
                 _rows[r].Value.gameObject.SetActive(used);
                 _rows[r].Track.gameObject.SetActive(used);
                 // Path is "/<device>/<control>"; show just the control part.
-                if (used) _rows[r].Name.SetText(_controls[i].path.Substring(_controls[i].device.name.Length + 2));
+                if (used) _rows[r].Name.SetText($"ch{i}  {_controls[i].path.Substring(_controls[i].device.name.Length + 2)}");
             }
 
             int pages = Mathf.Max(1, (_controls.Count + rowCount - 1) / rowCount);

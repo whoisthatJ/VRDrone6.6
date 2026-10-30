@@ -49,6 +49,22 @@ namespace GateRush.Tests
             }
         }
 
+        [TestCase("BETAFPV Joystick", "BetaFPV LiteRadio 2 SIM (joystick mode)")]
+        [TestCase("BETAFPV LiteRadio 3", "BetaFPV LiteRadio 3")]
+        [TestCase("LiteRadio 4 SE", "BetaFPV LiteRadio 4 / 4 SE (USB)")]
+        [TestCase("BETAFPV LiteRadio 4 BLE", "BetaFPV LiteRadio 4 / 4 SE (Bluetooth)")]
+        [TestCase("BETAFPV Xbox Controller", "BetaFPV LiteRadio 2 SIM (Xbox mode)")]
+        [TestCase("BETAFPV Nano Radio", "BetaFPV radio (generic)")]
+        [TestCase("RadioMaster TX16S Joystick", null)]
+        public void RadioPresets_MatchExpectedDeviceNames(string deviceName, string expectedPreset)
+        {
+            var lib = AssetDatabase.LoadAssetAtPath<GateRush.Input.ControllerPresetLibrary>("Assets/_Project/Data/Radios/ControllerPresets.asset");
+            Assert.IsNotNull(lib);
+            var preset = lib.Find(deviceName, deviceName);
+            Assert.AreEqual(expectedPreset, preset != null ? preset.DisplayName : null);
+            if (preset != null) Assert.IsFalse(preset.Verified, "shipped presets stay unverified until checked on hardware");
+        }
+
         [Test]
         public void BuildSettings_StartWithBootThenMenu()
         {

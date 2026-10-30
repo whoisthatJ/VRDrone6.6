@@ -1,5 +1,15 @@
 # Changelog
 
+## M6: RC radio + BetaFPV support, 2026-10-30
+- Generic radio path (`GateRush.Input`): `IChannelReader` with `InputSystemChannelReader` (any joystick/HID, canonical channel order, unprocessed values) and `AndroidChannelReader`; `RadioDeviceProvider` (selection, presets, calibrations, hot-plug); `RcRadioSource` (switch arming, absolute mode switch, reset switch); `RadioMapping` math (asymmetric centred axes, full-range throttle, 2/3-position switches); `SwitchArming`.
+- `ControllerPreset` / `ControllerPresetLibrary` + 6 BetaFPV presets (all unverified) built by `PresetBuilder`.
+- `CalibrationWizard` with auto-advance, `RadioCalibrationStore` (radios.json).
+- Android raw-joystick fallback: `GateRushRadio.androidlib` (Java window-callback hook, lock-free direct buffer, manifest features/permissions) + `AndroidJoystickBridge` (C#, unsafe pointer reads).
+- Hot-plug: `VehicleInputRouter.SourceChanged`, `ControllerHotplugGuard` (pause/resume), `HotplugOverlay`.
+- Menu: **Radio setup** (status, preset/verified/calibrated, live channels with roles, reader backend, calibrate, use preset), calibration wizard page, "Connecting a BetaFPV radio" help page. Input diagnostics now numbers channels like the radio mapping. Settings: `Input.RadioBackend`.
+- Tests (103 total): mapping math, switch arming, preset matching, calibration store, wizard flow (full, skip/timeout, incomplete, cancel), `InputTestFixture` simulated radios (channel reader, `RcRadioSource` with arm/mode switches, calibration over preset, hot-unplug), shipped preset name matching.
+- Play-mode check with a virtual "BETAFPV Joystick": preset auto-selected, router switches to the radio, arm switch starts the countdown, unplugging mid-race pauses with the overlay, re-plug + arm resumes with the clock intact.
+- No APK built (user preference); the Android Java module is not Gradle-verified yet.
 ## M5: Content + settings, 2026-10-30
 - **Quad classes**: 5" Race, 5" Freestyle, 65 mm Whoop (`QuadProfile` presets + assets + `QuadCatalog` with visual scale, collision radius, FPV camera offset).
 - **Tracks as JSON**: `GateRush.Track` (`TrackData`, `TrackLoader`, `TrackPrefabs`), built-in courses Open Field, Hangar 7, Dockyard (`Data/Tracks/*.json`), `TrackCatalog`.

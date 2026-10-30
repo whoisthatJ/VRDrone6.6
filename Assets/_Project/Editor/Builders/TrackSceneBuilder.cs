@@ -62,21 +62,34 @@ namespace GateRush.EditorTools.Builders
             var pilotGo = new GameObject("Pilot");
             var keyboardPad = pilotGo.AddComponent<KeyboardGamepadSource>();
             var touch = pilotGo.AddComponent<TouchControllerSource>();
+            var provider = pilotGo.AddComponent<RadioDeviceProvider>();
+            var pso = new SerializedObject(provider);
+            pso.FindProperty("presets").objectReferenceValue = AssetDatabase.LoadAssetAtPath<ControllerPresetLibrary>(PresetBuilder.LibraryPath);
+            pso.ApplyModifiedPropertiesWithoutUndo();
+            var radio = pilotGo.AddComponent<RcRadioSource>();
+            radio.Provider = provider;
             var quad = BuildQuad(mats, assets, keyboardPad, spawn, quadLayer);
             var router = pilotGo.AddComponent<VehicleInputRouter>();
             var rso = new SerializedObject(router);
             rso.FindProperty("vehicle").objectReferenceValue = quad;
             var srcs = rso.FindProperty("sources");
-            srcs.arraySize = 2;
+            srcs.arraySize = 3;
             srcs.GetArrayElementAtIndex(0).objectReferenceValue = keyboardPad;
             srcs.GetArrayElementAtIndex(1).objectReferenceValue = touch;
+            srcs.GetArrayElementAtIndex(2).objectReferenceValue = radio;
             rso.ApplyModifiedPropertiesWithoutUndo();
 
             var ghostVisual = BuildGhostVisual(mats);
             var race = BuildRace(quad, spawn, ghostVisual);
 
+            var guard = pilotGo.AddComponent<ControllerHotplugGuard>();
+            var gso = new SerializedObject(guard);
+            gso.FindProperty("router").objectReferenceValue = router;
+            gso.FindProperty("race").objectReferenceValue = race;
+            gso.ApplyModifiedPropertiesWithoutUndo();
+
             var fpv = quad.GetComponentInChildren<FpvCamera>();
-            BuildOverlay(quad, fpv.GetComponent<Camera>(), race);
+            BuildOverlay(quad, fpv.GetComponent<Camera>(), race, guard);
             var views = BuildViews(quad, fpv, mats, roomLayer, quadLayer);
 
             var controllerGo = new GameObject("Track Scene");
@@ -97,6 +110,8 @@ namespace GateRush.EditorTools.Builders
             cso.FindProperty("losStand").objectReferenceValue = views.LosStand;
             cso.FindProperty("keyboardGamepad").objectReferenceValue = keyboardPad;
             cso.FindProperty("touch").objectReferenceValue = touch;
+            cso.FindProperty("radio").objectReferenceValue = radio;
+            cso.FindProperty("radioProvider").objectReferenceValue = provider;
             cso.ApplyModifiedPropertiesWithoutUndo();
 
             string path = ScenePath(environment);
@@ -276,7 +291,7 @@ namespace GateRush.EditorTools.Builders
             return new ViewRefs { Manager = views, Screen = screen, Vignette = comfort, LosStand = stand };
         }
 
-        private static void BuildOverlay(QuadVehicle quad, Camera fpvCamera, RaceSession race)
+        private static void BuildOverlay(QuadVehicle quad, Camera fpvCamera, RaceSession race, ControllerHotplugGuard guard)
         {
             var canvasGo = new GameObject("Debug Overlay", typeof(Canvas), typeof(CanvasScaler));
             var canvas = canvasGo.GetComponent<Canvas>();
@@ -307,6 +322,33 @@ namespace GateRush.EditorTools.Builders
             so.ApplyModifiedPropertiesWithoutUndo();
 
             BuildRaceHud(canvasGo.transform, race);
+            BuildHotplugOverlay(canvasGo.transform, guard);
+        }
+
+        private static void BuildHotplugOverlay(Transform canvas, ControllerHotplugGuard guard)
+        {
+            var panel = new GameObject("Hotplug Pause", typeof(RectTransform), typeof(Image));
+            panel.transform.SetParent(canvas, false);
+            var prt = (RectTransform)panel.transform;
+            prt.anchorMin = prt.anchorMax = prt.pivot = new Vector2(0.5f, 0.5f);
+            prt.sizeDelta = new Vector2(1100f, 300f);
+            panel.GetComponent<Image>().color = new Color(0.3f, 0.05f, 0.05f, 0.75f);
+            var text = Label(panel.transform, "Hotplug Text", 0, 40);
+            var trt = (RectTransform)text.transform;
+            trt.anchorMin = Vector2.zero;
+            trt.anchorMax = Vector2.one;
+            trt.offsetMin = new Vector2(30f, 20f);
+            trt.offsetMax = new Vector2(-30f, -20f);
+            text.alignment = TextAlignmentOptions.Center;
+            text.textWrappingMode = TextWrappingModes.Normal;
+            panel.SetActive(false);
+
+            var overlay = canvas.gameObject.AddComponent<HotplugOverlay>();
+            var so = new SerializedObject(overlay);
+            so.FindProperty("guard").objectReferenceValue = guard;
+            so.FindProperty("panel").objectReferenceValue = panel;
+            so.FindProperty("text").objectReferenceValue = text;
+            so.ApplyModifiedPropertiesWithoutUndo();
         }
 
         private static void BuildRaceHud(Transform canvas, RaceSession race)

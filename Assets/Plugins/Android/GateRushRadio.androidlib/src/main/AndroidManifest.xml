@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- GateRush VR: RC radio support. Merged into the app manifest by Gradle. -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- USB-C OTG radios (LiteRadio 2 SIM / 3 / 4 over cable). Not required, so the app still installs everywhere. -->
+    <uses-feature android:name="android.hardware.usb.host" android:required="false" />
+    <!-- Bluetooth HID joysticks (LiteRadio 4 in Bluetooth joystick mode), paired in the Quest's own settings. -->
+    <uses-feature android:name="android.hardware.bluetooth" android:required="false" />
+    <!-- Legacy Bluetooth permission for Android 11 and lower; HID input itself needs no runtime permission. -->
+    <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30" />
+</manifest>

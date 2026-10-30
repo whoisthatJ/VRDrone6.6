@@ -44,6 +44,12 @@ namespace GateRush.Input
 
         public void Disarm() => _armed = false;
 
+        /// <summary>Set by sources with a physical mode switch (radios): the mode follows the switch instead of cycling.</summary>
+        protected bool HasAbsoluteMode;
+        protected FlightMode AbsoluteMode;
+
+        public float ArmThrottleLimit => armThrottleLimit;
+
         protected virtual void Update()
         {
             if (!IsConnected)
@@ -62,6 +68,7 @@ namespace GateRush.Input
                 else if (throttle <= armThrottleLimit) _armed = true;
             }
             if (modeCycle) mode = (FlightMode)(((int)mode + 1) % 3);
+            if (HasAbsoluteMode) mode = AbsoluteMode;
 
             Current = new PilotInput
             {

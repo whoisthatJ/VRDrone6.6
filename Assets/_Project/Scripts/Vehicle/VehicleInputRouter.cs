@@ -15,6 +15,9 @@ namespace GateRush.Vehicle
 
         public PilotInputSource Active => vehicle != null ? vehicle.InputSource : null;
 
+        /// <summary>(previous, next) whenever the active source changes: hot-plug, or a higher-priority device appearing.</summary>
+        public event System.Action<PilotInputSource, PilotInputSource> SourceChanged;
+
         private void Update()
         {
             if (vehicle == null) return;
@@ -39,9 +42,11 @@ namespace GateRush.Vehicle
             if (extra != null && extra.isActiveAndEnabled && extra.IsConnected && extra.Priority > bestPriority) best = extra;
 
             if (best == vehicle.InputSource) return;
-            if (vehicle.InputSource != null) vehicle.InputSource.Disarm();
+            var previous = vehicle.InputSource;
+            if (previous != null) previous.Disarm();
             vehicle.InputSource = best;
             Debug.Log(best != null ? $"[GateRush] Input source: {best.GetType().Name}" : "[GateRush] Input source: none");
+            SourceChanged?.Invoke(previous, best);
         }
     }
 }

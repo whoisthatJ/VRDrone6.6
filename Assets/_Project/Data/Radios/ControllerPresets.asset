@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c553a83128685d94380f8f7597292062, type: 3}
+  m_Name: ControllerPresets
+  m_EditorClassIdentifier: GateRush.Input::GateRush.Input.ControllerPresetLibrary
+  Presets:
+  - {fileID: 11400000, guid: fdff363573c257e47a1755a73b7adc22, type: 2}
+  - {fileID: 11400000, guid: a810ebb059a8b424f82f35946fe0df21, type: 2}
+  - {fileID: 11400000, guid: d007cdf99bd7d6647946334db624b470, type: 2}
+  - {fileID: 11400000, guid: 47e0a77acba384845878a6c402404a90, type: 2}
+  - {fileID: 11400000, guid: 469f566291a864f4ba6cc2e895f506c6, type: 2}
+  - {fileID: 11400000, guid: 52f416c5315cb9f4ba90dd807eca5242, type: 2}

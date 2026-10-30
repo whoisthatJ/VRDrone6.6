@@ -25,6 +25,7 @@ namespace GateRush.EditorTools.Builders
         {
             PropBuilder.BuildAll();      // gate + prop prefabs, TrackPrefabs
             CatalogBuilder.BuildAll();   // track JSON, quad profiles, catalogs
+            PresetBuilder.BuildAll();    // BetaFPV radio presets
             // Persist and re-import the content first: scenes must reference the saved assets, not in-flight copies.
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
@@ -70,6 +71,8 @@ namespace GateRush.EditorTools.Builders
                     }
                 }
             }
+            // Leave an empty, clean scene open so the test runner never stops on a "save modified scenes?" dialog.
+            EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
             if (problems.Count > 0)
                 throw new System.InvalidOperationException("Unassigned scene references (re-run Build All Scenes):\n" + string.Join("\n", problems));
         }

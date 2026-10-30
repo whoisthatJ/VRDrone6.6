@@ -9,6 +9,8 @@
         "GateRush.Track",
         "GateRush.Game",
         "GateRush.Vehicle",
+        "Unity.InputSystem",
+        "Unity.InputSystem.TestFramework",
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner"
     ],

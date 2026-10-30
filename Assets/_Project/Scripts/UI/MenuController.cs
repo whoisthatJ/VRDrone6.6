@@ -13,7 +13,7 @@ namespace GateRush.UI
     /// World-space main menu built at runtime: fly, choose quad, choose track, settings (rates, camera, input,
     /// comfort, physics, pilot), input diagnostics. Edits <see cref="SaveSystem.Settings"/> and commits on leaving a page.
     /// </summary>
-    public sealed class MenuController : MonoBehaviour
+    public sealed partial class MenuController : MonoBehaviour
     {
         private const float Width = 1600f;
         private const float Height = 1000f;
@@ -50,6 +50,7 @@ namespace GateRush.UI
                 _dirty = false;
             }
             if (_page != null) Destroy(_page.gameObject);
+            ClearRadioPage();
             _page = UiKit.Fill(root, "Page " + title);
             UiKit.Label(_page, title, new Vector2(Margin, -30f), new Vector2(ContentWidth, 80f), 56f, TextAlignmentOptions.MidlineLeft, UiKit.AccentColor);
             return _page;
@@ -72,9 +73,10 @@ namespace GateRush.UI
             UiKit.Button(p, "Choose track", new Vector2(Margin + half + 30f, y), new Vector2(half, 90f), ShowTracks);
             y -= 120f;
             UiKit.Button(p, "Settings", new Vector2(Margin, y), new Vector2(half, 90f), ShowSettings);
-            UiKit.Button(p, "Input diagnostics", new Vector2(Margin + half + 30f, y), new Vector2(half, 90f), () => { CommitIfDirty(); GameFlow.Diagnostics(); });
+            UiKit.Button(p, "Radio setup", new Vector2(Margin + half + 30f, y), new Vector2(half, 90f), ShowRadio);
             y -= 120f;
-            UiKit.Button(p, "Quit", new Vector2(Margin, y), new Vector2(half, 90f), GameFlow.Quit);
+            UiKit.Button(p, "Input diagnostics", new Vector2(Margin, y), new Vector2(half, 90f), () => { CommitIfDirty(); GameFlow.Diagnostics(); });
+            UiKit.Button(p, "Quit", new Vector2(Margin + half + 30f, y), new Vector2(half, 90f), GameFlow.Quit);
 
             UiKit.Label(p, "Point with a controller and pull the trigger. In flight, the left menu button returns here.",
                 new Vector2(Margin, -(Height - 100f)), new Vector2(ContentWidth, 60f), 26f, TextAlignmentOptions.MidlineLeft, UiKit.DimTextColor);
