@@ -1,5 +1,13 @@
 # Changelog
 
+## M3: Quest + VR views, 2026-10-30
+- VR views (`GateRush.Cameras`): `ViewModeManager` (Goggles / Immersive / Line-of-sight, desktop fallback), `GogglesScreen` (curved mono screen, smooth head-follow or fixed, recentre), `ComfortVignette` (rate-based), `ViewModeInput` (Y / V / LB).
+- `TouchControllerSource` (Mode 2, spring-centre hover assist or trigger throttle), `VehicleInputRouter` (priority-based source selection).
+- Input diagnostics moved forward from M6: `InputDiagnostics` scene with `InputDiagnosticsPanel` (all devices, layout, interface, VID/PID, capabilities, live bars with min/max for every axis/button, save report, 72/90 Hz toggle); `InputDeviceReport` logs every device change to logcat and writes `input-devices.txt`.
+- Boot flow with persistent `App` services and `SceneSwitcher`; `BootSceneBuilder.BuildAll()` builds all three scenes in order.
+- OSD (debug overlay) now renders inside the drone camera feed.
+- 3 new tests for VID/PID parsing (32 total).
+- First Quest APK build: `Builds/GateRush.apk`.
 ## M2: Flyable in editor, 2026-10-30
 - `GateRush.Input`: `PilotInputSource` base (arming with throttle-low check, mode cycling, deadband/expo via `StickShaping`), `KeyboardGamepadSource` (gamepad Mode 2 + keyboard), `ScriptedInputSource` (automation).
 - `GateRush.Vehicle`: `QuadProfileAsset`, `RateProfileAsset`, `PhysicsSettingsAsset` (sim + `CollisionSettings`), `QuadVehicle` bridge (fixed sub-steps, render interpolation, crash → 1.5 s → respawn, out-of-bounds), `CollisionHook` (swept sphere cast, bounce + friction), `PropVisuals`.

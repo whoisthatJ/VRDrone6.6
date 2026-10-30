@@ -17,6 +17,9 @@ namespace GateRush.Input
 
         public override bool IsConnected => true;
 
+        /// <summary>Above every hardware source, so adding this component takes over the quad.</summary>
+        public override int Priority => 100;
+
         public void PressArm() => _arm = true;
         public void PressMode() => _mode = true;
         public void PressReset() => _reset = true;

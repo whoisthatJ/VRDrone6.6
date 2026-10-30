@@ -24,6 +24,14 @@ namespace GateRush.Input
         /// <summary>True if this source has a usable device right now.</summary>
         public abstract bool IsConnected { get; }
 
+        /// <summary>
+        /// When several sources are connected the router uses the highest priority.
+        /// Guide: RC radio 30, gamepad 20, Touch controllers 10, keyboard 1.
+        /// </summary>
+        public abstract int Priority { get; }
+
+        public bool IsArmed => _armed;
+
         /// <summary>Reads devices into raw sticks (-1..1 each, throttle already 0..1) and button edges.</summary>
         protected abstract void ReadRaw(out float throttle, out float yaw, out float pitch, out float roll,
             out bool armToggle, out bool modeCycle, out bool reset);

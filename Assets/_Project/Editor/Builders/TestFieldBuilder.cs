@@ -16,6 +16,7 @@ namespace GateRush.EditorTools.Builders
         public const string ScenePath = "Assets/_Project/Scenes/Track_TestField.unity";
         public const string TrackLayerName = "TrackGeometry";
         public const string LocalQuadLayerName = "LocalQuad";
+        public const string VrRoomLayerName = "VRRoom";
         private const string MatDir = "Assets/_Project/Art/Materials";
         private const string DataDir = "Assets/_Project/Data";
 
@@ -24,6 +25,7 @@ namespace GateRush.EditorTools.Builders
         {
             int trackLayer = EnsureLayer(TrackLayerName, 8);
             int quadLayer = EnsureLayer(LocalQuadLayerName, 9);
+            int roomLayer = EnsureLayer(VrRoomLayerName, 10);
             var assets = EnsureDataAssets(1 << trackLayer);
             var mats = EnsureMaterials();
 
@@ -46,9 +48,22 @@ namespace GateRush.EditorTools.Builders
             spawn.SetParent(track.transform, false);
             spawn.position = new Vector3(0f, 0.15f, 0f);
 
-            var pilot = new GameObject("Pilot").AddComponent<KeyboardGamepadSource>();
-            var quad = BuildQuad(mats, assets, pilot, spawn, quadLayer);
-            BuildOverlay(quad);
+            var pilotGo = new GameObject("Pilot");
+            var keyboardPad = pilotGo.AddComponent<KeyboardGamepadSource>();
+            var touch = pilotGo.AddComponent<TouchControllerSource>();
+            var quad = BuildQuad(mats, assets, keyboardPad, spawn, quadLayer);
+            var router = pilotGo.AddComponent<VehicleInputRouter>();
+            var rso = new SerializedObject(router);
+            rso.FindProperty("vehicle").objectReferenceValue = quad;
+            var srcs = rso.FindProperty("sources");
+            srcs.arraySize = 2;
+            srcs.GetArrayElementAtIndex(0).objectReferenceValue = keyboardPad;
+            srcs.GetArrayElementAtIndex(1).objectReferenceValue = touch;
+            rso.ApplyModifiedPropertiesWithoutUndo();
+
+            var fpv = quad.GetComponentInChildren<FpvCamera>();
+            BuildOverlay(quad, fpv.GetComponent<Camera>());
+            BuildViews(quad, fpv, mats, roomLayer, quadLayer);
 
             EditorSceneManager.SaveScene(scene, ScenePath);
             AddToBuildSettings(ScenePath);
@@ -139,8 +154,8 @@ namespace GateRush.EditorTools.Builders
                 props[i] = prop.transform;
             }
 
+            // The XR rig's head camera is MainCamera and owns the AudioListener; this one only feeds the goggles/display.
             var camGo = new GameObject("FPV Camera");
-            camGo.tag = "MainCamera";
             camGo.transform.SetParent(root.transform, false);
             camGo.transform.localPosition = new Vector3(0f, 0.02f, 0.095f);
             var cam = camGo.AddComponent<Camera>();
@@ -150,7 +165,7 @@ namespace GateRush.EditorTools.Builders
             // The pilot's own quad is hidden from its FPV view (it is still visible to LOS/spectator cameras).
             cam.cullingMask = ~(1 << quadLayer);
             foreach (var t in visual.GetComponentsInChildren<Transform>(true)) t.gameObject.layer = quadLayer;
-            camGo.AddComponent<AudioListener>();
+            cam.stereoTargetEye = StereoTargetEyeMask.None;
             camGo.AddComponent<FpvCamera>();
 
             var so = new SerializedObject(quad);
@@ -186,11 +201,73 @@ namespace GateRush.EditorTools.Builders
             return go;
         }
 
-        private static void BuildOverlay(QuadVehicle quad)
+        /// <summary>XR rig, goggles room + curved screen, comfort vignette, LOS stand and the view-mode manager.</summary>
+        private static void BuildViews(QuadVehicle quad, FpvCamera fpv, Materials mats, int roomLayer, int quadLayer)
+        {
+            var origin = BootSceneBuilder.CreateXrRig();
+            origin.transform.position = new Vector3(0f, 0f, -2f);
+            var head = origin.Camera;
+
+            var room = new GameObject("Goggles Room") { layer = roomLayer };
+            var screenGo = new GameObject("Goggles Screen", typeof(MeshFilter), typeof(MeshRenderer)) { layer = roomLayer };
+            screenGo.transform.SetParent(room.transform, false);
+            var screenRenderer = screenGo.GetComponent<MeshRenderer>();
+            screenRenderer.sharedMaterial = mats.Screen;
+            screenRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            var screen = screenGo.AddComponent<GogglesScreen>();
+            var sso = new SerializedObject(screen);
+            sso.FindProperty("head").objectReferenceValue = head.transform;
+            sso.ApplyModifiedPropertiesWithoutUndo();
+
+            var vignette = GameObject.CreatePrimitive(PrimitiveType.Quad);
+            vignette.name = "Comfort Vignette";
+            Object.DestroyImmediate(vignette.GetComponent<Collider>());
+            vignette.transform.SetParent(head.transform, false);
+            vignette.transform.localPosition = new Vector3(0f, 0f, 0.12f);
+            vignette.transform.localScale = new Vector3(0.5f, 0.5f, 1f);
+            var vr = vignette.GetComponent<MeshRenderer>();
+            vr.sharedMaterial = mats.Vignette;
+            vr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            var comfort = vignette.AddComponent<ComfortVignette>();
+            var cso = new SerializedObject(comfort);
+            cso.FindProperty("vehicle").objectReferenceValue = quad;
+            cso.ApplyModifiedPropertiesWithoutUndo();
+            vignette.SetActive(false);
+
+            var stand = new GameObject("LOS Stand").transform;
+            stand.position = new Vector3(-4f, 0f, -6f);
+            stand.rotation = Quaternion.LookRotation(new Vector3(4f, 0f, 14f));
+
+            var viewsGo = new GameObject("Views");
+            var views = viewsGo.AddComponent<ViewModeManager>();
+            var vso = new SerializedObject(views);
+            vso.FindProperty("vehicle").objectReferenceValue = quad;
+            vso.FindProperty("xrOrigin").objectReferenceValue = origin.transform;
+            vso.FindProperty("headCamera").objectReferenceValue = head;
+            vso.FindProperty("droneCamera").objectReferenceValue = fpv;
+            vso.FindProperty("gogglesScreen").objectReferenceValue = screen;
+            vso.FindProperty("gogglesRoom").objectReferenceValue = room;
+            vso.FindProperty("vignette").objectReferenceValue = comfort;
+            vso.FindProperty("losStand").objectReferenceValue = stand;
+            vso.FindProperty("roomLayer").intValue = 1 << roomLayer;
+            vso.FindProperty("localQuadLayer").intValue = 1 << quadLayer;
+            vso.ApplyModifiedPropertiesWithoutUndo();
+
+            var input = viewsGo.AddComponent<ViewModeInput>();
+            var iso = new SerializedObject(input);
+            iso.FindProperty("views").objectReferenceValue = views;
+            iso.FindProperty("gogglesScreen").objectReferenceValue = screen;
+            iso.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        private static void BuildOverlay(QuadVehicle quad, Camera fpvCamera)
         {
             var canvasGo = new GameObject("Debug Overlay", typeof(Canvas), typeof(CanvasScaler));
             var canvas = canvasGo.GetComponent<Canvas>();
-            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            // Drawn by the FPV camera, so it shows inside the goggles feed like an OSD.
+            canvas.renderMode = RenderMode.ScreenSpaceCamera;
+            canvas.worldCamera = fpvCamera;
+            canvas.planeDistance = 0.05f;
             var scaler = canvasGo.GetComponent<CanvasScaler>();
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
             scaler.referenceResolution = new Vector2(1920f, 1080f);
@@ -273,7 +350,7 @@ namespace GateRush.EditorTools.Builders
 
         private struct Materials
         {
-            public Material Ground, Pillar, Accent, Frame, PropFront, PropRear;
+            public Material Ground, Pillar, Accent, Frame, PropFront, PropRear, Screen, Vignette;
         }
 
         private static DataAssets EnsureDataAssets(int trackMask)
@@ -326,7 +403,33 @@ namespace GateRush.EditorTools.Builders
                 Frame = Mat("Frame", new Color(0.12f, 0.12f, 0.13f)),
                 PropFront = Mat("PropFront", new Color(0.9f, 0.15f, 0.15f)),
                 PropRear = Mat("PropRear", new Color(0.15f, 0.15f, 0.15f)),
+                Screen = UnlitMat("GogglesScreen", Color.white, false),
+                Vignette = UnlitMat("Vignette", Color.black, true),
             };
+        }
+
+        private static Material UnlitMat(string name, Color color, bool transparent)
+        {
+            string path = $"{MatDir}/{name}.mat";
+            var m = AssetDatabase.LoadAssetAtPath<Material>(path);
+            if (m == null)
+            {
+                m = new Material(Shader.Find("Universal Render Pipeline/Unlit"));
+                AssetDatabase.CreateAsset(m, path);
+            }
+            m.SetColor("_BaseColor", color);
+            if (transparent)
+            {
+                m.SetFloat("_Surface", 1f);
+                m.SetFloat("_Blend", 0f);
+                m.SetFloat("_SrcBlend", (float)UnityEngine.Rendering.BlendMode.SrcAlpha);
+                m.SetFloat("_DstBlend", (float)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+                m.SetFloat("_ZWrite", 0f);
+                m.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
+                m.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Overlay;
+            }
+            EditorUtility.SetDirty(m);
+            return m;
         }
 
         private static Material Mat(string name, Color color)

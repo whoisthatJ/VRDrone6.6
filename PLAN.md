@@ -82,10 +82,10 @@ Tests/EditMode/   Flight model and rates tests
 | M0 ✅ (headset check pending) | Project bootstrap | Unity 6 URP project, Meta Quest profile, OpenXR + Meta XR Core, Project Setup Tool clean, git + LFS, blank scene runs at 72 Hz on headset |
 | M1 ✅ | Flight model (headless) | `QuadSimulator` + rates + PID + mixer + motors + drag; EditMode tests pass (hover equilibrium, rate step response, rates math matches the Betaflight formula, determinism) |
 | M2 ✅ | Flyable in editor | Flat test field, quad flies with gamepad/keyboard in Acro and Angle, FPV camera with tilt; debug overlay of rates and motors |
-| M3 | Quest + VR views | Goggles mode, LOS mode, Immersive mode; Touch controller Mode 2 mapping; arming switch; stable 72/90 fps |
+| M3 ✅ (headset check pending) | Quest + VR views | Goggles mode, LOS mode, Immersive mode; Touch controller Mode 2 mapping; arming switch; stable 72/90 fps |
 | M4 | Racing | Gate prefabs (standard race-gate sizes), checkpoints, lap timer, 3-lap race, results, best lap + ghost replay, local leaderboard |
 | M5 | Content + settings | 3 quad classes (5" race, 5" freestyle, whoop), 3 tracks (indoor hangar, outdoor field, industrial), rates/camera/physics settings UI, save/load |
-| M6 | RC radio + **BetaFPV** support | Generic HID joystick over USB-C OTG and Bluetooth; diagnostics screen; calibration wizard; BetaFPV presets (LR2 SIM, LR3, LR4 USB/BT) auto-applied by device name; Android axis fallback plugin; hot-plug handling; on headset: an LR2 SIM (USB) and an LR4 (Bluetooth) can arm and fly a full lap |
+| M6 | RC radio + **BetaFPV** support | Generic HID joystick over USB-C OTG and Bluetooth; diagnostics screen (✅ moved to M3); calibration wizard; BetaFPV presets (LR2 SIM, LR3, LR4 USB/BT) auto-applied by device name; Android axis fallback plugin; hot-plug handling; on headset: an LR2 SIM (USB) and an LR4 (Bluetooth) can arm and fly a full lap |
 | M7 | Track editor (VR) | Place, rotate and scale gates with controllers, snap, set checkpoint order, save/load JSON, share by file |
 | M8 | Polish + perf | Baked lighting, LODs, FFR, motor audio, crash/prop VFX, analog VTX noise effect, OSD HUD, comfort options |
 | M9 | Online (stretch) | Session-based multiplayer race (up to 6–8 pilots), synced start, interpolated remote quads; online leaderboards |
@@ -126,6 +126,14 @@ Tests/EditMode/   Flight model and rates tests
 | 2026-10-30 | Arming: Space/Start toggles, only with throttle ≤ 0.05; mode cycles Acro → Angle → Horizon (M / Select). Keyboard throttle ramps with W/S | Matches radio habits; keyboard is only an editor convenience |
 | 2026-10-30 | Gamepad throttle defaults to spring-centre = hover (`ThrottleMapping.SpringCenterHover`); trigger and direct mappings available | §7 risk on spring-centred sticks |
 | 2026-10-30 | `ScriptedInputSource` drives automated play-mode smoke tests through the Unity MCP | Simulated keyboard events from the MCP only reach the Editor's input state, not the player loop, while the Editor window is unfocused |
+| 2026-10-30 | Input diagnostics (moved forward from M6 into M3): `InputDiagnostics` scene + `InputDeviceReport` logger. Every device change is logged to logcat with full description and capabilities JSON, and `input-devices.txt` is rewritten in the app's files dir | Lets the user plug a BetaFPV radio into the headset early and send back exact device names, VID/PID and axis readings |
+| 2026-10-30 | Scene flow: `Boot` (persistent `App`: `AppBootstrap`, `XrDisplayConfig`, `PerfLogger`, `SceneSwitcher`) → `Track_TestField`. Temporary switch to `InputDiagnostics` with the left Touch menu button / F1 / gamepad right-stick click until the M5 main menu | No menu yet |
+| 2026-10-30 | Input sources compete by `Priority` (scripted 100 > RC radio 30 > gamepad 20 > Touch 10 > keyboard 1) through `VehicleInputRouter`; switching source disarms | Extensible for the M6 radio path and hot-plug |
+| 2026-10-30 | Touch Mode 2: left stick throttle/yaw, right stick pitch/roll; A = arm (throttle low, i.e. pull the left stick fully down when spring-centred), B = flight mode, X = reset, Y = view mode (hold Y = recentre goggles screen) | Leaves the menu button free for the scene switch |
+| 2026-10-30 | Goggles view: drone camera → 1280×720 RT (MSAA 2x) on a 60° curved mesh at 2 m, layer `VRRoom` (10), head camera culls everything else and clears to near-black. The debug OSD is a Screen Space–Camera canvas on the drone camera, so it shows inside the feed | Mono feed, cheap eye buffer, authentic look |
+| 2026-10-30 | Immersive view moves the XR Origin each `LateUpdate` so the head sits on the drone with uptilt; vignette is a camera-attached transparent URP Unlit quad with a generated radial mask (no post-processing) | §6 budget: no post in the eye buffer |
+| 2026-10-30 | Without an XR device (Editor), Goggles/Immersive show the drone camera on the main display and LOS uses the rig camera looking at the quad | Desktop testing |
+| 2026-10-30 | APK builds are started with `BuildScript.BuildQuestDeferred()` (via MCP eval) and report to `Builds/build-result.txt` | The CLI build can't run while the Editor has the project open, and a blocking eval would time out |
 | 2026-10-30 | Unity CLI is 1.0.0-beta.6 and not signed in (license is active). It wasn't needed: the live Editor is driven through the Unity Editor MCP | — |
 
 ## 9. Notes for tuning

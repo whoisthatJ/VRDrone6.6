@@ -3,7 +3,8 @@
     "rootNamespace": "GateRush.Cameras",
     "references": [
         "GateRush.Flight",
-        "GateRush.Vehicle"
+        "GateRush.Vehicle",
+        "Unity.InputSystem"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

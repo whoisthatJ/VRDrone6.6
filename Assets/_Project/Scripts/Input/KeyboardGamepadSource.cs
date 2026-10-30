@@ -18,6 +18,8 @@ namespace GateRush.Input
 
         public override bool IsConnected => Gamepad.current != null || Keyboard.current != null;
 
+        public override int Priority => Gamepad.current != null ? 20 : 1;
+
         protected override void ReadRaw(out float throttle, out float yaw, out float pitch, out float roll,
             out bool armToggle, out bool modeCycle, out bool reset)
         {

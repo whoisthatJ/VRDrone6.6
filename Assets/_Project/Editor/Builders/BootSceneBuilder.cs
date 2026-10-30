@@ -8,33 +8,34 @@ using UnityEngine.InputSystem.XR;
 
 namespace GateRush.EditorTools.Builders
 {
-    /// <summary>Builds Assets/_Project/Scenes/Boot.unity from code (minimal XR rig + ground).</summary>
+    /// <summary>
+    /// Builds Assets/_Project/Scenes/Boot.unity: app-wide services (display config, perf log, scene switcher)
+    /// kept alive across scenes, then loads the first gameplay scene. Also hosts the shared XR rig factory.
+    /// </summary>
     public static class BootSceneBuilder
     {
         public const string ScenePath = "Assets/_Project/Scenes/Boot.unity";
+
+        /// <summary>Builds every scene in build order: Boot, Track_TestField, InputDiagnostics.</summary>
+        [MenuItem("GateRush/Builders/Build All Scenes")]
+        public static string BuildAll()
+        {
+            Build();
+            TestFieldBuilder.Build();
+            DiagnosticsSceneBuilder.Build();
+            return string.Join(", ", System.Array.ConvertAll(EditorBuildSettings.scenes, s => s.path));
+        }
 
         [MenuItem("GateRush/Builders/Build Boot Scene")]
         public static string Build()
         {
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
 
-            var light = new GameObject("Directional Light").AddComponent<Light>();
-            light.type = LightType.Directional;
-            light.shadows = LightShadows.None;
-            light.transform.rotation = Quaternion.Euler(50f, -30f, 0f);
-
-            var ground = GameObject.CreatePrimitive(PrimitiveType.Plane);
-            ground.name = "Ground";
-            ground.transform.localScale = new Vector3(10f, 1f, 10f);
-
-            CreateXrRig();
-
-            var boot = new GameObject("Boot");
-            boot.AddComponent<XrDisplayConfig>();
-            boot.AddComponent<PerfLogger>();
-
-            RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Flat;
-            RenderSettings.ambientLight = new Color(0.45f, 0.5f, 0.55f);
+            var app = new GameObject("App");
+            app.AddComponent<AppBootstrap>();
+            app.AddComponent<XrDisplayConfig>();
+            app.AddComponent<PerfLogger>();
+            app.AddComponent<SceneSwitcher>();
 
             EditorSceneManager.SaveScene(scene, ScenePath);
             EditorBuildSettings.scenes = new[] { new EditorBuildSettingsScene(ScenePath, true) };
@@ -50,12 +51,13 @@ namespace GateRush.EditorTools.Builders
             var offset = new GameObject("Camera Offset");
             offset.transform.SetParent(originGo.transform, false);
 
-            var camGo = new GameObject("Main Camera");
+            var camGo = new GameObject("Head Camera");
             camGo.tag = "MainCamera";
             camGo.transform.SetParent(offset.transform, false);
+            camGo.transform.localPosition = new Vector3(0f, 1.6f, 0f);
             var cam = camGo.AddComponent<Camera>();
             cam.nearClipPlane = 0.05f;
-            cam.farClipPlane = 1000f;
+            cam.farClipPlane = 1500f;
             camGo.AddComponent<AudioListener>();
 
             var tpd = camGo.AddComponent<TrackedPoseDriver>();
