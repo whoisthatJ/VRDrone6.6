@@ -154,6 +154,9 @@ namespace GateRush.EditorTools.Art
                 if (string.IsNullOrEmpty(target))
                 {
                     r.enabled = false;
+                    // A disabled renderer still pulls its material (stock URP Lit) and every Lit variant into the
+                    // build; point it at an Env Lit material so the build compiles one lit shader, not two.
+                    r.sharedMaterial = MaterialLibrary.Get("M_Plastic_Grey");
                     hidden++;
                     continue;
                 }

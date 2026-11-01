@@ -175,7 +175,15 @@ namespace GateRush.EditorTools.Art
             ShaderUtil.allowAsyncCompilation = false; // variants still compiling would render as placeholders
             try
             {
-                if (source != null) cam.CopyFrom(source);
+                // Copy only what the shot needs: Camera.CopyFrom also copies stereo settings, which URP warns about.
+                if (source != null)
+                {
+                    cam.clearFlags = source.clearFlags;
+                    cam.backgroundColor = source.backgroundColor;
+                    cam.allowHDR = source.allowHDR;
+                    cam.allowMSAA = source.allowMSAA;
+                    cam.useOcclusionCulling = source.useOcclusionCulling;
+                }
                 cam.transform.SetPositionAndRotation(bm.Position, bm.Rotation);
                 cam.usePhysicalProperties = false;
                 cam.fieldOfView = bm.VerticalFov;

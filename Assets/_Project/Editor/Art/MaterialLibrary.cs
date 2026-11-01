@@ -88,7 +88,7 @@ namespace GateRush.EditorTools.Art
             T("M_Steel_Rusty", "Steel_Rusty", macro: 0.25f),
             T("M_Steel_Plate", "Steel_Plate", macro: 0.2f),
             Tint("M_Steel_Truss", "Steel_Plate", new Color(0.55f, 0.6f, 0.66f), smooth: 0.9f, metal: 0.4f, macro: 0.15f),
-            Tint("M_Crane_Yellow", "Steel_Plate", new Color(1.25f, 0.92f, 0.12f), smooth: 0.8f, metal: 0.15f, macro: 0.3f),
+            Tint("M_Crane_Yellow", "Steel_Plate", new Color(1.75f, 1.32f, 0.16f), smooth: 0.8f, metal: 0.1f, macro: 0.3f),
             Tint("M_Container_Blue", "Steel_Corrugated", new Color(0.16f, 0.33f, 0.62f), smooth: 0.75f, metal: 0.1f),
             Tint("M_Container_Red", "Steel_Corrugated", new Color(0.62f, 0.14f, 0.1f), smooth: 0.75f, metal: 0.1f),
             Tint("M_Container_Green", "Steel_Corrugated", new Color(0.18f, 0.42f, 0.24f), smooth: 0.75f, metal: 0.1f),

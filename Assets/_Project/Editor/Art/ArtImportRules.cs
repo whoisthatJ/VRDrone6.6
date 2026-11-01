@@ -81,6 +81,8 @@ namespace GateRush.EditorTools.Art
                     break;
             }
             ti.SetPlatformTextureSettings(standalone);
+            // Terrain detail (grass) textures are read on the CPU when the terrain builds its grass meshes.
+            if (assetPath.Contains("/GrassBlades/")) ti.isReadable = true;
         }
 
         private void OnPreprocessModel()

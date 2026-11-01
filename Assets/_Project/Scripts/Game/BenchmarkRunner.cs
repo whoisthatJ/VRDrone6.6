@@ -53,6 +53,20 @@ namespace GateRush.Game
             go.AddComponent<BenchmarkRunner>().Configure(args);
         }
 
+        /// <summary>
+        /// Starts the same benchmark from inside the editor (Play mode, Game view resolution). Leaves Play mode when
+        /// done. Example: <c>BenchmarkRunner.StartInEditor("Track_Field,Menu", "Medium,High", 15, "Docs/perf/editor.csv")</c>.
+        /// </summary>
+        public static void StartInEditor(string scenes, string presets, float seconds, string outPath)
+        {
+            var go = new GameObject("Benchmark");
+            DontDestroyOnLoad(go);
+            var args = new List<string> { Flag, "-benchSeconds", seconds.ToString(CultureInfo.InvariantCulture), "-benchOut", outPath };
+            if (!string.IsNullOrEmpty(scenes)) args.AddRange(new[] { "-benchScenes", scenes });
+            if (!string.IsNullOrEmpty(presets)) args.AddRange(new[] { "-benchPresets", presets });
+            go.AddComponent<BenchmarkRunner>().Configure(args.ToArray());
+        }
+
         private void Configure(string[] args)
         {
             string scenes = Arg(args, "-benchScenes", null);
@@ -80,7 +94,11 @@ namespace GateRush.Game
                 foreach (var scene in _scenes) yield return Measure(scene.Trim(), preset);
             }
             Debug.Log("[GateRush][Bench] finished, results in " + _out);
+#if UNITY_EDITOR
+            UnityEditor.EditorApplication.ExitPlaymode();
+#else
             Application.Quit();
+#endif
         }
 
         private IEnumerator Measure(string scene, string preset)

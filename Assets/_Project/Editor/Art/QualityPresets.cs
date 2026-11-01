@@ -153,7 +153,9 @@ namespace GateRush.EditorTools.Art
             Set(so, "m_ShadowDepthBias", 1f, log);
             Set(so, "m_ShadowNormalBias", 0.6f, log);
             SetBool(so, "m_SoftShadowsSupported", true, log);
-            Set(so, "m_SoftShadowQuality", p.SoftShadowQuality + 1, log);
+            // One soft-shadow quality for every preset: each distinct value doubles-to-triples the shader variants
+            // every Lit/Env Lit/Terrain material compiles (the first Windows build took over an hour).
+            Set(so, "m_SoftShadowQuality", 2, log);
             SetBool(so, "m_RequireDepthTexture", true, log);
             SetBool(so, "m_RequireOpaqueTexture", false, log);
             SetBool(so, "m_SupportsTerrainHoles", true, log);
@@ -192,6 +194,7 @@ namespace GateRush.EditorTools.Art
                 SetRel(e, "maximumLODLevel", 0, log);
                 SetRel(e, "vSyncCount", 1, log);
                 SetRelBool(e, "softParticles", true, log);
+                SetRelBool(e, "enableLODCrossFade", p.LodCrossFade, log); // URP mirrors its asset flag here; keep them equal
                 SetRelBool(e, "realtimeReflectionProbes", true, log);
                 SetRelBool(e, "billboardsFaceCameraPosition", true, log);
                 SetRelBool(e, "streamingMipmapsActive", true, log);

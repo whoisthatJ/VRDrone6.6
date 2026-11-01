@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-8278257263792225105
+--- !u!114 &-8598511387822663436
 MonoBehaviour:
   m_ObjectHideFlags: 3
   m_CorrespondingSourceObject: {fileID: 0}
@@ -19,7 +19,7 @@ MonoBehaviour:
   tint:
     m_OverrideState: 1
     m_Value: 0
---- !u!114 &-5026889904356202070
+--- !u!114 &-8288301399667292190
 MonoBehaviour:
   m_ObjectHideFlags: 3
   m_CorrespondingSourceObject: {fileID: 0}
@@ -59,7 +59,7 @@ MonoBehaviour:
   maxNits:
     m_OverrideState: 1
     m_Value: 1000
---- !u!114 &-3091523738327249214
+--- !u!114 &-6590354047137609720
 MonoBehaviour:
   m_ObjectHideFlags: 3
   m_CorrespondingSourceObject: {fileID: 0}
@@ -87,7 +87,7 @@ MonoBehaviour:
   rounded:
     m_OverrideState: 1
     m_Value: 0
---- !u!114 &-2300957435854876153
+--- !u!114 &-3300826017130145067
 MonoBehaviour:
   m_ObjectHideFlags: 3
   m_CorrespondingSourceObject: {fileID: 0}
@@ -115,7 +115,7 @@ MonoBehaviour:
   saturation:
     m_OverrideState: 1
     m_Value: -12
---- !u!114 &-1579127090388960663
+--- !u!114 &-2546403594118379334
 MonoBehaviour:
   m_ObjectHideFlags: 3
   m_CorrespondingSourceObject: {fileID: 0}
@@ -178,8 +178,8 @@ MonoBehaviour:
   m_Name: VP_Industrial
   m_EditorClassIdentifier: Unity.RenderPipelines.Core.Runtime::UnityEngine.Rendering.VolumeProfile
   components:
-  - {fileID: -5026889904356202070}
-  - {fileID: -2300957435854876153}
-  - {fileID: -8278257263792225105}
-  - {fileID: -1579127090388960663}
-  - {fileID: -3091523738327249214}
+  - {fileID: -8288301399667292190}
+  - {fileID: -3300826017130145067}
+  - {fileID: -8598511387822663436}
+  - {fileID: -2546403594118379334}
+  - {fileID: -6590354047137609720}

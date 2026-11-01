@@ -17,7 +17,11 @@ namespace GateRush.EditorTools.Art
         {
             foreach (var root in ctx.Scene.GetRootGameObjects())
                 foreach (var r in root.GetComponentsInChildren<MeshRenderer>(true))
-                    if (r.name == "Floor" || r.name == "Floor Ring") r.enabled = false;
+                    if (r.name == "Floor" || r.name == "Floor Ring")
+                    {
+                        r.enabled = false;
+                        r.sharedMaterial = MaterialLibrary.Get("M_Plastic_Grey"); // keep stock Lit out of the build
+                    }
 
             var sunLight = ctx.Scene.GetRootGameObjects().Select(g => g.GetComponent<Light>()).FirstOrDefault(l => l != null && l.type == LightType.Directional);
             ctx.Sun = sunLight;

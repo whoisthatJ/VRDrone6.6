@@ -1,5 +1,14 @@
 # Changelog
 
+## Realistic visuals V0–V8 (Windows, monitor), 2026-11-01
+See `Docs/visual_overhaul_report.md` and `VISUALS_PLAN.md`.
+- **V0** Art audit (`Tools > Art > Audit Project`), camera bookmarks and before/after screenshots, `GateRush.exe -benchmark` flythrough benchmark.
+- **V1** CC0 pipeline: Poly Haven + ambientCG downloader (`Tools > Art > Download …`), import presets (BC7/BC5, aniso 8, mip streaming), licence log.
+- **V2** `GateRush/Env Lit` (URP Lit + ORM mask), `GateRush/LED`, ~75 master materials, procedural textures, HDRI skies, terrain layers.
+- **V3** Medium/High/Ultra Forward+ presets (decals; SSAO on High/Ultra) and the in-game **Settings > Graphics** tab; preset picked from VRAM on first launch.
+- **V4** Field: terrain, grass, impostor tree line, fence, pilot pit, golden hour. **V5** Hangar at night: trusses, high-bays, polished concrete. **V6** Industrial yard: rust, cracked asphalt, decals, puddles, visible water. **V7** Menu pit tent at dusk; padded LED gates; CC0 prop models; realistic quad.
+- **V8** Report, after-audit and benchmark per preset.
+
 ## PC platform + RadioMaster Pocket, 2026-11-01
 - **Windows (flat-screen)**: OpenXR loader removed from Standalone (Android unchanged), Standalone scripting backend Mono, `BuildScript.BuildWindows` / `BuildWindowsDeferred` + menu *GateRush/Build/Build Windows (PC)* → `Builds/Windows/GateRush.exe`. Player starts with no XR probe; menu works with the mouse.
 - **Radios**: `RM_Pocket` (RadioMaster Pocket, EdgeTX USB joystick) and `EdgeTX_Generic` presets in `PresetBuilder`, with pitch un-inverted and the CH5 arm switch flipped for the Input System's HID Y/Ry inversion. Unverified on hardware.
