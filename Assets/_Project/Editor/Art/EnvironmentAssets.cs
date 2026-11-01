@@ -27,10 +27,11 @@ namespace GateRush.EditorTools.Art
 
         public static readonly List<LayerDef> FieldLayers = new List<LayerDef>
         {
-            new LayerDef { Name = "TL_Grass_Lawn", Texture = "Grass_Lawn", TileMeters = 2f },
-            new LayerDef { Name = "TL_Grass_Worn", Texture = "Grass_Worn", TileMeters = 2f },
-            new LayerDef { Name = "TL_Dirt_Field", Texture = "Dirt_Field", TileMeters = 2.07f },
-            new LayerDef { Name = "TL_Chalk", Texture = "proc:Chalk", TileMeters = 0.5f },
+            // Grass and soil are rough: the mask smoothness is scaled down so low sun doesn't turn the field into a mirror.
+            new LayerDef { Name = "TL_Grass_Lawn", Texture = "Grass_Field", TileMeters = 2.5f, Smoothness = 0.22f },
+            new LayerDef { Name = "TL_Grass_Worn", Texture = "Grass_Mossy", TileMeters = 2.5f, Smoothness = 0.22f },
+            new LayerDef { Name = "TL_Dirt_Field", Texture = "Dirt_Field", TileMeters = 2.07f, Smoothness = 0.3f },
+            new LayerDef { Name = "TL_Chalk", Texture = "proc:Chalk", TileMeters = 0.5f, Smoothness = 0.2f },
         };
 
         [MenuItem("Tools/Art/Build Skies and Terrain Layers")]

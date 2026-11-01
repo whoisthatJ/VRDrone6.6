@@ -54,7 +54,8 @@ namespace GateRush.EditorTools.Art
         public static readonly List<ArtSource> Textures = new List<ArtSource>
         {
             // Ground and terrain
-            Ph("Ground", "Grass_Lawn", "leafy_grass", "2k", 2f, height: true),
+            Acg("Ground", "Grass_Field", "Grass004", "2K", 2f, height: true),
+            Acg("Ground", "Grass_Mossy", "Ground037", "2K", 2f, height: true),
             Ph("Ground", "Grass_Worn", "sparse_grass", "2k", 2f, height: true),
             Ph("Ground", "Dirt_Field", "dirt_floor", "2k", 2.07f, height: true),
             Ph("Ground", "Asphalt_PitLane", "asphalt_pit_lane", "2k", 2f),

@@ -7,10 +7,10 @@ TerrainLayer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: TL_Grass_Worn
-  m_DiffuseTexture: {fileID: 2800000, guid: 33ae4328614d5a94fae47c33d253be63, type: 3}
-  m_NormalMapTexture: {fileID: 2800000, guid: 67557cbe954586a47b97a63c3283abd9, type: 3}
+  m_DiffuseTexture: {fileID: 2800000, guid: 94c7b6225984d8f4aaa4eb43b8ccb44a, type: 3}
+  m_NormalMapTexture: {fileID: 2800000, guid: 7f2c08a03e5a2224cbb58557a2690bfd, type: 3}
   m_MaskMapTexture: {fileID: 2800000, guid: d5a5509130795d04f82db91499758f47, type: 3}
-  m_TileSize: {x: 2, y: 2}
+  m_TileSize: {x: 2.5, y: 2.5}
   m_TileOffset: {x: 0, y: 0}
   m_Specular: {r: 0, g: 0, b: 0, a: 0}
   m_Metallic: 0
@@ -19,5 +19,5 @@ TerrainLayer:
   m_DiffuseRemapMin: {x: 0, y: 0, z: 0, w: 0}
   m_DiffuseRemapMax: {x: 1, y: 1, z: 1, w: 1}
   m_MaskMapRemapMin: {x: 0, y: 0, z: 0, w: 0}
-  m_MaskMapRemapMax: {x: 1, y: 1, z: 1, w: 1}
+  m_MaskMapRemapMax: {x: 1, y: 1, z: 1, w: 0.22}
   m_SmoothnessSource: 1

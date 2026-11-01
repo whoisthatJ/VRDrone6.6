@@ -4,7 +4,8 @@ Every external art asset in this project is **CC0 1.0** (public domain dedicatio
 
 | Asset | Type | Source | URL | License | Downloaded | Used for |
 |---|---|---|---|---|---|---|
-| Grass_Lawn | Texture | Poly Haven `leafy_grass` | https://polyhaven.com/a/leafy_grass | CC0 1.0 | 2026-11-01 | Ground material, 2k, tile 2 m |
+| Grass_Field | Texture | ambientCG `Grass004` | https://ambientcg.com/view?id=Grass004 | CC0 1.0 | 2026-11-01 | Ground material, 2K, tile 2 m |
+| Grass_Mossy | Texture | ambientCG `Ground037` | https://ambientcg.com/view?id=Ground037 | CC0 1.0 | 2026-11-01 | Ground material, 2K, tile 2 m |
 | Grass_Worn | Texture | Poly Haven `sparse_grass` | https://polyhaven.com/a/sparse_grass | CC0 1.0 | 2026-11-01 | Ground material, 2k, tile 2 m |
 | Dirt_Field | Texture | Poly Haven `dirt_floor` | https://polyhaven.com/a/dirt_floor | CC0 1.0 | 2026-11-01 | Ground material, 2k, tile 2,07 m |
 | Asphalt_PitLane | Texture | Poly Haven `asphalt_pit_lane` | https://polyhaven.com/a/asphalt_pit_lane | CC0 1.0 | 2026-11-01 | Ground material, 2k, tile 2 m |

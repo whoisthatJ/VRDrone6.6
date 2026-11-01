@@ -35,7 +35,7 @@ namespace GateRush.EditorTools.Art
             var standalone = ti.GetPlatformTextureSettings("Standalone");
             standalone.overridden = true;
 
-            if (ext == ".hdr" || ext == ".exr")
+            if ((ext == ".hdr" || ext == ".exr") && assetPath.Contains("/HDRI/"))
             {
                 ti.textureShape = TextureImporterShape.TextureCube;
                 ti.generateCubemap = TextureImporterGenerateCubemap.AutoCubemap;
@@ -88,12 +88,16 @@ namespace GateRush.EditorTools.Art
             if (!Managed(assetPath)) return;
             var mi = (ModelImporter)assetImporter;
             bool cache = assetPath.StartsWith(ArtCatalog.CacheRoot + "/");
-            mi.materialImportMode = ModelImporterMaterialImportMode.None;
+            // Embedded materials only carry the FBX material names; the art pass swaps them for Env Lit materials
+            // built from the matching Poly Haven texture set (ArtPass.ModelMaterials).
+            mi.materialImportMode = ModelImporterMaterialImportMode.ImportViaMaterialDescription;
+            mi.materialLocation = ModelImporterMaterialLocation.InPrefab;
             mi.importAnimation = false;
             mi.animationType = ModelImporterAnimationType.None;
             mi.importCameras = false;
             mi.importLights = false;
             mi.useFileScale = true;
+            mi.bakeAxisConversion = true; // Z-up FBX → Y-up baked into the mesh, so placing code can set any yaw
             mi.meshCompression = ModelImporterMeshCompression.Off;
             mi.isReadable = cache; // impostor sources are read back when baking
             // Dressing models are lit by light probes (ContributeGI off), so they need no lightmap UVs; Unity's

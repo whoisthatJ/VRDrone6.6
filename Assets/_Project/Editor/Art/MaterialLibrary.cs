@@ -59,8 +59,8 @@ namespace GateRush.EditorTools.Art
         public static readonly List<MatDef> Defs = new List<MatDef>
         {
             // Ground
-            T("M_Grass_Lawn", "Grass_Lawn", macro: 0.45f, macroM: 25f),
-            T("M_Grass_Worn", "Grass_Worn", macro: 0.4f),
+            T("M_Grass_Lawn", "Grass_Field", smooth: 0.25f, macro: 0.45f, macroM: 25f),
+            T("M_Grass_Worn", "Grass_Worn", smooth: 0.3f, macro: 0.4f),
             T("M_Dirt_Field", "Dirt_Field", macro: 0.4f),
             T("M_Asphalt_PitLane", "Asphalt_PitLane", macro: 0.3f),
             T("M_Asphalt_Old", "Asphalt_Old", macro: 0.45f, macroM: 40f),
@@ -69,6 +69,7 @@ namespace GateRush.EditorTools.Art
             T("M_Concrete_HangarFloor", "Concrete_GarageFloor", smooth: 1.55f, macro: 0.3f, macroM: 18f),
             T("M_Concrete_PaintedFloor", "Concrete_PaintedFloor", smooth: 1.25f, macro: 0.25f),
             T("M_Concrete_Wall", "Concrete_Wall", macro: 0.35f, macroM: 20f),
+            Tint("M_Concrete_Pillar", "Concrete_Damaged", new Color(1.2f, 1.2f, 1.22f), macro: 0.35f),
             T("M_Concrete_Damaged", "Concrete_Damaged", macro: 0.35f, macroM: 35f),
             T("M_Concrete_Blocks", "Concrete_Blocks", macro: 0.25f),
             T("M_Brick_Factory", "Brick_Factory", macro: 0.3f, macroM: 25f),
@@ -87,6 +88,7 @@ namespace GateRush.EditorTools.Art
             T("M_Steel_Rusty", "Steel_Rusty", macro: 0.25f),
             T("M_Steel_Plate", "Steel_Plate", macro: 0.2f),
             Tint("M_Steel_Truss", "Steel_Plate", new Color(0.55f, 0.6f, 0.66f), smooth: 0.9f, metal: 0.4f, macro: 0.15f),
+            Tint("M_Crane_Yellow", "Steel_Plate", new Color(1.25f, 0.92f, 0.12f), smooth: 0.8f, metal: 0.15f, macro: 0.3f),
             Tint("M_Container_Blue", "Steel_Corrugated", new Color(0.16f, 0.33f, 0.62f), smooth: 0.75f, metal: 0.1f),
             Tint("M_Container_Red", "Steel_Corrugated", new Color(0.62f, 0.14f, 0.1f), smooth: 0.75f, metal: 0.1f),
             Tint("M_Container_Green", "Steel_Corrugated", new Color(0.18f, 0.42f, 0.24f), smooth: 0.75f, metal: 0.1f),
@@ -108,6 +110,13 @@ namespace GateRush.EditorTools.Art
             T("M_Plastic_Black", "Plastic_Matte", macro: 0f),
             new MatDef { Name = "M_Fence_Chainlink", Texture = "Fence_Chainlink", AlphaClip = true, Cutoff = 0.45f, DoubleSided = true, Macro = 0f },
             // Plain and procedural
+            Plain("M_Paint_Yellow", new Color(0.88f, 0.66f, 0.06f), 0.42f),
+            Plain("M_Paint_White", new Color(0.82f, 0.82f, 0.8f), 0.42f),
+            Plain("M_Glass_Night", new Color(0.02f, 0.035f, 0.07f), 0.96f),
+            Plain("M_Glass_Dirty", new Color(0.05f, 0.06f, 0.065f), 0.82f),
+            new MatDef { Name = "M_Prop_Front", Tint = new Color(1f, 0.45f, 0.08f, 0.6f), Smoothness = 0.85f, Metallic = 0f, Macro = 0f, Transparent = true, DoubleSided = true },
+            new MatDef { Name = "M_Prop_Rear", Tint = new Color(0.1f, 0.1f, 0.12f, 0.7f), Smoothness = 0.85f, Metallic = 0f, Macro = 0f, Transparent = true, DoubleSided = true },
+            new MatDef { Name = "M_Puddle", Texture = "proc:DecalPuddle", TileMeters = 1f, Tint = Color.white, Smoothness = 0.97f, Metallic = 0f, Macro = 0f, Transparent = true },
             Plain("M_Plastic_ConeOrange", new Color(0.95f, 0.32f, 0.05f), 0.42f),
             Plain("M_Plastic_White", new Color(0.82f, 0.82f, 0.8f), 0.45f),
             Plain("M_Plastic_Grey", new Color(0.22f, 0.23f, 0.25f), 0.35f),

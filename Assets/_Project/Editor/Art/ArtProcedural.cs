@@ -28,6 +28,7 @@ namespace GateRush.EditorTools.Art
             WaterRipples();
             LipoLabel();
             Checker();
+            Decals();
             AssetDatabase.Refresh();
             return "procedural textures written to " + Root;
         }
@@ -179,8 +180,8 @@ namespace GateRush.EditorTools.Art
                     {
                         float cover = Mathf.Clamp01(half + 0.5f - Mathf.Abs(x - cx));
                         if (cover <= 0f) continue;
-                        float g = Mathf.Lerp(0.22f, 0.55f, t) * (0.85f + 0.3f * hue);
-                        var col = C(g * 0.62f, g, g * 0.28f, Mathf.Max(cover, px[y * w + x].a / 255f));
+                        float g = Mathf.Lerp(0.42f, 0.78f, t) * (0.85f + 0.3f * hue);
+                        var col = C(g * 0.66f, g, g * 0.32f, Mathf.Max(cover, px[y * w + x].a / 255f));
                         px[y * w + x] = col;
                     }
                 }
@@ -236,6 +237,69 @@ namespace GateRush.EditorTools.Art
                 px[y * w + x] = c;
             }
             Save(File("Lipo", "Albedo"), w, h, px);
+        }
+
+        /// <summary>Decal sheets (RGBA, alpha = coverage): oil stain, asphalt crack (+ normal), puddle mask, tyre marks.</summary>
+        public static void Decals()
+        {
+            const int n = 512;
+            var oil = new Color32[n * n];
+            var puddle = new Color32[n * n];
+            var tyre = new Color32[n * n];
+            for (int y = 0; y < n; y++)
+            for (int x = 0; x < n; x++)
+            {
+                float u = x / (float)n - 0.5f, v = y / (float)n - 0.5f;
+                float r = Mathf.Sqrt(u * u + v * v) * 2f;
+                float edge = Fbm(x / (float)n, y / (float)n, 4, 4, 61) * 0.6f;
+                float a = Mathf.Clamp01((1f - r - edge * 0.7f + 0.25f) * 3f);
+                float tint = Fbm(x / (float)n, y / (float)n, 16, 3, 63);
+                oil[y * n + x] = C(0.02f + 0.03f * tint, 0.018f + 0.025f * tint, 0.015f + 0.02f * tint, a * (0.75f + 0.25f * tint));
+                float pa = Mathf.Clamp01((0.85f - r - edge * 0.5f) * 5f);
+                puddle[y * n + x] = C(0.03f, 0.035f, 0.04f, pa * 0.85f);
+                // two worn tyre tracks running along V with a gentle S-curve
+                float centre = Mathf.Sin(v * Mathf.PI * 1.5f) * 0.12f;
+                float d1 = Mathf.Abs(u - centre - 0.17f), d2 = Mathf.Abs(u - centre + 0.17f);
+                float track = Mathf.Clamp01(1f - Mathf.Min(d1, d2) / 0.06f) * Mathf.Clamp01(1.2f - Mathf.Abs(v) * 2.2f);
+                tyre[y * n + x] = C(0.015f, 0.015f, 0.015f, track * (0.35f + 0.4f * tint));
+            }
+            Save(File("DecalOil", "Albedo"), n, n, oil, alpha: true);
+            Save(File("DecalPuddle", "Albedo"), n, n, puddle, alpha: true);
+            Save(File("DecalTyre", "Albedo"), n, n, tyre, alpha: true);
+
+            // Branching crack: random walks from the centre, dark core, slight depth in the normal map.
+            var crackA = new float[n * n];
+            var rng = new System.Random(19);
+            void Walk(float x, float y, float dir, int steps, float width)
+            {
+                for (int s = 0; s < steps; s++)
+                {
+                    dir += ((float)rng.NextDouble() - 0.5f) * 0.6f;
+                    x += Mathf.Cos(dir) * 2f;
+                    y += Mathf.Sin(dir) * 2f;
+                    int w = Mathf.Max(1, Mathf.RoundToInt(width));
+                    for (int dy = -w; dy <= w; dy++)
+                    for (int dx = -w; dx <= w; dx++)
+                    {
+                        int xx = (int)x + dx, yy = (int)y + dy;
+                        if (xx < 0 || yy < 0 || xx >= n || yy >= n) continue;
+                        float f = 1f - Mathf.Sqrt(dx * dx + dy * dy) / (w + 1f);
+                        crackA[yy * n + xx] = Mathf.Max(crackA[yy * n + xx], f);
+                    }
+                    width = Mathf.Max(0.6f, width * 0.995f);
+                    if (rng.NextDouble() < 0.025 && steps - s > 20) Walk(x, y, dir + ((float)rng.NextDouble() - 0.5f) * 2f, (steps - s) / 2, width * 0.7f);
+                }
+            }
+            for (int k = 0; k < 4; k++) Walk(n / 2f, n / 2f, k * Mathf.PI / 2f + 0.4f, 110, 2.6f);
+            var crack = new Color32[n * n];
+            var height = new float[n * n];
+            for (int i = 0; i < crack.Length; i++)
+            {
+                crack[i] = C(0.03f, 0.03f, 0.03f, Mathf.Clamp01(crackA[i] * 1.6f));
+                height[i] = -crackA[i];
+            }
+            Save(File("DecalCrack", "Albedo"), n, n, crack, alpha: true);
+            Save(File("DecalCrack", "Normal"), n, n, NormalFromHeight(height, n, n, 3f));
         }
 
         /// <summary>Black and white checker for start/finish banners and the timing arch.</summary>
