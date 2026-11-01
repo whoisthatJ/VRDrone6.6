@@ -136,7 +136,9 @@ namespace GateRush.UI
                 string pad = radio != null && radio.GamepadPreset != null
                     ? $"\n<color=#ffb347>{radio.GamepadPreset.DisplayName} detected in Xbox mode: it flies as a gamepad with radio-style throttle.</color>"
                     : "";
-                _radioStatus.text = "<b>No radio found.</b> Plug it in with a USB-C OTG cable, or pair it over Bluetooth in the Quest settings.\nSee Connection help." + pad;
+                _radioStatus.text = Application.platform == RuntimePlatform.Android
+                    ? "<b>No radio found.</b> Plug it in with a USB-C OTG cable, or pair it over Bluetooth in the Quest settings.\nSee Connection help." + pad
+                    : "<b>No radio found.</b> Power the radio on, plug it into the PC by USB and pick <b>USB Joystick (HID)</b>.\nSee Connection help." + pad;
                 return;
             }
             var preset = radio.Preset;
@@ -221,8 +223,11 @@ namespace GateRush.UI
 
         private void ShowRadioHelp()
         {
-            var p = NewPage("Connecting a BetaFPV radio");
+            var p = NewPage("Connecting a radio");
             UiKit.Label(p,
+                "<b>RadioMaster Pocket / EdgeTX radios (PC):</b> power the radio <b>on</b>, plug in USB and pick <b>USB Joystick (HID)</b>. " +
+                "No driver is needed. If Windows shows \"STM32 BOOTLOADER\", the radio is in firmware mode: unplug it and power it on normally first. " +
+                "In the model's mixes, put SA on CH5 (arm) and SB on CH6 (flight mode).\n\n" +
                 "<b>LiteRadio 2 SE / LiteRadio 3 (USB-C):</b> set the radio to <b>joystick (HID) mode</b> and plug it into the Quest with a " +
                 "USB-C OTG cable. If the Quest doesn't see it, open <b>BETAFPV Configurator</b> on a PC and enable Android/joystick compatibility.\n\n" +
                 "<b>LiteRadio 2 SIM:</b> joystick mode (default) shows up as \"BETAFPV Joystick\". In Xbox mode it works as a gamepad; " +

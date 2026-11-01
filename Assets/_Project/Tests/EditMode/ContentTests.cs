@@ -55,7 +55,8 @@ namespace GateRush.Tests
         [TestCase("BETAFPV LiteRadio 4 BLE", "BetaFPV LiteRadio 4 / 4 SE (Bluetooth)")]
         [TestCase("BETAFPV Xbox Controller", "BetaFPV LiteRadio 2 SIM (Xbox mode)")]
         [TestCase("BETAFPV Nano Radio", "BetaFPV radio (generic)")]
-        [TestCase("RadioMaster TX16S Joystick", null)]
+        [TestCase("RadioMaster TX16S Joystick", "EdgeTX / OpenTX radio (generic)")]
+        [TestCase("Thrustmaster T.16000M", null)]
         public void RadioPresets_MatchExpectedDeviceNames(string deviceName, string expectedPreset)
         {
             var lib = AssetDatabase.LoadAssetAtPath<GateRush.Input.ControllerPresetLibrary>("Assets/_Project/Data/Radios/ControllerPresets.asset");

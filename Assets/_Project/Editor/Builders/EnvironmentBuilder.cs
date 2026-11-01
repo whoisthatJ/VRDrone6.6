@@ -47,7 +47,6 @@ namespace GateRush.EditorTools.Builders
             s.indirectSampleCount = 128;
             s.environmentSampleCount = 64;
             s.maxBounces = 2;
-            s.compressLightmaps = true;
             s.ao = false;
             // Non-directional: one lightmap texture per atlas, cheapest to sample on Quest.
             s.directionalityMode = LightmapsMode.NonDirectional;
@@ -55,7 +54,7 @@ namespace GateRush.EditorTools.Builders
             UnityEditor.EditorUtility.SetDirty(s);
             UnityEditor.Lightmapping.lightingSettings = s;
 
-            foreach (var light in Object.FindObjectsByType<Light>(FindObjectsSortMode.None))
+            foreach (var light in Object.FindObjectsByType<Light>())
                 light.lightmapBakeType = LightmapBakeType.Mixed;
 
             // Huge ground planes get a reduced lightmap share (they are mostly flat and evenly lit).

@@ -1,5 +1,12 @@
 # Changelog
 
+## PC platform + RadioMaster Pocket, 2026-11-01
+- **Windows (flat-screen)**: OpenXR loader removed from Standalone (Android unchanged), Standalone scripting backend Mono, `BuildScript.BuildWindows` / `BuildWindowsDeferred` + menu *GateRush/Build/Build Windows (PC)* → `Builds/Windows/GateRush.exe`. Player starts with no XR probe; menu works with the mouse.
+- **Radios**: `RM_Pocket` (RadioMaster Pocket, EdgeTX USB joystick) and `EdgeTX_Generic` presets in `PresetBuilder`, with pitch un-inverted and the CH5 arm switch flipped for the Input System's HID Y/Ry inversion. Unverified on hardware.
+- Radio menu: PC-specific "no radio" hint; help page renamed "Connecting a radio" with EdgeTX/Pocket steps (including the STM32 BOOTLOADER/DFU pitfall).
+- Fixed obsolete-API warnings in `EnvironmentBuilder`.
+- `PcPlatformTests` (shipped-library routing for EdgeTX/BetaFPV names, Pocket mapping); `ContentTests` now expects TX16S → EdgeTX generic. 132 tests green.
+
 ## M8: Polish + performance, 2026-10-30
 - **Battery**: `BatteryModel` (LiPo curve, sag, drain), packs per quad class, optional thrust sag (`PhysicsSettings.BatterySag`), voltage/current/mAh in `QuadState`.
 - **Motor audio**: procedural `QuadAudio` (blade-pass whine per motor, airflow noise, crash thump, start/lap beeps), 2D in FPV views / 3D in LOS, RPM per quad class.

@@ -33,6 +33,11 @@ namespace GateRush.EditorTools.Builders
                 "Bluetooth joystick mode, paired in Quest Settings > Devices > Bluetooth."));
             library.Presets.Add(Preset("BetaFPV_Generic", "BetaFPV radio (generic)", "BETAFPV|LiteRadio", 0, Aetr(),
                 "Fallback for other BetaFPV radios."));
+            library.Presets.Add(Preset("RM_Pocket", "RadioMaster Pocket (EdgeTX USB joystick)", "(RadioMaster|EdgeTX|OpenTX).*Pocket|Pocket.*(Joystick|EdgeTX)", 20, EdgeTxAetr(),
+                "Power the radio ON, plug in USB and pick \"USB Joystick (HID)\". EdgeTX sends CH1-CH8 on X/Y/Z/Rx/Ry/Rz/Slider/Dial. " +
+                "Model needs AETR order plus mixes: SA -> CH5 (arm), SB -> CH6 (flight mode). No driver needed on Windows."));
+            library.Presets.Add(Preset("EdgeTX_Generic", "EdgeTX / OpenTX radio (generic)", "EdgeTX|OpenTX|RadioMaster|Jumper|FrSky|\\bTBS\\b", 0, EdgeTxAetr(),
+                "Fallback for other EdgeTX/OpenTX radios in USB joystick mode (TX16S, Boxer, Zorro, Jumper, Taranis...)."));
 
             EditorUtility.SetDirty(library);
             AssetDatabase.SaveAssets();
@@ -49,6 +54,19 @@ namespace GateRush.EditorTools.Builders
             Mode = new SwitchAssignment(5, -1f, 0f) { Position2 = 1f, ThreePosition = true },
             Reset = SwitchAssignment.None,
         };
+
+        /// <summary>
+        /// AETR for EdgeTX's classic USB joystick (CH1..CH8 on X, Y, Z, Rx, Ry, Rz, Slider, Dial).
+        /// The Input System's HID fallback inverts Y and Ry, so pitch (CH2) is un-inverted here and the
+        /// arm switch on CH5 reads +1 when the switch is in its EdgeTX -100 (disarmed) position.
+        /// </summary>
+        private static RadioMapping EdgeTxAetr()
+        {
+            var m = Aetr();
+            m.Pitch = new AxisAssignment(1, invert: true);
+            m.Arm = new SwitchAssignment(4, 1f, -1f);
+            return m;
+        }
 
         private static ControllerPreset Preset(string file, string name, string pattern, int priority, RadioMapping mapping, string notes, bool gamepadPath = false)
         {
