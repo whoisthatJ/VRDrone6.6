@@ -84,6 +84,7 @@ namespace GateRush.Core
         public ComfortPrefs Comfort = new ComfortPrefs();
         public PhysicsPrefs Physics = new PhysicsPrefs();
         public FeedPrefs Feed = new FeedPrefs();
+        public GraphicsPrefs Graphics = new GraphicsPrefs();
 
         /// <summary>Brings every value into its valid range (after loading or editing).</summary>
         public void Clamp()
@@ -97,6 +98,8 @@ namespace GateRush.Core
             Comfort ??= new ComfortPrefs();
             Physics ??= new PhysicsPrefs();
             Feed ??= new FeedPrefs();
+            Graphics ??= new GraphicsPrefs();
+            Graphics.Clamp();
             Comfort.Foveation = Mathf.Clamp(Comfort.Foveation, 0, 3);
             Feed.VtxNoise = Mathf.Clamp(Feed.VtxNoise, 0, 2);
             Feed.MotorVolume = Mathf.Clamp01(Feed.MotorVolume);

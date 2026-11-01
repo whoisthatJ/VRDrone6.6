@@ -188,12 +188,12 @@ namespace GateRush.UI
 
         // ---------- settings ----------
 
-        private static readonly string[] Tabs = { "Rates", "Camera", "Input", "Feed", "Comfort", "Physics", "Pilot" };
+        private static readonly string[] Tabs = { "Rates", "Camera", "Input", "Graphics", "Feed", "Comfort", "Physics", "Pilot" };
 
         private void ShowSettings()
         {
             var p = NewPage("Settings");
-            float tabWidth = (ContentWidth - 5f * 12f) / Tabs.Length;
+            float tabWidth = (ContentWidth - (Tabs.Length - 1) * 12f) / Tabs.Length;
             for (int i = 0; i < Tabs.Length; i++)
             {
                 string tab = Tabs[i];
@@ -211,6 +211,7 @@ namespace GateRush.UI
                 case "Rates": BuildRates(content); break;
                 case "Camera": BuildCamera(content); break;
                 case "Input": BuildInput(content); break;
+                case "Graphics": BuildGraphics(content); break;
                 case "Feed": BuildFeed(content); break;
                 case "Comfort": BuildComfort(content); break;
                 case "Physics": BuildPhysics(content); break;
@@ -220,7 +221,7 @@ namespace GateRush.UI
             BackButton(p);
             UiKit.Button(p, "Reset all to defaults", new Vector2(Width - Margin - 420f, -(Height - 110f)), new Vector2(420f, 70f), () =>
             {
-                var fresh = new GameSettings { QuadId = S.QuadId, TrackId = S.TrackId, PilotName = S.PilotName };
+                var fresh = new GameSettings { QuadId = S.QuadId, TrackId = S.TrackId, PilotName = S.PilotName, Graphics = S.Graphics };
                 SaveSystem.Replace(fresh);
                 ShowSettings();
             }, 28f);
@@ -332,6 +333,32 @@ namespace GateRush.UI
             UiKit.StepperRow(c, "Horizon line (Immersive)", -270f, new[] { "Off", "On" }, comfort.HorizonLine ? 1 : 0, i => { comfort.HorizonLine = i == 1; Changed(); }, ContentWidth);
             UiKit.Label(c, "Higher foveation = faster rendering, blurrier edges. 90 Hz is smoother but needs more headroom.",
                 new Vector2(0f, -380f), new Vector2(ContentWidth, 60f), 26f, TextAlignmentOptions.TopLeft, UiKit.DimTextColor);
+        }
+
+        private void BuildGraphics(RectTransform c)
+        {
+            var g = S.Graphics;
+            if (string.IsNullOrEmpty(g.Preset)) g.Preset = GraphicsQuality.Current != null ? GraphicsQuality.Current.Preset : "High";
+            int preset = Mathf.Max(0, System.Array.IndexOf(GraphicsQuality.Presets, g.Preset));
+            UiKit.StepperRow(c, "Quality preset", 0f, GraphicsQuality.Presets, preset, i =>
+            {
+                S.Graphics = GraphicsPrefs.ForPreset(GraphicsQuality.Presets[i]);
+                ApplyGraphics();
+                ShowSettings();
+            }, ContentWidth);
+            UiKit.SliderRow(c, "Render scale", -75f, 50f, 100f, g.RenderScale * 100f, v => F(v, "0") + " %", v => { g.RenderScale = v / 100f; ApplyGraphics(); }, ContentWidth, true);
+            UiKit.StepperRow(c, "Anti-aliasing", -150f, new[] { "Off", "SMAA", "MSAA 2x", "MSAA 4x" }, g.AntiAliasing, i => { g.AntiAliasing = i; ApplyGraphics(); }, ContentWidth);
+            UiKit.StepperRow(c, "Shadows", -225f, new[] { "Off", "Low", "Medium", "High" }, g.Shadows, i => { g.Shadows = i; ApplyGraphics(); }, ContentWidth);
+            UiKit.StepperRow(c, "Ambient occlusion", -300f, new[] { "Off", "On" }, g.Ssao ? 1 : 0, i => { g.Ssao = i == 1; ApplyGraphics(); }, ContentWidth);
+            UiKit.SliderRow(c, "Grass density", -375f, 0f, 100f, g.Vegetation * 100f, v => F(v, "0") + " %", v => { g.Vegetation = v / 100f; ApplyGraphics(); }, ContentWidth, true);
+            UiKit.StepperRow(c, "Post-processing", -450f, new[] { "Off", "On" }, g.PostProcessing ? 1 : 0, i => { g.PostProcessing = i == 1; ApplyGraphics(); }, ContentWidth);
+            UiKit.StepperRow(c, "VSync", -525f, new[] { "Off", "On" }, g.VSync ? 1 : 0, i => { g.VSync = i == 1; ApplyGraphics(); }, ContentWidth);
+        }
+
+        private void ApplyGraphics()
+        {
+            GraphicsQuality.Apply(S.Graphics);
+            Changed();
         }
 
         private void BuildFeed(RectTransform c)

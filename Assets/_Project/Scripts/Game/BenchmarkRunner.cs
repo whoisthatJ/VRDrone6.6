@@ -74,8 +74,9 @@ namespace GateRush.Game
             foreach (var preset in presets)
             {
                 int level = Array.FindIndex(QualitySettings.names, n => string.Equals(n, preset, StringComparison.OrdinalIgnoreCase));
-                if (level >= 0) QualitySettings.SetQualityLevel(level, true);
+                if (level >= 0) GraphicsQuality.Apply(GraphicsPrefs.ForPreset(QualitySettings.names[level]));
                 else Debug.LogWarning($"[GateRush][Bench] unknown quality level '{preset}', using current");
+                QualitySettings.vSyncCount = 0;
                 foreach (var scene in _scenes) yield return Measure(scene.Trim(), preset);
             }
             Debug.Log("[GateRush][Bench] finished, results in " + _out);
