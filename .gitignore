@@ -120,3 +120,7 @@ InitTestScene*.unity*
 /Assets/Resources/PerformanceTestRun*
 /Assets/Resources.meta
 
+
+# Art pipeline: impostor source models (CC0, re-downloadable, too large for the repo)
+/Assets/_ArtCache/
+/Assets/_ArtCache.meta
