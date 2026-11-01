@@ -76,7 +76,7 @@ namespace GateRush.EditorTools.Art
                 default:
                     ti.textureType = TextureImporterType.Default;
                     ti.sRGBTexture = false;
-                    ti.alphaSource = TextureImporterAlphaSource.None;
+                    ti.alphaSource = TextureImporterAlphaSource.FromInput; // terrain mask maps keep smoothness in alpha
                     standalone.format = TextureImporterFormat.BC7;
                     break;
             }

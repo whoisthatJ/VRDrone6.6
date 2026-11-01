@@ -171,6 +171,8 @@ namespace GateRush.EditorTools.Art
         {
             var go = new GameObject("__ShotCam") { hideFlags = HideFlags.HideAndDontSave };
             var cam = go.AddComponent<Camera>();
+            bool asyncShaders = ShaderUtil.allowAsyncCompilation;
+            ShaderUtil.allowAsyncCompilation = false; // variants still compiling would render as placeholders
             try
             {
                 if (source != null) cam.CopyFrom(source);
@@ -180,7 +182,6 @@ namespace GateRush.EditorTools.Art
                 cam.aspect = Width / (float)Height;
                 cam.nearClipPlane = 0.05f;
                 cam.farClipPlane = Mathf.Max(source != null ? source.farClipPlane : 0f, 1500f);
-                cam.stereoTargetEye = StereoTargetEyeMask.None;
                 int mask = ~((1 << VRRoomLayer) | (1 << EditorUILayer));
                 if (bm.HideLocalQuad) mask &= ~(1 << LocalQuadLayer);
                 cam.cullingMask = mask;
@@ -211,6 +212,7 @@ namespace GateRush.EditorTools.Art
             }
             finally
             {
+                ShaderUtil.allowAsyncCompilation = asyncShaders;
                 Object.DestroyImmediate(go);
             }
         }
