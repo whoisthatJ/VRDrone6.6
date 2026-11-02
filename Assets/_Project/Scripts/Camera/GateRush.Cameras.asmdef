@@ -4,7 +4,10 @@
     "references": [
         "GateRush.Flight",
         "GateRush.Vehicle",
-        "Unity.InputSystem"
+        "Unity.InputSystem",
+        "GateRush.Input",
+        "Unity.Cinemachine",
+        "Unity.RenderPipelines.Core.Runtime"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

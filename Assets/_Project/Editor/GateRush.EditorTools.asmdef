@@ -12,19 +12,14 @@
         "GateRush.Game",
         "GateRush.Track",
         "GateRush.TrackEditor",
-        "Unity.XR.Interaction.Toolkit",
         "Unity.TextMeshPro",
         "UnityEngine.UI",
         "Unity.InputSystem",
-        "Unity.XR.CoreUtils",
-        "Unity.XR.Management",
-        "Unity.XR.Management.Editor",
-        "Unity.XR.OpenXR",
-        "Unity.XR.OpenXR.Editor",
         "Unity.RenderPipelines.Universal.Runtime",
         "Unity.RenderPipelines.Core.Runtime",
         "UnityEditor.TestRunner",
-        "UnityEngine.TestRunner"
+        "UnityEngine.TestRunner",
+        "Unity.Cinemachine"
     ],
     "includePlatforms": [
         "Editor"

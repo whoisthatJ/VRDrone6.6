@@ -61,7 +61,7 @@ namespace GateRush.UI
 
         private void ShowMain()
         {
-            var p = NewPage("GATERUSH VR");
+            var p = NewPage("GATERUSH");
             _summary = UiKit.Label(p, "", new Vector2(Margin, -120f), new Vector2(ContentWidth, 120f), 32f, TextAlignmentOptions.TopLeft, UiKit.DimTextColor);
             UpdateSummary();
 
@@ -80,7 +80,7 @@ namespace GateRush.UI
             y -= 120f;
             UiKit.Button(p, "Quit", new Vector2(Margin, y), new Vector2(half, 90f), GameFlow.Quit);
 
-            UiKit.Label(p, "Point with a controller and pull the trigger. In flight, the left menu button returns here.",
+            UiKit.Label(p, "Mouse, keyboard or gamepad. In flight: V switches the camera, Esc returns here.",
                 new Vector2(Margin, -(Height - 100f)), new Vector2(ContentWidth, 60f), 26f, TextAlignmentOptions.MidlineLeft, UiKit.DimTextColor);
         }
 
@@ -188,7 +188,7 @@ namespace GateRush.UI
 
         // ---------- settings ----------
 
-        private static readonly string[] Tabs = { "Rates", "Camera", "Input", "Graphics", "Feed", "Comfort", "Physics", "Pilot" };
+        private static readonly string[] Tabs = { "Rates", "Camera", "Input", "Graphics", "Feed", "Physics", "Pilot" };
 
         private void ShowSettings()
         {
@@ -213,7 +213,6 @@ namespace GateRush.UI
                 case "Input": BuildInput(content); break;
                 case "Graphics": BuildGraphics(content); break;
                 case "Feed": BuildFeed(content); break;
-                case "Comfort": BuildComfort(content); break;
                 case "Physics": BuildPhysics(content); break;
                 default: BuildPilot(content); break;
             }
@@ -307,32 +306,21 @@ namespace GateRush.UI
             var cam = S.Camera;
             UiKit.SliderRow(c, "Camera tilt", 0f, 0f, 60f, cam.TiltDegrees, v => F(v, "0") + " deg", v => { cam.TiltDegrees = v; Changed(); }, ContentWidth, true);
             UiKit.SliderRow(c, "FOV (horizontal)", -90f, 90f, 150f, cam.HorizontalFov, v => F(v, "0") + " deg", v => { cam.HorizontalFov = v; Changed(); }, ContentWidth, true);
-            UiKit.StepperRow(c, "View", -180f, new[] { "Goggles (comfortable)", "Immersive (intense)", "Line of sight" }, cam.ViewMode, i => { cam.ViewMode = i; Changed(); }, ContentWidth);
-            UiKit.SliderRow(c, "Goggles screen size", -270f, 30f, 100f, cam.GogglesArcDegrees, v => F(v, "0") + " deg", v => { cam.GogglesArcDegrees = v; Changed(); }, ContentWidth, true);
-            UiKit.StepperRow(c, "Goggles screen", -360f, new[] { "Fixed in the room", "Follows your head" }, cam.GogglesFollow, i => { cam.GogglesFollow = i; Changed(); }, ContentWidth);
+            UiKit.StepperRow(c, "View", -180f, new[] { "FPV (drone camera)", "Chase", "Line of sight" }, cam.ViewMode, i => { cam.ViewMode = i; Changed(); }, ContentWidth);
+            UiKit.StepperRow(c, "Lens distortion (FPV)", -270f, new[] { "Off", "On" }, cam.LensDistortion ? 1 : 0, i => { cam.LensDistortion = i == 1; Changed(); }, ContentWidth);
+            UiKit.Label(c, "Switch views in flight with V, gamepad LB or the radio's view switch (Radio setup).",
+                new Vector2(0f, -370f), new Vector2(ContentWidth, 60f), 26f, TextAlignmentOptions.TopLeft, UiKit.DimTextColor);
         }
 
         private void BuildInput(RectTransform c)
         {
             var input = S.Input;
             string[] throttle = { "Full stick (radio-style)", "Centre = hover", "Trigger" };
-            UiKit.StepperRow(c, "Touch throttle", 0f, throttle, input.TouchThrottle, i => { input.TouchThrottle = i; Changed(); }, ContentWidth);
-            UiKit.StepperRow(c, "Gamepad throttle", -90f, throttle, input.GamepadThrottle, i => { input.GamepadThrottle = i; Changed(); }, ContentWidth);
-            UiKit.SliderRow(c, "Stick deadband", -180f, 0f, 0.3f, input.Deadband, v => F(v * 100f, "0") + " %", v => { input.Deadband = v; Changed(); }, ContentWidth);
-            UiKit.SliderRow(c, "Stick expo", -270f, 0f, 1f, input.Expo, v => F(v, "0.00"), v => { input.Expo = v; Changed(); }, ContentWidth);
-            UiKit.StepperRow(c, "Invert pitch (right stick)", -360f, new[] { "Off", "On" }, input.InvertPitch ? 1 : 0, i => { input.InvertPitch = i == 1; Changed(); }, ContentWidth);
-            UiKit.StepperRow(c, "Invert roll (right stick)", -450f, new[] { "Off", "On" }, input.InvertRoll ? 1 : 0, i => { input.InvertRoll = i == 1; Changed(); }, ContentWidth);
-        }
-
-        private void BuildComfort(RectTransform c)
-        {
-            var comfort = S.Comfort;
-            UiKit.SliderRow(c, "Vignette (Immersive)", 0f, 0f, 1f, comfort.VignetteStrength, v => F(v * 100f, "0") + " %", v => { comfort.VignetteStrength = v; Changed(); }, ContentWidth);
-            UiKit.StepperRow(c, "Refresh rate", -90f, new[] { "72 Hz", "90 Hz" }, comfort.RefreshRate >= 90f ? 1 : 0, i => { comfort.RefreshRate = i == 1 ? 90f : 72f; Changed(); }, ContentWidth);
-            UiKit.StepperRow(c, "Foveated rendering", -180f, new[] { "Off", "Low", "Medium", "High" }, comfort.Foveation, i => { comfort.Foveation = i; Changed(); }, ContentWidth);
-            UiKit.StepperRow(c, "Horizon line (Immersive)", -270f, new[] { "Off", "On" }, comfort.HorizonLine ? 1 : 0, i => { comfort.HorizonLine = i == 1; Changed(); }, ContentWidth);
-            UiKit.Label(c, "Higher foveation = faster rendering, blurrier edges. 90 Hz is smoother but needs more headroom.",
-                new Vector2(0f, -380f), new Vector2(ContentWidth, 60f), 26f, TextAlignmentOptions.TopLeft, UiKit.DimTextColor);
+            UiKit.StepperRow(c, "Gamepad throttle", 0f, throttle, input.GamepadThrottle, i => { input.GamepadThrottle = i; Changed(); }, ContentWidth);
+            UiKit.SliderRow(c, "Stick deadband", -90f, 0f, 0.3f, input.Deadband, v => F(v * 100f, "0") + " %", v => { input.Deadband = v; Changed(); }, ContentWidth);
+            UiKit.SliderRow(c, "Stick expo", -180f, 0f, 1f, input.Expo, v => F(v, "0.00"), v => { input.Expo = v; Changed(); }, ContentWidth);
+            UiKit.StepperRow(c, "Invert pitch (right stick)", -270f, new[] { "Off", "On" }, input.InvertPitch ? 1 : 0, i => { input.InvertPitch = i == 1; Changed(); }, ContentWidth);
+            UiKit.StepperRow(c, "Invert roll (right stick)", -360f, new[] { "Off", "On" }, input.InvertRoll ? 1 : 0, i => { input.InvertRoll = i == 1; Changed(); }, ContentWidth);
         }
 
         private void BuildGraphics(RectTransform c)
@@ -352,7 +340,18 @@ namespace GateRush.UI
             UiKit.StepperRow(c, "Ambient occlusion", -300f, new[] { "Off", "On" }, g.Ssao ? 1 : 0, i => { g.Ssao = i == 1; ApplyGraphics(); }, ContentWidth);
             UiKit.SliderRow(c, "Grass density", -375f, 0f, 100f, g.Vegetation * 100f, v => F(v, "0") + " %", v => { g.Vegetation = v / 100f; ApplyGraphics(); }, ContentWidth, true);
             UiKit.StepperRow(c, "Post-processing", -450f, new[] { "Off", "On" }, g.PostProcessing ? 1 : 0, i => { g.PostProcessing = i == 1; ApplyGraphics(); }, ContentWidth);
-            UiKit.StepperRow(c, "VSync", -525f, new[] { "Off", "On" }, g.VSync ? 1 : 0, i => { g.VSync = i == 1; ApplyGraphics(); }, ContentWidth);
+            // Frame limit: VSync, or VSync off with an optional cap (GraphicsPrefs.FrameCaps).
+            var caps = GraphicsPrefs.FrameCaps;
+            var limits = new string[caps.Length + 1];
+            limits[0] = "VSync";
+            for (int k = 0; k < caps.Length; k++) limits[k + 1] = caps[k] == 0 ? "Uncapped" : caps[k] + " fps";
+            int limit = g.VSync ? 0 : 1 + Mathf.Max(0, System.Array.IndexOf(caps, g.FrameCap));
+            UiKit.StepperRow(c, "Frame limit", -525f, limits, limit, i =>
+            {
+                g.VSync = i == 0;
+                g.FrameCap = i == 0 ? 0 : caps[i - 1];
+                ApplyGraphics();
+            }, ContentWidth);
         }
 
         private void ApplyGraphics()
@@ -364,11 +363,8 @@ namespace GateRush.UI
         private void BuildFeed(RectTransform c)
         {
             var feed = S.Feed;
-            UiKit.StepperRow(c, "Analog video noise", 0f, new[] { "Off", "Light", "Realistic" }, feed.VtxNoise, i => { feed.VtxNoise = i; Changed(); }, ContentWidth);
-            UiKit.SliderRow(c, "Motor volume", -90f, 0f, 1f, feed.MotorVolume, v => F(v * 100f, "0") + " %", v => { feed.MotorVolume = v; Changed(); }, ContentWidth);
-            UiKit.StepperRow(c, "Debug readout", -180f, new[] { "Off", "On" }, feed.ShowDebugOverlay ? 1 : 0, i => { feed.ShowDebugOverlay = i == 1; Changed(); }, ContentWidth);
-            UiKit.Label(c, "Video noise grows with distance from you and with obstacles between you and the quad, like a real analog link (goggles view).",
-                new Vector2(0f, -290f), new Vector2(ContentWidth, 90f), 26f, TextAlignmentOptions.TopLeft, UiKit.DimTextColor);
+            UiKit.SliderRow(c, "Motor volume", 0f, 0f, 1f, feed.MotorVolume, v => F(v * 100f, "0") + " %", v => { feed.MotorVolume = v; Changed(); }, ContentWidth);
+            UiKit.StepperRow(c, "Debug readout", -90f, new[] { "Off", "On" }, feed.ShowDebugOverlay ? 1 : 0, i => { feed.ShowDebugOverlay = i == 1; Changed(); }, ContentWidth);
         }
 
         private void BuildPhysics(RectTransform c)

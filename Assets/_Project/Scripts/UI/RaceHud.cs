@@ -132,7 +132,7 @@ namespace GateRush.UI
                 sb.AppendLine(Inv($"{i + 1}. {e.TotalTime:F2}   best {e.BestLap:F2}   {e.Pilot}   {e.Quad}   {e.Date}"));
             }
             sb.AppendLine();
-            sb.AppendLine("<size=80%>Restart: T  /  gamepad L-stick click  /  left Touch stick click</size>");
+            sb.AppendLine("<size=80%>Restart: T  /  gamepad L-stick click     Menu: Esc</size>");
             return sb.ToString();
         }
 

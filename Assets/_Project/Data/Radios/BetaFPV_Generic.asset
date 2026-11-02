@@ -49,7 +49,7 @@ MonoBehaviour:
         Max: 1
     Arm:
       Channel: 17
-      Position0: -1
+      Position0: 0
       Position1: 1
       Position2: 1
       ThreePosition: 0
@@ -60,6 +60,12 @@ MonoBehaviour:
       Position2: 1
       ThreePosition: 1
     Reset:
+      Channel: -1
+      Position0: 0
+      Position1: 1
+      Position2: 1
+      ThreePosition: 0
+    View:
       Channel: -1
       Position0: 0
       Position1: 1

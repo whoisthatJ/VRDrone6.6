@@ -65,3 +65,9 @@ MonoBehaviour:
       Position1: 1
       Position2: 1
       ThreePosition: 0
+    View:
+      Channel: -1
+      Position0: 0
+      Position1: 1
+      Position2: 1
+      ThreePosition: 0

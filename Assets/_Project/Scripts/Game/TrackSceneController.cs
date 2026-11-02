@@ -29,23 +29,19 @@ namespace GateRush.Game
         [SerializeField] private Transform ghostVisual;
         [SerializeField] private FpvCamera fpvCamera;
         [SerializeField] private ViewModeManager views;
-        [SerializeField] private GogglesScreen gogglesScreen;
-        [SerializeField] private ComfortVignette vignette;
         [SerializeField] private KeyboardGamepadSource keyboardGamepad;
-        [SerializeField] private TouchControllerSource touch;
         [SerializeField] private RcRadioSource radio;
         [SerializeField] private RadioDeviceProvider radioProvider;
-        [Tooltip("Moved next to the track's spawn so the line-of-sight pilot stands by the pad.")]
-        [SerializeField] private Transform losStand;
 
         [Header("Track editor")]
         [SerializeField] private GateRush.TrackEditor.TrackEditorController editor;
 
-        [Header("Feed, audio, comfort")]
+        [Header("Feed and audio")]
         [SerializeField] private QuadAudio quadAudio;
         [SerializeField] private VtxSignal vtx;
-        [SerializeField] private GameObject horizonRing;
         [SerializeField] private GameObject debugOverlay;
+        [Tooltip("Race HUD / OSD canvas, hidden while editing a track.")]
+        [SerializeField] private GameObject hud;
 
         private string _appliedQuadId;
         private bool _testFlying;
@@ -95,13 +91,12 @@ namespace GateRush.Game
 
         private void OnRadioChanged() => ApplySettings(SaveSystem.Settings);
 
-        // ---------- feed / audio / comfort ----------
+        // ---------- feed / audio ----------
 
         private void OnViewChanged(ViewMode mode)
         {
-            // Motor sound comes from the quad in line of sight, "in your ears" in the FPV views.
-            if (quadAudio != null) quadAudio.SetSpatial(mode == ViewMode.LineOfSight);
-            if (horizonRing != null) horizonRing.SetActive(SaveSystem.Settings.Comfort.HorizonLine && mode == ViewMode.Immersive);
+            // Motor sound is "in your ears" in FPV, and comes from the quad in the chase and line-of-sight views.
+            if (quadAudio != null) quadAudio.SetSpatial(mode != ViewMode.Fpv);
         }
 
         private void OnGatePassed(int gate, PassResult result)
@@ -124,12 +119,9 @@ namespace GateRush.Game
             Time.timeScale = 1f;
             race.gameObject.SetActive(false);
             vehicle.gameObject.SetActive(false);
-            if (views != null)
-            {
-                // Stand in the world (line of sight) and let the editor move the rig.
-                views.Apply(ViewMode.LineOfSight);
-                views.enabled = false;
-            }
+            // The editor flies the output camera itself.
+            if (views != null) views.SetFreeCamera(true);
+            if (hud != null) hud.SetActive(false);
             editor.Begin(data);
             Debug.Log($"[GateRush] Editing track '{data.Name}' ({data.Environment})");
         }
@@ -144,9 +136,10 @@ namespace GateRush.Game
             LoadData(data);
             if (views != null)
             {
-                views.enabled = true;
+                views.SetFreeCamera(false);
                 views.Apply((ViewMode)SaveSystem.Settings.Camera.ViewMode);
             }
+            if (hud != null) hud.SetActive(true);
             // While test-flying, the menu button goes back to the editor instead of the main menu.
             SceneSwitcher.MenuOverride = () =>
             {
@@ -184,6 +177,7 @@ namespace GateRush.Game
 
             Track = TrackLoader.Load(data, trackPrefabs);
             vehicle.SpawnPoint = Track.Spawn;
+            var losStand = views != null ? views.LosStand : null;
             if (losStand != null)
             {
                 // Stand 4 m left of and 6 m behind the pad, facing down the start straight.
@@ -205,12 +199,7 @@ namespace GateRush.Game
                 fpvCamera.TiltDegrees = s.Camera.TiltDegrees;
                 fpvCamera.HorizontalFov = s.Camera.HorizontalFov;
             }
-            if (gogglesScreen != null)
-            {
-                gogglesScreen.ArcDegrees = s.Camera.GogglesArcDegrees;
-                gogglesScreen.FollowMode = (ScreenFollowMode)s.Camera.GogglesFollow;
-            }
-            if (vignette != null) vignette.Strength = s.Comfort.VignetteStrength;
+            if (views != null) views.LensDistortion = s.Camera.LensDistortion;
 
             var shaping = new StickShaping
             {
@@ -224,19 +213,6 @@ namespace GateRush.Game
                 // A radio in Xbox mode is a gamepad with a non-centring throttle stick.
                 bool radioPad = radioProvider != null && radioProvider.GamepadPreset != null;
                 keyboardGamepad.GamepadThrottle = radioPad ? ThrottleMapping.Direct : (ThrottleMapping)s.Input.GamepadThrottle;
-            }
-            if (touch != null)
-            {
-                touch.Shaping = shaping;
-                touch.ThrottleMapping = (ThrottleMapping)s.Input.TouchThrottle;
-            }
-
-            var display = FindAnyObjectByType<XrDisplayConfig>();
-            if (display != null)
-            {
-                if (display.TargetRefreshRate != s.Comfort.RefreshRate) display.SetRefreshRate(s.Comfort.RefreshRate);
-                float fov = s.Comfort.Foveation / 3f;
-                if (!Mathf.Approximately(display.FoveationLevel, fov)) display.SetFoveation(fov);
             }
 
             if (quadAudio != null) quadAudio.Volume = s.Feed.MotorVolume;
@@ -268,6 +244,7 @@ namespace GateRush.Game
             if (quadVisual != null) quadVisual.localScale = Vector3.one * entry.VisualScale;
             if (ghostVisual != null) ghostVisual.localScale = Vector3.one * entry.VisualScale;
             if (fpvCamera != null) fpvCamera.transform.localPosition = entry.CameraOffset;
+            if (views != null) views.SetQuadScale(entry.VisualScale);
             if (quadAudio != null) quadAudio.MaxRpm = entry.MotorRpm;
 
             // A different quad means a different ghost and a fresh start.

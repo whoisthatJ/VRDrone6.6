@@ -12,7 +12,10 @@ namespace GateRush.Input
         [SerializeField] private RadioDeviceProvider provider;
 
         private SwitchArming _arming;
-        private bool _resetWasOn;
+        private bool _resetWasOn, _viewWasOn;
+
+        /// <summary>Counts flips of the view switch to its "on" position; consumers compare against the last count they saw.</summary>
+        public int ViewPresses { get; private set; }
 
         public RadioDeviceProvider Provider
         {
@@ -48,6 +51,10 @@ namespace GateRush.Input
             bool resetOn = m.Reset.IsAssigned && RadioMapping.SwitchPosition(reader.Read(m.Reset.Channel), m.Reset) == 1;
             reset = resetOn && !_resetWasOn;
             _resetWasOn = resetOn;
+
+            bool viewOn = m.View.IsAssigned && RadioMapping.SwitchPosition(reader.Read(m.View.Channel), m.View) == 1;
+            if (viewOn && !_viewWasOn) ViewPresses++;
+            _viewWasOn = viewOn;
         }
     }
 }

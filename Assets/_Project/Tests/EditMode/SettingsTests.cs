@@ -20,8 +20,9 @@ namespace GateRush.Tests
             };
             s.Camera.TiltDegrees = 40f;
             s.Camera.ViewMode = 2;
-            s.Input.TouchThrottle = 2;
-            s.Comfort.RefreshRate = 90f;
+            s.Camera.LensDistortion = true;
+            s.Input.InvertPitch = true;
+            s.Graphics.FrameCap = 144;
             s.Physics.CrashSpeed = 12f;
 
             var copy = GameSettings.FromJson(s.ToJson());
@@ -33,8 +34,9 @@ namespace GateRush.Tests
             Assert.AreEqual(670f, copy.Rates.Roll.Rate);
             Assert.AreEqual(40f, copy.Camera.TiltDegrees);
             Assert.AreEqual(2, copy.Camera.ViewMode);
-            Assert.AreEqual(2, copy.Input.TouchThrottle);
-            Assert.AreEqual(90f, copy.Comfort.RefreshRate);
+            Assert.IsTrue(copy.Camera.LensDistortion);
+            Assert.IsTrue(copy.Input.InvertPitch);
+            Assert.AreEqual(144, copy.Graphics.FrameCap);
             Assert.AreEqual(12f, copy.Physics.CrashSpeed);
         }
 
@@ -44,7 +46,8 @@ namespace GateRush.Tests
             var s = GameSettings.FromJson("{\"PilotName\":\"Old\"}");
             Assert.AreEqual("Old", s.PilotName);
             Assert.AreEqual(25f, s.Camera.TiltDegrees);
-            Assert.AreEqual(72f, s.Comfort.RefreshRate);
+            Assert.AreEqual(0, s.Camera.ViewMode, "FPV by default");
+            Assert.IsFalse(s.Camera.LensDistortion);
             Assert.AreEqual("race5", s.QuadId);
         }
 
@@ -61,14 +64,16 @@ namespace GateRush.Tests
             var s = new GameSettings { PilotName = "  " };
             s.Camera.TiltDegrees = 99f;
             s.Camera.HorizontalFov = 10f;
-            s.Comfort.RefreshRate = 85f;
+            s.Graphics.FrameCap = 77;
+            s.Input.RadioBackend = 9;
             s.Physics.DragScale = 9f;
             s.Rates.Roll = new AxisRates(5f, 2f, 3f);
             s.Clamp();
             Assert.AreEqual("Pilot", s.PilotName);
             Assert.AreEqual(60f, s.Camera.TiltDegrees);
             Assert.AreEqual(90f, s.Camera.HorizontalFov);
-            Assert.AreEqual(90f, s.Comfort.RefreshRate);
+            Assert.AreEqual(0, s.Graphics.FrameCap, "unknown cap → uncapped");
+            Assert.AreEqual(3, s.Input.RadioBackend);
             Assert.AreEqual(2f, s.Physics.DragScale);
             Assert.AreEqual(2.55f, s.Rates.Roll.RcRate);
             Assert.AreEqual(0.99f, s.Rates.Roll.Rate);

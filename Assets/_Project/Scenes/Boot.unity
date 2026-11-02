@@ -119,7 +119,7 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1 &645512783
+--- !u!1 &1577632178
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -127,11 +127,10 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 645512788}
-  - component: {fileID: 645512787}
-  - component: {fileID: 645512786}
-  - component: {fileID: 645512785}
-  - component: {fileID: 645512784}
+  - component: {fileID: 1577632182}
+  - component: {fileID: 1577632181}
+  - component: {fileID: 1577632180}
+  - component: {fileID: 1577632179}
   m_Layer: 0
   m_Name: App
   m_TagString: Untagged
@@ -139,66 +138,52 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &645512784
+--- !u!114 &1577632179
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 645512783}
+  m_GameObject: {fileID: 1577632178}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b879abd6632b69a478c550b474bdb947, type: 3}
   m_Name: 
   m_EditorClassIdentifier: GateRush.Core::GateRush.Core.SceneSwitcher
   menuScene: Menu
---- !u!114 &645512785
+--- !u!114 &1577632180
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 645512783}
+  m_GameObject: {fileID: 1577632178}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 40b5f521d9846254a8a336035e2afd8c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: GateRush.Core::GateRush.Core.PerfLogger
   intervalSeconds: 5
---- !u!114 &645512786
+--- !u!114 &1577632181
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 645512783}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 61bca5332c00123469379d6371d9f153, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: GateRush.Core::GateRush.Core.XrDisplayConfig
-  targetRefreshRate: 72
-  foveationLevel: 1
---- !u!114 &645512787
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 645512783}
+  m_GameObject: {fileID: 1577632178}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e435c5c6d98419940ae8a04b1ffe19df, type: 3}
   m_Name: 
   m_EditorClassIdentifier: GateRush.Core::GateRush.Core.AppBootstrap
   firstScene: Menu
---- !u!4 &645512788
+--- !u!4 &1577632182
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 645512783}
+  m_GameObject: {fileID: 1577632178}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
@@ -211,4 +196,4 @@ Transform:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
-  - {fileID: 645512788}
+  - {fileID: 1577632182}

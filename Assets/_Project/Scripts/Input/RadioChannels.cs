@@ -92,7 +92,6 @@ namespace GateRush.Input
         {
             if (d is Joystick) return true;
             if (d is Gamepad || d is Keyboard || d is Mouse || d is Pointer || d is Sensor) return false;
-            if (d is UnityEngine.InputSystem.XR.XRController || d is UnityEngine.InputSystem.XR.XRHMD) return false;
             return d.description.interfaceName == "HID";
         }
     }

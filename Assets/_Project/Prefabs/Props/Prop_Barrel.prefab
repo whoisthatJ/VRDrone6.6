@@ -145,7 +145,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8706644361764845357}
-  - {fileID: 4753817935381197043}
+  - {fileID: 2054780101810013535}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!205 &6761589379566549877
@@ -165,10 +165,10 @@ LODGroup:
   - screenRelativeHeight: 0.006
     fadeTransitionWidth: 0
     renderers:
-    - renderer: {fileID: 5887287616387746716}
+    - renderer: {fileID: 922999608893947440}
   m_Enabled: 1
   m_GlobalIlluminationLOD: 0
---- !u!1001 &5076204687875348248
+--- !u!1001 &1949692367419220660
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -245,13 +245,13 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 983c3ef02a0e100428cd6e1e73f918e9, type: 3}
---- !u!4 &4753817935381197043 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 983c3ef02a0e100428cd6e1e73f918e9, type: 3}
-  m_PrefabInstance: {fileID: 5076204687875348248}
-  m_PrefabAsset: {fileID: 0}
---- !u!23 &5887287616387746716 stripped
+--- !u!23 &922999608893947440 stripped
 MeshRenderer:
   m_CorrespondingSourceObject: {fileID: -7511558181221131132, guid: 983c3ef02a0e100428cd6e1e73f918e9, type: 3}
-  m_PrefabInstance: {fileID: 5076204687875348248}
+  m_PrefabInstance: {fileID: 1949692367419220660}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &2054780101810013535 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 983c3ef02a0e100428cd6e1e73f918e9, type: 3}
+  m_PrefabInstance: {fileID: 1949692367419220660}
   m_PrefabAsset: {fileID: 0}

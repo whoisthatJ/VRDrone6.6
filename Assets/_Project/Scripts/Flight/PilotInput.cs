@@ -10,7 +10,7 @@ namespace GateRush.Flight
     }
 
     /// <summary>
-    /// Normalised pilot commands. Every input source (Touch, gamepad, RC radio) produces this.
+    /// Normalised pilot commands. Every input source (keyboard, gamepad, RC radio) produces this.
     /// Lives in Flight (not Input) so the simulator has no dependency on input code.
     /// </summary>
     [Serializable]

@@ -72,6 +72,8 @@ namespace GateRush.Input
         public SwitchAssignment Arm = SwitchAssignment.None;
         public SwitchAssignment Mode = SwitchAssignment.None;
         public SwitchAssignment Reset = SwitchAssignment.None;
+        /// <summary>Camera-view switch/button: each flip to position 1 cycles FPV → chase → line of sight.</summary>
+        public SwitchAssignment View = SwitchAssignment.None;
 
         public RadioMapping Clone() => (RadioMapping)MemberwiseClone();
 

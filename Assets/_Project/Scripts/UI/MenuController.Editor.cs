@@ -84,7 +84,7 @@ namespace GateRush.UI
 
             UiKit.Label(p,
                 // Forward slashes: TMP would turn "\t" in a Windows path into a tab.
-                $"<size=80%>Share tracks by copying the .json files in <b>{library.Folder.Replace('\\', '/')}</b> (on Quest: Android/data/com.gaterush.vr/files/tracks, via adb or SideQuest). " +
+                $"<size=80%>Share tracks by copying the .json files in <b>{library.Folder.Replace('\\', '/')}</b>. " +
                 "Files you copy in show up here.</size>",
                 new Vector2(Margin, -(Height - 210f)), new Vector2(ContentWidth, 90f), 26f, TextAlignmentOptions.TopLeft, UiKit.DimTextColor);
             BackButton(p);

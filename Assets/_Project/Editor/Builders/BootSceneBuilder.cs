@@ -1,16 +1,13 @@
 using GateRush.Core;
-using Unity.XR.CoreUtils;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
-using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.XR;
 
 namespace GateRush.EditorTools.Builders
 {
     /// <summary>
     /// Builds Assets/_Project/Scenes/Boot.unity: app-wide services (display config, perf log, scene switcher)
-    /// kept alive across scenes, then loads the first gameplay scene. Also hosts the shared XR rig factory.
+    /// kept alive across scenes, then loads the first gameplay scene. Also hosts the shared desktop camera factory.
     /// </summary>
     public static class BootSceneBuilder
     {
@@ -48,8 +45,9 @@ namespace GateRush.EditorTools.Builders
         private static readonly System.Collections.Generic.HashSet<string> OptionalReferences = new System.Collections.Generic.HashSet<string>
         {
             "QuadVehicle.rates", // pilot rates come from the settings (TrackSceneController)
-            "RaceHud.resultsPanel", // the head-locked HUD has no results panel
-            "RaceHud.resultsText",
+            "VtxSignal.screen", // desktop: the link model only feeds the OSD link quality
+            "TrackEditorController.leftHand", // VR hands: unused on the desktop
+            "TrackEditorController.rightHand",
         };
 
         public static void VerifySceneReferences(System.Collections.Generic.IEnumerable<string> scenePaths)
@@ -86,7 +84,6 @@ namespace GateRush.EditorTools.Builders
 
             var app = new GameObject("App");
             app.AddComponent<AppBootstrap>();
-            app.AddComponent<XrDisplayConfig>();
             app.AddComponent<PerfLogger>();
             app.AddComponent<SceneSwitcher>();
 
@@ -95,35 +92,26 @@ namespace GateRush.EditorTools.Builders
             return ScenePath;
         }
 
-        public static XROrigin CreateXrRig()
+        /// <summary>
+        /// Desktop camera: a "Camera Rig" root (moved by the track editor) with the tagged main camera at eye height,
+        /// an AudioListener and URP camera data.
+        /// </summary>
+        public static Camera CreateCamera(Vector3 rigPosition, float verticalFov, out Transform rig)
         {
-            var originGo = new GameObject("XR Origin");
-            var origin = originGo.AddComponent<XROrigin>();
-            origin.RequestedTrackingOriginMode = XROrigin.TrackingOriginMode.Floor;
+            rig = new GameObject("Camera Rig").transform;
+            rig.position = rigPosition;
 
-            var offset = new GameObject("Camera Offset");
-            offset.transform.SetParent(originGo.transform, false);
-
-            var camGo = new GameObject("Head Camera");
+            var camGo = new GameObject("Main Camera");
             camGo.tag = "MainCamera";
-            camGo.transform.SetParent(offset.transform, false);
+            camGo.transform.SetParent(rig, false);
             camGo.transform.localPosition = new Vector3(0f, 1.6f, 0f);
             var cam = camGo.AddComponent<Camera>();
-            cam.nearClipPlane = 0.05f;
+            cam.nearClipPlane = 0.02f;
             cam.farClipPlane = 1500f;
+            cam.fieldOfView = verticalFov;
             camGo.AddComponent<AudioListener>();
-
-            var tpd = camGo.AddComponent<TrackedPoseDriver>();
-            tpd.positionInput = new InputActionProperty(
-                new InputAction("Position", InputActionType.Value, "<XRHMD>/centerEyePosition", expectedControlType: "Vector3"));
-            tpd.rotationInput = new InputActionProperty(
-                new InputAction("Rotation", InputActionType.Value, "<XRHMD>/centerEyeRotation", expectedControlType: "Quaternion"));
-            tpd.trackingStateInput = new InputActionProperty(
-                new InputAction("Tracking State", InputActionType.Value, "<XRHMD>/trackingState", expectedControlType: "Integer"));
-
-            origin.CameraFloorOffsetObject = offset;
-            origin.Camera = cam;
-            return origin;
+            camGo.AddComponent<UnityEngine.Rendering.Universal.UniversalAdditionalCameraData>();
+            return cam;
         }
     }
 }

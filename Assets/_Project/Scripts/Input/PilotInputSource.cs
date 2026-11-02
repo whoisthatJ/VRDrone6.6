@@ -26,7 +26,7 @@ namespace GateRush.Input
 
         /// <summary>
         /// When several sources are connected the router uses the highest priority.
-        /// Guide: RC radio 30, gamepad 20, Touch controllers 10, keyboard 1.
+        /// Guide: RC radio 30, gamepad 20, keyboard 1.
         /// </summary>
         public abstract int Priority { get; }
 

@@ -156,7 +156,7 @@ namespace GateRush.Tests
     public class CalibrationWizardTests
     {
         // Simulated radio: 0 roll, 1 pitch, 2 throttle (inverted wiring), 3 yaw, 4 arm switch, 5 mode switch (3-pos).
-        private readonly float[] _v = new float[6];
+        private readonly float[] _v = new float[7];
         private CalibrationWizard _w;
         private const float Dt = 1f / 72f;
 
@@ -219,6 +219,9 @@ namespace GateRush.Tests
             Assert.AreEqual(CalibrationStep.ModeThird, _w.Step);
             _v[5] = 1f; // horizon
             Run(1.2f);
+            Assert.AreEqual(CalibrationStep.ViewSwitch, _w.Step);
+            _v[6] = 1f; // view button
+            Run(1.2f);
             Assert.AreEqual(CalibrationStep.Done, _w.Step);
 
             var m = _w.Result;
@@ -234,6 +237,8 @@ namespace GateRush.Tests
             Assert.AreEqual(1, RadioMapping.SwitchPosition(1f, m.Arm));
             Assert.AreEqual(5, m.Mode.Channel);
             Assert.IsTrue(m.Mode.ThreePosition);
+            Assert.AreEqual(6, m.View.Channel);
+            Assert.AreEqual(1, RadioMapping.SwitchPosition(1f, m.View));
             Assert.AreEqual(FlightMode.Horizon, RadioMapping.ModeFor(RadioMapping.SwitchPosition(1f, m.Mode)));
 
             // The result maps the radio correctly.
@@ -259,7 +264,10 @@ namespace GateRush.Tests
             _v[5] = 0f; Run(1.2f);
             Assert.AreEqual(CalibrationStep.ModeThird, _w.Step);
             Run(CalibrationWizard.ModeThirdTimeout + 0.5f);
+            Assert.AreEqual(CalibrationStep.ViewSwitch, _w.Step);
+            _w.Skip(_v);
             Assert.AreEqual(CalibrationStep.Done, _w.Step);
+            Assert.IsFalse(_w.Result.View.IsAssigned);
             Assert.IsFalse(_w.Result.Arm.IsAssigned);
             Assert.IsFalse(_w.Result.Mode.ThreePosition);
         }

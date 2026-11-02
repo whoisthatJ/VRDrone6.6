@@ -9,18 +9,15 @@ namespace GateRush.Core
     {
         [Range(0f, 60f)] public float TiltDegrees = 25f;
         [Range(90f, 150f)] public float HorizontalFov = 120f;
-        /// <summary>0 = Goggles, 1 = Immersive, 2 = Line of sight (GateRush.Cameras.ViewMode).</summary>
+        /// <summary>0 = FPV, 1 = Chase, 2 = Line of sight (GateRush.Cameras.ViewMode).</summary>
         public int ViewMode;
-        [Range(30f, 100f)] public float GogglesArcDegrees = 60f;
-        /// <summary>0 = Fixed, 1 = Smooth follow (GateRush.Cameras.ScreenFollowMode).</summary>
-        public int GogglesFollow = 1;
+        /// <summary>Wide-angle FPV lens distortion (barrel), FPV view only.</summary>
+        public bool LensDistortion;
     }
 
     [Serializable]
     public sealed class InputPrefs
     {
-        /// <summary>GateRush.Input.ThrottleMapping for Touch controllers (1 = spring-centre hover, 2 = trigger).</summary>
-        public int TouchThrottle = 1;
         /// <summary>GateRush.Input.ThrottleMapping for gamepads.</summary>
         public int GamepadThrottle = 1;
         [Range(0f, 0.3f)] public float Deadband = 0.02f;
@@ -29,20 +26,8 @@ namespace GateRush.Core
         public bool InvertPitch;
         /// <summary>Flip roll on the right stick (all controllers).</summary>
         public bool InvertRoll;
-        /// <summary>GateRush.Input.RadioBackend: 0 = auto, 1 = Input System, 2 = Android raw reader.</summary>
+        /// <summary>GateRush.Input.RadioBackend: 0 = auto, 1 = Input System, 2 = Android raw reader, 3 = Windows HID.</summary>
         public int RadioBackend;
-    }
-
-    [Serializable]
-    public sealed class ComfortPrefs
-    {
-        [Range(0f, 1f)] public float VignetteStrength = 0.7f;
-        /// <summary>72 or 90.</summary>
-        public float RefreshRate = 72f;
-        /// <summary>Fixed foveated rendering: 0 off, 1 low, 2 medium, 3 high.</summary>
-        public int Foveation = 2;
-        /// <summary>World-horizon ring in Immersive view.</summary>
-        public bool HorizonLine = true;
     }
 
     [Serializable]
@@ -85,7 +70,6 @@ namespace GateRush.Core
         public RateProfile Rates = RateProfile.BetaflightDefault;
         public CameraPrefs Camera = new CameraPrefs();
         public InputPrefs Input = new InputPrefs();
-        public ComfortPrefs Comfort = new ComfortPrefs();
         public PhysicsPrefs Physics = new PhysicsPrefs();
         public FeedPrefs Feed = new FeedPrefs();
         public GraphicsPrefs Graphics = new GraphicsPrefs();
@@ -99,12 +83,10 @@ namespace GateRush.Core
             if (string.IsNullOrEmpty(TrackId)) TrackId = "field";
             Camera ??= new CameraPrefs();
             Input ??= new InputPrefs();
-            Comfort ??= new ComfortPrefs();
             Physics ??= new PhysicsPrefs();
             Feed ??= new FeedPrefs();
             Graphics ??= new GraphicsPrefs();
             Graphics.Clamp();
-            Comfort.Foveation = Mathf.Clamp(Comfort.Foveation, 0, 3);
             Feed.VtxNoise = Mathf.Clamp(Feed.VtxNoise, 0, 2);
             Feed.MotorVolume = Mathf.Clamp01(Feed.MotorVolume);
 
@@ -115,17 +97,11 @@ namespace GateRush.Core
             Camera.TiltDegrees = Mathf.Clamp(Camera.TiltDegrees, 0f, 60f);
             Camera.HorizontalFov = Mathf.Clamp(Camera.HorizontalFov, 90f, 150f);
             Camera.ViewMode = Mathf.Clamp(Camera.ViewMode, 0, 2);
-            Camera.GogglesArcDegrees = Mathf.Clamp(Camera.GogglesArcDegrees, 30f, 100f);
-            Camera.GogglesFollow = Mathf.Clamp(Camera.GogglesFollow, 0, 1);
 
-            Input.TouchThrottle = Mathf.Clamp(Input.TouchThrottle, 0, 2);
             Input.GamepadThrottle = Mathf.Clamp(Input.GamepadThrottle, 0, 2);
             Input.Deadband = Mathf.Clamp(Input.Deadband, 0f, 0.3f);
             Input.Expo = Mathf.Clamp01(Input.Expo);
-            Input.RadioBackend = Mathf.Clamp(Input.RadioBackend, 0, 2);
-
-            Comfort.VignetteStrength = Mathf.Clamp01(Comfort.VignetteStrength);
-            Comfort.RefreshRate = Comfort.RefreshRate >= 81f ? 90f : 72f;
+            Input.RadioBackend = Mathf.Clamp(Input.RadioBackend, 0, 3);
 
             Physics.CrashSpeed = Mathf.Clamp(Physics.CrashSpeed, 3f, 20f);
             Physics.DragScale = Mathf.Clamp(Physics.DragScale, 0.5f, 2f);

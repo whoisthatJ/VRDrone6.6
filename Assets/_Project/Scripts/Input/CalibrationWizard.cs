@@ -13,15 +13,17 @@ namespace GateRush.Input
         ArmSwitch = 5,
         ModeSwitch = 6,
         ModeThird = 7,
-        Done = 8,
-        Cancelled = 9,
+        /// <summary>Optional: a switch or button that cycles the camera view.</summary>
+        ViewSwitch = 8,
+        Done = 9,
+        Cancelled = 10,
     }
 
     /// <summary>
     /// Radio calibration as a state machine fed with raw channel values every frame. Steps advance by themselves
     /// when the pilot holds the requested position (so it works with both hands on the radio); Next/Skip are also
     /// available. Detects stick ranges and centres, which channel is which axis and its direction, the arm switch
-    /// and a 2- or 3-position mode switch. Pure C#: no engine or device code.
+    /// a 2- or 3-position mode switch and an optional camera-view switch. Pure C#: no engine or device code.
     /// </summary>
     public sealed class CalibrationWizard
     {
@@ -64,7 +66,7 @@ namespace GateRush.Input
             {
                 Throttle = new AxisAssignment(-1), Yaw = new AxisAssignment(-1),
                 Pitch = new AxisAssignment(-1), Roll = new AxisAssignment(-1),
-                Arm = SwitchAssignment.None, Mode = SwitchAssignment.None, Reset = SwitchAssignment.None,
+                Arm = SwitchAssignment.None, Mode = SwitchAssignment.None, Reset = SwitchAssignment.None, View = SwitchAssignment.None,
             };
         }
 
@@ -75,7 +77,8 @@ namespace GateRush.Input
         public bool IsFinished => Step == CalibrationStep.Done || Step == CalibrationStep.Cancelled;
         /// <summary>Number of channels that have moved enough to be stick axes so far.</summary>
         public int StickChannelsFound { get; private set; }
-        public bool CanSkip => Step == CalibrationStep.ArmSwitch || Step == CalibrationStep.ModeSwitch || Step == CalibrationStep.ModeThird;
+        public bool CanSkip => Step == CalibrationStep.ArmSwitch || Step == CalibrationStep.ModeSwitch || Step == CalibrationStep.ModeThird
+                               || Step == CalibrationStep.ViewSwitch;
 
         public string Instruction
         {
@@ -94,6 +97,7 @@ namespace GateRush.Input
                     case CalibrationStep.ArmSwitch: return "Centre the sticks. Flip your ARM switch to ARMED and hold.\n(Skip if you want to arm with throttle low instead.)";
                     case CalibrationStep.ModeSwitch: return "Put the MODE switch in ACRO, then move it to ANGLE and hold.\n(Skip if you don't use a mode switch.)";
                     case CalibrationStep.ModeThird: return "If the mode switch has a third position, move it to HORIZON and hold.\n(Skips by itself after a few seconds.)";
+                    case CalibrationStep.ViewSwitch: return "Optional: flip the switch (or press the button) you want for CAMERA VIEW and hold.\n(Skip if you don't want one.)";
                     case CalibrationStep.Done: return "Done! Flip the arm switch off.";
                     default: return "Cancelled.";
                 }
@@ -134,6 +138,7 @@ namespace GateRush.Input
                     break;
                 case CalibrationStep.ArmSwitch:
                 case CalibrationStep.ModeSwitch:
+                case CalibrationStep.ViewSwitch:
                     TrackDeflection(values, n, sticks: false);
                     break;
                 case CalibrationStep.ModeThird:
@@ -249,12 +254,17 @@ namespace GateRush.Input
                         mode.Position2 = values[mode.Channel];
                         mode.ThreePosition = true;
                         Result.Mode = mode;
+                        _used[mode.Channel] = true;
                     }
+                    break;
+                case CalibrationStep.ViewSwitch:
+                    if (_candidate < 0) return;
+                    Result.View = new SwitchAssignment(_candidate, _baseline[_candidate], values[_candidate]);
                     break;
             }
 
             if (Step is CalibrationStep.Throttle or CalibrationStep.Yaw or CalibrationStep.Pitch or CalibrationStep.Roll
-                or CalibrationStep.ArmSwitch or CalibrationStep.ModeSwitch)
+                or CalibrationStep.ArmSwitch or CalibrationStep.ModeSwitch or CalibrationStep.ViewSwitch)
                 _used[_candidate] = true;
 
             BeginStep(Step + 1, values);

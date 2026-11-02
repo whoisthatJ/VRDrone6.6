@@ -5,7 +5,6 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
-using UnityEngine.InputSystem.XR;
 using UnityEngine.UI;
 
 namespace GateRush.UI
@@ -13,8 +12,8 @@ namespace GateRush.UI
     /// <summary>
     /// World-space input diagnostics: every Input System device with layout, interface, VID/PID and capabilities,
     /// plus a live bar (with min/max seen) for every leaf axis and button of the selected device.
-    /// Navigation: ←/→ device, ↑/↓ page (keyboard arrows, gamepad d-pad, right Touch stick);
-    /// save report: Enter / gamepad A / Touch A; toggle 72/90 Hz: F / Touch B.
+    /// Navigation: ←/→ device, ↑/↓ page (keyboard arrows, gamepad d-pad);
+    /// save report: Enter / gamepad A.
     /// </summary>
     public sealed class InputDiagnosticsPanel : MonoBehaviour
     {
@@ -40,11 +39,6 @@ namespace GateRush.UI
         private int _deviceIndex, _page;
         private bool _devicesDirty = true, _pageDirty = true;
         private string _status = "";
-        private XrDisplayConfig _display;
-
-        private Vector2Control _touchStick;
-        private ButtonControl _touchA, _touchB;
-        private bool _touchDirty = true, _stickLatched;
 
         private void Awake() => BuildRows();
 
@@ -54,7 +48,6 @@ namespace GateRush.UI
         private void OnDeviceChange(InputDevice device, InputDeviceChange change)
         {
             _devicesDirty = true;
-            if (device is XRController) _touchDirty = true;
             _status = $"{change}: {device.displayName}";
             _pageDirty = true;
         }
@@ -72,7 +65,7 @@ namespace GateRush.UI
         private void HandleNavigation()
         {
             int dx = 0, dy = 0;
-            bool save = false, toggleHz = false;
+            bool save = false;
 
             var kb = Keyboard.current;
             if (kb != null)
@@ -82,7 +75,6 @@ namespace GateRush.UI
                 if (kb.downArrowKey.wasPressedThisFrame) dy++;
                 if (kb.upArrowKey.wasPressedThisFrame) dy--;
                 save |= kb.enterKey.wasPressedThisFrame;
-                toggleHz |= kb.fKey.wasPressedThisFrame;
             }
 
             var pad = Gamepad.current;
@@ -94,29 +86,6 @@ namespace GateRush.UI
                 if (pad.dpad.up.wasPressedThisFrame) dy--;
                 save |= pad.buttonSouth.wasPressedThisFrame;
             }
-
-            if (_touchDirty)
-            {
-                _touchDirty = false;
-                var right = XRController.rightHand;
-                _touchStick = right?.TryGetChildControl<Vector2Control>("thumbstick");
-                _touchA = right?.TryGetChildControl<ButtonControl>("primaryButton");
-                _touchB = right?.TryGetChildControl<ButtonControl>("secondaryButton");
-            }
-            if (_touchStick != null && !_touchStick.device.added) _touchDirty = true;
-            else if (_touchStick != null)
-            {
-                Vector2 s = _touchStick.ReadValue();
-                if (!_stickLatched && s.magnitude > 0.7f)
-                {
-                    _stickLatched = true;
-                    if (Mathf.Abs(s.x) > Mathf.Abs(s.y)) dx += s.x > 0f ? 1 : -1;
-                    else dy += s.y < 0f ? 1 : -1;
-                }
-                else if (s.magnitude < 0.3f) _stickLatched = false;
-            }
-            save |= _touchA != null && _touchA.device.added && _touchA.wasPressedThisFrame;
-            toggleHz |= _touchB != null && _touchB.device.added && _touchB.wasPressedThisFrame;
 
             if (dx != 0 && _devices.Count > 0)
             {
@@ -134,20 +103,6 @@ namespace GateRush.UI
                 _status = "Report saved: " + InputDeviceReport.WriteReport();
                 _pageDirty = true;
             }
-            if (toggleHz) ToggleRefreshRate();
-        }
-
-        private void ToggleRefreshRate()
-        {
-            if (_display == null) _display = FindAnyObjectByType<XrDisplayConfig>();
-            if (_display == null)
-            {
-                _status = "No XrDisplayConfig (start from the Boot scene)";
-                return;
-            }
-            _display.SetRefreshRate(_display.TargetRefreshRate >= 90f ? 72f : 90f);
-            _status = $"Refresh rate requested: {_display.TargetRefreshRate:0} Hz";
-            _pageDirty = true;
         }
 
         // ---------- content ----------
@@ -230,8 +185,7 @@ namespace GateRush.UI
             }
 
             int pages = Mathf.Max(1, (_controls.Count + rowCount - 1) / rowCount);
-            string hz = _display != null ? $"{_display.TargetRefreshRate:0} Hz" : "72 Hz (default)";
-            footer.SetText($"page {_page + 1}/{pages}    Enter / A: save report    F / B: toggle 72/90 Hz ({hz})\n{_status}");
+            footer.SetText($"page {_page + 1}/{pages}    Enter / A: save report\n{_status}");
         }
 
         private void UpdateRows()

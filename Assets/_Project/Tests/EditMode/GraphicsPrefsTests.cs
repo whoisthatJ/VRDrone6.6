@@ -5,6 +5,7 @@ namespace GateRush.Tests
 {
     public class GraphicsPrefsTests
     {
+        [TestCase(2048, "Low")]    // GTX 1050 class
         [TestCase(4096, "Medium")] // GTX 1650 Ti class laptop
         [TestCase(6144, "High")]   // RTX 2060
         [TestCase(8192, "High")]   // RTX 3070
@@ -15,12 +16,16 @@ namespace GateRush.Tests
         }
 
         [Test]
-        public void Presets_ScaleUpFromMediumToUltra()
+        public void Presets_ScaleUpFromLowToUltra()
         {
+            var low = GraphicsPrefs.ForPreset("Low");
             var medium = GraphicsPrefs.ForPreset("Medium");
             var high = GraphicsPrefs.ForPreset("High");
             var ultra = GraphicsPrefs.ForPreset("Ultra");
-            Assert.IsFalse(medium.Ssao);
+            Assert.IsFalse(low.Ssao || medium.Ssao);
+            Assert.Less(low.Shadows, medium.Shadows);
+            Assert.Less(low.RenderScale, medium.RenderScale);
+            Assert.Less(low.Vegetation, medium.Vegetation);
             Assert.IsTrue(high.Ssao && ultra.Ssao);
             Assert.Less(medium.Shadows, high.Shadows);
             Assert.Less(high.Shadows, ultra.Shadows);

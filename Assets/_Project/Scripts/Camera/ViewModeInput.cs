@@ -1,65 +1,34 @@
+using GateRush.Input;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.Controls;
-using UnityEngine.InputSystem.XR;
 
 namespace GateRush.Cameras
 {
-    /// <summary>View-mode button: left Touch Y, gamepad left shoulder, or keyboard V. Long-press Y recentres the goggles screen.</summary>
+    /// <summary>Cycles the camera view: keyboard V, gamepad left shoulder, or the radio's view switch (if calibrated).</summary>
     public sealed class ViewModeInput : MonoBehaviour
     {
         [SerializeField] private ViewModeManager views;
-        [SerializeField] private GogglesScreen gogglesScreen;
-        [SerializeField] private float longPressSeconds = 0.6f;
+        [SerializeField] private RcRadioSource radio;
 
-        private ButtonControl _touchY;
-        private bool _dirty = true;
-        private float _heldFor;
-        private bool _longPressFired;
+        private int _radioPresses;
 
-        private void OnEnable() => InputSystem.onDeviceChange += OnDeviceChange;
-        private void OnDisable() => InputSystem.onDeviceChange -= OnDeviceChange;
-
-        private void OnDeviceChange(InputDevice device, InputDeviceChange change)
+        private void Start()
         {
-            if (device is XRController) _dirty = true;
+            if (radio != null) _radioPresses = radio.ViewPresses;
         }
 
         private void Update()
         {
-            if (views == null) return;
-            if (_dirty)
-            {
-                _dirty = false;
-                _touchY = XRController.leftHand?.TryGetChildControl<ButtonControl>("secondaryButton");
-            }
-
+            if (views == null || !views.isActiveAndEnabled) return;
             var kb = Keyboard.current;
             var pad = Gamepad.current;
-            if ((kb != null && kb.vKey.wasPressedThisFrame) || (pad != null && pad.leftShoulder.wasPressedThisFrame))
-                views.Cycle();
-
-            // A cached control can outlive its device (XR runtime restarts): rebind instead of throwing.
-            if (_touchY == null || !_touchY.device.added)
+            bool cycle = (kb != null && kb.vKey.wasPressedThisFrame) || (pad != null && pad.leftShoulder.wasPressedThisFrame);
+            if (radio != null && radio.ViewPresses != _radioPresses)
             {
-                _dirty = _touchY != null;
-                return;
+                _radioPresses = radio.ViewPresses;
+                cycle = true;
             }
-            if (_touchY.isPressed)
-            {
-                _heldFor += Time.unscaledDeltaTime;
-                if (!_longPressFired && _heldFor >= longPressSeconds)
-                {
-                    _longPressFired = true;
-                    if (gogglesScreen != null) gogglesScreen.Recenter();
-                }
-            }
-            else if (_touchY.wasReleasedThisFrame)
-            {
-                if (!_longPressFired) views.Cycle();
-                _heldFor = 0f;
-                _longPressFired = false;
-            }
+            if (cycle) views.Cycle();
         }
     }
 }

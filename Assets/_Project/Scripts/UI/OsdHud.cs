@@ -25,6 +25,9 @@ namespace GateRush.UI
         [Tooltip("Artificial horizon bar: rotated by roll, moved by pitch.")]
         [SerializeField] private RectTransform horizon;
         [SerializeField] private float horizonPixelsPerDegree = 6f;
+        [Tooltip("Crosshair and horizon only make sense in the FPV view; hidden in chase / line of sight.")]
+        [SerializeField] private GameObject crosshair;
+        [SerializeField] private ViewModeManager views;
         [SerializeField] private float lowCellVoltage = 3.5f;
 
         private const string ModeAcro = "ACRO";
@@ -68,7 +71,10 @@ namespace GateRush.UI
             string w = cell < lowCellVoltage && s.Armed && blink ? LowBattery : lq < 0.3f && blink ? LinkLost : "";
             SetIfChanged(warning, w, ref _warningShown);
 
-            if (horizon != null)
+            bool fpv = views == null || views.Mode == ViewMode.Fpv;
+            if (crosshair != null && crosshair.activeSelf != fpv) crosshair.SetActive(fpv);
+            if (horizon != null && horizon.gameObject.activeSelf != fpv) horizon.gameObject.SetActive(fpv);
+            if (horizon != null && fpv)
             {
                 Vector3 fwd = vehicle.transform.forward;
                 Vector3 right = vehicle.transform.right;

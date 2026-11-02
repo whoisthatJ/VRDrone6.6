@@ -11,7 +11,7 @@ namespace GateRush.Core
     [Serializable]
     public sealed class GraphicsPrefs
     {
-        /// <summary>Quality level: "Medium", "High" or "Ultra". Empty = pick from the GPU on first launch.</summary>
+        /// <summary>Quality level: "Low", "Medium", "High" or "Ultra". Empty = pick from the GPU on first launch.</summary>
         public string Preset = "";
         [Range(0.5f, 1f)] public float RenderScale = 1f;
         /// <summary>0 off, 1 SMAA, 2 MSAA 2×, 3 MSAA 4×.</summary>
@@ -23,9 +23,15 @@ namespace GateRush.Core
         [Range(0f, 1f)] public float Vegetation = 0.85f;
         public bool PostProcessing = true;
         public bool VSync = true;
+        /// <summary>Frame-rate cap when VSync is off; 0 = uncapped.</summary>
+        public int FrameCap;
+
+        /// <summary>Choices offered for <see cref="FrameCap"/>.</summary>
+        public static readonly int[] FrameCaps = { 0, 60, 120, 144, 165, 240 };
 
         public static GraphicsPrefs ForPreset(string preset) => preset switch
         {
+            "Low" => new GraphicsPrefs { Preset = "Low", RenderScale = 0.85f, AntiAliasing = 1, Shadows = 0, Ssao = false, Vegetation = 0.25f },
             "Medium" => new GraphicsPrefs { Preset = "Medium", RenderScale = 1f, AntiAliasing = 1, Shadows = 1, Ssao = false, Vegetation = 0.5f },
             "Ultra" => new GraphicsPrefs { Preset = "Ultra", RenderScale = 1f, AntiAliasing = 3, Shadows = 3, Ssao = true, Vegetation = 1f },
             _ => new GraphicsPrefs { Preset = "High", RenderScale = 1f, AntiAliasing = 3, Shadows = 2, Ssao = true, Vegetation = 0.85f },
@@ -38,6 +44,7 @@ namespace GateRush.Core
             AntiAliasing = Mathf.Clamp(AntiAliasing, 0, 3);
             Shadows = Mathf.Clamp(Shadows, 0, 3);
             Vegetation = Mathf.Clamp01(Vegetation);
+            if (Array.IndexOf(FrameCaps, FrameCap) < 0) FrameCap = 0;
         }
     }
 
@@ -49,7 +56,7 @@ namespace GateRush.Core
     /// </summary>
     public static class GraphicsQuality
     {
-        public static readonly string[] Presets = { "Medium", "High", "Ultra" };
+        public static readonly string[] Presets = { "Low", "Medium", "High", "Ultra" };
 
         private struct ShadowLevel
         {
@@ -69,7 +76,7 @@ namespace GateRush.Core
         public static GraphicsPrefs Current { get; private set; }
 
         /// <summary>Preset for a GPU with <paramref name="vramMb"/> of video memory (first launch only).</summary>
-        public static string DetectPreset(int vramMb) => vramMb >= 10000 ? "Ultra" : vramMb >= 5500 ? "High" : "Medium";
+        public static string DetectPreset(int vramMb) => vramMb >= 10000 ? "Ultra" : vramMb >= 5500 ? "High" : vramMb >= 3000 ? "Medium" : "Low";
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void Init()
@@ -99,6 +106,7 @@ namespace GateRush.Core
             int level = Array.IndexOf(QualitySettings.names, string.IsNullOrEmpty(prefs.Preset) ? "High" : prefs.Preset);
             if (level >= 0 && level != QualitySettings.GetQualityLevel()) QualitySettings.SetQualityLevel(level, true);
             QualitySettings.vSyncCount = prefs.VSync ? 1 : 0;
+            Application.targetFrameRate = !prefs.VSync && prefs.FrameCap > 0 ? prefs.FrameCap : -1;
 
             var urp = QualitySettings.renderPipeline as UniversalRenderPipelineAsset ?? GraphicsSettings.currentRenderPipeline as UniversalRenderPipelineAsset;
             if (urp != null)

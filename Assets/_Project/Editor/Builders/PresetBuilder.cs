@@ -31,7 +31,7 @@ namespace GateRush.EditorTools.Builders
                 "USB-C joystick only outputs while the radio is switched OFF and powered by the cable. 10 channels."));
             library.Presets.Add(Preset("LR4_BT", "BetaFPV LiteRadio 4 / 4 SE (Bluetooth)", "(LiteRadio|BETAFPV|ELRS).*(BLE|Bluetooth|BT\\b)", 25, Aetr(),
                 "Bluetooth joystick mode, paired in Quest Settings > Devices > Bluetooth."));
-            library.Presets.Add(Preset("BetaFPV_Generic", "BetaFPV radio (generic)", "BETAFPV|LiteRadio", 0, Aetr(),
+            library.Presets.Add(Preset("BetaFPV_Generic", "BetaFPV radio (generic)", "BETAFPV|LiteRadio", 0, BetaFpvGeneric(),
                 "Fallback for other BetaFPV radios."));
             library.Presets.Add(Preset("RM_Pocket", "RadioMaster Pocket (EdgeTX USB joystick)", "(RadioMaster|EdgeTX|OpenTX).*Pocket|Pocket.*(Joystick|EdgeTX)", 20, EdgeTxAetr(),
                 "Power the radio ON, plug in USB and pick \"USB Joystick (HID)\". EdgeTX sends CH1-CH8 on X/Y/Z/Rx/Ry/Rz/Slider/Dial. " +
@@ -70,6 +70,14 @@ namespace GateRush.EditorTools.Builders
             m.Yaw.Range = sticks;
             m.Pitch.Range = sticks;
             m.Roll.Range = sticks;
+            m.Arm = new SwitchAssignment(17, 0f, 1f);
+            return m;
+        }
+
+        /// <summary>Other BetaFPV radios: AETR with the arm switch on button4 (channel 17) like the LiteRadio 2 SIM, full stick ranges.</summary>
+        private static RadioMapping BetaFpvGeneric()
+        {
+            var m = Aetr();
             m.Arm = new SwitchAssignment(17, 0f, 1f);
             return m;
         }

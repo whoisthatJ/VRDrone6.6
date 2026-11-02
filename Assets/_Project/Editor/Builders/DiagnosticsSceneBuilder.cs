@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 namespace GateRush.EditorTools.Builders
 {
-    /// <summary>Builds Assets/_Project/Scenes/InputDiagnostics.unity: XR rig facing a world-space diagnostics panel.</summary>
+    /// <summary>Builds Assets/_Project/Scenes/InputDiagnostics.unity: a desktop camera facing a world-space diagnostics panel.</summary>
     public static class DiagnosticsSceneBuilder
     {
         public const string ScenePath = "Assets/_Project/Scenes/InputDiagnostics.unity";
@@ -26,8 +26,7 @@ namespace GateRush.EditorTools.Builders
             light.shadows = LightShadows.None;
             light.transform.rotation = Quaternion.Euler(50f, 0f, 0f);
 
-            var origin = BootSceneBuilder.CreateXrRig();
-            var head = origin.Camera;
+            var head = BootSceneBuilder.CreateCamera(new Vector3(0f, -0.1f, 0f), 56f, out _);
             head.clearFlags = CameraClearFlags.SolidColor;
             head.backgroundColor = new Color(0.06f, 0.07f, 0.09f);
 

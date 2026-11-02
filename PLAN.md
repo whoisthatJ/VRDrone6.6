@@ -1,5 +1,10 @@
-# FPV Racing Sim for Meta Quest — Project Plan
-Working title: **"GateRush VR"** (an original name, so this is a game *inspired by* VelociDrone, not a copy of its brand, tracks or art)
+# FPV Racing Sim — Project Plan
+
+> **Platform (2026-11-02): desktop PC, no VR.** GateRush is now a Windows simulator played on a monitor with an RC radio,
+> gamepad or keyboard. The XR packages, rigs and VR views were removed in T0 of `TRACK_GARAGE_PLAN.md`; the Quest/VR
+> sections below (§2, §3 build profile, §6, M0/M3/M7 headset notes) are kept as history only.
+
+Working title: **"GateRush"** (was "GateRush VR") (an original name, so this is a game *inspired by* VelociDrone, not a copy of its brand, tracks or art)
 
 ## 1. What we are cloning: VelociDrone's core loop
 | VelociDrone pillar | What it means for us |
@@ -180,6 +185,7 @@ Tests/EditMode/   Flight model and rates tests
 | 2026-11-01 | **PC (Windows) platform**, branch `feature/pc-radiomaster-pocket`: Standalone is flat-screen. The OpenXR loader is removed from Standalone (Android keeps it), so `ViewModeManager` puts the drone camera on the monitor. Build with *GateRush/Build/Build Windows (PC)* → `Builds/Windows/GateRush.exe` | With the loader assigned, OpenXR probes the runtime natively during graphics init even with "Initialize on Startup" off: a ~6 s stall plus `XR_ERROR_FORM_FACTOR_UNAVAILABLE` when no headset is connected. PC VR (Link/SteamVR) = re-add the loader for Standalone |
 | 2026-11-01 | Standalone scripting backend is **Mono** (Android stays IL2CPP) | Windows IL2CPP module isn't installed; Mono needs no extra module and is fine for the sim's CPU budget on PC |
 | 2026-11-01 | **RadioMaster Pocket / EdgeTX** presets (`RM_Pocket`, `EdgeTX_Generic`, unverified). EdgeTX USB joystick = CH1-8 on X/Y/Z/Rx/Ry/Rz/Slider/Dial; the Input System HID fallback inverts Y and Ry, so the presets un-invert pitch (CH2) and flip the CH5 arm switch positions. No Windows driver needed (standard HID). Windows showing "STM32 BOOTLOADER" (0483:DF11) means the radio is in DFU/flash mode, not joystick mode | Second radio target alongside BetaFPV; same generic HID path |
+| 2026-11-02 | **Desktop only (T0 of TRACK_GARAGE_PLAN.md)**: XR packages, VR template content, XR rigs, Touch input, goggles/immersive views and comfort settings removed; Cinemachine FPV / chase / line-of-sight cameras, screen-space OSD with a next-gate indicator, Low quality preset and a frame cap added | The owner dropped VR; the game is a PC sim for students with radios |
 
 ## 9. Notes for tuning
 - `QuadProfile.Race5Inch`: 650 g, 15.7 N/motor (≈10:1 TWR), hover command ≈ 0.28, motor τ 30/40 ms, rate P 0.03 / I 0.1 / D 0.0004 (pitch/roll), yaw P 0.15 / I 0.3. Rate-step tests show < 100 ms rise time (pitch/roll) and < 200 ms (yaw) at half stick, under 25 % overshoot.

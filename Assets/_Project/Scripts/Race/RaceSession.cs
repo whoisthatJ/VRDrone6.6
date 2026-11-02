@@ -3,7 +3,6 @@ using GateRush.Vehicle;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
-using UnityEngine.InputSystem.XR;
 
 namespace GateRush.Race
 {
@@ -20,7 +19,7 @@ namespace GateRush.Race
 
     /// <summary>
     /// Runs a lap race over an ordered list of gates: countdown, sub-frame gate timing, checkpoint respawns,
-    /// ghosts and the local leaderboard. Restart: T / gamepad left-stick click / left Touch stick click.
+    /// ghosts and the local leaderboard. Restart: T / gamepad left-stick click.
     /// </summary>
     [DefaultExecutionOrder(-40)]
     public sealed class RaceSession : MonoBehaviour
@@ -49,9 +48,6 @@ namespace GateRush.Race
         private double _prevTime;
         private bool _hasPrev, _holdForRelease;
 
-        private ButtonControl _touchRestart;
-        private bool _touchDirty = true;
-
         public event Action<RacePhase> PhaseChanged;
         /// <summary>Gate index and result, for HUD/audio.</summary>
         public event Action<int, PassResult> GatePassed;
@@ -62,6 +58,10 @@ namespace GateRush.Race
         /// <summary>Display name (falls back to the id).</summary>
         public string TrackName => string.IsNullOrEmpty(_trackName) ? trackId : _trackName;
         public int GateCount => gates.Length;
+        /// <summary>The gate to fly through next, or null without a course or after the finish.</summary>
+        public Gate NextGate => _timer != null && !_timer.Finished && gates.Length > 0
+            ? gates[Mathf.Clamp(_timer.NextCheckpoint, 0, gates.Length - 1)]
+            : null;
         public double Now => Time.timeAsDouble;
         public float CountdownRemaining => _phase == RacePhase.Countdown ? (float)Math.Max(0, _countdownEnd - Now) : 0f;
         public bool WaitingForRelease => _holdForRelease;
@@ -120,14 +120,6 @@ namespace GateRush.Race
         private void OnDestroy()
         {
             if (vehicle != null) vehicle.Respawned -= OnRespawned;
-        }
-
-        private void OnEnable() => InputSystem.onDeviceChange += OnDeviceChange;
-        private void OnDisable() => InputSystem.onDeviceChange -= OnDeviceChange;
-
-        private void OnDeviceChange(InputDevice device, InputDeviceChange change)
-        {
-            if (device is XRController) _touchDirty = true;
         }
 
         public void Restart()
@@ -300,14 +292,8 @@ namespace GateRush.Race
 
         private bool RestartPressed()
         {
-            if (_touchDirty)
-            {
-                _touchDirty = false;
-                _touchRestart = XRController.leftHand?.TryGetChildControl<ButtonControl>("thumbstickClicked");
-            }
             return (Keyboard.current != null && Keyboard.current.tKey.wasPressedThisFrame)
-                   || (Gamepad.current != null && Gamepad.current.leftStickButton.wasPressedThisFrame)
-                   || (_touchRestart != null && _touchRestart.device.added && _touchRestart.wasPressedThisFrame);
+                   || (Gamepad.current != null && Gamepad.current.leftStickButton.wasPressedThisFrame);
         }
     }
 }

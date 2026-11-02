@@ -82,7 +82,6 @@ namespace GateRush.Game
             switch (s)
             {
                 case RcRadioSource _: return "Radio";
-                case TouchControllerSource _: return "Touch controllers";
                 case KeyboardGamepadSource _: return "Gamepad";
                 default: return "Controller";
             }

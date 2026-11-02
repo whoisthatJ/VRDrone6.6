@@ -1,156 +1,118 @@
 using System;
 using GateRush.Vehicle;
+using Unity.Cinemachine;
 using UnityEngine;
-using UnityEngine.XR;
+using UnityEngine.Rendering;
 
 namespace GateRush.Cameras
 {
     public enum ViewMode
     {
-        /// <summary>Drone camera on a curved screen in a dark room (default, most comfortable).</summary>
-        Goggles = 0,
-        /// <summary>The XR rig rides on the drone with camera tilt; head rotation adds on top. Intense.</summary>
-        Immersive = 1,
-        /// <summary>The pilot stands on the field and watches the quad.</summary>
+        /// <summary>The quad's FPV camera, full screen (default).</summary>
+        Fpv = 0,
+        /// <summary>Third-person camera behind and above the quad.</summary>
+        Chase = 1,
+        /// <summary>The pilot stands by the start pad and watches the quad.</summary>
         LineOfSight = 2,
     }
 
     /// <summary>
-    /// Switches between the three VR views. Without an active XR device (Editor, no headset) Goggles and
-    /// Immersive fall back to the drone camera on the main display, and LOS uses the rig camera looking at the quad.
+    /// Desktop camera set: one rendering camera with a <see cref="CinemachineBrain"/> and three Cinemachine cameras
+    /// (FPV on the quad, chase, line of sight from the pilot stand). Only the active view's camera is enabled, so the
+    /// brain cuts straight to it. The pilot's own quad is hidden in FPV; the FPV lens-distortion volume only applies
+    /// in FPV. <see cref="SetFreeCamera"/> hands the camera to another controller (the track editor).
     /// </summary>
     [DefaultExecutionOrder(100)]
     public sealed class ViewModeManager : MonoBehaviour
     {
-        [SerializeField] private ViewMode mode = ViewMode.Goggles;
+        [SerializeField] private ViewMode mode = ViewMode.Fpv;
         [SerializeField] private QuadVehicle vehicle;
-        [SerializeField] private Transform xrOrigin;
-        [SerializeField] private Camera headCamera;
-        [SerializeField] private FpvCamera droneCamera;
-        [SerializeField] private GogglesScreen gogglesScreen;
-        [SerializeField] private GameObject gogglesRoom;
-        [SerializeField] private ComfortVignette vignette;
+        [Tooltip("The camera that renders (has the CinemachineBrain).")]
+        [SerializeField] private Camera outputCamera;
+        [SerializeField] private FpvCamera fpv;
+        [SerializeField] private CinemachineCamera chase;
+        [Tooltip("Chase offset for a 5\" quad (visual scale 1); smaller quads get a proportionally closer camera.")]
+        [SerializeField] private Vector3 chaseOffset = new Vector3(0f, 0.6f, -1.6f);
+        [SerializeField] private CinemachineCamera lineOfSight;
+        [Tooltip("Where the line-of-sight pilot stands (moved next to the track's spawn).")]
         [SerializeField] private Transform losStand;
-        [SerializeField] private LayerMask roomLayer;
         [SerializeField] private LayerMask localQuadLayer;
-        [SerializeField] private Vector2Int gogglesResolution = new Vector2Int(1280, 720);
-        [SerializeField] private Color roomColor = new Color(0.02f, 0.02f, 0.025f);
+        [Tooltip("Barrel distortion for the FPV lens; weight is driven by the view and the setting.")]
+        [SerializeField] private Volume lensVolume;
+        [Tooltip("Output camera pose on its rig when no view drives it (track editor): eye height, level.")]
+        [SerializeField] private Vector3 cameraHome = new Vector3(0f, 1.6f, 0f);
 
-        private RenderTexture _rt;
-        private Vector3 _homePosition;
-        private Quaternion _homeRotation;
-        private bool _xrActive;
+        private bool _free;
+        private bool _lensDistortion;
+        private int _fullMask = ~0;
 
         public event Action<ViewMode> Changed;
 
         public ViewMode Mode => mode;
+        public Camera OutputCamera => outputCamera;
+        public Transform LosStand => losStand;
 
-        private void Start()
+        /// <summary>FPV barrel distortion on/off (settings).</summary>
+        public bool LensDistortion
         {
-            if (xrOrigin != null)
+            get => _lensDistortion;
+            set
             {
-                _homePosition = xrOrigin.position;
-                _homeRotation = xrOrigin.rotation;
+                _lensDistortion = value;
+                UpdateLens();
             }
-            Apply(mode);
         }
+
+        private void Awake()
+        {
+            if (outputCamera != null) _fullMask = outputCamera.cullingMask;
+        }
+
+        private void Start() => Apply(mode);
 
         public void Cycle() => Apply((ViewMode)(((int)mode + 1) % 3));
 
         public void Apply(ViewMode newMode)
         {
             mode = newMode;
-            _xrActive = XRSettings.isDeviceActive;
-
-            var droneCam = droneCamera != null ? droneCamera.Camera : null;
-            bool goggles = mode == ViewMode.Goggles;
-            bool immersive = mode == ViewMode.Immersive;
-            bool los = mode == ViewMode.LineOfSight;
-
-            // Rig placement.
-            if (xrOrigin != null)
-            {
-                if (los && losStand != null) xrOrigin.SetPositionAndRotation(losStand.position, losStand.rotation);
-                else xrOrigin.SetPositionAndRotation(_homePosition, _homeRotation);
-            }
-
-            // Drone camera: renders to the goggles texture in XR, straight to the display without XR.
-            if (droneCam != null)
-            {
-                bool showDrone = _xrActive ? goggles : !los;
-                droneCam.enabled = showDrone;
-                droneCam.stereoTargetEye = StereoTargetEyeMask.None;
-                droneCam.targetTexture = _xrActive && goggles ? EnsureTexture() : null;
-                droneCam.cullingMask = ~(roomLayer | localQuadLayer);
-            }
-
-            if (headCamera != null)
-            {
-                headCamera.enabled = _xrActive || los;
-                if (goggles)
-                {
-                    headCamera.cullingMask = roomLayer;
-                    headCamera.clearFlags = CameraClearFlags.SolidColor;
-                    headCamera.backgroundColor = roomColor;
-                }
-                else
-                {
-                    headCamera.cullingMask = immersive ? ~(roomLayer | localQuadLayer) : ~roomLayer;
-                    headCamera.clearFlags = CameraClearFlags.Skybox;
-                }
-            }
-
-            if (gogglesRoom != null) gogglesRoom.SetActive(goggles && _xrActive);
-            if (gogglesScreen != null && goggles && _xrActive)
-            {
-                gogglesScreen.SetTexture(_rt);
-                gogglesScreen.Recenter();
-            }
-            if (vignette != null) vignette.gameObject.SetActive(immersive && _xrActive);
-
-            Debug.Log($"[GateRush] View mode: {mode} (XR {(_xrActive ? "on" : "off")})");
+            bool fpvOn = !_free && mode == ViewMode.Fpv;
+            if (fpv != null && fpv.VirtualCamera != null) fpv.VirtualCamera.enabled = fpvOn;
+            if (chase != null) chase.enabled = !_free && mode == ViewMode.Chase;
+            if (lineOfSight != null) lineOfSight.enabled = !_free && mode == ViewMode.LineOfSight;
+            if (outputCamera != null) outputCamera.cullingMask = fpvOn ? _fullMask & ~localQuadLayer : _fullMask;
+            UpdateLens();
+            if (!_free) Debug.Log($"[GateRush] View mode: {mode}");
             Changed?.Invoke(mode);
         }
 
-        private void LateUpdate()
+        /// <summary>
+        /// True: every Cinemachine camera is off, so another script (the track editor) moves the output camera.
+        /// False: back to the current view.
+        /// </summary>
+        public void SetFreeCamera(bool free)
         {
-            // XR can come up after Start (e.g. headset put on later); re-apply once it does.
-            if (XRSettings.isDeviceActive != _xrActive) Apply(mode);
-            if (vehicle == null) return;
-
-            if (mode == ViewMode.Immersive && _xrActive && xrOrigin != null && headCamera != null)
+            _free = free;
+            if (outputCamera != null)
             {
-                // Rig rotation = drone attitude + camera uptilt; then shift so the eye sits on the drone.
-                float tilt = droneCamera != null ? droneCamera.TiltDegrees : 0f;
-                xrOrigin.rotation = vehicle.transform.rotation * Quaternion.Euler(-tilt, 0f, 0f);
-                xrOrigin.position += vehicle.transform.position - headCamera.transform.position;
+                // The brain would keep placing the camera (it moves it in world space); switch it off and hand the
+                // camera over at its home pose on the rig.
+                var brain = outputCamera.GetComponent<CinemachineBrain>();
+                if (brain != null) brain.enabled = !free;
+                if (free) outputCamera.transform.SetLocalPositionAndRotation(cameraHome, Quaternion.identity);
             }
-            else if (mode == ViewMode.LineOfSight && !_xrActive && headCamera != null)
-            {
-                headCamera.transform.LookAt(vehicle.transform.position);
-            }
+            Apply(mode);
         }
 
-        private RenderTexture EnsureTexture()
+        /// <summary>Keeps the chase framing the same for every quad class (a whoop is ~0.3× a 5" quad).</summary>
+        public void SetQuadScale(float visualScale)
         {
-            if (_rt != null) return _rt;
-            _rt = new RenderTexture(gogglesResolution.x, gogglesResolution.y, 24, RenderTextureFormat.ARGB32)
-            {
-                name = "GogglesFeed",
-                antiAliasing = 2,
-                useMipMap = false,
-            };
-            _rt.Create();
-            return _rt;
+            var follow = chase != null ? chase.GetComponent<CinemachineFollow>() : null;
+            if (follow != null) follow.FollowOffset = chaseOffset * Mathf.Clamp(visualScale, 0.3f, 2f);
         }
 
-        private void OnDestroy()
+        private void UpdateLens()
         {
-            if (_rt != null)
-            {
-                _rt.Release();
-                Destroy(_rt);
-            }
+            if (lensVolume != null) lensVolume.weight = !_free && mode == ViewMode.Fpv && _lensDistortion ? 1f : 0f;
         }
     }
 }

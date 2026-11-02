@@ -11,7 +11,7 @@ namespace GateRush.EditorTools.Art
     /// <summary>
     /// Tools > Art > Build Quality Presets: the Windows (monitor) presets. One Forward+ renderer and one URP asset
     /// per preset in Assets/_Project/Settings/PC (decals everywhere, SSAO on High/Ultra), and the quality levels
-    /// Medium / High / Ultra replacing the old single "Quest" level. Runtime overrides (render scale, AA, shadows,
+    /// Low / Medium / High / Ultra replacing the old single "Quest" level. Runtime overrides (render scale, AA, shadows,
     /// SSAO, vegetation, post-processing, VSync) are applied by GateRush.Core.GraphicsQuality.
     /// </summary>
     public static class QualityPresets
@@ -40,6 +40,7 @@ namespace GateRush.EditorTools.Art
 
         private static readonly Preset[] Presets =
         {
+            new Preset { Name = "Low", Msaa = 1, ShadowResolution = 512, ShadowDistance = 50f, Cascades = 1, SoftShadowQuality = 0, AdditionalShadows = false, AdditionalShadowResolution = 512, Ssao = false, SsaoSamples = 0, LodBias = 0.7f, TextureBudgetMb = 512, DetailDistance = 40f, DetailDensity = 0.25f, LodCrossFade = false },
             new Preset { Name = "Medium", Msaa = 1, ShadowResolution = 1024, ShadowDistance = 80f, Cascades = 2, SoftShadowQuality = 0, AdditionalShadows = false, AdditionalShadowResolution = 1024, Ssao = false, SsaoSamples = 0, LodBias = 1f, TextureBudgetMb = 1024, DetailDistance = 70f, DetailDensity = 0.5f, LodCrossFade = false },
             new Preset { Name = "High", Msaa = 4, ShadowResolution = 2048, ShadowDistance = 150f, Cascades = 4, SoftShadowQuality = 1, AdditionalShadows = true, AdditionalShadowResolution = 2048, Ssao = true, SsaoSamples = 1, LodBias = 1.5f, TextureBudgetMb = 2048, DetailDistance = 110f, DetailDensity = 0.85f, LodCrossFade = true },
             new Preset { Name = "Ultra", Msaa = 4, ShadowResolution = 4096, ShadowDistance = 220f, Cascades = 4, SoftShadowQuality = 2, AdditionalShadows = true, AdditionalShadowResolution = 4096, Ssao = true, SsaoSamples = 2, LodBias = 2f, TextureBudgetMb = 3072, DetailDistance = 150f, DetailDensity = 1f, LodCrossFade = true },
@@ -63,7 +64,8 @@ namespace GateRush.EditorTools.Art
             }
             AssetDatabase.SaveAssets();
             BuildQualityLevels(assets, log);
-            GraphicsSettings.defaultRenderPipeline = assets[1];
+            // The editor (Scene view, edit-mode renders) uses High.
+            GraphicsSettings.defaultRenderPipeline = assets[System.Array.FindIndex(Presets, p => p.Name == "High")];
             AssetDatabase.SaveAssets();
             return "quality presets: " + string.Join(", ", QualitySettings.names) + log;
         }
@@ -99,7 +101,7 @@ namespace GateRush.EditorTools.Art
             var decals = Feature<DecalRendererFeature>(data, "Decals");
             var dso = new SerializedObject(decals);
             SetEnum(dso, "m_Settings.technique", 1, log); // DBuffer: normals + MAOS on lit surfaces
-            Set(dso, "m_Settings.maxDrawDistance", p.Name == "Medium" ? 60f : 120f, log);
+            Set(dso, "m_Settings.maxDrawDistance", p.Name == "Low" || p.Name == "Medium" ? 60f : 120f, log);
             dso.ApplyModifiedPropertiesWithoutUndo();
             decals.SetActive(true);
 
@@ -202,8 +204,8 @@ namespace GateRush.EditorTools.Art
                 SetRel(e, "streamingMipmapsMemoryBudget", (float)p.TextureBudgetMb, log);
                 SetRel(e, "terrainDetailDistance", p.DetailDistance, log);
                 SetRel(e, "terrainDetailDensityScale", p.DetailDensity, log);
-                SetRel(e, "terrainPixelError", p.Name == "Medium" ? 8f : 4f, log);
-                SetRel(e, "terrainBasemapDistance", p.Name == "Medium" ? 400f : 800f, log);
+                SetRel(e, "terrainPixelError", p.Name == "Low" || p.Name == "Medium" ? 8f : 4f, log);
+                SetRel(e, "terrainBasemapDistance", p.Name == "Low" || p.Name == "Medium" ? 400f : 800f, log);
                 SetRel(e, "particleRaycastBudget", 256, log);
                 var excluded = e.FindPropertyRelative("excludedTargetPlatforms");
                 if (excluded != null) excluded.arraySize = 0;

@@ -86,7 +86,7 @@ namespace GateRush.EditorTools.Art
             var track = TrackLoader.Load(CourseFor(environment), prefabs);
             try
             {
-                var source = GameObject.Find("FPV Camera")?.GetComponent<Camera>();
+                var source = GameObject.Find("Main Camera")?.GetComponent<Camera>();
                 return CaptureSet(sceneName, TrackBookmarks(track, indoor: environment == "Hangar"), source, tag);
             }
             finally
