@@ -27,7 +27,7 @@ namespace GateRush.EditorTools.Builders
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
 
-            var order = new System.Collections.Generic.List<string> { Build(), MenuSceneBuilder.Build() };
+            var order = new System.Collections.Generic.List<string> { Build(), MenuSceneBuilder.Build(), GarageSceneBuilder.Build() };
             foreach (var env in TrackSceneBuilder.Environments) order.Add(TrackSceneBuilder.Build(env));
             order.Add(DiagnosticsSceneBuilder.Build());
 

@@ -33,7 +33,7 @@ Missing for the plan: `com.unity.cinemachine` (6.6.0 available), `com.unity.spli
 - Spline track system, lane lights, chevrons, supports, ordered checkpoints by route distance (T1).
 - ~~Truss/obstacle kit with LODs, showroom (T2)~~ done; ~~stadium environment with Night/Dusk/Day (T3)~~ done (Track_Stadium, Stadium Oval); ~~Serpent Arena layout (T4)~~ done (serpent-arena, 477 m, 4 overpasses).
 - ~~Route guidance modes, racing-line ribbon, off-screen arrow (T5)~~ done; finish cube + cinematic finish + results overlay (T6).
-- Garage scene, UI Toolkit screens, parts definitions, procedural parts, `BuildComposer`, stats from physics (T7–T8).
+- ~~Garage scene, parts definitions, procedural parts, `BuildComposer`, stats from physics (T7–T8)~~ done (uGUI, see decisions).
 
 ## Conflicts with the plan
 | Plan says | Project has | Resolution |

@@ -21,6 +21,8 @@ namespace GateRush.EditorTools.Art
             StartGrid();
             ChevronSign();
             LedBanner();
+            CuttingMat();
+            Pegboard();
             AssetDatabase.Refresh();
             return "kit textures written";
         }
@@ -216,6 +218,58 @@ namespace GateRush.EditorTools.Art
                     px[y * w + x] = new Color32((byte)(p.r * 0.35f), (byte)(p.g * 0.35f), (byte)(p.b * 0.35f), 255);
                 }
             Save(File("LedBanner", "Albedo"), w, h, px);
+        }
+
+        /// <summary>
+        /// Garage workbench mat (T7): blue self-healing cutting mat, one texture = 30 cm: faint 1 cm grid, brighter 5 cm
+        /// lines, 45° guide lines and knife scuffs.
+        /// </summary>
+        public static void CuttingMat()
+        {
+            const int n = 1024;
+            var px = new Color32[n * n];
+            var baseC = new Color(0.07f, 0.42f, 0.78f);
+            float cm = n / 30f;
+            for (int y = 0; y < n; y++)
+            for (int x = 0; x < n; x++)
+            {
+                float u = (x + 0.5f) / n, v = (y + 0.5f) / n;
+                float noise = Fbm(u, v, 16, 4, 77);
+                var c = baseC * (0.92f + noise * 0.14f);
+                float fx = Mathf.Repeat(x / cm, 1f), fy = Mathf.Repeat(y / cm, 1f);
+                bool minor = Mathf.Min(fx, 1f - fx) * cm < 0.9f || Mathf.Min(fy, 1f - fy) * cm < 0.9f;
+                float f5x = Mathf.Repeat(x / (cm * 5f), 1f), f5y = Mathf.Repeat(y / (cm * 5f), 1f);
+                bool major = Mathf.Min(f5x, 1f - f5x) * cm * 5f < 1.6f || Mathf.Min(f5y, 1f - f5y) * cm * 5f < 1.6f;
+                float d = Mathf.Repeat((x - y) / (cm * 10f), 1f);
+                bool diag = Mathf.Min(d, 1f - d) * cm * 10f < 1.0f;
+                if (minor) c = Color.Lerp(c, new Color(0.55f, 0.8f, 1f), 0.35f);
+                if (diag) c = Color.Lerp(c, new Color(0.6f, 0.85f, 1f), 0.3f);
+                if (major) c = Color.Lerp(c, new Color(0.85f, 0.95f, 1f), 0.8f);
+                // Knife scuffs: short bright scratches.
+                float s = Fbm(u * 3f, v * 0.2f, 64, 2, 9);
+                if (s > 0.72f) c = Color.Lerp(c, Color.white, (s - 0.72f) * 1.2f);
+                px[y * n + x] = C(c.r, c.g, c.b);
+            }
+            Save(File("CuttingMat", "Albedo"), n, n, px);
+        }
+
+        /// <summary>Hardboard pegboard: tan board with dark 6 mm holes on a 25 mm grid; one texture = 20 cm.</summary>
+        public static void Pegboard()
+        {
+            const int n = 512;
+            var px = new Color32[n * n];
+            float pitch = n / 8f;
+            for (int y = 0; y < n; y++)
+            for (int x = 0; x < n; x++)
+            {
+                float u = (x + 0.5f) / n, v = (y + 0.5f) / n;
+                float grain = Fbm(u * 6f, v, 32, 3, 13);
+                var c = new Color(0.62f, 0.47f, 0.3f) * (0.88f + grain * 0.2f);
+                float dx = Mathf.Repeat(x, pitch) - pitch * 0.5f, dy = Mathf.Repeat(y, pitch) - pitch * 0.5f;
+                if (dx * dx + dy * dy < (pitch * 0.12f) * (pitch * 0.12f)) c = new Color(0.04f, 0.035f, 0.03f);
+                px[y * n + x] = C(c.r, c.g, c.b);
+            }
+            Save(File("Pegboard", "Albedo"), n, n, px);
         }
 
         // ---------- 5×7 bitmap font for the brand and slot numbers ----------

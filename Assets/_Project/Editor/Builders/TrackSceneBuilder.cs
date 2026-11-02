@@ -97,6 +97,7 @@ namespace GateRush.EditorTools.Builders
             cso.FindProperty("quads").objectReferenceValue = quadCatalog;
             cso.FindProperty("tracks").objectReferenceValue = trackCatalog;
             cso.FindProperty("trackPrefabs").objectReferenceValue = trackPrefabs;
+            GarageSceneBuilder.AssignModelMaterials(cso.FindProperty("buildMaterials"));
             cso.FindProperty("vehicle").objectReferenceValue = quad;
             cso.FindProperty("race").objectReferenceValue = race;
             cso.FindProperty("quadVisual").objectReferenceValue = quad.transform.Find("Visual");

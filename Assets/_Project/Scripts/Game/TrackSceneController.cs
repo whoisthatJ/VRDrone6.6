@@ -36,6 +36,10 @@ namespace GateRush.Game
         [Header("Track editor")]
         [SerializeField] private GateRush.TrackEditor.TrackEditorController editor;
 
+        [Header("Garage builds")]
+        [Tooltip("Materials for a garage build's generated model (replaces the stock quad visual).")]
+        [SerializeField] private GateRush.Garage.QuadModelMaterials buildMaterials = new GateRush.Garage.QuadModelMaterials();
+
         [Header("Feed and audio")]
         [SerializeField] private QuadAudio quadAudio;
         [SerializeField] private VtxSignal vtx;
@@ -240,10 +244,14 @@ namespace GateRush.Game
 
         private void ApplyQuad(GameSettings s)
         {
-            var entry = quads.Find(s.QuadId);
+            // A garage build flies its composed profile and its own model.
+            var build = GateRush.Garage.BuildLibrary.IsBuildId(s.QuadId) ? GateRush.Garage.BuildLibrary.Default.Resolve(s.QuadId) : null;
+            if (build != null && GateRush.Garage.BuildComposer.Validate(build).Count > 0) build = null;
+            var entry = build != null ? quads.Find(build.Size == GateRush.Garage.SizeClass.Whoop ? "whoop65" : "race5") : quads.Find(s.QuadId);
             if (entry == null || entry.Profile == null || vehicle == null) return;
+            string quadKey = build != null ? s.QuadId + "|" + build.ToJson().GetHashCode() : entry.Id;
 
-            QuadProfile p = entry.Profile.Profile;
+            QuadProfile p = build != null ? GateRush.Garage.BuildComposer.Compose(build) : entry.Profile.Profile;
             if (s.UseCustomRates) p.Rates = s.Rates;
             p.Aero.LinearDrag = p.Aero.LinearDrag * s.Physics.DragScale;
             p.Aero.QuadraticDrag = p.Aero.QuadraticDrag * s.Physics.DragScale;
@@ -251,23 +259,65 @@ namespace GateRush.Game
             p.Motors.TimeConstantDown *= s.Physics.MotorLagScale;
 
             var collision = vehicle.BaseCollision;
-            collision.Radius = entry.CollisionRadius;
+            collision.Radius = build != null ? build.Frame.WheelbaseMm * 0.0005f + build.Prop.DiameterIn * 0.0254f * 0.25f : entry.CollisionRadius;
             collision.CrashSpeed = s.Physics.CrashSpeed;
             vehicle.Configure(p, collision);
 
-            if (quadVisual != null) quadVisual.localScale = Vector3.one * entry.VisualScale;
-            if (ghostVisual != null) ghostVisual.localScale = Vector3.one * entry.VisualScale;
-            if (fpvCamera != null) fpvCamera.transform.localPosition = entry.CameraOffset;
-            if (views != null) views.SetQuadScale(entry.VisualScale);
-            if (quadAudio != null) quadAudio.MaxRpm = entry.MotorRpm;
+            float visualScale = entry.VisualScale;
+            if (build != null && _appliedQuadId != quadKey) ApplyBuildVisual(build);
+            else if (build == null && _buildModel != null) RestoreStockVisual();
+            if (build != null) visualScale = build.Frame.WheelbaseMm / 220f;
+            if (quadVisual != null && build == null) quadVisual.localScale = Vector3.one * entry.VisualScale;
+            if (ghostVisual != null) ghostVisual.localScale = Vector3.one * visualScale;
+            if (fpvCamera != null)
+                fpvCamera.transform.localPosition = build != null
+                    ? new Vector3(0f, 0.004f, build.Frame.BodyLengthMm * 0.0005f + 0.005f) // front of the stack (model is centred on it)
+                    : entry.CameraOffset;
+            if (views != null) views.SetQuadScale(visualScale);
+            if (quadAudio != null) quadAudio.MaxRpm = build != null ? GateRush.Garage.BuildComposer.FullThrottle(build.Motor, build.Prop, build.Battery).RevPerSec * 60f : entry.MotorRpm;
 
             // A different quad means a different ghost and a fresh start.
-            if (_appliedQuadId != null && _appliedQuadId != entry.Id && race != null)
+            if (_appliedQuadId != null && _appliedQuadId != quadKey && race != null)
             {
                 race.ReloadGhost();
                 race.Restart();
             }
-            _appliedQuadId = entry.Id;
+            _appliedQuadId = quadKey;
+        }
+
+        private GameObject _buildModel;
+        private Transform[] _stockProps;
+        private Renderer[] _stockDiscs;
+
+        private void RestoreStockVisual()
+        {
+            Destroy(_buildModel);
+            _buildModel = null;
+            foreach (var r in quadVisual.GetComponentsInChildren<Renderer>(true)) r.enabled = true;
+            var spinner = FindAnyObjectByType<GateRush.Vehicle.PropVisuals>();
+            if (spinner != null && _stockProps != null) spinner.Configure(_stockProps, _stockDiscs);
+        }
+
+        /// <summary>Hides the stock quad model and shows the build's generated one (props spin through PropVisuals).</summary>
+        private void ApplyBuildVisual(GateRush.Garage.QuadBuild build)
+        {
+            if (quadVisual == null || buildMaterials == null || buildMaterials.Carbon == null) return;
+            if (_buildModel != null) Destroy(_buildModel);
+            quadVisual.localScale = Vector3.one;
+            foreach (var r in quadVisual.GetComponentsInChildren<Renderer>(true)) r.enabled = false;
+            var model = GateRush.Garage.QuadModelBuilder.Build(build, buildMaterials, quadVisual, quadVisual.gameObject.layer);
+            // The generated model's origin is the bottom plate; centre the stack on the body.
+            model.Root.transform.localPosition = Vector3.down * (build.Frame.PlateMm * 0.001f + build.Frame.StackMm * 0.0005f);
+            foreach (var t in model.Root.GetComponentsInChildren<Transform>(true)) t.gameObject.layer = quadVisual.gameObject.layer;
+            _buildModel = model.Root;
+            var spinner = vehicle != null ? vehicle.GetComponentInChildren<GateRush.Vehicle.PropVisuals>(true) : null;
+            if (spinner == null) spinner = FindAnyObjectByType<GateRush.Vehicle.PropVisuals>();
+            if (spinner != null)
+            {
+                _stockProps ??= spinner.Props;
+                _stockDiscs ??= spinner.BlurDiscs;
+                spinner.Configure(model.Props, null);
+            }
         }
     }
 }

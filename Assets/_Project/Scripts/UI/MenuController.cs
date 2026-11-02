@@ -69,7 +69,11 @@ namespace GateRush.UI
             UiKit.Button(p, "FLY", new Vector2(Margin, y), new Vector2(ContentWidth, 110f), Fly, 52f);
             y -= 140f;
             float half = (ContentWidth - 30f) * 0.5f;
-            UiKit.Button(p, "Choose quad", new Vector2(Margin, y), new Vector2(half, 90f), ShowQuads);
+            UiKit.Button(p, "Choose quad", new Vector2(Margin, y), new Vector2(half, 90f), () =>
+            {
+                CommitIfDirty();
+                GameFlow.Garage();
+            });
             UiKit.Button(p, "Choose track", new Vector2(Margin + half + 30f, y), new Vector2(half, 90f), ShowTracks);
             y -= 120f;
             UiKit.Button(p, "Settings", new Vector2(Margin, y), new Vector2(half, 90f), ShowSettings);

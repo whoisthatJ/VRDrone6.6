@@ -23,6 +23,17 @@ namespace GateRush.Vehicle
         private Renderer[] _propRenderers = new Renderer[0];
         private MaterialPropertyBlock _mpb;
 
+        public Transform[] Props => props;
+        public Renderer[] BlurDiscs => blurDiscs;
+
+        /// <summary>Points the spinner at another model's props (a garage build replacing the stock visual).</summary>
+        public void Configure(Transform[] propTransforms, Renderer[] discs)
+        {
+            props = propTransforms;
+            blurDiscs = discs ?? new Renderer[0];
+            Awake();
+        }
+
         private void Awake()
         {
             _propRenderers = new Renderer[props.Length];

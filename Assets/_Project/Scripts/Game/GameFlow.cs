@@ -10,6 +10,7 @@ namespace GateRush.Game
     {
         public const string MenuScene = "Menu";
         public const string DiagnosticsScene = "InputDiagnostics";
+        public const string GarageScene = "Garage";
 
         /// <summary>A track handed to the next track scene to open in the editor (consumed on load).</summary>
         public static TrackData PendingEdit { get; private set; }
@@ -85,6 +86,8 @@ namespace GateRush.Game
         public static void Menu() => SceneManager.LoadScene(MenuScene);
 
         public static void Diagnostics() => SceneManager.LoadScene(DiagnosticsScene);
+        /// <summary>The garage: choose and build your quad (T7).</summary>
+        public static void Garage() => SceneManager.LoadScene(GarageScene);
 
         public static void Quit()
         {
