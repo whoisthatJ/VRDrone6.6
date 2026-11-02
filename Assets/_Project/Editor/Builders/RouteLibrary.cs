@@ -154,7 +154,6 @@ namespace GateRush.EditorTools.Builders
             t.Spawn.Yaw = Mathf.Atan2(pad.FlatForward.x, pad.FlatForward.z) * Mathf.Rad2Deg;
             foreach (float side in new[] { -4.2f, 4.2f })
                 t.Props.Add(new PropData { Type = "Flag", Position = new Vector3(padPos.x, 0f, padPos.z) + pad.Right * 1.2f + pad.FlatForward * side, Euler = new Vector3(0f, t.Spawn.Yaw, 0f) });
-            t.Props.Add(new PropData { Type = "StartPad", Position = new Vector3(padPos.x, 0f, padPos.z), Euler = new Vector3(0f, t.Spawn.Yaw, 0f) });
             return t;
         }
 
@@ -228,12 +227,11 @@ namespace GateRush.EditorTools.Builders
             r.Obstacles.Sort((a, b) => a.Distance.CompareTo(b.Distance));
             r.FinishObstacle = r.Obstacles.FindIndex(o => o.Type == "Arch");
 
-            // Start pad south of the start straight, 12 m before the finish arch.
+            // Start pad south of the start straight, 12 m before the finish arch (TrackBuilder lays the start grid at the spawn).
             var pad = route.Sample(At(3) - 12f);
             Vector3 padPos = pad.Position + pad.Right * 4.5f;
             t.Spawn.Position = new Vector3(padPos.x, r.GroundHeight + 0.15f, padPos.z);
             t.Spawn.Yaw = Mathf.Atan2(pad.FlatForward.x, pad.FlatForward.z) * Mathf.Rad2Deg;
-            t.Props.Add(new PropData { Type = "StartPad", Position = new Vector3(padPos.x, 0f, padPos.z), Euler = new Vector3(0f, t.Spawn.Yaw, 0f) });
             foreach (float side in new[] { -4.2f, 4.2f })
                 t.Props.Add(new PropData { Type = "Flag", Position = new Vector3(padPos.x, 0f, padPos.z) + pad.Right * 1.4f + pad.FlatForward * side, Euler = new Vector3(0f, t.Spawn.Yaw, 0f) });
             // Landing pads inside the two big loops and the white-pad loop (where the reference has them). 1 mm up: the

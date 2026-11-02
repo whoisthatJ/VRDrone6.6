@@ -32,10 +32,6 @@ MonoBehaviour:
       Position: {x: -7.7462654, y: 0, z: -47.179993}
       Euler: {x: 0, y: 89.99989, z: 0}
       Scale: {x: 1, y: 1, z: 1}
-    - Type: StartPad
-      Position: {x: -11.946267, y: 0, z: -45.98}
-      Euler: {x: 0, y: 89.99989, z: 0}
-      Scale: {x: 1, y: 1, z: 1}
     Route:
       Knots:
       - Position: {x: -42.195, y: 1.5, z: -41.38}

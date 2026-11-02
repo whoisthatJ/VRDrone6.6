@@ -24,10 +24,6 @@ MonoBehaviour:
       Yaw: 126.83682
     Gates: []
     Props:
-    - Type: StartPad
-      Position: {x: 3.3101687, y: 0, z: -27.628088}
-      Euler: {x: 0, y: 126.83682, z: 0}
-      Scale: {x: 1, y: 1, z: 1}
     - Type: Flag
       Position: {x: -0.8906386, y: 0, z: -26.230513}
       Euler: {x: 0, y: 126.83682, z: 0}
