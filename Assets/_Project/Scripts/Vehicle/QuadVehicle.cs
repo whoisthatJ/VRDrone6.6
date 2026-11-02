@@ -97,8 +97,15 @@ namespace GateRush.Vehicle
         /// <summary>Collision settings from the physics asset (defaults if none), as a base for <see cref="Configure"/>.</summary>
         public CollisionSettings BaseCollision => physics != null ? physics.Collision : CollisionSettings.Default;
 
-        public void Respawn()
+        /// <summary>False when the last respawn followed a crash: sources were disarmed at the crash, and an arm press
+        /// made during the respawn delay is kept instead of being wiped.</summary>
+        public bool LastRespawnDisarmed { get; private set; } = true;
+
+        public void Respawn() => Respawn(true);
+
+        private void Respawn(bool disarm)
         {
+            LastRespawnDisarmed = disarm;
             Transform t = spawnPoint != null ? spawnPoint : transform;
             _state = QuadState.AtRest(CollisionHook.FromUnity(t.position), CollisionHook.FromUnity(t.rotation));
             _collision.PrevPosition = _state.Position;
@@ -106,7 +113,7 @@ namespace GateRush.Vehicle
             _collision.Crashed = false;
             _accumulator = 0f;
             _crashed = false;
-            if (input != null) input.Disarm();
+            if (disarm && input != null) input.Disarm();
             ApplyPose(1f);
             Respawned?.Invoke();
         }
@@ -130,7 +137,7 @@ namespace GateRush.Vehicle
             if (_crashed)
             {
                 _crashTimer -= Time.deltaTime;
-                if (_crashTimer <= 0f) Respawn();
+                if (_crashTimer <= 0f) Respawn(false);
                 return;
             }
 

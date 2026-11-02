@@ -42,7 +42,26 @@ namespace GateRush.Input
         protected abstract void ReadRaw(out float throttle, out float yaw, out float pitch, out float roll,
             out bool armToggle, out bool modeCycle, out bool reset);
 
-        public void Disarm() => _armed = false;
+        public void Disarm()
+        {
+            _armed = false;
+            OnDisarmed();
+        }
+
+        /// <summary>Called on every forced disarm (crash, respawn): sources with a held throttle drop it.</summary>
+        protected virtual void OnDisarmed() { }
+
+        public enum ArmRefusal { None, ThrottleHigh, SwitchBlocked }
+
+        /// <summary>Why the last arm attempt (any source) was refused, and until when to show it (unscaled time).</summary>
+        public static ArmRefusal LastRefusal { get; private set; }
+        public static float RefusalShownUntil { get; private set; }
+
+        protected static void ReportRefusal(ArmRefusal why)
+        {
+            LastRefusal = why;
+            RefusalShownUntil = Time.unscaledTime + 2.5f;
+        }
 
         /// <summary>Set by sources with a physical mode switch (radios): the mode follows the switch instead of cycling.</summary>
         protected bool HasAbsoluteMode;
@@ -66,6 +85,7 @@ namespace GateRush.Input
             {
                 if (_armed) _armed = false;
                 else if (throttle <= armThrottleLimit) _armed = true;
+                else ReportRefusal(ArmRefusal.ThrottleHigh);
             }
             if (modeCycle) mode = (FlightMode)(((int)mode + 1) % 3);
             if (HasAbsoluteMode) mode = AbsoluteMode;

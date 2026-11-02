@@ -25,15 +25,29 @@ namespace GateRush.Vehicle
 
         private void OnEnable()
         {
-            if (vehicle != null) vehicle.Respawned += DisarmAll;
+            if (vehicle != null)
+            {
+                vehicle.Respawned += OnRespawned;
+                vehicle.Crashed += DisarmAll;
+            }
         }
 
         private void OnDisable()
         {
-            if (vehicle != null) vehicle.Respawned -= DisarmAll;
+            if (vehicle != null)
+            {
+                vehicle.Respawned -= OnRespawned;
+                vehicle.Crashed -= DisarmAll;
+            }
         }
 
-        // The vehicle only disarms its main source on respawn; the mixed-in ones must not keep the quad armed.
+        // After a crash everything was disarmed at the crash; keep an arm press made during the respawn delay.
+        private void OnRespawned()
+        {
+            if (vehicle.LastRespawnDisarmed) DisarmAll();
+        }
+
+        // The vehicle only disarms its main source; the mixed-in ones must not keep the quad armed.
         private void DisarmAll()
         {
             foreach (var s in sources)

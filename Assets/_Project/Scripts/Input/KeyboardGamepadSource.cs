@@ -72,6 +72,13 @@ namespace GateRush.Input
             reset |= pad.buttonNorth.wasPressedThisFrame;
         }
 
+        // The keyboard throttle is a held value: after a crash it would still be up and Space could never re-arm.
+        protected override void OnDisarmed()
+        {
+            _kbThrottle = 0f;
+            _kbYaw = _kbPitch = _kbRoll = 0f;
+        }
+
         private static float Axis(UnityEngine.InputSystem.Controls.KeyControl pos, UnityEngine.InputSystem.Controls.KeyControl neg) =>
             (pos.isPressed ? 1f : 0f) - (neg.isPressed ? 1f : 0f);
     }

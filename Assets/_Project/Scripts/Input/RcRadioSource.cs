@@ -42,7 +42,11 @@ namespace GateRush.Input
             roll = m.Roll.IsAssigned ? RadioMapping.Centered(reader.Read(m.Roll.Channel), m.Roll) : 0f;
 
             bool armOn = !m.Arm.IsAssigned || RadioMapping.SwitchPosition(reader.Read(m.Arm.Channel), m.Arm) == 1;
+            bool wasBlocked = _arming.Blocked;
             armToggle = _arming.Update(armOn, throttle, IsArmed, ArmThrottleLimit);
+            if (_arming.Blocked && !wasBlocked) ReportRefusal(ArmRefusal.SwitchBlocked);
+            // Switch on, not blocked, but waiting for throttle low (e.g. after a crash): say so while they wait.
+            if (armOn && !IsArmed && !_arming.Blocked && throttle > ArmThrottleLimit && Time.frameCount % 30 == 0) ReportRefusal(ArmRefusal.ThrottleHigh);
 
             HasAbsoluteMode = m.Mode.IsAssigned;
             if (HasAbsoluteMode) AbsoluteMode = RadioMapping.ModeFor(RadioMapping.SwitchPosition(reader.Read(m.Mode.Channel), m.Mode));

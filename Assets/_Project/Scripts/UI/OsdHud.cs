@@ -34,6 +34,8 @@ namespace GateRush.UI
         private const string ModeAngle = "ANGL";
         private const string ModeHorizon = "HOR";
         private const string Disarmed = "DISARMED";
+        private const string ThrottleToArm = "THROTTLE LOW TO ARM";
+        private const string ArmSwitchBlocked = "ARM SWITCH OFF, THEN ON";
         private const string LowBattery = "LOW BATTERY";
         private const string LinkLost = "LINK";
 
@@ -69,6 +71,9 @@ namespace GateRush.UI
 
             bool blink = (Time.time * 2f) % 1f < 0.6f;
             string w = cell < lowCellVoltage && s.Armed && blink ? LowBattery : lq < 0.3f && blink ? LinkLost : "";
+            // Why an arm attempt did nothing (Betaflight shows "THROTTLE" in the same place).
+            if (w.Length == 0 && !s.Armed && Time.unscaledTime < GateRush.Input.PilotInputSource.RefusalShownUntil)
+                w = GateRush.Input.PilotInputSource.LastRefusal == GateRush.Input.PilotInputSource.ArmRefusal.SwitchBlocked ? ArmSwitchBlocked : ThrottleToArm;
             SetIfChanged(warning, w, ref _warningShown);
 
             bool fpv = views == null || views.Mode == ViewMode.Fpv;
