@@ -236,8 +236,9 @@ namespace GateRush.EditorTools.Builders
             t.Props.Add(new PropData { Type = "StartPad", Position = new Vector3(padPos.x, 0f, padPos.z), Euler = new Vector3(0f, t.Spawn.Yaw, 0f) });
             foreach (float side in new[] { -4.2f, 4.2f })
                 t.Props.Add(new PropData { Type = "Flag", Position = new Vector3(padPos.x, 0f, padPos.z) + pad.Right * 1.4f + pad.FlatForward * side, Euler = new Vector3(0f, t.Spawn.Yaw, 0f) });
-            // Landing pads inside the two big loops and the white-pad loop (where the reference has them).
-            foreach (var p in new[] { new Vector3(-16f, 0f, 3f), new Vector3(18.4f, 0f, 3f), new Vector3(25.9f, 0f, -12.7f) })
+            // Landing pads inside the two big loops and the white-pad loop (where the reference has them). 1 mm up: the
+            // pad's print disc is 0.03 m high, exactly the top of the stadium pitch, and would z-fight with it.
+            foreach (var p in new[] { new Vector3(-16f, 0.001f, 3f), new Vector3(18.4f, 0.001f, 3f), new Vector3(25.9f, 0.001f, -12.7f) })
                 t.Props.Add(new PropData { Type = "LandingPad", Position = p });
             return t;
         }

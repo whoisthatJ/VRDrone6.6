@@ -37,15 +37,15 @@ MonoBehaviour:
       Euler: {x: 0, y: 126.83682, z: 0}
       Scale: {x: 1, y: 1, z: 1}
     - Type: LandingPad
-      Position: {x: -16, y: 0, z: 3}
+      Position: {x: -16, y: 0.001, z: 3}
       Euler: {x: 0, y: 0, z: 0}
       Scale: {x: 1, y: 1, z: 1}
     - Type: LandingPad
-      Position: {x: 18.4, y: 0, z: 3}
+      Position: {x: 18.4, y: 0.001, z: 3}
       Euler: {x: 0, y: 0, z: 0}
       Scale: {x: 1, y: 1, z: 1}
     - Type: LandingPad
-      Position: {x: 25.9, y: 0, z: -12.7}
+      Position: {x: 25.9, y: 0.001, z: -12.7}
       Euler: {x: 0, y: 0, z: 0}
       Scale: {x: 1, y: 1, z: 1}
     Route:
