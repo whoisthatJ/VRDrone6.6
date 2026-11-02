@@ -145,11 +145,15 @@ namespace GateRush.UI
             var board = new LocalLeaderboard();
             board.Load(LocalLeaderboard.DefaultPath);
 
-            // Built-in tracks first, then your own (newest first).
+            // Newest first: your own tracks (newest first), then the built-in ones from the latest to the oldest.
             var rows = new System.Collections.Generic.List<(string id, string name, string info)>();
-            foreach (var t in tracks.Tracks) rows.Add((t.Id, t.DisplayName, t.Description));
             foreach (var u in GateRush.Track.TrackLibrary.Default.LoadAll())
                 rows.Add((u.Id, u.Name, $"Your track: {EnvironmentName(u.Environment)}, {u.Gates.Count} gates, {u.Laps} laps"));
+            for (int i = tracks.Tracks.Count - 1; i >= 0; i--)
+            {
+                var t = tracks.Tracks[i];
+                rows.Add((t.Id, t.DisplayName, t.Description));
+            }
 
             int pages = Mathf.Max(1, (rows.Count + TracksPerPage - 1) / TracksPerPage);
             _trackPage = Mathf.Clamp(_trackPage, 0, pages - 1);
