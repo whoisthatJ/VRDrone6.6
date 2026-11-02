@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -6,10 +7,15 @@ namespace GateRush.Input
 {
     public enum RadioBackend
     {
-        /// <summary>Input System, unless the Android raw reader sees more axes for the radio.</summary>
+        /// <summary>
+        /// Windows in Play mode: the radio straight from USB (Windows HID). Otherwise the Input System, unless the
+        /// Android raw reader sees more axes for the radio.
+        /// </summary>
         Auto = 0,
         InputSystem = 1,
         AndroidRaw = 2,
+        /// <summary>Windows only: read the radio's USB HID reports directly (falls back to the Input System).</summary>
+        WindowsHid = 3,
     }
 
     /// <summary>
@@ -58,6 +64,12 @@ namespace GateRush.Input
 
         private void OnEnable() => InputSystem.onDeviceChange += OnDeviceChange;
         private void OnDisable() => InputSystem.onDeviceChange -= OnDeviceChange;
+
+        private void OnDestroy()
+        {
+            (Reader as IDisposable)?.Dispose();
+            Reader = null;
+        }
 
         private void OnDeviceChange(InputDevice device, InputDeviceChange change)
         {
@@ -125,17 +137,38 @@ namespace GateRush.Input
                 }
             }
 
+            var old = Reader;
+            IChannelReader windowsHid = null;
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
+            // The Input System can drop a USB radio's reports (focus resets, devices that only report on change), so
+            // on Windows the radio is read from USB directly. Edit mode (tests, tools) keeps the Input System.
+            if (backend == RadioBackend.WindowsHid || backend == RadioBackend.Auto && Application.isPlaying)
+            {
+                if (old is WindowsHidChannelReader current && current.IsConnected) windowsHid = current;
+                else
+                {
+                    var gamepads = new HashSet<int>();
+                    foreach (var pad in Gamepad.all)
+                        if (InputDeviceReport.TryGetVidPid(pad.description.capabilities, out int vid, out int pid)) gamepads.Add(vid << 16 | pid);
+                    windowsHid = WindowsHidChannelReader.OpenFirst(gamepads);
+                }
+            }
+#endif
+
             switch (backend)
             {
+                case RadioBackend.WindowsHid: Reader = windowsHid ?? inputSystem; break;
                 case RadioBackend.InputSystem: Reader = inputSystem; break;
                 case RadioBackend.AndroidRaw: Reader = (IChannelReader)android ?? inputSystem; break;
                 default:
                     // Prefer the Input System; fall back to the raw reader when it sees more axes (or is the only one).
-                    Reader = inputSystem != null && (android == null || android.AxisCount <= inputSystem.AxisCount)
+                    Reader = windowsHid ?? (inputSystem != null && (android == null || android.AxisCount <= inputSystem.AxisCount)
                         ? inputSystem
-                        : (IChannelReader)android;
+                        : (IChannelReader)android);
                     break;
             }
+            if (old != Reader) (old as IDisposable)?.Dispose();
+            if (windowsHid != null && windowsHid != Reader) ((IDisposable)windowsHid).Dispose();
 
             Preset = Reader != null && presets != null ? presets.Find(Reader.ProductName, Reader.DisplayName) : null;
             var saved = Reader != null ? _store.Find(Reader.DeviceKey) : null;
@@ -152,7 +185,7 @@ namespace GateRush.Input
                 }
             }
 
-            if (Reader?.DeviceKey != previous)
+            if (Reader?.DeviceKey != previous || Reader?.Backend != old?.Backend)
             {
                 Debug.Log(Reader != null
                     ? $"[GateRush][Input] Radio: {Reader.DisplayName} via {Reader.Backend}, {Reader.ChannelCount} channels, " +

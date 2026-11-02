@@ -25,6 +25,16 @@ namespace GateRush.Core
         /// </summary>
         public static System.Func<bool> MenuOverride;
 
+        // The Boot scene normally provides one; this covers starting Play mode directly in a track scene.
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        private static void EnsureExists()
+        {
+            if (FindAnyObjectByType<SceneSwitcher>() != null) return;
+            var go = new GameObject(nameof(SceneSwitcher));
+            DontDestroyOnLoad(go);
+            go.AddComponent<SceneSwitcher>();
+        }
+
         private void OnEnable() => InputSystem.onDeviceChange += OnDeviceChange;
         private void OnDisable() => InputSystem.onDeviceChange -= OnDeviceChange;
 

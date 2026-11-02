@@ -212,7 +212,10 @@ namespace GateRush.Game
             }
             if (vignette != null) vignette.Strength = s.Comfort.VignetteStrength;
 
-            var shaping = new StickShaping { Deadband = s.Input.Deadband, Expo = s.Input.Expo };
+            var shaping = new StickShaping
+            {
+                Deadband = s.Input.Deadband, Expo = s.Input.Expo, InvertPitch = s.Input.InvertPitch, InvertRoll = s.Input.InvertRoll,
+            };
             if (radioProvider != null) radioProvider.Backend = (RadioBackend)s.Input.RadioBackend;
             if (radio != null) radio.Shaping = shaping;
             if (keyboardGamepad != null)

@@ -74,8 +74,8 @@ namespace GateRush.Input
             {
                 Throttle = throttle,
                 Yaw = shaping.Apply(yaw),
-                Pitch = shaping.Apply(pitch),
-                Roll = shaping.Apply(roll),
+                Pitch = shaping.InvertPitch ? -shaping.Apply(pitch) : shaping.Apply(pitch),
+                Roll = shaping.InvertRoll ? -shaping.Apply(roll) : shaping.Apply(roll),
                 Arm = _armed,
                 Mode = mode,
                 Reset = reset,

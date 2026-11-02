@@ -23,33 +23,33 @@ MonoBehaviour:
       Channel: 2
       Invert: 0
       Range:
-        Min: -1
+        Min: -0.78
         Center: 0
-        Max: 1
+        Max: 0.8
     Yaw:
       Channel: 3
       Invert: 0
       Range:
-        Min: -1
+        Min: -0.8
         Center: 0
-        Max: 1
+        Max: 0.8
     Pitch:
       Channel: 1
       Invert: 0
       Range:
-        Min: -1
+        Min: -0.8
         Center: 0
-        Max: 1
+        Max: 0.8
     Roll:
       Channel: 0
       Invert: 0
       Range:
-        Min: -1
+        Min: -0.8
         Center: 0
-        Max: 1
+        Max: 0.8
     Arm:
-      Channel: 4
-      Position0: -1
+      Channel: 17
+      Position0: 0
       Position1: 1
       Position2: 1
       ThreePosition: 0

@@ -320,8 +320,8 @@ namespace GateRush.UI
             UiKit.StepperRow(c, "Gamepad throttle", -90f, throttle, input.GamepadThrottle, i => { input.GamepadThrottle = i; Changed(); }, ContentWidth);
             UiKit.SliderRow(c, "Stick deadband", -180f, 0f, 0.3f, input.Deadband, v => F(v * 100f, "0") + " %", v => { input.Deadband = v; Changed(); }, ContentWidth);
             UiKit.SliderRow(c, "Stick expo", -270f, 0f, 1f, input.Expo, v => F(v, "0.00"), v => { input.Expo = v; Changed(); }, ContentWidth);
-            UiKit.Label(c, "RC radios (BetaFPV and others): calibration and presets arrive in M6. Use Input diagnostics to check your radio.",
-                new Vector2(0f, -380f), new Vector2(ContentWidth, 90f), 26f, TextAlignmentOptions.TopLeft, UiKit.DimTextColor);
+            UiKit.StepperRow(c, "Invert pitch (right stick)", -360f, new[] { "Off", "On" }, input.InvertPitch ? 1 : 0, i => { input.InvertPitch = i == 1; Changed(); }, ContentWidth);
+            UiKit.StepperRow(c, "Invert roll (right stick)", -450f, new[] { "Off", "On" }, input.InvertRoll ? 1 : 0, i => { input.InvertRoll = i == 1; Changed(); }, ContentWidth);
         }
 
         private void BuildComfort(RectTransform c)

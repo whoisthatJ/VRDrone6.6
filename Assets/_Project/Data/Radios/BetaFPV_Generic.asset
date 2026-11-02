@@ -48,7 +48,7 @@ MonoBehaviour:
         Center: 0
         Max: 1
     Arm:
-      Channel: 4
+      Channel: 17
       Position0: -1
       Position1: 1
       Position2: 1

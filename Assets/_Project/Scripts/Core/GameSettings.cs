@@ -25,6 +25,10 @@ namespace GateRush.Core
         public int GamepadThrottle = 1;
         [Range(0f, 0.3f)] public float Deadband = 0.02f;
         [Range(0f, 1f)] public float Expo;
+        /// <summary>Flip pitch on the right stick (all controllers).</summary>
+        public bool InvertPitch;
+        /// <summary>Flip roll on the right stick (all controllers).</summary>
+        public bool InvertRoll;
         /// <summary>GateRush.Input.RadioBackend: 0 = auto, 1 = Input System, 2 = Android raw reader.</summary>
         public int RadioBackend;
     }

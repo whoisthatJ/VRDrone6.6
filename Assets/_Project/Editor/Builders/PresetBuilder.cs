@@ -21,7 +21,7 @@ namespace GateRush.EditorTools.Builders
             var library = LoadOrCreate<ControllerPresetLibrary>(LibraryPath);
             library.Presets.Clear();
 
-            library.Presets.Add(Preset("LR2SIM_Joystick", "BetaFPV LiteRadio 2 SIM (joystick mode)", "^BETAFPV Joystick$", 20, Aetr(),
+            library.Presets.Add(Preset("LR2SIM_Joystick", "BetaFPV LiteRadio 2 SIM (joystick mode)", "^BETAFPV Joystick$", 20, BetaFpvJoystick(),
                 "USB-C, joystick mode (default). Reported name \"BETAFPV Joystick\". 8 channels, switches A-D. Mapping is a guess: please verify with Input diagnostics."));
             library.Presets.Add(Preset("LR2SIM_Xbox", "BetaFPV LiteRadio 2 SIM (Xbox mode)", "BETAFPV.*(Xbox|XInput|Gamepad)|(Xbox|XInput).*BETAFPV", 30, Aetr(),
                 "Xbox mode appears as a gamepad: flown through the gamepad path with full-range (radio-style) throttle.", gamepadPath: true));
@@ -54,6 +54,25 @@ namespace GateRush.EditorTools.Builders
             Mode = new SwitchAssignment(5, -1f, 0f) { Position2 = 1f, ThreePosition = true },
             Reset = SwitchAssignment.None,
         };
+
+        /// <summary>
+        /// "BETAFPV Joystick" (VID 0483 / PID 572B) over USB: the arm switch is a button, not an axis. It shows up as
+        /// button4, which is channel 17 in <see cref="InputSystemChannelReader"/> order (8 axes, then buttons sorted by
+        /// path: button10..16, button2..9, trigger). Checked on hardware with Input diagnostics.
+        /// The gimbals only cover about ±0.8 of the HID range (throttle bottom reads -0.8), so the ranges are narrowed;
+        /// throttle min sits just above that so stick-down reads 0 and the arm check (throttle ≤ 5%) passes.
+        /// </summary>
+        private static RadioMapping BetaFpvJoystick()
+        {
+            var m = Aetr();
+            var sticks = new ChannelRange(-0.8f, 0f, 0.8f);
+            m.Throttle.Range = new ChannelRange(-0.78f, 0f, 0.8f);
+            m.Yaw.Range = sticks;
+            m.Pitch.Range = sticks;
+            m.Roll.Range = sticks;
+            m.Arm = new SwitchAssignment(17, 0f, 1f);
+            return m;
+        }
 
         /// <summary>
         /// AETR for EdgeTX's classic USB joystick (CH1..CH8 on X, Y, Z, Rx, Ry, Rz, Slider, Dial).

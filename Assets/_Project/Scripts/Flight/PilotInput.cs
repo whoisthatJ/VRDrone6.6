@@ -30,5 +30,20 @@ namespace GateRush.Flight
 
         public static PilotInput Armed(float throttle, FlightMode mode = FlightMode.Acro) =>
             new PilotInput { Throttle = throttle, Arm = true, Mode = mode };
+
+        /// <summary>
+        /// Two controllers flying one quad (e.g. radio + keyboard): sticks add, throttle takes the higher one, either
+        /// can arm or reset. The flight mode comes from <paramref name="primary"/>.
+        /// </summary>
+        public static PilotInput Mix(in PilotInput primary, in PilotInput other) => new PilotInput
+        {
+            Throttle = Math.Max(primary.Throttle, other.Throttle),
+            Yaw = Math.Clamp(primary.Yaw + other.Yaw, -1f, 1f),
+            Pitch = Math.Clamp(primary.Pitch + other.Pitch, -1f, 1f),
+            Roll = Math.Clamp(primary.Roll + other.Roll, -1f, 1f),
+            Arm = primary.Arm || other.Arm,
+            Mode = primary.Mode,
+            Reset = primary.Reset || other.Reset,
+        };
     }
 }

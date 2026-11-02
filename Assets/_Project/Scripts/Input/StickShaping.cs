@@ -20,6 +20,10 @@ namespace GateRush.Input
         public float Deadband;
         /// <summary>0..1 stick expo (cubic blend), on top of the rate curve's own expo.</summary>
         public float Expo;
+        /// <summary>Flip the right stick's pitch (forward = nose up) for this source.</summary>
+        public bool InvertPitch;
+        /// <summary>Flip the right stick's roll for this source.</summary>
+        public bool InvertRoll;
 
         public static StickShaping Default => new StickShaping { Deadband = 0.02f, Expo = 0f };
 

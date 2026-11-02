@@ -46,6 +46,9 @@ namespace GateRush.Vehicle
             set => input = value;
         }
 
+        /// <summary>The other connected controllers' input, mixed on top of <see cref="InputSource"/>. Set by the router each frame.</summary>
+        public PilotInput AssistInput { get; set; }
+
         public Transform SpawnPoint
         {
             get => spawnPoint;
@@ -114,7 +117,7 @@ namespace GateRush.Vehicle
             if (input != null)
             {
                 input.HoverThrottle = HoverThrottle;
-                pilot = input.Current;
+                pilot = PilotInput.Mix(input.Current, AssistInput);
             }
             LastInput = pilot;
 
