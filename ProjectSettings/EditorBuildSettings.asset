@@ -21,6 +21,9 @@ EditorBuildSettings:
     path: Assets/_Project/Scenes/Track_Industrial.unity
     guid: adc026636da73ff4cb6f859b9e389c3c
   - enabled: 1
+    path: Assets/_Project/Scenes/Track_Stadium.unity
+    guid: 013dca48267a0a440ae4b019d4d130c4
+  - enabled: 1
     path: Assets/_Project/Scenes/InputDiagnostics.unity
     guid: 371b0653f2a7bf846a8d325efb88e3fa
   m_configObjects:

@@ -64,7 +64,7 @@ namespace GateRush.EditorTools.Art
         public const int TrackGeometryLayer = 8;
         public const string MeshDir = "Assets/_Project/Art/Meshes";
         public const string VolumeDir = "Assets/_Project/Art/Volumes";
-        public static readonly string[] Scenes = { "Field", "Hangar", "Industrial", "Menu" };
+        public static readonly string[] Scenes = { "Field", "Hangar", "Industrial", "Stadium", "Menu" };
 
         [MenuItem("Tools/Art/Apply Art Pass (all scenes)")]
         private static void MenuAll() => Debug.Log(ApplyAll());
@@ -96,6 +96,7 @@ namespace GateRush.EditorTools.Art
                     case "Field": FieldArt.Apply(ctx); break;
                     case "Hangar": HangarArt.Apply(ctx); break;
                     case "Industrial": IndustrialArt.Apply(ctx); break;
+                    case "Stadium": StadiumArt.Apply(ctx); break;
                     case "Menu": MenuArt.Apply(ctx); break;
                 }
                 if (env != "Menu") PrefabArt.ApplyQuad(ctx);
@@ -249,10 +250,10 @@ namespace GateRush.EditorTools.Art
             return hdr;
         }
 
-        public static void SetupVolume(ArtContext ctx, SceneLook look)
+        public static Volume SetupVolume(ArtContext ctx, SceneLook look, string suffix = "")
         {
             Directory.CreateDirectory(VolumeDir);
-            string path = $"{VolumeDir}/VP_{ctx.Env}.asset";
+            string path = $"{VolumeDir}/VP_{ctx.Env}{suffix}.asset";
             AssetDatabase.DeleteAsset(path);
             var profile = ScriptableObject.CreateInstance<VolumeProfile>();
             AssetDatabase.CreateAsset(profile, path);
@@ -289,12 +290,13 @@ namespace GateRush.EditorTools.Art
             EditorUtility.SetDirty(profile);
             AssetDatabase.SaveAssets();
 
-            var go = new GameObject("Post Volume");
+            var go = new GameObject("Post Volume" + suffix);
             go.transform.SetParent(ctx.Dressing, false);
             var vol = go.AddComponent<Volume>();
             vol.isGlobal = true;
             vol.priority = 0;
             vol.sharedProfile = profile;
+            return vol;
         }
 
         /// <summary>Game cameras render post-processing (GraphicsQuality applies the player's choices at runtime).</summary>

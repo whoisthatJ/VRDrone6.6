@@ -173,7 +173,8 @@ namespace GateRush.EditorTools.Art
         /// <summary>Padded foam cover (box-ish bar with rounded edges) with Velcro straps every 0.6 m.</summary>
         private static void Pad(Geo g, Vector3 center, Vector3 size, Quaternion rotation = default, bool collider = true)
         {
-            if (rotation == default) rotation = Quaternion.identity;
+            // Quaternion == compares by dot product, so a zero (default) quaternion never equals default; test the components.
+            if (rotation.x == 0f && rotation.y == 0f && rotation.z == 0f && rotation.w == 0f) rotation = Quaternion.identity;
             // PaddedBar is a unit mesh made for a transform scaled to the bar size.
             var local = Matrix4x4.TRS(center, rotation, size);
             g.Part(0, PaddedMesh(size, 4), local, Slot.Pad);

@@ -15,6 +15,7 @@ namespace GateRush.EditorTools.Builders
             {
                 case "hangar": Hangar(parent, layer, grid); break;
                 case "industrial": Industrial(parent, layer, grid); break;
+                case "stadium": Stadium(parent, layer, grid); break;
                 default: Field(parent, layer, grid); break;
             }
             ConfigureLighting(environment, parent);
@@ -36,7 +37,9 @@ namespace GateRush.EditorTools.Builders
                 s = new LightingSettings { name = "Lighting_" + environment };
                 UnityEditor.AssetDatabase.CreateAsset(s, path);
             }
-            s.bakedGI = true;
+            // The stadium switches time of day at runtime (StadiumLighting): nothing baked there.
+            bool baked = environment != "stadium";
+            s.bakedGI = baked;
             s.realtimeGI = false;
             s.mixedBakeMode = MixedLightingMode.IndirectOnly;
             s.lightmapper = LightingSettings.Lightmapper.ProgressiveGPU;
@@ -55,7 +58,8 @@ namespace GateRush.EditorTools.Builders
             UnityEditor.Lightmapping.lightingSettings = s;
 
             foreach (var light in Object.FindObjectsByType<Light>())
-                light.lightmapBakeType = LightmapBakeType.Mixed;
+                light.lightmapBakeType = baked ? LightmapBakeType.Mixed : LightmapBakeType.Realtime;
+            if (!baked) return;
 
             // Huge ground planes get a reduced lightmap share (they are mostly flat and evenly lit).
             foreach (var r in parent.GetComponentsInChildren<MeshRenderer>())
@@ -83,6 +87,19 @@ namespace GateRush.EditorTools.Builders
             var probes = new GameObject("Light Probes").AddComponent<LightProbeGroup>();
             probes.transform.SetParent(parent, false);
             probes.probePositions = positions.ToArray();
+        }
+
+        // ---------- stadium ----------
+
+        /// <summary>
+        /// Football stadium (T3): flat ground and a sun; the pitch, running track, stands, boards and floodlights are
+        /// built by the stadium art pass (StadiumArt), which also owns the time-of-day presets.
+        /// </summary>
+        private static void Stadium(Transform parent, int layer, Material grid)
+        {
+            Sun(new Vector3(40f, -30f, 0f), 1.2f, new Color(1f, 0.95f, 0.88f));
+            Ambient(new Color(0.4f, 0.45f, 0.55f), new Color(0.3f, 0.32f, 0.35f), new Color(0.15f, 0.15f, 0.14f));
+            Ground(parent, layer, Tinted(grid, "GroundStadium", new Color(0.3f, 0.42f, 0.26f)), 1200f);
         }
 
         // ---------- open field ----------

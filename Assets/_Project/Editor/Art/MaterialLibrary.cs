@@ -123,6 +123,15 @@ namespace GateRush.EditorTools.Art
             new MatDef { Name = "M_Kit_Flag", Texture = "proc:BrandFlag", TileMeters = 1f, DoubleSided = true, Smoothness = 0.3f, Metallic = 0f, Macro = 0f },
             new MatDef { Name = "M_Kit_LandingPad", Texture = "proc:LandingPad", TileMeters = 1f, Smoothness = 1f, Metallic = 0f, Macro = 0f },
             new MatDef { Name = "M_Kit_StartGrid", Texture = "proc:StartGrid", TileMeters = 1f, Smoothness = 0.35f, Metallic = 0f, Macro = 0f },
+            // T3 stadium: mown pitch stripes, red tartan running track, line paint, seats, LED boards and lamps
+            Tint("M_Stadium_Grass_Light", "Grass_Field", new Color(0.92f, 1.08f, 0.86f), smooth: 0.3f, macro: 0.25f),
+            Tint("M_Stadium_Grass_Dark", "Grass_Field", new Color(0.68f, 0.82f, 0.62f), smooth: 0.3f, macro: 0.25f),
+            Tint("M_Stadium_Tartan", "Rubber_Mat", new Color(2.1f, 0.55f, 0.36f), smooth: 0.6f, macro: 0.2f),
+            Plain("M_Stadium_LinePaint", new Color(0.86f, 0.86f, 0.84f), 0.3f),
+            Plain("M_Stadium_Seat_Red", new Color(0.62f, 0.07f, 0.06f), 0.55f),
+            Plain("M_Stadium_Seat_Blue", new Color(0.06f, 0.16f, 0.52f), 0.55f),
+            new MatDef { Name = "M_Stadium_LedBanner", Shader = MatDef.Led, Texture = "proc:LedBanner", Tint = Color.white, LedIntensity = 2.2f },
+            new MatDef { Name = "M_Stadium_Floodlamp", Shader = MatDef.Led, Tint = new Color(1f, 0.96f, 0.88f), LedIntensity = 12f },
             new MatDef { Name = "M_Kit_ChevronSign", Texture = "proc:ChevronSign", TileMeters = 1f, Smoothness = 0.4f, Metallic = 0f, Macro = 0f },
             // Plain and procedural
             Plain("M_Paint_Yellow", new Color(0.88f, 0.66f, 0.06f), 0.42f),
@@ -212,6 +221,10 @@ namespace GateRush.EditorTools.Art
             {
                 m.SetColor("_BaseColor", d.Tint);
                 m.SetFloat("_Intensity", d.LedIntensity);
+                // An LED screen can show a procedural pattern (T3 stadium banner); otherwise plain white.
+                Texture2D pattern = d.Texture != null && d.Texture.StartsWith("proc:")
+                    ? LoadAny(ArtProcedural.Dir(d.Texture.Substring(5)), d.Texture.Substring(5) + "_Albedo") : null;
+                m.SetTexture("_BaseMap", pattern);
                 EditorUtility.SetDirty(m);
                 return true;
             }

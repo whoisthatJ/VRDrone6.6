@@ -218,6 +218,8 @@ namespace GateRush.Game
             if (quadAudio != null) quadAudio.Volume = s.Feed.MotorVolume;
             if (vtx != null) vtx.Level = (VtxNoiseLevel)s.Feed.VtxNoise;
             if (debugOverlay != null) debugOverlay.SetActive(s.Feed.ShowDebugOverlay);
+            var stadium = FindAnyObjectByType<StadiumLighting>();
+            if (stadium != null && stadium.Current != (TimeOfDay)s.Feed.StadiumLighting) stadium.Apply((TimeOfDay)s.Feed.StadiumLighting);
             if (vehicle != null) vehicle.SetBatterySag(s.Physics.BatterySag);
             if (views != null) OnViewChanged(views.Mode);
 

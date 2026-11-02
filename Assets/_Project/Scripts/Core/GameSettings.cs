@@ -38,6 +38,8 @@ namespace GateRush.Core
         [Range(0f, 1f)] public float MotorVolume = 0.6f;
         /// <summary>Developer readout (sticks, rates, motors) instead of the clean OSD.</summary>
         public bool ShowDebugOverlay;
+        /// <summary>Stadium time of day: 0 night (floodlights), 1 dusk, 2 day (GateRush.Core.TimeOfDay).</summary>
+        public int StadiumLighting;
     }
 
     [Serializable]
@@ -89,6 +91,7 @@ namespace GateRush.Core
             Graphics.Clamp();
             Feed.VtxNoise = Mathf.Clamp(Feed.VtxNoise, 0, 2);
             Feed.MotorVolume = Mathf.Clamp01(Feed.MotorVolume);
+            Feed.StadiumLighting = Mathf.Clamp(Feed.StadiumLighting, 0, 2);
 
             Rates.Roll = ClampAxis(Rates.Type, Rates.Roll);
             Rates.Pitch = ClampAxis(Rates.Type, Rates.Pitch);

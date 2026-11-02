@@ -236,7 +236,7 @@ namespace GateRush.EditorTools.Art
                 var go = new GameObject("Art " + name) { layer = layer };
                 go.transform.SetParent(visual, false);
                 go.transform.localPosition = pos;
-                go.transform.localRotation = rot == default ? Quaternion.identity : rot;
+                go.transform.localRotation = rot.x == 0f && rot.y == 0f && rot.z == 0f && rot.w == 0f ? Quaternion.identity : rot;
                 go.transform.localScale = size;
                 go.AddComponent<MeshFilter>().sharedMesh = BoxAsset(size);
                 var mr = go.AddComponent<MeshRenderer>();

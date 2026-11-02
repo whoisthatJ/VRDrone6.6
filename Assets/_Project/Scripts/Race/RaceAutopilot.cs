@@ -86,9 +86,13 @@ namespace GateRush.Race
             // Aim at a point before the gate, then through it once lined up and close.
             // Past the plane without the gate counting = missed: loop back to a longer approach.
             float along = Vector3.Dot(pos - centre, gateFwd);
+            // Only commit to the opening once lined up with it: on a bend the quad reaches the last few metres from
+            // the side, so keep steering for the approach point until the sideways offset is small.
+            float offAxis = Mathf.Abs(Vector3.Dot(pos - centre, Vector3.Cross(Vector3.up, gateFwd).normalized));
+            bool lined = offAxis < 0.8f || along > -1.5f;
             Vector3 target;
             if (along >= 0f) target = centre - gateFwd * (approachDistance * 2f);
-            else if (along < -approachDistance) target = centre - gateFwd * approachDistance;
+            else if (along < -approachDistance || !lined) target = centre - gateFwd * approachDistance;
             else target = centre + gateFwd * 4f;
 
             Vector3 fwd = vehicle.transform.forward;

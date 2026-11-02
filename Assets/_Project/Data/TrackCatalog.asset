@@ -29,6 +29,10 @@ MonoBehaviour:
     DisplayName: Spline Test Loop
     Description: Figure-eight lane track with an overpass (spline track system test).
     Json: {fileID: 4900000, guid: 9c367b8fd3d888d41ba92c0abd0a3c02, type: 3}
+  - Id: stadium-oval
+    DisplayName: Stadium Oval
+    Description: 'Floodlit football stadium: an easy oval around the pitch. Learn the lanes and gates.'
+    Json: {fileID: 4900000, guid: 481cab861150c8a458796624b8d6e691, type: 3}
   Environments:
   - Environment: field
     SceneName: Track_Field
@@ -36,3 +40,5 @@ MonoBehaviour:
     SceneName: Track_Hangar
   - Environment: industrial
     SceneName: Track_Industrial
+  - Environment: stadium
+    SceneName: Track_Stadium

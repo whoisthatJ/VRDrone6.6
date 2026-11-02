@@ -365,6 +365,7 @@ namespace GateRush.UI
             var feed = S.Feed;
             UiKit.SliderRow(c, "Motor volume", 0f, 0f, 1f, feed.MotorVolume, v => F(v * 100f, "0") + " %", v => { feed.MotorVolume = v; Changed(); }, ContentWidth);
             UiKit.StepperRow(c, "Debug readout", -90f, new[] { "Off", "On" }, feed.ShowDebugOverlay ? 1 : 0, i => { feed.ShowDebugOverlay = i == 1; Changed(); }, ContentWidth);
+            UiKit.StepperRow(c, "Stadium lighting", -180f, new[] { "Night (floodlights)", "Dusk", "Day" }, feed.StadiumLighting, i => { feed.StadiumLighting = i; Changed(); }, ContentWidth);
         }
 
         private void BuildPhysics(RectTransform c)

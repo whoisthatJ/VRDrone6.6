@@ -24,7 +24,7 @@ namespace GateRush.EditorTools.Builders
     {
         public const string TrackLayerName = "TrackGeometry";
         public const string LocalQuadLayerName = "LocalQuad";
-        public static readonly string[] Environments = { "field", "hangar", "industrial" };
+        public static readonly string[] Environments = { "field", "hangar", "industrial", "stadium" };
         private const string MatDir = "Assets/_Project/Art/Materials";
         private const string DataDir = "Assets/_Project/Data";
 

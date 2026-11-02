@@ -18,6 +18,7 @@ namespace GateRush.EditorTools.Builders
         public static IEnumerable<TrackData> All()
         {
             yield return SplineTest();
+            yield return StadiumOval();
         }
 
         /// <summary>Writes every built-in spline track's JSON and definition asset.</summary>
@@ -109,6 +110,70 @@ namespace GateRush.EditorTools.Builders
             foreach (float x in new[] { -36f, 36f })
                 t.Props.Add(new PropData { Type = "LandingPad", Position = new Vector3(x, 0f, 0f) });
             return t;
+        }
+
+        /// <summary>
+        /// Stadium beginner track (T3): an oval along the middle of the 400 m running track (straights 84.4 m, radius
+        /// 41 m, ~430 m), flown anticlockwise, with kit gates on the straights and bends and the start pad on the outer lanes.
+        /// </summary>
+        public static TrackData StadiumOval()
+        {
+            var t = new TrackData { Id = "stadium-oval", Name = "Stadium Oval", Author = "GateRush", Environment = "stadium", Laps = 3 };
+            var r = t.Route;
+            r.CorridorWidth = 4f;
+            r.FlightHeight = 1.5f;
+            const float half = 42.195f, radius = 41.38f;
+            // Knots around the oval, anticlockwise seen from above (start on the south straight heading +X).
+            foreach (var p in OvalPoints(half, radius, 20)) r.Knots.Add(new RouteKnot { Position = new Vector3(p.x, 1.5f, p.y) });
+            var route = new TrackRoute(r);
+            float D(float x, float z) => route.ClosestDistance(new Vector3(x, 1.5f, z));
+
+            void Add(string type, float d, string color, bool checkpoint = true, float lateral = 0f) =>
+                r.Obstacles.Add(new RouteObstacle { Type = type, Distance = d, Color = color, IsCheckpoint = checkpoint, Lateral = lateral });
+
+            // Narrow gates (Single, Cube, Double) sit where the line is straight; the bends get ladders and wide arches.
+            Add("Arch", D(0f, -radius), "white"); // finish on the south straight
+            Add("Double", D(30f, -radius), "red");
+            Add("Ladder", D(half + radius * 0.7f, -radius * 0.7f), "green");
+            Add("Arch", D(half + radius, 0f), "green");
+            Add("Single", D(half - 2f, radius), "red"); // bend exit
+            Add("Slalom", D(10f, radius), "white");
+            Add("Cube", D(-30f, radius), "green");
+            Add("Single", D(-half + 2f, radius), "blue"); // bend entry
+            Add("Arch", D(-half - radius, 0f), "blue");
+            Add("Ladder", D(-half - radius * 0.7f, -radius * 0.7f), "green");
+            Add("Single", D(-30f, -radius), "red");
+            r.FinishObstacle = 0;
+
+            // Start pad on the outer lanes of the south straight, 12 m before the finish arch, facing along it.
+            float dPad = r.Obstacles[0].Distance - 12f;
+            var pad = route.Sample(dPad);
+            Vector3 padPos = pad.Position + pad.Right * 4.6f;
+            t.Spawn.Position = new Vector3(padPos.x, r.GroundHeight + 0.15f, padPos.z);
+            t.Spawn.Yaw = Mathf.Atan2(pad.FlatForward.x, pad.FlatForward.z) * Mathf.Rad2Deg;
+            foreach (float side in new[] { -4.2f, 4.2f })
+                t.Props.Add(new PropData { Type = "Flag", Position = new Vector3(padPos.x, 0f, padPos.z) + pad.Right * 1.2f + pad.FlatForward * side, Euler = new Vector3(0f, t.Spawn.Yaw, 0f) });
+            t.Props.Add(new PropData { Type = "StartPad", Position = new Vector3(padPos.x, 0f, padPos.z), Euler = new Vector3(0f, t.Spawn.Yaw, 0f) });
+            return t;
+        }
+
+        /// <summary>Points on a stadium-shaped oval (two straights of ±<paramref name="half"/> and semicircles of <paramref name="radius"/>), anticlockwise from (−half, −radius).</summary>
+        public static List<Vector2> OvalPoints(float half, float radius, int perArc)
+        {
+            var pts = new List<Vector2>();
+            for (int i = 0; i < 4; i++) pts.Add(new Vector2(-half + i * half * 2f / 4f, -radius));
+            for (int i = 0; i < perArc; i++)
+            {
+                float a = -Mathf.PI / 2 + i * Mathf.PI / perArc;
+                pts.Add(new Vector2(half + Mathf.Cos(a) * radius, Mathf.Sin(a) * radius));
+            }
+            for (int i = 0; i < 4; i++) pts.Add(new Vector2(half - i * half * 2f / 4f, radius));
+            for (int i = 0; i < perArc; i++)
+            {
+                float a = Mathf.PI / 2 + i * Mathf.PI / perArc;
+                pts.Add(new Vector2(-half + Mathf.Cos(a) * radius, Mathf.Sin(a) * radius));
+            }
+            return pts;
         }
 
         /// <summary>The test loop's flight line at parameter <paramref name="t"/> (radians): lemniscate of Bernoulli, raised around t = 3π/2.</summary>

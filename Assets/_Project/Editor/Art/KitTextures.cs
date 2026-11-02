@@ -20,6 +20,7 @@ namespace GateRush.EditorTools.Art
             LandingPad();
             StartGrid();
             ChevronSign();
+            LedBanner();
             AssetDatabase.Refresh();
             return "kit textures written";
         }
@@ -178,6 +179,43 @@ namespace GateRush.EditorTools.Art
                 px[y * w + x] = C(g, g, g);
             }
             Save(File("ChevronSign", "Albedo"), w, h, px);
+        }
+
+        /// <summary>
+        /// Stadium perimeter LED board content (T3): "GATERUSH" in white between orange chevrons on a dark navy
+        /// screen with a fine pixel grid. U runs along the board, repeated and scrolled by LedBoardScroller.
+        /// </summary>
+        public static void LedBanner()
+        {
+            const int w = 1024, h = 128;
+            var px = new Color32[w * h];
+            var navy = new Color(0.02f, 0.04f, 0.12f);
+            var orange = new Color(1f, 0.38f, 0.04f);
+            for (int y = 0; y < h; y++)
+            for (int x = 0; x < w; x++)
+            {
+                float u = (x + 0.5f) / w, v = (y + 0.5f) / h;
+                var c = navy;
+                // Chevrons at both ends, pointing in the scroll direction.
+                foreach (float tip in new[] { 0.09f, 0.15f, 0.87f, 0.93f })
+                {
+                    float line = tip - 0.035f * Mathf.Abs(v - 0.5f) * 2f;
+                    if (u <= line && u >= line - 0.022f && Mathf.Abs(v - 0.5f) < 0.38f) c = orange;
+                }
+                // Orange rules along the top and bottom edges.
+                if (v < 0.06f || v > 0.94f) c = orange * 0.8f;
+                px[y * w + x] = C(c.r, c.g, c.b);
+            }
+            DrawText(px, w, h, "GATERUSH", x0: 0.18f, y0: 0.12f, cell: 0.0137f, vertical: false, color: Color.white);
+            // LED pixel grid: dark gaps every 4 px.
+            for (int y = 0; y < h; y++)
+            for (int x = 0; x < w; x++)
+                if (x % 4 == 3 || y % 4 == 3)
+                {
+                    var p = px[y * w + x];
+                    px[y * w + x] = new Color32((byte)(p.r * 0.35f), (byte)(p.g * 0.35f), (byte)(p.b * 0.35f), 255);
+                }
+            Save(File("LedBanner", "Albedo"), w, h, px);
         }
 
         // ---------- 5×7 bitmap font for the brand and slot numbers ----------

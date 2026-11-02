@@ -61,10 +61,12 @@ namespace GateRush.EditorTools.Builders
             catalog.Tracks.Add(Entry("hangar", "Hangar 7", "Indoor hall: tight turns between crates, columns and walls. Whoop heaven."));
             catalog.Tracks.Add(Entry("industrial", "Dockyard", "Container corridors and a gate above a container stack."));
             catalog.Tracks.Add(Entry("spline-test", "Spline Test Loop", "Figure-eight lane track with an overpass (spline track system test)."));
+            catalog.Tracks.Add(Entry("stadium-oval", "Stadium Oval", "Floodlit football stadium: an easy oval around the pitch. Learn the lanes and gates."));
             catalog.Environments.Clear();
             catalog.Environments.Add(new TrackCatalog.EnvironmentScene { Environment = "field", SceneName = "Track_Field" });
             catalog.Environments.Add(new TrackCatalog.EnvironmentScene { Environment = "hangar", SceneName = "Track_Hangar" });
             catalog.Environments.Add(new TrackCatalog.EnvironmentScene { Environment = "industrial", SceneName = "Track_Industrial" });
+            catalog.Environments.Add(new TrackCatalog.EnvironmentScene { Environment = "stadium", SceneName = "Track_Stadium" });
             EditorUtility.SetDirty(catalog);
             return catalog;
         }

@@ -22,7 +22,7 @@ namespace GateRush.EditorTools.Art
         public const int Width = 1920, Height = 1080;
         public const string Root = "Docs/screenshots";
         public const string PrefabsPath = "Assets/_Project/Data/TrackPrefabs.asset";
-        public static readonly string[] Environments = { "Field", "Hangar", "Industrial" };
+        public static readonly string[] Environments = { "Field", "Hangar", "Industrial", "Stadium" };
 
         private const int LocalQuadLayer = 9, VRRoomLayer = 10, EditorUILayer = 11;
 
@@ -75,6 +75,7 @@ namespace GateRush.EditorTools.Art
         {
             "Field" => CourseLibrary.Field(),
             "Hangar" => CourseLibrary.Hangar(),
+            "Stadium" => RouteLibrary.StadiumOval(),
             _ => CourseLibrary.Industrial(),
         };
 
@@ -93,6 +94,50 @@ namespace GateRush.EditorTools.Art
             {
                 Object.DestroyImmediate(track.Root.gameObject);
             }
+        }
+
+        public static string CaptureStadiumDeferred(string tag) => ArtJobs.RunDeferred("stadium shots " + tag, () => CaptureStadium(tag));
+
+        /// <summary>Track_Stadium under each time-of-day preset: overview, pitch-side and FPV at the start (T3).</summary>
+        public static string CaptureStadium(string tag)
+        {
+            ArtJobs.RequireCleanScenes();
+            const string sceneName = "Track_Stadium";
+            EditorSceneManager.OpenScene(ArtJobs.ScenePath(sceneName), OpenSceneMode.Single);
+            var prefabs = AssetDatabase.LoadAssetAtPath<TrackPrefabs>(PrefabsPath);
+            var track = TrackLoader.Load(RouteLibrary.StadiumOval(), prefabs);
+            var lighting = Object.FindAnyObjectByType<GateRush.Core.StadiumLighting>();
+            var sb = new StringBuilder(sceneName + ":");
+            try
+            {
+                var source = GameObject.Find("Main Camera")?.GetComponent<Camera>();
+                var generic = TrackBookmarks(track);
+                foreach (var time in new[] { GateRush.Core.TimeOfDay.Night, GateRush.Core.TimeOfDay.Dusk, GateRush.Core.TimeOfDay.Day })
+                {
+                    lighting.Apply(time);
+                    var shots = new List<Bookmark>
+                    {
+                        new Bookmark("overview", new Vector3(-25f, 80f, -128f), new Vector3(0f, 0f, 8f), 52f),
+                        new Bookmark("touchline", new Vector3(-20f, 3.5f, -33f), new Vector3(15f, 6f, 60f), 60f),
+                        new Bookmark("bend", new Vector3(60f, 2.2f, -40f), new Vector3(80f, 1.5f, 10f), 60f),
+                    };
+                    shots.AddRange(generic.FindAll(b => b.Name == "spawn" || b.Name == "fpv"));
+                    for (int i = 0; i < shots.Count; i++)
+                    {
+                        var b = shots[i];
+                        b.Name = $"{time.ToString().ToLowerInvariant()}_{b.Name}";
+                        shots[i] = b;
+                    }
+                    sb.Append(' ').Append(CaptureSet(sceneName, shots, source, $"{tag}"));
+                }
+                lighting.Apply(GateRush.Core.TimeOfDay.Night);
+            }
+            finally
+            {
+                Object.DestroyImmediate(track.Root.gameObject);
+                ArtJobs.ReturnToBoot();
+            }
+            return sb.ToString();
         }
 
         public static string CaptureMenu(string tag)
@@ -193,6 +238,8 @@ namespace GateRush.EditorTools.Art
                 int mask = ~((1 << VRRoomLayer) | (1 << EditorUILayer));
                 if (bm.HideLocalQuad) mask &= ~(1 << LocalQuadLayer);
                 cam.cullingMask = mask;
+                // GPU-instanced crowds of seats are queued per camera.
+                GateRush.Core.InstancedSeats.DrawAll(cam);
 
                 // Camera.CopyFrom does not copy URP's per-camera data: mirror post-processing and AA from the game camera.
                 var data = cam.GetUniversalAdditionalCameraData();
