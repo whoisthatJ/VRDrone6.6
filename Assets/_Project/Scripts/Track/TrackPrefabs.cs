@@ -33,6 +33,8 @@ namespace GateRush.Track
             public Material Wear;
             [Tooltip("Start pad mat.")]
             public Material StartPad;
+            [Tooltip("Trainer racing line (GateRush/LED; its colour strip is generated per track).")]
+            public Material RacingLine;
         }
 
         public List<Entry> Gates = new List<Entry>();

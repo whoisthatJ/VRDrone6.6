@@ -87,7 +87,13 @@ namespace GateRush.Track
             spawn.SetParent(root, false);
             spawn.SetPositionAndRotation(data.Spawn.Position, Quaternion.Euler(0f, data.Spawn.Yaw, 0f));
 
-            return new LoadedTrack { Data = data, Root = root, Gates = gates, Spawn = spawn, Route = route };
+            var racingLine = GateRush.Track.RacingLine.Build(route, data.Route, kit?.RacingLine, root);
+            racingLine.SetActive(false);
+
+            return new LoadedTrack
+            {
+                Data = data, Root = root, Gates = gates, Spawn = spawn, Route = route, RacingLine = racingLine, LaneColliders = laneColliders,
+            };
         }
 
         /// <summary>Height of the lane deck under the route at <paramref name="p"/> (ground, or raised where the route climbs).</summary>

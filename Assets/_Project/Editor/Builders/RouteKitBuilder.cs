@@ -34,9 +34,26 @@ namespace GateRush.EditorTools.Builders
             w.renderQueue = 2950;
             EditorUtility.SetDirty(w);
             kit.Wear = w;
+            kit.RacingLine = Led("M_Route_RacingLine", 2.6f);
             prefabs.RouteKit = kit;
             EditorUtility.SetDirty(prefabs);
             AssetDatabase.SaveAssets();
+        }
+
+        private static Material Led(string name, float intensity)
+        {
+            string path = $"{Dir}/{name}.mat";
+            var m = AssetDatabase.LoadAssetAtPath<Material>(path);
+            if (m == null)
+            {
+                m = new Material(Shader.Find("GateRush/LED"));
+                AssetDatabase.CreateAsset(m, path);
+            }
+            m.shader = Shader.Find("GateRush/LED");
+            m.SetColor("_BaseColor", Color.white);
+            m.SetFloat("_Intensity", intensity);
+            EditorUtility.SetDirty(m);
+            return m;
         }
 
         private static Material Emissive(string name, Color color, float intensity)

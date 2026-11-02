@@ -186,6 +186,7 @@ namespace GateRush.Game
                 losStand.SetPositionAndRotation(new Vector3(pos.x, 0f, pos.z), Quaternion.LookRotation(s.rotation * new Vector3(4f, 0f, 14f)));
             }
             race.SetCourse(Track.Gates, Track.Spawn, data.Id, data.Laps, data.Name);
+            ApplyGuidance(SaveSystem.Settings);
             Debug.Log($"[GateRush] Track '{data.Name}' loaded: {Track.Gates.Length} gates, {data.Props.Count} props, {data.Laps} laps");
         }
 
@@ -224,6 +225,17 @@ namespace GateRush.Game
             if (views != null) OnViewChanged(views.Mode);
 
             if (race != null) race.PilotName = s.PilotName;
+            ApplyGuidance(s);
+        }
+
+        /// <summary>Route guidance (gate highlights, racing line, HUD arrow) and ghost lanes for the loaded track.</summary>
+        private void ApplyGuidance(GameSettings s)
+        {
+            var level = (RouteGuidanceLevel)s.Guidance.RouteGuidance;
+            if (race != null) race.Guidance = level;
+            if (Track == null) return;
+            if (Track.RacingLine != null) Track.RacingLine.SetActive(level == RouteGuidanceLevel.Trainer);
+            if (Track.LaneColliders != null) Track.LaneColliders.SetActive(!s.Guidance.GhostLanes);
         }
 
         private void ApplyQuad(GameSettings s)

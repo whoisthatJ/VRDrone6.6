@@ -75,6 +75,23 @@ namespace GateRush.Race
         public bool TryCross(Vector3 from, Vector3 to, out float fraction) =>
             GateCrossing.TryCross(from, to, OpeningCenterWorld, transform.rotation, OpeningSize * 0.5f, out fraction);
 
+        /// <summary>
+        /// True when the segment crosses the opening's plane in the flying direction outside the opening but within
+        /// <paramref name="radius"/> of its centre: the pilot flew past the gate instead of through it.
+        /// </summary>
+        public bool PassedBeside(Vector3 from, Vector3 to, float radius)
+        {
+            Vector3 c = OpeningCenterWorld;
+            Vector3 n = transform.forward;
+            float d0 = Vector3.Dot(from - c, n), d1 = Vector3.Dot(to - c, n);
+            if (!(d0 < 0f && d1 >= 0f)) return false;
+            Vector3 hit = Vector3.Lerp(from, to, d0 / (d0 - d1));
+            if ((hit - c).sqrMagnitude > radius * radius) return false;
+            Vector3 local = Quaternion.Inverse(transform.rotation) * (hit - c);
+            Vector2 half = OpeningSize * 0.5f;
+            return Mathf.Abs(local.x) > half.x || Mathf.Abs(local.y) > half.y;
+        }
+
         public void SetVisualState(GateVisualState state)
         {
             if (state == _state) return;

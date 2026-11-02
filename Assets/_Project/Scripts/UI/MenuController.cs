@@ -366,6 +366,11 @@ namespace GateRush.UI
             UiKit.SliderRow(c, "Motor volume", 0f, 0f, 1f, feed.MotorVolume, v => F(v * 100f, "0") + " %", v => { feed.MotorVolume = v; Changed(); }, ContentWidth);
             UiKit.StepperRow(c, "Debug readout", -90f, new[] { "Off", "On" }, feed.ShowDebugOverlay ? 1 : 0, i => { feed.ShowDebugOverlay = i == 1; Changed(); }, ContentWidth);
             UiKit.StepperRow(c, "Stadium lighting", -180f, new[] { "Night (floodlights)", "Dusk", "Day" }, feed.StadiumLighting, i => { feed.StadiumLighting = i; Changed(); }, ContentWidth);
+            var guide = S.Guidance;
+            UiKit.StepperRow(c, "Route guidance", -270f, new[] { "Off", "Standard", "Trainer" }, guide.RouteGuidance, i => { guide.RouteGuidance = i; Changed(); }, ContentWidth);
+            UiKit.StepperRow(c, "Ghost lanes", -360f, new[] { "Off", "On" }, guide.GhostLanes ? 1 : 0, i => { guide.GhostLanes = i == 1; Changed(); }, ContentWidth);
+            UiKit.Label(c, "Trainer adds a racing line (green: fast, yellow: brake, red: slow) and an arrow to the next gate. Ghost lanes: fly through the lane posts.",
+                new Vector2(0f, -450f), new Vector2(ContentWidth, 60f), 26f, TextAlignmentOptions.TopLeft, UiKit.DimTextColor);
         }
 
         private void BuildPhysics(RectTransform c)

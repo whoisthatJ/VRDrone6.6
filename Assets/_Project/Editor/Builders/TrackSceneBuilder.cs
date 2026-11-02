@@ -587,11 +587,24 @@ namespace GateRush.EditorTools.Builders
             results.alignment = TextAlignmentOptions.TopLeft;
             panel.SetActive(false);
 
+            var flash = new GameObject("Missed Gate Flash", typeof(RectTransform), typeof(Image));
+            flash.transform.SetParent(canvas, false);
+            flash.transform.SetAsFirstSibling();
+            var frt = (RectTransform)flash.transform;
+            frt.anchorMin = Vector2.zero;
+            frt.anchorMax = Vector2.one;
+            frt.offsetMin = frt.offsetMax = Vector2.zero;
+            var flashImage = flash.GetComponent<Image>();
+            flashImage.color = new Color(1f, 0.08f, 0.05f, 0f);
+            flashImage.raycastTarget = false;
+            flashImage.enabled = false;
+
             var hud = canvas.gameObject.AddComponent<RaceHud>();
             var so = new SerializedObject(hud);
             so.FindProperty("session").objectReferenceValue = race;
             so.FindProperty("lapInfo").objectReferenceValue = lap;
             so.FindProperty("centre").objectReferenceValue = centre;
+            so.FindProperty("missedFlash").objectReferenceValue = flashImage;
             so.FindProperty("resultsPanel").objectReferenceValue = panel;
             so.FindProperty("resultsText").objectReferenceValue = results;
             so.ApplyModifiedPropertiesWithoutUndo();

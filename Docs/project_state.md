@@ -32,7 +32,7 @@ Missing for the plan: `com.unity.cinemachine` (6.6.0 available), `com.unity.spli
 - Desktop camera set (Cinemachine FPV / chase / LOS / replay), screen-space HUD with next-gate indicator, Low preset, frame cap (T0).
 - Spline track system, lane lights, chevrons, supports, ordered checkpoints by route distance (T1).
 - ~~Truss/obstacle kit with LODs, showroom (T2)~~ done; ~~stadium environment with Night/Dusk/Day (T3)~~ done (Track_Stadium, Stadium Oval); ~~Serpent Arena layout (T4)~~ done (serpent-arena, 477 m, 4 overpasses).
-- Route guidance modes, racing-line ribbon, off-screen arrow (T5); finish cube + cinematic finish + results overlay (T6).
+- ~~Route guidance modes, racing-line ribbon, off-screen arrow (T5)~~ done; finish cube + cinematic finish + results overlay (T6).
 - Garage scene, UI Toolkit screens, parts definitions, procedural parts, `BuildComposer`, stats from physics (T7–T8).
 
 ## Conflicts with the plan

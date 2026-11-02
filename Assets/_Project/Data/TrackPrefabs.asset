@@ -68,3 +68,4 @@ MonoBehaviour:
     Support: {fileID: 2100000, guid: 93326f563867af24b98eb321136071e4, type: 2}
     Wear: {fileID: 2100000, guid: 0e1ab172325f7534295dd4a09e74d0ba, type: 2}
     StartPad: {fileID: 2100000, guid: d7540b8e290bc084dbfbb4cf4bef85c6, type: 2}
+    RacingLine: {fileID: 2100000, guid: aa54bd0acfe191c409e4ec19c849f15f, type: 2}

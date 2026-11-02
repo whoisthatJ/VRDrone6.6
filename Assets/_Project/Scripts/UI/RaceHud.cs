@@ -14,6 +14,9 @@ namespace GateRush.UI
         [SerializeField] private RaceSession session;
         [SerializeField] private TMP_Text lapInfo;
         [SerializeField] private TMP_Text centre;
+        [Tooltip("Full-screen red tint that flashes when a gate is missed.")]
+        [SerializeField] private UnityEngine.UI.Image missedFlash;
+        [SerializeField] private float missedFlashAlpha = 0.14f;
         [SerializeField] private GameObject resultsPanel;
         [SerializeField] private TMP_Text resultsText;
         [SerializeField] private float lapFlashSeconds = 2f;
@@ -69,6 +72,20 @@ namespace GateRush.UI
                     timer.CurrentLap, timer.TotalLaps, (float)timer.CurrentLapTime(now), (float)timer.TotalTime(now), best);
             }
 
+            if (missedFlash != null)
+            {
+                // Two quick pulses fading over the hint time.
+                float left = (float)(session.WrongGateUntil - now);
+                float a = left > 0f ? missedFlashAlpha * Mathf.Clamp01(left / 1.5f) * (0.6f + 0.4f * Mathf.Cos(left * 12f)) : 0f;
+                var c = missedFlash.color;
+                if (!Mathf.Approximately(c.a, a))
+                {
+                    c.a = a;
+                    missedFlash.color = c;
+                    missedFlash.enabled = a > 0.001f;
+                }
+            }
+
             if (centre == null) return;
             switch (session.Phase)
             {
@@ -86,7 +103,7 @@ namespace GateRush.UI
                     break;
                 case RacePhase.Racing:
                     if (session.WaitingForRelease) SetCentre(CentreMode.Hold, "ARM + THROTTLE UP");
-                    else if (now < session.WrongGateUntil) SetCentre(CentreMode.MissedGate, "MISSED GATE");
+                    else if (now < session.WrongGateUntil) SetCentre(CentreMode.MissedGate, "<color=#ff4a3d>MISSED GATE - GO BACK</color>");
                     else if (now < _lapFlashUntil) ShowLapFlash();
                     else if (now - timer.StartTime < goSeconds) SetCentre(CentreMode.Go, "GO!");
                     else SetCentre(CentreMode.None, "");

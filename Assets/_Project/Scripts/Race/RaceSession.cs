@@ -66,6 +66,22 @@ namespace GateRush.Race
         public float CountdownRemaining => _phase == RacePhase.Countdown ? (float)Math.Max(0, _countdownEnd - Now) : 0f;
         public bool WaitingForRelease => _holdForRelease;
         public double WrongGateUntil { get; private set; }
+        /// <summary>Flying past (not through) the next gate within this distance counts as missing it.</summary>
+        public const float MissRadius = 5f;
+
+        private GateRush.Core.RouteGuidanceLevel _guidance = GateRush.Core.RouteGuidanceLevel.Standard;
+
+        /// <summary>Route guidance (T5): Off shows every gate plain; Standard/Trainer highlight next, upcoming and passed.</summary>
+        public GateRush.Core.RouteGuidanceLevel Guidance
+        {
+            get => _guidance;
+            set
+            {
+                if (_guidance == value) return;
+                _guidance = value;
+                if (gates != null && _timer != null) UpdateGateVisuals();
+            }
+        }
         public float LastLapTime { get; private set; }
         public bool LastLapWasPersonalBest { get; private set; }
         /// <summary>1-based leaderboard rank of the last finished race, or -1.</summary>
@@ -216,6 +232,13 @@ namespace GateRush.Race
                 GatePassed?.Invoke(i, PassResult.WrongGate);
                 return;
             }
+
+            // Flew past the next gate: warn and point back to it (the lap only counts through every gate in order).
+            if (_phase == RacePhase.Racing && gates[next].PassedBeside(_prevPos, cur, MissRadius))
+            {
+                WrongGateUntil = now + wrongGateHintSeconds;
+                GatePassed?.Invoke(next, PassResult.WrongGate);
+            }
         }
 
         private void OnPass(int gate, double time)
@@ -278,13 +301,16 @@ namespace GateRush.Race
             bool showStart = _phase == RacePhase.Idle || _phase == RacePhase.Countdown;
             int next = racing ? _timer.NextCheckpoint : 0;
             int upcoming = gates.Length > 1 ? (next + 1) % gates.Length : -1;
+            bool guided = _guidance != GateRush.Core.RouteGuidanceLevel.Off;
             for (int i = 0; i < gates.Length; i++)
             {
                 GateVisualState s = GateVisualState.Idle;
-                if (racing || showStart)
+                if (guided && (racing || showStart))
                 {
                     if (i == next) s = GateVisualState.Next;
                     else if (i == upcoming) s = GateVisualState.Upcoming;
+                    // Gates already flown this lap (gate 0 counts once the lap is under way).
+                    else if (racing && next > 0 && i < next) s = GateVisualState.Passed;
                 }
                 gates[i].SetVisualState(s);
             }

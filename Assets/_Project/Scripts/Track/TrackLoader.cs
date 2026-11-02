@@ -13,6 +13,10 @@ namespace GateRush.Track
         public Transform Spawn;
         /// <summary>The sampled route of a spline track (null for gate-list tracks).</summary>
         public TrackRoute Route;
+        /// <summary>Trainer racing line (spline tracks; inactive until route guidance turns it on).</summary>
+        public GameObject RacingLine;
+        /// <summary>Colliders of the lane posts (spline tracks; off with Ghost lanes).</summary>
+        public GameObject LaneColliders;
     }
 
     /// <summary>Instantiates a <see cref="TrackData"/> (gates in order, props, spawn point) under a new root.</summary>

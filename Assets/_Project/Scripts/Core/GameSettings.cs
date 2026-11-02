@@ -42,6 +42,26 @@ namespace GateRush.Core
         public int StadiumLighting;
     }
 
+    /// <summary>How much the game helps you find the route (T5).</summary>
+    public enum RouteGuidanceLevel
+    {
+        /// <summary>Only the physical track: lane lights and chevrons.</summary>
+        Off = 0,
+        /// <summary>Next gate glows and pulses, the one after shows an outline, passed gates dim.</summary>
+        Standard = 1,
+        /// <summary>Standard + a racing line coloured by recommended speed and an off-screen arrow to the next gate.</summary>
+        Trainer = 2,
+    }
+
+    [Serializable]
+    public sealed class GuidancePrefs
+    {
+        /// <summary><see cref="RouteGuidanceLevel"/>.</summary>
+        public int RouteGuidance = (int)RouteGuidanceLevel.Standard;
+        /// <summary>Lane posts have no colliders (beginners fly through them).</summary>
+        public bool GhostLanes;
+    }
+
     [Serializable]
     public sealed class PhysicsPrefs
     {
@@ -75,6 +95,7 @@ namespace GateRush.Core
         public PhysicsPrefs Physics = new PhysicsPrefs();
         public FeedPrefs Feed = new FeedPrefs();
         public GraphicsPrefs Graphics = new GraphicsPrefs();
+        public GuidancePrefs Guidance = new GuidancePrefs();
 
         /// <summary>Brings every value into its valid range (after loading or editing).</summary>
         public void Clamp()
@@ -88,6 +109,8 @@ namespace GateRush.Core
             Physics ??= new PhysicsPrefs();
             Feed ??= new FeedPrefs();
             Graphics ??= new GraphicsPrefs();
+            Guidance ??= new GuidancePrefs();
+            Guidance.RouteGuidance = Mathf.Clamp(Guidance.RouteGuidance, 0, 2);
             Graphics.Clamp();
             Feed.VtxNoise = Mathf.Clamp(Feed.VtxNoise, 0, 2);
             Feed.MotorVolume = Mathf.Clamp01(Feed.MotorVolume);

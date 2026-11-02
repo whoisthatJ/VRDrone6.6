@@ -31,7 +31,9 @@ namespace GateRush.UI
         {
             var gate = race != null && race.isActiveAndEnabled ? race.NextGate : null;
             if (_camera == null || !_camera.isActiveAndEnabled) _camera = Camera.main;
-            if (gate == null || _camera == null)
+            // Route guidance (from the race): Off hides it; Standard shows the edge arrow only after a missed gate; Trainer always.
+            var guidance = race != null ? race.Guidance : GateRush.Core.RouteGuidanceLevel.Standard;
+            if (gate == null || _camera == null || guidance == GateRush.Core.RouteGuidanceLevel.Off)
             {
                 Show(false, false);
                 return;
@@ -46,6 +48,11 @@ namespace GateRush.UI
             {
                 Show(true, false);
                 marker.anchoredPosition = new Vector2((view.x - 0.5f) * size.x, (view.y - 0.5f) * size.y);
+            }
+            else if (guidance != GateRush.Core.RouteGuidanceLevel.Trainer && race.Now >= race.WrongGateUntil)
+            {
+                Show(false, false);
+                return;
             }
             else
             {

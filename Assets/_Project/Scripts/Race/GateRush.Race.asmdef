@@ -5,6 +5,7 @@
         "GateRush.Flight",
         "GateRush.Input",
         "GateRush.Vehicle",
+        "GateRush.Core",
         "Unity.InputSystem"
     ],
     "includePlatforms": [],
