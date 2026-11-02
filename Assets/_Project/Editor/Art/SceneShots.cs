@@ -33,6 +33,8 @@ namespace GateRush.EditorTools.Art
             public Quaternion Rotation;
             public float VerticalFov;
             public bool HideLocalQuad;
+            /// <summary>Vertical lens shift in frame heights (off-axis projection, like a cropped photo).</summary>
+            public float LensShiftY;
 
             public Bookmark(string name, Vector3 position, Vector3 lookAt, float verticalFov, bool hideLocalQuad = false)
             {
@@ -41,6 +43,7 @@ namespace GateRush.EditorTools.Art
                 Rotation = Quaternion.LookRotation(lookAt - position, Vector3.up);
                 VerticalFov = verticalFov;
                 HideLocalQuad = hideLocalQuad;
+                LensShiftY = 0f;
             }
         }
 
@@ -129,6 +132,58 @@ namespace GateRush.EditorTools.Art
                         shots[i] = b;
                     }
                     sb.Append(' ').Append(CaptureSet(sceneName, shots, source, $"{tag}"));
+                }
+                lighting.Apply(GateRush.Core.TimeOfDay.Night);
+            }
+            finally
+            {
+                Object.DestroyImmediate(track.Root.gameObject);
+                ArtJobs.ReturnToBoot();
+            }
+            return sb.ToString();
+        }
+
+        public static string CaptureSerpentDeferred(string tag) => ArtJobs.RunDeferred("serpent shots " + tag, () => CaptureSerpent(tag));
+
+        /// <summary>
+        /// Serpent Arena (T4) at night and dusk: the reference camera (pose recovered from the homography in
+        /// Docs/reference/trace_serpent.py with the principal point solved too: the reference is the top of a 68° frame), an overview and FPV.
+        /// </summary>
+        public static string CaptureSerpent(string tag)
+        {
+            ArtJobs.RequireCleanScenes();
+            const string sceneName = "Track_Stadium";
+            EditorSceneManager.OpenScene(ArtJobs.ScenePath(sceneName), OpenSceneMode.Single);
+            var prefabs = AssetDatabase.LoadAssetAtPath<TrackPrefabs>(PrefabsPath);
+            var track = TrackLoader.Load(RouteLibrary.SerpentArena(), prefabs);
+            var lighting = Object.FindAnyObjectByType<GateRush.Core.StadiumLighting>();
+            var sb = new StringBuilder(sceneName + ":");
+            try
+            {
+                var source = GameObject.Find("Main Camera")?.GetComponent<Camera>();
+                var generic = TrackBookmarks(track);
+                foreach (var time in new[] { GateRush.Core.TimeOfDay.Night, GateRush.Core.TimeOfDay.Dusk })
+                {
+                    lighting.Apply(time);
+                    var shots = new List<Bookmark>
+                    {
+                        // Optical axis + lens shift: the reference is the top part of a 68° frame (principal point below it).
+                        new Bookmark("serpent_reference", new Vector3(-52.35f, 43.04f, -51.9f), new Vector3(-30.31f, -5.53f, -24.41f), 41.6f) { LensShiftY = 0.552f },
+                        new Bookmark("serpent_overview", new Vector3(0f, 95f, -70f), new Vector3(0f, 0f, 2f), 50f),
+                    };
+                    foreach (var g in generic.FindAll(b => b.Name == "spawn" || b.Name == "fpv"))
+                    {
+                        var b = g;
+                        b.Name = "serpent_" + b.Name;
+                        shots.Add(b);
+                    }
+                    for (int i = 0; i < shots.Count; i++)
+                    {
+                        var b = shots[i];
+                        b.Name = $"{time.ToString().ToLowerInvariant()}_{b.Name}";
+                        shots[i] = b;
+                    }
+                    sb.Append(' ').Append(CaptureSet(sceneName, shots, source, tag));
                 }
                 lighting.Apply(GateRush.Core.TimeOfDay.Night);
             }
@@ -235,6 +290,12 @@ namespace GateRush.EditorTools.Art
                 cam.aspect = Width / (float)Height;
                 cam.nearClipPlane = 0.05f;
                 cam.farClipPlane = Mathf.Max(source != null ? source.farClipPlane : 0f, 1500f);
+                if (bm.LensShiftY != 0f)
+                {
+                    var proj = cam.projectionMatrix;
+                    proj.m12 += 2f * bm.LensShiftY;
+                    cam.projectionMatrix = proj;
+                }
                 int mask = ~((1 << VRRoomLayer) | (1 << EditorUILayer));
                 if (bm.HideLocalQuad) mask &= ~(1 << LocalQuadLayer);
                 cam.cullingMask = mask;

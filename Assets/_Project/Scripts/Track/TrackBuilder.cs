@@ -25,7 +25,7 @@ namespace GateRush.Track
         public const float PostSpacing = 2f;
         public const float ChevronSpacing = 3.5f;
         public const float LaneHeight = 0.3f;
-        public const float TubeRadius = 0.025f;
+        public const float TubeRadius = 0.04f;
         public const float SupportSpacing = 4f;
         /// <summary>Deck heights above ground below this stay on the ground (no supports).</summary>
         public const float ElevatedThreshold = 0.25f;

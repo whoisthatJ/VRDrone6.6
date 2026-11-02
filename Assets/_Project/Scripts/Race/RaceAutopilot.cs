@@ -130,7 +130,8 @@ namespace GateRush.Race
         private bool Watchdog(Vector3 pos, int next, Gate gate)
         {
             if (GaveUp) return true;
-            if (session.WaitingForRelease || vehicle.IsCrashed)
+            // A crashed quad doesn't move either, so a crash also ends in a rescue (it never re-arms by itself).
+            if (session.WaitingForRelease)
             {
                 _stuckAnchor = pos;
                 _stuckTimer = 0f;
@@ -154,7 +155,7 @@ namespace GateRush.Race
             string touching = "";
             foreach (var c in Physics.OverlapSphere(pos, 0.6f, ~0, QueryTriggerInteraction.Ignore))
                 touching += " " + c.transform.root.name + "/" + c.name;
-            LastReport = $"stuck before {gate.name} at {pos:F1}, touching:{(touching.Length > 0 ? touching : " nothing")}";
+            LastReport = $"{(vehicle.IsCrashed ? "crashed" : "stuck")} before {gate.name} at {pos:F1}, touching:{(touching.Length > 0 ? touching : " nothing")}";
 
             if (++_rescuesAtGate > maxRescuesPerGate)
             {

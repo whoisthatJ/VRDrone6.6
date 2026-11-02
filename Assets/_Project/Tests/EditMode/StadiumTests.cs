@@ -124,6 +124,42 @@ namespace GateRush.Tests
         }
 
         [Test]
+        public void SerpentArena_HasRaceLengthObstaclesAndClearOverpasses()
+        {
+            var entry = Tracks.Tracks.FirstOrDefault(t => t.Id == "serpent-arena");
+            Assert.IsNotNull(entry, "serpent-arena in the catalog");
+            var data = TrackData.FromJson(entry.Json.text);
+            Assert.AreEqual("stadium", data.Environment);
+            var route = new TrackRoute(data.Route);
+            Assert.That(route.Length, Is.InRange(450f, 650f), "lap length (plan: 450–650 m)");
+            Assert.That(data.Route.Obstacles.Count, Is.InRange(20, 25), "obstacles (plan: ~20–25)");
+            Assert.IsTrue(data.Route.FinishObstacle >= 0, "finish obstacle");
+
+            // Wherever the route passes over itself, the two levels are at least 2 m apart; and it does so 3+ times.
+            const float step = 1f;
+            var pts = new System.Collections.Generic.List<Vector3>();
+            for (float d = 0f; d < route.Length; d += step) pts.Add(route.Sample(d).Position);
+            int crossings = 0;
+            float lastCross = -100f;
+            for (int i = 0; i < pts.Count; i++)
+            for (int j = i + 30; j < pts.Count; j++)
+            {
+                if (pts.Count - (j - i) < 30) continue;
+                var a = pts[i];
+                var b = pts[j];
+                if (new Vector2(a.x - b.x, a.z - b.z).magnitude > 1.5f) continue;
+                Assert.That(Mathf.Abs(a.y - b.y), Is.GreaterThanOrEqualTo(2f), $"levels too close where the route crosses at {a} / {b}");
+                if (i - lastCross > 10f) crossings++;
+                lastCross = i;
+            }
+            Assert.That(crossings, Is.GreaterThanOrEqualTo(3), "overpasses");
+
+            // Everything stays on the pitch side of the LED boards.
+            foreach (var p in pts)
+                Assert.That(Mathf.Abs(p.z), Is.LessThan(34f), $"route point {p} off the pitch");
+        }
+
+        [Test]
         public void StadiumLightingSetting_IsClamped()
         {
             var s = new GameSettings();

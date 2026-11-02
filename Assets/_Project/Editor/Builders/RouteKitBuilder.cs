@@ -22,8 +22,8 @@ namespace GateRush.EditorTools.Builders
             var wear = Texture("Wear", 256, 256, WearPixel, TextureWrapMode.Clamp);
 
             var kit = prefabs.RouteKit ?? new TrackPrefabs.RouteKitMaterials();
-            kit.LaneWarm = Emissive("M_Route_LaneWarm", new Color(1f, 0.82f, 0.55f), 4f);
-            kit.LaneRed = Emissive("M_Route_LaneRed", new Color(1f, 0.02f, 0.015f), 2.2f);
+            kit.LaneWarm = Emissive("M_Route_LaneWarm", new Color(1f, 0.82f, 0.55f), 7f);
+            kit.LaneRed = Emissive("M_Route_LaneRed", new Color(1f, 0.02f, 0.015f), 4.5f);
             kit.Hardware = Lit("M_Route_Hardware", new Color(0.09f, 0.09f, 0.1f), 0.45f, 0.6f);
             kit.Support = Lit("M_Route_Support", new Color(0.6f, 0.07f, 0.06f), 0.5f, 0.35f);
             kit.Chevron = Lit("M_Route_Chevron", Color.white, 0.25f, 0f, chevron);

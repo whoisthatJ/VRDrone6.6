@@ -33,6 +33,10 @@ MonoBehaviour:
     DisplayName: Stadium Oval
     Description: 'Floodlit football stadium: an easy oval around the pitch. Learn the lanes and gates.'
     Json: {fileID: 4900000, guid: 481cab861150c8a458796624b8d6e691, type: 3}
+  - Id: serpent-arena
+    DisplayName: Serpent Arena
+    Description: 'The stadium race track: loops round the landing pads, a figure-eight at the centre spot and four overpasses.'
+    Json: {fileID: 4900000, guid: ce521c4b474270e46a5b63650c7880bf, type: 3}
   Environments:
   - Environment: field
     SceneName: Track_Field
