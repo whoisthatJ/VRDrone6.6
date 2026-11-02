@@ -140,6 +140,18 @@ namespace GateRush.UI
             if (_toast != null && _toast.gameObject.activeSelf && Time.unscaledTime > _toastUntil) _toast.gameObject.SetActive(false);
             if (_device != null) _device.text = DeviceName();
             var kb = Keyboard.current;
+            bool typing = _name != null && _name.isFocused;
+            if (kb != null && !typing)
+            {
+                if (kb.leftArrowKey.wasPressedThisFrame) StepChoice(-1);
+                if (kb.rightArrowKey.wasPressedThisFrame) StepChoice(1);
+            }
+            var pad = Gamepad.current;
+            if (pad != null)
+            {
+                if (pad.leftShoulder.wasPressedThisFrame) StepChoice(-1);
+                if (pad.rightShoulder.wasPressedThisFrame) StepChoice(1);
+            }
             if (kb != null && kb.escapeKey.wasPressedThisFrame)
             {
                 if (_dataPanel != null && _dataPanel.gameObject.activeSelf) _dataPanel.gameObject.SetActive(false);
@@ -560,7 +572,25 @@ namespace GateRush.UI
             if (_choices.Count == 0) return "";
             var c = _choices[_choice];
             bool preset = c.Id.StartsWith("preset-", StringComparison.Ordinal);
-            return (preset ? "PRESET: " : "SAVED: ") + c.Name.ToUpperInvariant();
+            return (preset ? "" : "SAVED: ") + c.Name.ToUpperInvariant() + $"  <color=#9aa>{_choice + 1}/{_choices.Count}</color>";
+        }
+
+        /// <summary>Grid Previous/Next: pages when the tab has several pages, otherwise selects the previous/next part.</summary>
+        private void PageOrStep(int dir)
+        {
+            var parts = PartsForTab();
+            int pages = Mathf.Max(1, (parts.Count + CardsPerPage - 1) / CardsPerPage);
+            if (pages > 1)
+            {
+                _page = (_page + dir + pages) % pages;
+                RefreshCards();
+                return;
+            }
+            if (_tab == PartSlot.Extra || parts.Count == 0) return;
+            int i = parts.FindIndex(IsSelected);
+            var part = parts[((i < 0 ? 0 : i + dir) % parts.Count + parts.Count) % parts.Count];
+            SetBuild(_build.With(part));
+            RefreshInfo(part);
         }
 
         private void StepChoice(int dir)
@@ -652,9 +682,19 @@ namespace GateRush.UI
             var presetRt = UiKit.Rect(left, "Preset", new Vector2(0f, -56f), new Vector2(360f, 48f));
             UiKit.Image(presetRt, Panel);
             Outline(presetRt, PanelLine, 2f);
-            _preset = UiKit.Label(presetRt, "", new Vector2(14f, 0f), new Vector2(280f, 48f), 20f, TextAlignmentOptions.MidlineLeft, Color.white);
-            FlatButton(presetRt, "^", new Vector2(300f, -2f), new Vector2(56f, 22f), new Color(0, 0, 0, 0), () => StepChoice(-1), 16f);
-            FlatButton(presetRt, "v", new Vector2(300f, -24f), new Vector2(56f, 22f), new Color(0, 0, 0, 0), () => StepChoice(1), 16f);
+            // Previous / next quad (presets, then your saved builds). Clicking the name also goes to the next one.
+            var presetNext = presetRt.gameObject.AddComponent<Button>();
+            presetNext.targetGraphic = presetRt.GetComponent<Image>();
+            presetRt.GetComponent<Image>().raycastTarget = true;
+            presetNext.onClick.AddListener(() => StepChoice(1));
+            _preset = UiKit.Label(presetRt, "", new Vector2(50f, 0f), new Vector2(260f, 48f), 18f, TextAlignmentOptions.Center, Color.white);
+            foreach (var (glyph, dir, px) in new[] { ("<", -1, 2f), (">", 1, 312f) })
+            {
+                int d = dir;
+                var arrow = FlatButton(presetRt, glyph, new Vector2(px, -2f), new Vector2(46f, 44f), new Color(1f, 1f, 1f, 0.12f), () => StepChoice(d), 28f);
+                var lrt = arrow.GetComponentInChildren<TMP_Text>().rectTransform;
+                lrt.offsetMin = lrt.offsetMax = Vector2.zero; // the default 16 px padding leaves no room in a 46 px button
+            }
 
             var names = new[] { (Stat.Thrust, "THRUST"), (Stat.Weight, "WEIGHT"), (Stat.TopSpeed, "TOP SPEED"), (Stat.Torque, "TORQUE"), (Stat.Drag, "DRAG"), (Stat.Rpm, "RPM"), (Stat.Temp, "PEAK TEMP") };
             float y = -118f;
@@ -710,9 +750,9 @@ namespace GateRush.UI
                 RefreshCards();
             });
             _grid = UiKit.Rect(right, "Grid", new Vector2(0f, -60f), new Vector2(415f, 410f));
-            var prev = FlatButton(right, "<   PREVIOUS", new Vector2(0f, -482f), new Vector2(200f, 50f), new Color(0, 0, 0, 0), () => { _page--; RefreshCards(); }, 20f);
+            var prev = FlatButton(right, "<   PREVIOUS", new Vector2(0f, -482f), new Vector2(200f, 50f), new Color(0, 0, 0, 0), () => PageOrStep(-1), 20f);
             Outline((RectTransform)prev.transform, new Color(1f, 1f, 1f, 0.4f), 1f);
-            var next = FlatButton(right, "NEXT   >", new Vector2(215f, -482f), new Vector2(200f, 50f), Panel, () => { _page++; RefreshCards(); }, 20f);
+            var next = FlatButton(right, "NEXT   >", new Vector2(215f, -482f), new Vector2(200f, 50f), Panel, () => PageOrStep(1), 20f);
             Outline((RectTransform)next.transform, PanelLine, 2f);
             _pageLabel = UiKit.Label(right, "", new Vector2(0f, -536f), new Vector2(415f, 26f), 16f, TextAlignmentOptions.Center, UiKit.DimTextColor);
 
