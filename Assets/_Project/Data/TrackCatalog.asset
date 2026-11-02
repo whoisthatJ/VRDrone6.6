@@ -25,6 +25,10 @@ MonoBehaviour:
     DisplayName: Dockyard
     Description: Container corridors and a gate above a container stack.
     Json: {fileID: 4900000, guid: ee31c46cd8b798a40b850617b17648aa, type: 3}
+  - Id: spline-test
+    DisplayName: Spline Test Loop
+    Description: Figure-eight lane track with an overpass (spline track system test).
+    Json: {fileID: 4900000, guid: 9c367b8fd3d888d41ba92c0abd0a3c02, type: 3}
   Environments:
   - Environment: field
     SceneName: Track_Field

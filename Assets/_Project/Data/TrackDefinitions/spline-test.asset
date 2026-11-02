@@ -1,0 +1,172 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 822e4063ef2a56140a80566d62a63e91, type: 3}
+  m_Name: spline-test
+  m_EditorClassIdentifier: GateRush.Track::GateRush.Track.TrackDefinition
+  Track:
+    Version: 1
+    Id: spline-test
+    Name: Spline Test Loop
+    Author: GateRush
+    Environment: field
+    Laps: 2
+    Spawn:
+      Position: {x: 55.315086, y: 0.15, z: 11.663315}
+      Yaw: -35.69475
+    Gates: []
+    Props: []
+    Route:
+      Knots:
+      - Position: {x: 60, y: 1.5023857, z: 0}
+        TangentIn: {x: 0, y: 0, z: 0}
+        TangentOut: {x: 0, y: 0, z: 0}
+      - Position: {x: 48.351814, y: 1.5000467, z: 18.503439}
+        TangentIn: {x: 0, y: 0, z: 0}
+        TangentOut: {x: 0, y: 0, z: 0}
+      - Position: {x: 28.284271, y: 1.5000004, z: 20}
+        TangentIn: {x: 0, y: 0, z: 0}
+        TangentOut: {x: 0, y: 0, z: 0}
+      - Position: {x: 12.387562, y: 1.5, z: 11.444614}
+        TangentIn: {x: 0, y: 0, z: 0}
+        TangentOut: {x: 0, y: 0, z: 0}
+      - Position: {x: -0.0000013113416, y: 1.5, z: -0.0000013113416}
+        TangentIn: {x: 0, y: 0, z: 0}
+        TangentOut: {x: 0, y: 0, z: 0}
+      - Position: {x: -12.387565, y: 1.5, z: -11.444617}
+        TangentIn: {x: 0, y: 0, z: 0}
+        TangentOut: {x: 0, y: 0, z: 0}
+      - Position: {x: -28.284271, y: 1.5000004, z: -20}
+        TangentIn: {x: 0, y: 0, z: 0}
+        TangentOut: {x: 0, y: 0, z: 0}
+      - Position: {x: -48.35182, y: 1.5000467, z: -18.503435}
+        TangentIn: {x: 0, y: 0, z: 0}
+        TangentOut: {x: 0, y: 0, z: 0}
+      - Position: {x: -60, y: 1.5023857, z: 0.0000052453665}
+        TangentIn: {x: 0, y: 0, z: 0}
+        TangentOut: {x: 0, y: 0, z: 0}
+      - Position: {x: -48.351814, y: 1.55087, z: 18.503437}
+        TangentIn: {x: 0, y: 0, z: 0}
+        TangentOut: {x: 0, y: 0, z: 0}
+      - Position: {x: -28.284264, y: 1.9525173, z: 19.999998}
+        TangentIn: {x: 0, y: 0, z: 0}
+        TangentOut: {x: 0, y: 0, z: 0}
+      - Position: {x: -12.387549, y: 3.179341, z: 11.444605}
+        TangentIn: {x: 0, y: 0, z: 0}
+        TangentOut: {x: 0, y: 0, z: 0}
+      - Position: {x: 0.00000035774642, y: 4.1, z: -0.00000035774642}
+        TangentIn: {x: 0, y: 0, z: 0}
+        TangentOut: {x: 0, y: 0, z: 0}
+      - Position: {x: 12.387568, y: 3.1793401, z: -11.444619}
+        TangentIn: {x: 0, y: 0, z: 0}
+        TangentOut: {x: 0, y: 0, z: 0}
+      - Position: {x: 28.284286, y: 1.9525157, z: -20.000004}
+        TangentIn: {x: 0, y: 0, z: 0}
+        TangentOut: {x: 0, y: 0, z: 0}
+      - Position: {x: 48.351814, y: 1.55087, z: -18.503439}
+        TangentIn: {x: 0, y: 0, z: 0}
+        TangentOut: {x: 0, y: 0, z: 0}
+      Closed: 1
+      CorridorWidth: 4
+      OuterLineGap: 0.35
+      FlightHeight: 1.5
+      GroundHeight: 0
+      FinishObstacle: 0
+      Obstacles:
+      - Type: Large
+        Distance: 21.75
+        Lateral: 0
+        Height: 0
+        Yaw: 0
+        Scale: 1
+        Color: white
+        IsCheckpoint: 1
+      - Type: Square
+        Distance: 43
+        Lateral: 0
+        Height: 0
+        Yaw: 0
+        Scale: 1
+        Color: red
+        IsCheckpoint: 1
+      - Type: Hurdle
+        Distance: 67.5
+        Lateral: 0
+        Height: 0
+        Yaw: 0
+        Scale: 1
+        Color: green
+        IsCheckpoint: 1
+      - Type: Square
+        Distance: 94.25
+        Lateral: 0
+        Height: 0
+        Yaw: 0
+        Scale: 1
+        Color: red
+        IsCheckpoint: 1
+      - Type: Large
+        Distance: 121
+        Lateral: 0
+        Height: 0
+        Yaw: 0
+        Scale: 1
+        Color: blue
+        IsCheckpoint: 1
+      - Type: Square
+        Distance: 156.25
+        Lateral: 0
+        Height: 0
+        Yaw: 0
+        Scale: 1
+        Color: red
+        IsCheckpoint: 1
+      - Type: Hurdle
+        Distance: 188.25
+        Lateral: 0
+        Height: 0
+        Yaw: 0
+        Scale: 1
+        Color: green
+        IsCheckpoint: 1
+      - Type: Square
+        Distance: 214.25
+        Lateral: 0
+        Height: 0
+        Yaw: 0
+        Scale: 1
+        Color: red
+        IsCheckpoint: 1
+      - Type: Large
+        Distance: 234.5
+        Lateral: 0
+        Height: 0
+        Yaw: 0
+        Scale: 1
+        Color: blue
+        IsCheckpoint: 1
+      - Type: Square
+        Distance: 262.25
+        Lateral: 0
+        Height: 0
+        Yaw: 0
+        Scale: 1
+        Color: red
+        IsCheckpoint: 1
+      - Type: Hurdle
+        Distance: 291.25
+        Lateral: 0
+        Height: 0
+        Yaw: 0
+        Scale: 1
+        Color: green
+        IsCheckpoint: 1
+  Json: {fileID: 4900000, guid: 9c367b8fd3d888d41ba92c0abd0a3c02, type: 3}

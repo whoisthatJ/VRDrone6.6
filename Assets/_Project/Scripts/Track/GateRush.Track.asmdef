@@ -2,7 +2,9 @@
     "name": "GateRush.Track",
     "rootNamespace": "GateRush.Track",
     "references": [
-        "GateRush.Race"
+        "GateRush.Race",
+        "Unity.Splines",
+        "Unity.Mathematics"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

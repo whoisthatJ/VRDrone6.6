@@ -37,6 +37,7 @@ namespace GateRush.Track
 
     /// <summary>
     /// A race course as plain data: gates in race order (index 0 = start/finish), optional props, spawn.
+    /// A spline track has a <see cref="Route"/> instead of gates: its obstacles, lanes and checkpoints are generated.
     /// Stored as JSON (built-in tracks in Data/Tracks, user tracks in persistentDataPath/tracks).
     /// The environment (scene) supplies the static world; the track only adds gates and props.
     /// </summary>
@@ -55,6 +56,10 @@ namespace GateRush.Track
         public SpawnData Spawn = new SpawnData();
         public List<GateData> Gates = new List<GateData>();
         public List<PropData> Props = new List<PropData>();
+        /// <summary>Spline route (empty for gate-list tracks).</summary>
+        public RouteData Route = new RouteData();
+
+        public bool IsSplineTrack => Route != null && Route.HasRoute;
 
         public string ToJson(bool pretty = true) => JsonUtility.ToJson(this, pretty);
 
@@ -66,6 +71,9 @@ namespace GateRush.Track
             t.Gates ??= new List<GateData>();
             t.Props ??= new List<PropData>();
             t.Spawn ??= new SpawnData();
+            t.Route ??= new RouteData();
+            t.Route.Knots ??= new List<RouteKnot>();
+            t.Route.Obstacles ??= new List<RouteObstacle>();
             return t;
         }
 
@@ -75,7 +83,8 @@ namespace GateRush.Track
             var errors = new List<string>();
             if (Version > CurrentVersion) errors.Add($"Track version {Version} is newer than this game ({CurrentVersion})");
             if (string.IsNullOrWhiteSpace(Id)) errors.Add("Missing id");
-            if (Gates.Count == 0) errors.Add("A track needs at least one gate");
+            if (IsSplineTrack) ValidateRoute(errors, knownGateTypes, knownPropTypes);
+            else if (Gates.Count == 0) errors.Add("A track needs at least one gate");
             if (Laps < 1 || Laps > 10) errors.Add($"Laps must be 1-10 (is {Laps})");
             for (int i = 0; i < Gates.Count; i++)
             {
@@ -87,6 +96,24 @@ namespace GateRush.Track
                 for (int i = 0; i < Props.Count; i++)
                     if (!knownPropTypes.Contains(Props[i].Type)) errors.Add($"Prop {i}: unknown type '{Props[i].Type}'");
             return errors;
+        }
+
+        private void ValidateRoute(List<string> errors, ICollection<string> knownGateTypes, ICollection<string> knownPropTypes)
+        {
+            var r = Route;
+            if (r.CorridorWidth < 1f || r.CorridorWidth > 20f) errors.Add($"Route: corridor width {r.CorridorWidth} out of range (1-20 m)");
+            if (r.FinishObstacle >= r.Obstacles.Count) errors.Add($"Route: finish obstacle {r.FinishObstacle} does not exist");
+            int checkpoints = 0;
+            for (int i = 0; i < r.Obstacles.Count; i++)
+            {
+                var o = r.Obstacles[i];
+                if (o.IsCheckpoint) checkpoints++;
+                bool known = knownGateTypes == null || knownGateTypes.Contains(o.Type) || (knownPropTypes != null && knownPropTypes.Contains(o.Type));
+                if (!known) errors.Add($"Obstacle {i}: unknown type '{o.Type}'");
+                if (o.Scale <= 0f || o.Scale > 10f) errors.Add($"Obstacle {i}: scale {o.Scale} out of range");
+                if (o.Distance < 0f) errors.Add($"Obstacle {i}: negative distance");
+            }
+            if (checkpoints == 0) errors.Add("Route: needs at least one checkpoint obstacle");
         }
 
         public static Quaternion GateRotation(GateData g) => Quaternion.Euler(g.Pitch, g.Yaw, 0f);

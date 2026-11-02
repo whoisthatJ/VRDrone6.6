@@ -11,6 +11,8 @@ namespace GateRush.Track
         public Transform Root;
         public Gate[] Gates;
         public Transform Spawn;
+        /// <summary>The sampled route of a spline track (null for gate-list tracks).</summary>
+        public TrackRoute Route;
     }
 
     /// <summary>Instantiates a <see cref="TrackData"/> (gates in order, props, spawn point) under a new root.</summary>
@@ -18,6 +20,12 @@ namespace GateRush.Track
     {
         public static LoadedTrack Load(TrackData data, TrackPrefabs prefabs, Transform parent = null)
         {
+            if (data.IsSplineTrack)
+            {
+                int layer = LayerMask.NameToLayer("TrackGeometry");
+                return TrackBuilder.Build(data, prefabs, parent, layer < 0 ? 0 : layer);
+            }
+
             var root = new GameObject("Track: " + data.Name).transform;
             root.SetParent(parent, false);
 
@@ -39,6 +47,18 @@ namespace GateRush.Track
                 gates.Add(gate);
             }
 
+            AddProps(data, prefabs, root);
+
+            var spawn = new GameObject("Spawn").transform;
+            spawn.SetParent(root, false);
+            spawn.SetPositionAndRotation(data.Spawn.Position, Quaternion.Euler(0f, data.Spawn.Yaw, 0f));
+
+            return new LoadedTrack { Data = data, Root = root, Gates = gates.ToArray(), Spawn = spawn };
+        }
+
+        /// <summary>Scenery props from the track's prop list.</summary>
+        public static void AddProps(TrackData data, TrackPrefabs prefabs, Transform root)
+        {
             for (int i = 0; i < data.Props.Count; i++)
             {
                 var p = data.Props[i];
@@ -52,12 +72,6 @@ namespace GateRush.Track
                 go.name = $"Prop {i} ({p.Type})";
                 go.transform.localScale = p.Scale;
             }
-
-            var spawn = new GameObject("Spawn").transform;
-            spawn.SetParent(root, false);
-            spawn.SetPositionAndRotation(data.Spawn.Position, Quaternion.Euler(0f, data.Spawn.Yaw, 0f));
-
-            return new LoadedTrack { Data = data, Root = root, Gates = gates.ToArray(), Spawn = spawn };
         }
     }
 }

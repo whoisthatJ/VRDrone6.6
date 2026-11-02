@@ -17,6 +17,7 @@ namespace GateRush.EditorTools.Builders
         public static void BuildAll()
         {
             CourseLibrary.WriteAll();
+            RouteLibrary.WriteAll();
             BuildQuads();
             BuildTracks();
             AssetDatabase.SaveAssets();
@@ -59,6 +60,7 @@ namespace GateRush.EditorTools.Builders
             catalog.Tracks.Add(Entry("field", "Open Field", "Big outdoor loop with a floating gate and a hurdle. Room to learn."));
             catalog.Tracks.Add(Entry("hangar", "Hangar 7", "Indoor hall: tight turns between crates, columns and walls. Whoop heaven."));
             catalog.Tracks.Add(Entry("industrial", "Dockyard", "Container corridors and a gate above a container stack."));
+            catalog.Tracks.Add(Entry("spline-test", "Spline Test Loop", "Figure-eight lane track with an overpass (spline track system test)."));
             catalog.Environments.Clear();
             catalog.Environments.Add(new TrackCatalog.EnvironmentScene { Environment = "field", SceneName = "Track_Field" });
             catalog.Environments.Add(new TrackCatalog.EnvironmentScene { Environment = "hangar", SceneName = "Track_Hangar" });

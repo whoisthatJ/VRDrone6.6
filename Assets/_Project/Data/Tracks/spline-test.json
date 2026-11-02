@@ -1,0 +1,412 @@
+{
+    "Version": 1,
+    "Id": "spline-test",
+    "Name": "Spline Test Loop",
+    "Author": "GateRush",
+    "Environment": "field",
+    "Laps": 2,
+    "Spawn": {
+        "Position": {
+            "x": 55.315086364746094,
+            "y": 0.15000000596046448,
+            "z": 11.663314819335938
+        },
+        "Yaw": -35.69475173950195
+    },
+    "Gates": [],
+    "Props": [],
+    "Route": {
+        "Knots": [
+            {
+                "Position": {
+                    "x": 60.0,
+                    "y": 1.5023857355117798,
+                    "z": 0.0
+                },
+                "TangentIn": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "TangentOut": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            {
+                "Position": {
+                    "x": 48.35181427001953,
+                    "y": 1.500046730041504,
+                    "z": 18.50343894958496
+                },
+                "TangentIn": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "TangentOut": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            {
+                "Position": {
+                    "x": 28.284271240234375,
+                    "y": 1.5000003576278687,
+                    "z": 20.0
+                },
+                "TangentIn": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "TangentOut": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            {
+                "Position": {
+                    "x": 12.387561798095703,
+                    "y": 1.5,
+                    "z": 11.44461441040039
+                },
+                "TangentIn": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "TangentOut": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            {
+                "Position": {
+                    "x": -0.0000013113416343912832,
+                    "y": 1.5,
+                    "z": -0.0000013113416343912832
+                },
+                "TangentIn": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "TangentOut": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            {
+                "Position": {
+                    "x": -12.387564659118652,
+                    "y": 1.5,
+                    "z": -11.44461727142334
+                },
+                "TangentIn": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "TangentOut": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            {
+                "Position": {
+                    "x": -28.284271240234375,
+                    "y": 1.5000003576278687,
+                    "z": -20.0
+                },
+                "TangentIn": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "TangentOut": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            {
+                "Position": {
+                    "x": -48.35182189941406,
+                    "y": 1.500046730041504,
+                    "z": -18.503435134887695
+                },
+                "TangentIn": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "TangentOut": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            {
+                "Position": {
+                    "x": -60.0,
+                    "y": 1.5023857355117798,
+                    "z": 0.000005245366537565133
+                },
+                "TangentIn": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "TangentOut": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            {
+                "Position": {
+                    "x": -48.35181427001953,
+                    "y": 1.5508699417114258,
+                    "z": 18.503437042236328
+                },
+                "TangentIn": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "TangentOut": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            {
+                "Position": {
+                    "x": -28.284263610839844,
+                    "y": 1.9525172710418701,
+                    "z": 19.999998092651367
+                },
+                "TangentIn": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "TangentOut": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            {
+                "Position": {
+                    "x": -12.38754940032959,
+                    "y": 3.1793410778045654,
+                    "z": 11.444604873657227
+                },
+                "TangentIn": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "TangentOut": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            {
+                "Position": {
+                    "x": 3.5774641560237797e-7,
+                    "y": 4.099999904632568,
+                    "z": -3.5774641560237797e-7
+                },
+                "TangentIn": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "TangentOut": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            {
+                "Position": {
+                    "x": 12.387568473815918,
+                    "y": 3.179340124130249,
+                    "z": -11.444619178771973
+                },
+                "TangentIn": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "TangentOut": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            {
+                "Position": {
+                    "x": 28.284286499023438,
+                    "y": 1.952515721321106,
+                    "z": -20.000003814697266
+                },
+                "TangentIn": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "TangentOut": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            {
+                "Position": {
+                    "x": 48.35181427001953,
+                    "y": 1.5508699417114258,
+                    "z": -18.50343894958496
+                },
+                "TangentIn": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "TangentOut": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            }
+        ],
+        "Closed": true,
+        "CorridorWidth": 4.0,
+        "OuterLineGap": 0.3499999940395355,
+        "FlightHeight": 1.5,
+        "GroundHeight": 0.0,
+        "FinishObstacle": 0,
+        "Obstacles": [
+            {
+                "Type": "Large",
+                "Distance": 21.75,
+                "Lateral": 0.0,
+                "Height": 0.0,
+                "Yaw": 0.0,
+                "Scale": 1.0,
+                "Color": "white",
+                "IsCheckpoint": true
+            },
+            {
+                "Type": "Square",
+                "Distance": 43.0,
+                "Lateral": 0.0,
+                "Height": 0.0,
+                "Yaw": 0.0,
+                "Scale": 1.0,
+                "Color": "red",
+                "IsCheckpoint": true
+            },
+            {
+                "Type": "Hurdle",
+                "Distance": 67.5,
+                "Lateral": 0.0,
+                "Height": 0.0,
+                "Yaw": 0.0,
+                "Scale": 1.0,
+                "Color": "green",
+                "IsCheckpoint": true
+            },
+            {
+                "Type": "Square",
+                "Distance": 94.25,
+                "Lateral": 0.0,
+                "Height": 0.0,
+                "Yaw": 0.0,
+                "Scale": 1.0,
+                "Color": "red",
+                "IsCheckpoint": true
+            },
+            {
+                "Type": "Large",
+                "Distance": 121.0,
+                "Lateral": 0.0,
+                "Height": 0.0,
+                "Yaw": 0.0,
+                "Scale": 1.0,
+                "Color": "blue",
+                "IsCheckpoint": true
+            },
+            {
+                "Type": "Square",
+                "Distance": 156.25,
+                "Lateral": 0.0,
+                "Height": 0.0,
+                "Yaw": 0.0,
+                "Scale": 1.0,
+                "Color": "red",
+                "IsCheckpoint": true
+            },
+            {
+                "Type": "Hurdle",
+                "Distance": 188.25,
+                "Lateral": 0.0,
+                "Height": 0.0,
+                "Yaw": 0.0,
+                "Scale": 1.0,
+                "Color": "green",
+                "IsCheckpoint": true
+            },
+            {
+                "Type": "Square",
+                "Distance": 214.25,
+                "Lateral": 0.0,
+                "Height": 0.0,
+                "Yaw": 0.0,
+                "Scale": 1.0,
+                "Color": "red",
+                "IsCheckpoint": true
+            },
+            {
+                "Type": "Large",
+                "Distance": 234.5,
+                "Lateral": 0.0,
+                "Height": 0.0,
+                "Yaw": 0.0,
+                "Scale": 1.0,
+                "Color": "blue",
+                "IsCheckpoint": true
+            },
+            {
+                "Type": "Square",
+                "Distance": 262.25,
+                "Lateral": 0.0,
+                "Height": 0.0,
+                "Yaw": 0.0,
+                "Scale": 1.0,
+                "Color": "red",
+                "IsCheckpoint": true
+            },
+            {
+                "Type": "Hurdle",
+                "Distance": 291.25,
+                "Lateral": 0.0,
+                "Height": 0.0,
+                "Yaw": 0.0,
+                "Scale": 1.0,
+                "Color": "green",
+                "IsCheckpoint": true
+            }
+        ]
+    }
+}

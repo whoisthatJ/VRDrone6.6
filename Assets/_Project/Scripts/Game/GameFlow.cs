@@ -65,6 +65,12 @@ namespace GateRush.Game
         /// <summary>Opens a track (new, user or a copy of a built-in) in the VR track editor.</summary>
         public static bool Edit(TrackCatalog catalog, TrackData track)
         {
+            if (track.IsSplineTrack)
+            {
+                // The in-game editor places gates; spline tracks are edited in Unity (TrackDefinition + Tools > Track).
+                Debug.LogWarning($"[GateRush] '{track.Name}' is a spline track: edit it in Unity (Tools > Track)");
+                return false;
+            }
             string scene = catalog.SceneFor(track.Environment);
             if (string.IsNullOrEmpty(scene))
             {

@@ -28,7 +28,8 @@ namespace GateRush.Tests
                 Assert.AreEqual(entry.Id, data.Id, "catalog id matches the file");
                 var errors = data.Validate(Prefabs.GateTypes(), Prefabs.PropTypes());
                 Assert.IsEmpty(errors, $"{entry.Id}: {string.Join("; ", errors)}");
-                Assert.That(data.Gates.Count, Is.GreaterThanOrEqualTo(4), $"{entry.Id}: too few gates");
+                int gates = data.IsSplineTrack ? data.Route.Obstacles.Count(o => o.IsCheckpoint) : data.Gates.Count;
+                Assert.That(gates, Is.GreaterThanOrEqualTo(4), $"{entry.Id}: too few gates");
                 string scene = catalog.SceneFor(data.Environment);
                 Assert.IsNotNull(scene, $"{entry.Id}: no scene for environment '{data.Environment}'");
                 CollectionAssert.Contains(buildScenes, scene, $"{entry.Id}: scene '{scene}' not in build settings");

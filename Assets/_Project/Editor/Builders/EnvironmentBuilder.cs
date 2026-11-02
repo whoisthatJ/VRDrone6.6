@@ -101,7 +101,7 @@ namespace GateRush.EditorTools.Builders
             {
                 float h = 3f + (float)rng.NextDouble() * 9f;
                 var pos = new Vector3(x * 25f + (float)rng.NextDouble() * 8f - 4f, h * 0.5f, z * 25f + (float)rng.NextDouble() * 8f - 4f);
-                if (NearCourse(course, pos, 9f)) continue;
+                if (NearCourse(course, pos, 9f) || RouteLibrary.NearAnyRoute("field", pos, 9f)) continue;
                 Box(parent, $"Pillar {x},{z}", pos, new Vector3(1.2f, h, 1.2f), pillar, layer);
             }
             // Tree-line silhouettes far away for a horizon.

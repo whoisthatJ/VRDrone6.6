@@ -40,6 +40,7 @@ namespace GateRush.EditorTools.Builders
             Add(prefabs, "Container", PrimitiveType.Cube, containerSize, Materials.Lit("ContainerBlue", new Color(0.16f, 0.32f, 0.6f)), layer);
             Add(prefabs, "ContainerRed", PrimitiveType.Cube, containerSize, Materials.Lit("ContainerRed", new Color(0.62f, 0.16f, 0.12f)), layer);
             Add(prefabs, "ContainerGreen", PrimitiveType.Cube, containerSize, Materials.Lit("ContainerGreen", new Color(0.2f, 0.45f, 0.25f)), layer);
+            RouteKitBuilder.Build(prefabs);
 
             EditorUtility.SetDirty(prefabs);
             AssetDatabase.SaveAssets();

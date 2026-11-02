@@ -34,3 +34,11 @@ MonoBehaviour:
     Prefab: {fileID: 9081924862698209770, guid: ab5ed48fe34ea51459b5fbfb00474972, type: 3}
   - Type: ContainerGreen
     Prefab: {fileID: 1030122228322098512, guid: 97aba0013eae225428a027212ce147f9, type: 3}
+  RouteKit:
+    LaneWarm: {fileID: 2100000, guid: dd82e6a5f6596544cbcc3834d5b13257, type: 2}
+    LaneRed: {fileID: 2100000, guid: 161a57b29835ee641a772f24598a48bb, type: 2}
+    Hardware: {fileID: 2100000, guid: 6d8b80b5b35abd94a84a5fd4a4f2e166, type: 2}
+    Chevron: {fileID: 2100000, guid: 2ecf62324f891ec489b34ef79cb2db4b, type: 2}
+    Support: {fileID: 2100000, guid: 93326f563867af24b98eb321136071e4, type: 2}
+    Wear: {fileID: 2100000, guid: 0e1ab172325f7534295dd4a09e74d0ba, type: 2}
+    StartPad: {fileID: 2100000, guid: d7540b8e290bc084dbfbb4cf4bef85c6, type: 2}

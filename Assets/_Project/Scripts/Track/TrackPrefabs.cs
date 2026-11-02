@@ -15,8 +15,29 @@ namespace GateRush.Track
             public GameObject Prefab;
         }
 
+        /// <summary>Materials for the geometry <see cref="TrackBuilder"/> generates along a spline route.</summary>
+        [Serializable]
+        public sealed class RouteKitMaterials
+        {
+            [Tooltip("Inner lane line LEDs (warm white, HDR emissive).")]
+            public Material LaneWarm;
+            [Tooltip("Outer lane line LEDs (red, HDR emissive).")]
+            public Material LaneRed;
+            [Tooltip("Lane posts, clamps and cables.")]
+            public Material Hardware;
+            [Tooltip("Black-and-white chevron boards on the centre line.")]
+            public Material Chevron;
+            [Tooltip("Supports and truss bridges under elevated sections.")]
+            public Material Support;
+            [Tooltip("Ground wear marks under obstacles.")]
+            public Material Wear;
+            [Tooltip("Start pad mat.")]
+            public Material StartPad;
+        }
+
         public List<Entry> Gates = new List<Entry>();
         public List<Entry> Props = new List<Entry>();
+        public RouteKitMaterials RouteKit = new RouteKitMaterials();
 
         public GameObject Gate(string type) => Find(Gates, type);
         public GameObject Prop(string type) => Find(Props, type);

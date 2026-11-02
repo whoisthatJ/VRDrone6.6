@@ -37,6 +37,17 @@ namespace GateRush.Race
         private MaterialPropertyBlock _mpb;
         private GateVisualState _state = (GateVisualState)(-1);
 
+        /// <summary>Frame colour while the gate is neither next, upcoming nor passed (e.g. a track's red/green gates).</summary>
+        public Color IdleColor
+        {
+            get => idleColor;
+            set
+            {
+                idleColor = value;
+                if (_state == GateVisualState.Idle) _state = (GateVisualState)(-1); // repaint on the next SetVisualState
+            }
+        }
+
         public int Order
         {
             get => order;

@@ -175,6 +175,7 @@ namespace GateRush.EditorTools.Art
             td.SetDetailResolution(dr, 32);
             var lawnLayer = new int[dr, dr];
             var roughLayer = new int[dr, dr];
+            var mown = RouteCorridors(dr);
             for (int iz = 0; iz < dr; iz++)
             for (int ix = 0; ix < dr; ix++)
             {
@@ -182,7 +183,7 @@ namespace GateRush.EditorTools.Art
                 float z = -TerrainSize / 2 + (iz + 0.5f) / dr * TerrainSize;
                 float worn = wornMap[iz * ar / dr, ix * ar / dr];
                 float outside = OutsidePlay(x, z);
-                if (outside > 380f) continue;
+                if (outside > 380f || mown[iz, ix]) continue;
                 float n = Mathf.PerlinNoise(x * 0.15f + 13f, z * 0.15f + 29f);
                 if (outside < 12f) lawnLayer[iz, ix] = Mathf.RoundToInt((1f - worn) * (9f + 8f * n));
                 else roughLayer[iz, ix] = Mathf.RoundToInt((1f - worn) * (3f + 6f * n));
@@ -287,6 +288,36 @@ namespace GateRush.EditorTools.Art
                 col.AddComponent<BoxCollider>().size = new Vector3(0.1f, height, len);
                 _ = go;
             }
+        }
+
+        /// <summary>
+        /// Detail cells with no grass: the corridors (lanes + a margin) and start pads of the built-in spline tracks in
+        /// the Field, so the chevron boards and pads are not buried in grass.
+        /// </summary>
+        private static bool[,] RouteCorridors(int dr)
+        {
+            var mown = new bool[dr, dr];
+            float cell = TerrainSize / dr;
+            void Mark(Vector3 p, float radius)
+            {
+                int cx = Mathf.FloorToInt((p.x + TerrainSize / 2) / cell), cz = Mathf.FloorToInt((p.z + TerrainSize / 2) / cell);
+                int r = Mathf.CeilToInt(radius / cell);
+                for (int iz = Mathf.Max(0, cz - r); iz <= Mathf.Min(dr - 1, cz + r); iz++)
+                for (int ix = Mathf.Max(0, cx - r); ix <= Mathf.Min(dr - 1, cx + r); ix++)
+                {
+                    float x = -TerrainSize / 2 + (ix + 0.5f) * cell - p.x, z = -TerrainSize / 2 + (iz + 0.5f) * cell - p.z;
+                    if (x * x + z * z <= radius * radius) mown[iz, ix] = true;
+                }
+            }
+            foreach (var t in RouteLibrary.All())
+            {
+                if (t.Environment != "field") continue;
+                var route = new GateRush.Track.TrackRoute(t.Route);
+                float radius = t.Route.CorridorWidth * 0.5f + t.Route.OuterLineGap + 0.6f;
+                for (float d = 0f; d < route.Length; d += 0.5f) Mark(route.Sample(d).Position, radius);
+                Mark(t.Spawn.Position, 2.2f);
+            }
+            return mown;
         }
 
         private static Vector3 FreeSpot(Vector3 want, List<Vector3> pillars, float clearance)
