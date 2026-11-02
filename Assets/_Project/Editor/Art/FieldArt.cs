@@ -315,7 +315,8 @@ namespace GateRush.EditorTools.Art
                 var route = new GateRush.Track.TrackRoute(t.Route);
                 float radius = t.Route.CorridorWidth * 0.5f + t.Route.OuterLineGap + 0.6f;
                 for (float d = 0f; d < route.Length; d += 0.5f) Mark(route.Sample(d).Position, radius);
-                Mark(t.Spawn.Position, 2.2f);
+                Mark(t.Spawn.Position, 3.6f);
+                foreach (var prop in t.Props) Mark(prop.Position, prop.Type == "LandingPad" ? 1.8f : 0.8f);
             }
             return mown;
         }

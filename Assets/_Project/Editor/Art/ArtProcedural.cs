@@ -59,7 +59,7 @@ namespace GateRush.EditorTools.Art
         }
 
         /// <summary>Tileable fBm in [0,1]; u, v in [0,1).</summary>
-        private static float Fbm(float u, float v, int basePeriod, int octaves, int seed, float gain = 0.5f)
+        internal static float Fbm(float u, float v, int basePeriod, int octaves, int seed, float gain = 0.5f)
         {
             float sum = 0f, amp = 1f, norm = 0f;
             int period = basePeriod;
@@ -73,7 +73,7 @@ namespace GateRush.EditorTools.Art
             return sum / norm;
         }
 
-        private static Color32[] NormalFromHeight(float[] h, int w, int hgt, float strength)
+        internal static Color32[] NormalFromHeight(float[] h, int w, int hgt, float strength)
         {
             var px = new Color32[w * hgt];
             for (int y = 0; y < hgt; y++)
@@ -87,7 +87,7 @@ namespace GateRush.EditorTools.Art
             return px;
         }
 
-        private static void Save(string path, int w, int h, Color32[] px, bool alpha = false)
+        internal static void Save(string path, int w, int h, Color32[] px, bool alpha = false)
         {
             Directory.CreateDirectory(Path.GetDirectoryName(path));
             var tex = new Texture2D(w, h, alpha ? TextureFormat.RGBA32 : TextureFormat.RGB24, false, true);
@@ -97,7 +97,7 @@ namespace GateRush.EditorTools.Art
         }
 
         private static byte B(float v) => (byte)Mathf.Clamp(Mathf.RoundToInt(v * 255f), 0, 255);
-        private static Color32 C(float r, float g, float b, float a = 1f) => new Color32(B(r), B(g), B(b), B(a));
+        internal static Color32 C(float r, float g, float b, float a = 1f) => new Color32(B(r), B(g), B(b), B(a));
 
         // ---------- generators ----------
 

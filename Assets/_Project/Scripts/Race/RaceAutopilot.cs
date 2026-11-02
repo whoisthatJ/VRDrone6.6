@@ -18,9 +18,26 @@ namespace GateRush.Race
         [SerializeField] private Gate[] gates = new Gate[0];
         [SerializeField] private float cruiseSpeed = 8f;
         [SerializeField] private float approachDistance = 5f;
+        [Header("Stuck watchdog")]
+        [Tooltip("Moving less than this (m) for Stuck Seconds counts as stuck.")]
+        [SerializeField] private float stuckDistance = 0.6f;
+        [SerializeField] private float stuckSeconds = 3f;
+        [Tooltip("Rescues allowed at one gate before the autopilot gives up and reports it.")]
+        [SerializeField] private int maxRescuesPerGate = 3;
 
         private bool _armRequested;
         private bool _angleModeSet;
+        private Vector3 _stuckAnchor;
+        private float _stuckTimer;
+        private int _rescueGate = -1, _rescuesAtGate;
+        private Transform _rescueSpawn;
+
+        /// <summary>How often the watchdog had to put the quad back in front of a gate.</summary>
+        public int Rescues { get; private set; }
+        /// <summary>The autopilot could not get through a gate after <see cref="maxRescuesPerGate"/> rescues.</summary>
+        public bool GaveUp { get; private set; }
+        /// <summary>Last watchdog message (gate, position, what the quad was touching).</summary>
+        public string LastReport { get; private set; } = "";
 
         public void Configure(RaceSession raceSession, QuadVehicle quad, ScriptedInputSource source, Gate[] course)
         {
@@ -61,8 +78,9 @@ namespace GateRush.Race
 
             Gate gate = gates[session.Timer.NextCheckpoint];
             Vector3 pos = new Vector3(s.Position.x, s.Position.y, s.Position.z);
+            if (Watchdog(pos, session.Timer.NextCheckpoint, gate)) return;
             Vector3 vel = new Vector3(s.Velocity.x, s.Velocity.y, s.Velocity.z);
-            Vector3 centre = gate.OpeningCenterWorld;
+            Vector3 centre = gate.AimPointWorld;
             Vector3 gateFwd = gate.transform.forward;
 
             // Aim at a point before the gate, then through it once lined up and close.
@@ -97,6 +115,67 @@ namespace GateRush.Race
             float climbTarget = Mathf.Clamp(1.2f * (target.y - pos.y), -2.5f, 2.5f);
             float throttle = vehicle.HoverThrottle / Mathf.Max(0.4f, Mathf.Cos(tilt)) + 0.06f * (climbTarget - vel.y);
             pilot.Throttle = Mathf.Clamp(throttle, 0.06f, 0.9f);
+        }
+
+        /// <summary>
+        /// Stuck watchdog: if the quad barely moves for <see cref="stuckSeconds"/> (pinned against a frame, hovering in
+        /// a corner), respawn it lined up in front of the gate it is trying to reach. Gives up after
+        /// <see cref="maxRescuesPerGate"/> rescues at the same gate and reports what it was touching.
+        /// </summary>
+        /// <returns>True when it acted this frame.</returns>
+        private bool Watchdog(Vector3 pos, int next, Gate gate)
+        {
+            if (GaveUp) return true;
+            if (session.WaitingForRelease || vehicle.IsCrashed)
+            {
+                _stuckAnchor = pos;
+                _stuckTimer = 0f;
+                return false;
+            }
+            if ((pos - _stuckAnchor).sqrMagnitude > stuckDistance * stuckDistance)
+            {
+                _stuckAnchor = pos;
+                _stuckTimer = 0f;
+                return false;
+            }
+            _stuckTimer += Time.deltaTime;
+            if (_stuckTimer < stuckSeconds) return false;
+            _stuckTimer = 0f;
+
+            if (next != _rescueGate)
+            {
+                _rescueGate = next;
+                _rescuesAtGate = 0;
+            }
+            string touching = "";
+            foreach (var c in Physics.OverlapSphere(pos, 0.6f, ~0, QueryTriggerInteraction.Ignore))
+                touching += " " + c.transform.root.name + "/" + c.name;
+            LastReport = $"stuck before {gate.name} at {pos:F1}, touching:{(touching.Length > 0 ? touching : " nothing")}";
+
+            if (++_rescuesAtGate > maxRescuesPerGate)
+            {
+                GaveUp = true;
+                pilot.Throttle = 0f;
+                Debug.LogError($"[GateRush][Autopilot] gave up: {LastReport} (after {maxRescuesPerGate} rescues)");
+                return true;
+            }
+
+            Rescues++;
+            Debug.LogWarning($"[GateRush][Autopilot] rescue {_rescuesAtGate}/{maxRescuesPerGate}: {LastReport}");
+            if (_rescueSpawn == null) _rescueSpawn = new GameObject("Autopilot Rescue Spawn").transform;
+            gate.GetRespawnPose(out Vector3 rp, out Quaternion rr);
+            _rescueSpawn.SetPositionAndRotation(rp, rr);
+            var previous = vehicle.SpawnPoint;
+            vehicle.SpawnPoint = _rescueSpawn;
+            vehicle.Respawn();
+            vehicle.SpawnPoint = previous;
+            _stuckAnchor = rp;
+            return true;
+        }
+
+        private void OnDestroy()
+        {
+            if (_rescueSpawn != null) Destroy(_rescueSpawn.gameObject);
         }
     }
 }

@@ -19,6 +19,22 @@ MonoBehaviour:
     Prefab: {fileID: 1420179406656756628, guid: 62b22d91c71be824ebf7e58188a3fd9c, type: 3}
   - Type: Hurdle
     Prefab: {fileID: 4030512663252119292, guid: 567b960579a6bda48ab8eefd127fa6d9, type: 3}
+  - Type: Single
+    Prefab: {fileID: 5344299309974517718, guid: 0fca0f66a37230240a248f86c9c7f85d, type: 3}
+  - Type: Double
+    Prefab: {fileID: 7106712939264408738, guid: f98d0522e58b443468bf3c39eb17e963, type: 3}
+  - Type: Slalom
+    Prefab: {fileID: 4376281860970027843, guid: 0ee4f002e4a25cd479c290328a995a4a, type: 3}
+  - Type: Cube
+    Prefab: {fileID: 5825361993847357260, guid: fece3aa884514834eafe15574f4420fb, type: 3}
+  - Type: Ladder
+    Prefab: {fileID: 8104382311684715340, guid: 7f75119d08985c1439785c9f8ecec0bc, type: 3}
+  - Type: Dive
+    Prefab: {fileID: 7000921075817980995, guid: 0b9be3929481e7447b59f7169ba4178e, type: 3}
+  - Type: Ramp
+    Prefab: {fileID: 6358162088031008227, guid: 17d8041e376ec71419691b898d2bfb3d, type: 3}
+  - Type: Arch
+    Prefab: {fileID: 6188823859593458276, guid: 100c7b0d357d98c478faed7ede34e169, type: 3}
   Props:
   - Type: Crate
     Prefab: {fileID: 6230052360999783274, guid: 45538f4ce20ee214cad7cb29047cab5f, type: 3}
@@ -34,6 +50,16 @@ MonoBehaviour:
     Prefab: {fileID: 9081924862698209770, guid: ab5ed48fe34ea51459b5fbfb00474972, type: 3}
   - Type: ContainerGreen
     Prefab: {fileID: 1030122228322098512, guid: 97aba0013eae225428a027212ce147f9, type: 3}
+  - Type: ChevronBoard
+    Prefab: {fileID: 2239530713763047862, guid: 4eb1cbc06973750408b5c5247c030573, type: 3}
+  - Type: ChevronBoardLeft
+    Prefab: {fileID: 5845043418546402701, guid: 52257f12afcee3040969d37d3baa8a7f, type: 3}
+  - Type: Flag
+    Prefab: {fileID: 2330593430257034992, guid: 5b4ff68c0eca21744b8b96e8c3abf24f, type: 3}
+  - Type: LandingPad
+    Prefab: {fileID: 7069801194610916979, guid: fd3d9519211052e4c819fc502af4a62b, type: 3}
+  - Type: StartPad
+    Prefab: {fileID: 5331810503428491344, guid: d34bc5f454f80e14ebd49d0bef8db4b1, type: 3}
   RouteKit:
     LaneWarm: {fileID: 2100000, guid: dd82e6a5f6596544cbcc3834d5b13257, type: 2}
     LaneRed: {fileID: 2100000, guid: 161a57b29835ee641a772f24598a48bb, type: 2}

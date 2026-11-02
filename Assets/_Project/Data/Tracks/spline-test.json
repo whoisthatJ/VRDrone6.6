@@ -7,14 +7,87 @@
     "Laps": 2,
     "Spawn": {
         "Position": {
-            "x": 55.315086364746094,
+            "x": 51.779396057128906,
             "y": 0.15000000596046448,
-            "z": 11.663314819335938
+            "z": 6.111804962158203
         },
-        "Yaw": -35.69475173950195
+        "Yaw": -30.432926177978516
     },
     "Gates": [],
-    "Props": [],
+    "Props": [
+        {
+            "Type": "Flag",
+            "Position": {
+                "x": 52.61348342895508,
+                "y": 0.0,
+                "z": 1.730675458908081
+            },
+            "Euler": {
+                "x": 0.0,
+                "y": -30.432926177978516,
+                "z": 0.0
+            },
+            "Scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            }
+        },
+        {
+            "Type": "Flag",
+            "Position": {
+                "x": 48.358638763427734,
+                "y": 0.0,
+                "z": 8.973345756530762
+            },
+            "Euler": {
+                "x": 0.0,
+                "y": -30.432926177978516,
+                "z": 0.0
+            },
+            "Scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            }
+        },
+        {
+            "Type": "LandingPad",
+            "Position": {
+                "x": -36.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "Euler": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "Scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            }
+        },
+        {
+            "Type": "LandingPad",
+            "Position": {
+                "x": 36.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "Euler": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "Scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            }
+        }
+    ],
     "Route": {
         "Knots": [
             {
@@ -298,7 +371,7 @@
         "FinishObstacle": 0,
         "Obstacles": [
             {
-                "Type": "Large",
+                "Type": "Arch",
                 "Distance": 21.75,
                 "Lateral": 0.0,
                 "Height": 0.0,
@@ -308,7 +381,7 @@
                 "IsCheckpoint": true
             },
             {
-                "Type": "Square",
+                "Type": "Single",
                 "Distance": 43.0,
                 "Lateral": 0.0,
                 "Height": 0.0,
@@ -318,7 +391,7 @@
                 "IsCheckpoint": true
             },
             {
-                "Type": "Hurdle",
+                "Type": "Ladder",
                 "Distance": 67.5,
                 "Lateral": 0.0,
                 "Height": 0.0,
@@ -328,8 +401,18 @@
                 "IsCheckpoint": true
             },
             {
-                "Type": "Square",
+                "Type": "Cube",
                 "Distance": 94.25,
+                "Lateral": 0.0,
+                "Height": 0.0,
+                "Yaw": 0.0,
+                "Scale": 1.0,
+                "Color": "green",
+                "IsCheckpoint": true
+            },
+            {
+                "Type": "Double",
+                "Distance": 121.0,
                 "Lateral": 0.0,
                 "Height": 0.0,
                 "Yaw": 0.0,
@@ -338,17 +421,7 @@
                 "IsCheckpoint": true
             },
             {
-                "Type": "Large",
-                "Distance": 121.0,
-                "Lateral": 0.0,
-                "Height": 0.0,
-                "Yaw": 0.0,
-                "Scale": 1.0,
-                "Color": "blue",
-                "IsCheckpoint": true
-            },
-            {
-                "Type": "Square",
+                "Type": "Single",
                 "Distance": 156.25,
                 "Lateral": 0.0,
                 "Height": 0.0,
@@ -358,18 +431,18 @@
                 "IsCheckpoint": true
             },
             {
-                "Type": "Hurdle",
-                "Distance": 188.25,
+                "Type": "Slalom",
+                "Distance": 191.5,
                 "Lateral": 0.0,
                 "Height": 0.0,
                 "Yaw": 0.0,
                 "Scale": 1.0,
-                "Color": "green",
+                "Color": "white",
                 "IsCheckpoint": true
             },
             {
-                "Type": "Square",
-                "Distance": 214.25,
+                "Type": "Single",
+                "Distance": 215.5,
                 "Lateral": 0.0,
                 "Height": 0.0,
                 "Yaw": 0.0,
@@ -378,7 +451,7 @@
                 "IsCheckpoint": true
             },
             {
-                "Type": "Large",
+                "Type": "Single",
                 "Distance": 234.5,
                 "Lateral": 0.0,
                 "Height": 0.0,
@@ -388,17 +461,17 @@
                 "IsCheckpoint": true
             },
             {
-                "Type": "Square",
-                "Distance": 262.25,
+                "Type": "Dive",
+                "Distance": 253.5,
                 "Lateral": 0.0,
                 "Height": 0.0,
                 "Yaw": 0.0,
                 "Scale": 1.0,
-                "Color": "red",
+                "Color": "blue",
                 "IsCheckpoint": true
             },
             {
-                "Type": "Hurdle",
+                "Type": "Ladder",
                 "Distance": 291.25,
                 "Lateral": 0.0,
                 "Height": 0.0,
@@ -406,6 +479,26 @@
                 "Scale": 1.0,
                 "Color": "green",
                 "IsCheckpoint": true
+            },
+            {
+                "Type": "ChevronBoardLeft",
+                "Distance": 2.0,
+                "Lateral": 4.5,
+                "Height": 0.0,
+                "Yaw": 0.0,
+                "Scale": 1.0,
+                "Color": "",
+                "IsCheckpoint": false
+            },
+            {
+                "Type": "ChevronBoard",
+                "Distance": 158.25,
+                "Lateral": -4.5,
+                "Height": 0.0,
+                "Yaw": 0.0,
+                "Scale": 1.0,
+                "Color": "",
+                "IsCheckpoint": false
             }
         ]
     }

@@ -80,21 +80,43 @@ namespace GateRush.Track
             AddBox(sub, (a + b) * 0.5f, rot, new Vector3(thickness, thickness, len));
         }
 
-        /// <summary>A flat quad facing the rotation's +Y (decals, chevron boards, pads). UV 0..1, V along +Z.</summary>
-        public void AddQuad(int sub, Vector3 center, Quaternion rotation, Vector2 size)
+        /// <summary>A flat quad facing the rotation's +Y (decals, chevron boards, pads). UV 0..1 (or metres), V along +Z.</summary>
+        public void AddQuad(int sub, Vector3 center, Quaternion rotation, Vector2 size, bool metricUv = false)
         {
             Vector3 x = rotation * Vector3.right * (size.x * 0.5f);
             Vector3 z = rotation * Vector3.forward * (size.y * 0.5f);
             Vector3 n = rotation * Vector3.up;
             int i = _vertices.Count;
+            // Metric UVs (1 unit = 1 m) let tiling textures keep their real size; otherwise 0..1 across the quad.
+            float u = metricUv ? size.x : 1f, v = metricUv ? size.y : 1f;
             _vertices.Add(center - x - z); _uvs.Add(new Vector2(0f, 0f));
-            _vertices.Add(center + x - z); _uvs.Add(new Vector2(1f, 0f));
-            _vertices.Add(center + x + z); _uvs.Add(new Vector2(1f, 1f));
-            _vertices.Add(center - x + z); _uvs.Add(new Vector2(0f, 1f));
+            _vertices.Add(center + x - z); _uvs.Add(new Vector2(u, 0f));
+            _vertices.Add(center + x + z); _uvs.Add(new Vector2(u, v));
+            _vertices.Add(center - x + z); _uvs.Add(new Vector2(0f, v));
             for (int k = 0; k < 4; k++) _normals.Add(n);
             var tri = _triangles[sub];
             tri.Add(i); tri.Add(i + 2); tri.Add(i + 1);
             tri.Add(i); tri.Add(i + 3); tri.Add(i + 2);
+        }
+
+        /// <summary>A flat disc facing +Y at <paramref name="center"/>, UV 0..1 across its bounding square.</summary>
+        public void AddDisc(int sub, Vector3 center, float radius, int segments)
+        {
+            int c = _vertices.Count;
+            _vertices.Add(center); _normals.Add(Vector3.up); _uvs.Add(new Vector2(0.5f, 0.5f));
+            for (int k = 0; k <= segments; k++)
+            {
+                float a = k * Mathf.PI * 2f / segments;
+                float cx = Mathf.Cos(a), cz = Mathf.Sin(a);
+                _vertices.Add(center + new Vector3(cx * radius, 0f, cz * radius));
+                _normals.Add(Vector3.up);
+                _uvs.Add(new Vector2(0.5f + cx * 0.5f, 0.5f + cz * 0.5f));
+            }
+            var tri = _triangles[sub];
+            for (int k = 0; k < segments; k++)
+            {
+                tri.Add(c); tri.Add(c + k + 2); tri.Add(c + k + 1);
+            }
         }
 
         // One box face: centre c, normal n, half-extent axes u (V direction) and v (U direction).

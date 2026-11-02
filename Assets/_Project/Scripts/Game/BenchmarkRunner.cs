@@ -151,8 +151,8 @@ namespace GateRush.Game
             gates.Sort((a, b) => GateIndex(a.name).CompareTo(GateIndex(b.name)));
             var spawn = GameObject.Find("Spawn");
             if (spawn != null) _path.Add(spawn.transform.position + Vector3.up * 1.5f);
-            foreach (var g in gates) _path.Add(g.OpeningCenterWorld);
-            _path.Add(gates[0].OpeningCenterWorld);
+            foreach (var g in gates) _path.Add(g.AimPointWorld);
+            _path.Add(gates[0].AimPointWorld);
             for (int i = 1; i < _path.Count; i++) _pathLength += Vector3.Distance(_path[i - 1], _path[i]);
         }
 

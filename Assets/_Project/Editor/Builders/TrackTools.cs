@@ -51,8 +51,9 @@ namespace GateRush.EditorTools.Builders
             int layer = LayerMask.NameToLayer(TrackSceneBuilder.TrackLayerName);
             var loaded = TrackBuilder.Build(def.Track, prefabs, null, layer < 0 ? 0 : layer);
             loaded.Root.name = PreviewPrefix + def.Track.Name;
-            // A preview only: the game builds the track from JSON at runtime.
-            foreach (var t in loaded.Root.GetComponentsInChildren<Transform>(true)) t.gameObject.hideFlags = HideFlags.DontSave;
+            // A preview only (the game builds the track from JSON at runtime): never saved, and unlike HideFlags.DontSave it
+            // stays in this scene, so it does not linger across scene loads.
+            foreach (var t in loaded.Root.GetComponentsInChildren<Transform>(true)) t.gameObject.hideFlags = HideFlags.DontSaveInEditor;
 
             var errors = def.Track.Validate(prefabs != null ? prefabs.GateTypes() : null, prefabs != null ? prefabs.PropTypes() : null);
             int tris = 0, renderers = 0;

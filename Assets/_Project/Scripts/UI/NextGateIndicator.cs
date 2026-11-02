@@ -37,7 +37,7 @@ namespace GateRush.UI
                 return;
             }
 
-            Vector3 target = gate.OpeningCenterWorld;
+            Vector3 target = gate.AimPointWorld;
             Vector3 view = _camera.WorldToViewportPoint(target);
             bool onScreen = view.z > 0f && view.x > 0.02f && view.x < 0.98f && view.y > 0.02f && view.y < 0.98f;
             Vector2 size = _canvas.rect.size;

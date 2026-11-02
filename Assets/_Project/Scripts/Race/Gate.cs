@@ -26,6 +26,10 @@ namespace GateRush.Race
         [SerializeField] private Vector2 openingSize = new Vector2(1.52f, 1.52f);
         [Tooltip("Opening centre in local space.")]
         [SerializeField] private Vector3 openingCenter = new Vector3(0f, 1.76f, 0f);
+        [Tooltip("Optional point to aim for (local), e.g. the lower window of a stacked gate whose opening spans both; " +
+                 "used by the autopilot, the HUD marker and respawns. Off = the opening centre.")]
+        [SerializeField] private bool useAimPoint;
+        [SerializeField] private Vector3 aimPoint;
         [Tooltip("Respawn this far before the opening (m).")]
         [SerializeField] private float respawnDistance = 2.5f;
         [SerializeField] private Renderer[] frameRenderers = new Renderer[0];
@@ -56,6 +60,8 @@ namespace GateRush.Race
 
         public Vector2 OpeningSize => Vector2.Scale(openingSize, transform.lossyScale);
         public Vector3 OpeningCenterWorld => transform.TransformPoint(openingCenter);
+        /// <summary>Where to fly through: the aim point if set, else the opening centre.</summary>
+        public Vector3 AimPointWorld => transform.TransformPoint(useAimPoint ? aimPoint : openingCenter);
 
         /// <summary>Respawn pose: in front of the opening, level, facing through it.</summary>
         public void GetRespawnPose(out Vector3 position, out Quaternion rotation)
@@ -63,7 +69,7 @@ namespace GateRush.Race
             Vector3 fwd = transform.forward;
             Vector3 flat = new Vector3(fwd.x, 0f, fwd.z);
             rotation = Quaternion.LookRotation(flat.sqrMagnitude > 1e-4f ? flat : Vector3.forward, Vector3.up);
-            position = OpeningCenterWorld - rotation * Vector3.forward * respawnDistance;
+            position = AimPointWorld - rotation * Vector3.forward * respawnDistance;
         }
 
         public bool TryCross(Vector3 from, Vector3 to, out float fraction) =>
@@ -81,6 +87,13 @@ namespace GateRush.Race
                 GateVisualState.Passed => passedColor,
                 _ => idleColor,
             };
+            // Kit obstacles drive their LED strips (colour + pulsing intensity) through the highlight.
+            var highlight = GetComponentInParent<NextGateHighlight>();
+            if (highlight != null)
+            {
+                highlight.Show(state, c);
+                return;
+            }
             _mpb.SetColor(BaseColor, c);
             for (int i = 0; i < frameRenderers.Length; i++)
                 if (frameRenderers[i] != null) frameRenderers[i].SetPropertyBlock(_mpb);

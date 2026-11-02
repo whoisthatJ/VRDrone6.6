@@ -109,6 +109,21 @@ namespace GateRush.EditorTools.Art
             T("M_Rubber_Black", "Rubber_Black", macro: 0f),
             T("M_Plastic_Black", "Plastic_Matte", macro: 0f),
             new MatDef { Name = "M_Fence_Chainlink", Texture = "Fence_Chainlink", AlphaClip = true, Cutoff = 0.45f, DoubleSided = true, Macro = 0f },
+            Tint("M_Fabric_GateGreen", "Fabric_Woven", new Color(0.25f, 1.45f, 0.42f), smooth: 0.9f, macro: 0f),
+            // T2 obstacle kit: padded covers (stitched-seam fabric), powder-coated truss, net, flag, pads, signs
+            Pad("M_Kit_Pad_Red", new Color(0.86f, 0.09f, 0.08f)),
+            Pad("M_Kit_Pad_Green", new Color(0.12f, 0.62f, 0.22f)),
+            Pad("M_Kit_Pad_Blue", new Color(0.08f, 0.26f, 0.86f)),
+            Pad("M_Kit_Pad_White", new Color(0.92f, 0.92f, 0.9f)),
+            Pad("M_Kit_Pad_Black", new Color(0.09f, 0.09f, 0.1f)),
+            Tint("M_Kit_Truss_Black", "Steel_Plate", new Color(0.09f, 0.09f, 0.1f), smooth: 0.85f, metal: 0.4f, macro: 0.1f),
+            Tint("M_Kit_Truss_Green", "Steel_Plate", new Color(0.18f, 0.66f, 0.24f), smooth: 0.85f, metal: 0.25f, macro: 0.1f),
+            Tint("M_Kit_Truss_Red", "Steel_Plate", new Color(0.75f, 0.1f, 0.08f), smooth: 0.85f, metal: 0.25f, macro: 0.1f),
+            new MatDef { Name = "M_Kit_Net", Texture = "proc:SafetyNet", TileMeters = 0.2f, AlphaClip = true, Cutoff = 0.5f, DoubleSided = true, Smoothness = 0.3f, Metallic = 0f, Macro = 0f },
+            new MatDef { Name = "M_Kit_Flag", Texture = "proc:BrandFlag", TileMeters = 1f, DoubleSided = true, Smoothness = 0.3f, Metallic = 0f, Macro = 0f },
+            new MatDef { Name = "M_Kit_LandingPad", Texture = "proc:LandingPad", TileMeters = 1f, Smoothness = 1f, Metallic = 0f, Macro = 0f },
+            new MatDef { Name = "M_Kit_StartGrid", Texture = "proc:StartGrid", TileMeters = 1f, Smoothness = 0.35f, Metallic = 0f, Macro = 0f },
+            new MatDef { Name = "M_Kit_ChevronSign", Texture = "proc:ChevronSign", TileMeters = 1f, Smoothness = 0.4f, Metallic = 0f, Macro = 0f },
             // Plain and procedural
             Plain("M_Paint_Yellow", new Color(0.88f, 0.66f, 0.06f), 0.42f),
             Plain("M_Paint_White", new Color(0.82f, 0.82f, 0.8f), 0.42f),
@@ -136,6 +151,9 @@ namespace GateRush.EditorTools.Art
             new MatDef { Name = "M_LED_Red", Shader = MatDef.Led, Tint = new Color(1f, 0.06f, 0.04f), LedIntensity = 5f },
             new MatDef { Name = "M_LED_Blue", Shader = MatDef.Led, Tint = new Color(0.1f, 0.35f, 1f), LedIntensity = 5f },
         };
+
+        private static MatDef Pad(string name, Color color) =>
+            new MatDef { Name = name, Texture = "proc:PadFabric", Tint = color, TileMeters = 0.25f, Smoothness = 1f, Metallic = 0f, Macro = 0f };
 
         public static MatDef Def(string name) => Defs.FirstOrDefault(d => d.Name == name);
 

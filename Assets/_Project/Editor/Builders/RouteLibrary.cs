@@ -71,24 +71,43 @@ namespace GateRush.EditorTools.Builders
             void Add(string type, float turns, string color) =>
                 r.Obstacles.Add(new RouteObstacle { Type = type, Distance = At(turns), Color = color });
 
-            Add("Large", 0.12f, "white"); // finish
-            Add("Square", 0.25f, "red");
-            Add("Hurdle", 0.42f, "green");
-            Add("Square", 0.62f, "red");
-            Add("Large", 0.80f, "blue");
-            Add("Square", 1.00f, "red");
-            Add("Hurdle", 1.18f, "green");
-            Add("Square", 1.35f, "red");
-            Add("Large", 1.50f, "blue"); // on the bridge
-            Add("Square", 1.70f, "red");
-            Add("Hurdle", 1.88f, "green");
+            Add("Arch", 0.12f, "white"); // finish
+            Add("Single", 0.25f, "red");
+            Add("Ladder", 0.42f, "green");
+            Add("Cube", 0.62f, "green");
+            Add("Double", 0.80f, "red");
+            Add("Single", 1.00f, "red");
+            Add("Slalom", 1.20f, "white");
+            Add("Single", 1.36f, "red");
+            Add("Single", 1.50f, "blue"); // on the bridge
+            Add("Dive", 1.64f, "blue"); // dive off the bridge
+            Add("Ladder", 1.88f, "green");
             r.FinishObstacle = 0;
 
-            // Start pad on the centre line a few metres before the finish gate.
-            var pad = route.Sample(At(0.12f) - 9f);
+            // Chevron boards on the outside of the two tight ends, arrows pointing into the turn.
+            foreach (float turns in new[] { 0f, 1f })
+            {
+                float d = At(turns) - 10f;
+                var p = route.Sample(d);
+                var ahead = route.Sample(d + 8f);
+                bool turnsLeft = Vector3.Cross(p.FlatForward, ahead.FlatForward).y < 0f;
+                r.Obstacles.Add(new RouteObstacle
+                {
+                    Type = turnsLeft ? "ChevronBoardLeft" : "ChevronBoard", Distance = d + 12f, Lateral = turnsLeft ? 4.5f : -4.5f, IsCheckpoint = false,
+                });
+            }
+
+            // Start pad beside the route, 6 m to the left, a dozen metres before the finish arch.
+            var pad = route.Sample(At(0.12f) - 12f);
             var flat = pad.FlatForward;
-            t.Spawn.Position = new Vector3(pad.Position.x, r.GroundHeight + 0.15f, pad.Position.z);
+            Vector3 padPos = pad.Position - pad.Right * 6f;
+            t.Spawn.Position = new Vector3(padPos.x, r.GroundHeight + 0.15f, padPos.z);
             t.Spawn.Yaw = Mathf.Atan2(flat.x, flat.z) * Mathf.Rad2Deg;
+            foreach (float side in new[] { -4.2f, 4.2f })
+                t.Props.Add(new PropData { Type = "Flag", Position = new Vector3(padPos.x, 0f, padPos.z) - pad.Right * 1.5f + flat * side, Euler = new Vector3(0f, t.Spawn.Yaw, 0f) });
+            // Landing pads in the middle of both loops.
+            foreach (float x in new[] { -36f, 36f })
+                t.Props.Add(new PropData { Type = "LandingPad", Position = new Vector3(x, 0f, 0f) });
             return t;
         }
 

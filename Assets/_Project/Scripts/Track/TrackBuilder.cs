@@ -29,6 +29,8 @@ namespace GateRush.Track
         public const float SupportSpacing = 4f;
         /// <summary>Deck heights above ground below this stay on the ground (no supports).</summary>
         public const float ElevatedThreshold = 0.25f;
+        /// <summary>Kit start grid offset from the spawn (the spawn is slot 2 of four 1.5 m slots).</summary>
+        public const float StartSlotOffset = 0.75f;
 
         private const int SubWarm = 0, SubRed = 1, SubHardware = 2, SubChevron = 3, SubSupport = 4, SubCount = 5;
 
@@ -78,7 +80,7 @@ namespace GateRush.Track
                 mr.shadowCastingMode = ShadowCastingMode.Off;
             }
 
-            BuildStartPad(data, root, Or(kit?.StartPad), layer);
+            BuildStartPad(data, root, Or(kit?.StartPad), layer, prefabs);
             if (prefabs != null) TrackLoader.AddProps(data, prefabs, root);
 
             var spawn = new GameObject("Spawn").transform;
@@ -233,16 +235,15 @@ namespace GateRush.Track
             var r = data.Route;
             wear = new TrackMesh(1);
             int n = r.Obstacles.Count;
-            var distances = new float[n];
-            var isCheckpoint = new bool[n];
-            var gateOf = new Gate[n];
+            // One entry per checkpoint gate; an obstacle can have several (e.g. a slalom), each at its own distance.
+            var entries = new List<(int obstacle, Gate gate, float distance)>();
             var objects = new GameObject[n];
+            int finishEntry = -1;
 
             for (int i = 0; i < n; i++)
             {
                 var o = r.Obstacles[i];
                 var p = route.Sample(o.Distance);
-                distances[i] = p.Distance;
                 Vector3 pos = Deck(r, p) + p.Right * o.Lateral + Vector3.up * o.Height;
                 var rot = Quaternion.LookRotation(p.FlatForward) * Quaternion.Euler(0f, o.Yaw, 0f);
 
@@ -257,40 +258,74 @@ namespace GateRush.Track
                 go.transform.SetPositionAndRotation(pos, rot);
                 go.transform.localScale = Vector3.one * o.Scale;
                 objects[i] = go;
+                go.name = $"Obstacle {i} ({o.Type})";
 
-                var gate = go.GetComponent<Gate>();
-                if (o.IsCheckpoint && gate == null) gate = go.AddComponent<Gate>();
-                if (!o.IsCheckpoint && gate != null)
+                var gates = go.GetComponentsInChildren<Gate>(true);
+                if (!o.IsCheckpoint)
                 {
-                    if (Application.isPlaying) Object.Destroy(gate);
-                    else Object.DestroyImmediate(gate);
-                    gate = null;
+                    foreach (var gate in gates)
+                    {
+                        if (Application.isPlaying) Object.Destroy(gate);
+                        else Object.DestroyImmediate(gate);
+                    }
                 }
-                if (gate != null && TryParseColor(o.Color, out var tint)) gate.IdleColor = tint;
-                gateOf[i] = gate;
-                isCheckpoint[i] = gate != null;
+                else
+                {
+                    if (gates.Length == 0) gates = new[] { go.AddComponent<Gate>() };
+                    var tinted = TryParseColor(o.Color, out var tint);
+                    int first = entries.Count;
+                    foreach (var gate in gates)
+                    {
+                        if (tinted) gate.IdleColor = tint;
+                        float along = Vector3.Dot(gate.OpeningCenterWorld - pos, p.FlatForward);
+                        entries.Add((i, gate, p.Distance + along));
+                    }
+                    // The finish is the obstacle's first opening along the route.
+                    if (i == r.FinishObstacle)
+                    {
+                        finishEntry = first;
+                        for (int k = first + 1; k < entries.Count; k++)
+                            if (entries[k].distance < entries[finishEntry].distance) finishEntry = k;
+                    }
+                }
 
                 // A worn patch under it, turned a little differently each time (seeded by the index).
                 float yaw = Hash(i) * 40f - 20f;
                 wear.AddQuad(0, new Vector3(pos.x, Deck(r, p).y + 0.006f, pos.z), rot * Quaternion.Euler(0f, yaw, 0f), new Vector2(3.4f * o.Scale, 2.6f * o.Scale));
             }
 
-            var order = TrackCheckpoints.Order(distances, isCheckpoint, r.FinishObstacle, startDistance, route.Length);
-            var gates = new Gate[order.Length];
+            var distances = new float[entries.Count];
+            var isCheckpoint = new bool[entries.Count];
+            for (int k = 0; k < entries.Count; k++)
+            {
+                distances[k] = route.Wrap(entries[k].distance);
+                isCheckpoint[k] = true;
+            }
+            var order = TrackCheckpoints.Order(distances, isCheckpoint, finishEntry, startDistance, route.Length);
+            var result = new Gate[order.Length];
             for (int k = 0; k < order.Length; k++)
             {
-                int i = order[k];
-                gates[k] = gateOf[i];
-                gates[k].Order = k;
-                objects[i].name = $"Gate {k} ({r.Obstacles[i].Type})";
+                var e = entries[order[k]];
+                result[k] = e.gate;
+                e.gate.Order = k;
+                // "Gate {k} (type)" on whatever object carries the gate (tools sort gates by this name).
+                e.gate.gameObject.name = $"Gate {k} ({r.Obstacles[e.obstacle].Type})";
             }
-            for (int i = 0; i < n; i++)
-                if (!isCheckpoint[i]) objects[i].name = $"Obstacle {i} ({r.Obstacles[i].Type})";
-            return gates;
+            return result;
         }
 
-        private static void BuildStartPad(TrackData data, Transform root, Material material, int layer)
+        private static void BuildStartPad(TrackData data, Transform root, Material material, int layer, TrackPrefabs prefabs)
         {
+            var kitPad = prefabs != null ? prefabs.Prop("StartPad") : null;
+            if (kitPad != null)
+            {
+                // The kit's start grid: four numbered slots; the spawn sits in slot 2.
+                var yawRot = Quaternion.Euler(0f, data.Spawn.Yaw, 0f);
+                Vector3 ground = data.Spawn.Position - Vector3.up * 0.15f;
+                var grid = Object.Instantiate(kitPad, ground + yawRot * new Vector3(StartSlotOffset, 0f, 0f), yawRot, root);
+                grid.name = "Start Pad";
+                return;
+            }
             var pad = NewChild(root, "Start Pad", layer);
             var rot = Quaternion.Euler(0f, data.Spawn.Yaw, 0f);
             // The spawn point is 0.15 m above the pad surface.
