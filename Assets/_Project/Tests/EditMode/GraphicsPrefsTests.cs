@@ -6,14 +6,14 @@ namespace GateRush.Tests
 {
     public class GraphicsPrefsTests
     {
-        [TestCase(2048, "Low")]    // GTX 1050 class
-        [TestCase(4096, "Medium")] // GTX 1650 Ti class laptop
-        [TestCase(6144, "High")]   // RTX 2060
-        [TestCase(8192, "High")]   // RTX 3070
-        [TestCase(12288, "Ultra")] // RTX 3060 12 GB / 4070
-        public void DetectPreset_UsesVideoMemory(int vramMb, string expected)
+        [Test]
+        public void FirstLaunch_DefaultsToHigh()
         {
-            Assert.AreEqual(expected, GraphicsQuality.DetectPreset(vramMb));
+            Assert.AreEqual("High", GraphicsQuality.DefaultPreset);
+            var first = new GraphicsPrefs().WithPreset(GraphicsQuality.DefaultPreset);
+            Assert.AreEqual("High", first.Preset);
+            Assert.AreEqual(2, first.Shadows);
+            Assert.AreEqual(ScreenDisplay.Fullscreen, first.DisplayMode);
         }
 
         [Test]

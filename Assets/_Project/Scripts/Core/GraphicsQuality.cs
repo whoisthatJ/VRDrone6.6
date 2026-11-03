@@ -11,7 +11,7 @@ namespace GateRush.Core
     [Serializable]
     public sealed class GraphicsPrefs
     {
-        /// <summary>Quality level: "Low", "Medium", "High" or "Ultra". Empty = pick from the GPU on first launch.</summary>
+        /// <summary>Quality level: "Low", "Medium", "High" or "Ultra". Empty = first launch, which starts on <see cref="GraphicsQuality.DefaultPreset"/>.</summary>
         public string Preset = "";
         [Range(0.5f, 1f)] public float RenderScale = 1f;
         /// <summary>0 off, 1 SMAA, 2 MSAA 2×, 3 MSAA 4×.</summary>
@@ -93,8 +93,8 @@ namespace GateRush.Core
 
         public static GraphicsPrefs Current { get; private set; }
 
-        /// <summary>Preset for a GPU with <paramref name="vramMb"/> of video memory (first launch only).</summary>
-        public static string DetectPreset(int vramMb) => vramMb >= 10000 ? "Ultra" : vramMb >= 5500 ? "High" : vramMb >= 3000 ? "Medium" : "Low";
+        /// <summary>Preset every first launch starts on; players lower it in Settings > Graphics if needed.</summary>
+        public const string DefaultPreset = "High";
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void Init()
@@ -103,9 +103,8 @@ namespace GateRush.Core
             settings.Graphics ??= new GraphicsPrefs();
             if (string.IsNullOrEmpty(settings.Graphics.Preset))
             {
-                string preset = DetectPreset(SystemInfo.graphicsMemorySize);
-                settings.Graphics = GraphicsPrefs.ForPreset(preset);
-                Debug.Log($"[GateRush] Graphics preset {preset} chosen for {SystemInfo.graphicsDeviceName} ({SystemInfo.graphicsMemorySize} MB)");
+                settings.Graphics = settings.Graphics.WithPreset(DefaultPreset);
+                Debug.Log($"[GateRush] Graphics preset {DefaultPreset} (default) on {SystemInfo.graphicsDeviceName} ({SystemInfo.graphicsMemorySize} MB)");
             }
             Apply(settings.Graphics);
             ScreenDisplay.Apply(settings.Graphics);
