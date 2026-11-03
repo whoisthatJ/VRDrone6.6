@@ -245,7 +245,7 @@ namespace GateRush.EditorTools.Builders
         /// <summary>
         /// Expo Astana: one ~1.2 km lap of the EXPO 2017 site (ExpoArt; sphere at the origin, bearings clockwise from
         /// north). Start on the south-south-west walkway (bearing 194) heading for the sphere, then
-        /// anticlockwise round Nur Alem at 112 m (east, the park side, north-west), out across the open north-west lawn
+        /// anticlockwise round Nur Alem at 61 m between its podium and the pods (east, the park side, north-west), out across the open north-west lawn
         /// over a 4 m bridge, then anticlockwise along the lawn inside the ring road at 305 m past the south-west crescent
         /// and back into the walkway. Gates stay on level ground or mid-bridge (not on ramps). 14 obstacles, 2 laps.
         /// </summary>
@@ -265,16 +265,16 @@ namespace GateRush.EditorTools.Builders
             Add("Arch", 1, "white");      // finish, on the walkway
             Add("Single", 3, "red");
             Add("Double", 4, "red");      // between the southern petals
-            Add("Single", 7, "blue");     // south of the sphere, past the lobes
-            Add("Ladder", 10, "green");   // east
-            Add("Single", 13, "red");     // north-east
-            Add("Single", 15, "red");     // north, facing the park
-            Add("Ladder", 17, "green");   // north-west
-            r.Obstacles.Add(new RouteObstacle { Type = "Single", Distance = (At(21) + At(22)) * 0.5f, Color = "blue", IsCheckpoint = true }); // mid-bridge
-            Add("Single", 25, "red");     // turning onto the lawn loop
-            Add("Ladder", 27, "green");
-            Add("Cube", 29, "green");     // past the south-west petal
-            Add("Ladder", 31, "green");   // back towards the walkway
+            Add("Single", 8, "blue");     // under the canopy, south of the sphere
+            Add("Ladder", 11, "green");   // east, between the sphere and a pod
+            Add("Single", 14, "red");     // north-east
+            Add("Single", 16, "red");     // north, facing the park
+            Add("Ladder", 18, "green");   // north-west
+            r.Obstacles.Add(new RouteObstacle { Type = "Single", Distance = (At(22) + At(23)) * 0.5f, Color = "blue", IsCheckpoint = true }); // mid-bridge
+            Add("Single", 26, "red");     // turning onto the lawn loop
+            Add("Ladder", 28, "green");
+            Add("Cube", 30, "green");     // past the south-west petal
+            Add("Ladder", 32, "green");   // back towards the walkway
             r.Obstacles.Sort((a, b) => a.Distance.CompareTo(b.Distance));
             r.FinishObstacle = r.Obstacles.FindIndex(o => o.Type == "Arch");
 
@@ -288,6 +288,9 @@ namespace GateRush.EditorTools.Builders
                 t.Props.Add(new PropData { Type = "Flag", Position = padPos + right * 1.4f + fwd * side, Euler = new Vector3(0f, 14f, 0f) });
             return t;
         }
+
+        /// <summary>Radius of the Expo course's orbit round the sphere (generators keep it clear).</summary>
+        public const float OrbitRadius = 61f;
 
         /// <summary>A point at <paramref name="bearing"/> (degrees clockwise from north) and <paramref name="distance"/> from the sphere.</summary>
         public static Vector3 ExpoPoint(float bearing, float distance, float y = 0f)
@@ -306,18 +309,20 @@ namespace GateRush.EditorTools.Builders
                 ExpoPoint(194f, 215f),
                 ExpoPoint(194f, 182f),     // 3
                 ExpoPoint(194f, 152f),     // 4 between the southern petals
-                ExpoPoint(191f, 128f),
+                ExpoPoint(192f, 112f),
+                ExpoPoint(189f, 82f),      // 6 between the southern pods, under the canopy edge
             };
-            // Anticlockwise round the sphere at 112 m, between the lobes on its base and the petals: 180 down to -80.
-            for (float b = 180f; b >= -80f; b -= 20f) k.Add(ExpoPoint(b, 112f));   // knots 6..19
+            // Anticlockwise round the sphere at 61 m, between its podium (to 55 m) and the pods (from 67 m), under the
+            // canopy on the south side: bearing 180 down to -80.
+            for (float b = 180f; b >= -80f; b -= 20f) k.Add(ExpoPoint(b, OrbitRadius));   // knots 7..20
             // Out across the north-west lawn over a bridge (40 m level deck, 40-45 m ramps).
-            k.Add(ExpoPoint(274f, 150f));         // 20 ramp foot
-            k.Add(ExpoPoint(273f, 195f, 4f));     // 21 deck
-            k.Add(ExpoPoint(272f, 235f, 4f));     // 22 deck
-            k.Add(ExpoPoint(268f, 275f));         // 23 ramp foot
+            k.Add(ExpoPoint(274f, 150f));         // 21 ramp foot
+            k.Add(ExpoPoint(273f, 195f, 4f));     // 22 deck
+            k.Add(ExpoPoint(272f, 235f, 4f));     // 23 deck
+            k.Add(ExpoPoint(268f, 275f));         // 24 ramp foot
             // Anticlockwise along the lawn inside the ring road at 305 m, bearing 258 down to 202.
-            for (float b = 258f; b >= 202f; b -= 8f) k.Add(ExpoPoint(b, 305f));      // knots 24..31
-            k.Add(ExpoPoint(197f, 304f));         // 32
+            for (float b = 258f; b >= 202f; b -= 8f) k.Add(ExpoPoint(b, 305f));      // knots 25..32
+            k.Add(ExpoPoint(197f, 304f));         // 33
             return k;
         }
 

@@ -84,15 +84,27 @@ namespace GateRush.Track.Geo
                 }
                 else if (type == "relation" && tags.ContainsKey("building") && e.TryGetValue("members", out var members))
                 {
-                    // Multipolygon buildings: each closed outer ring becomes a footprint (inner rings are ignored).
+                    // Multipolygon buildings: each closed outer ring becomes a footprint; inner rings (courtyards) go
+                    // to the first outer one.
+                    GeoBuilding first = null;
+                    var holes = new List<GeoRing>();
                     foreach (Dictionary<string, object> mem in (List<object>)members)
                     {
-                        if ((string)mem["type"] != "way" || (mem.TryGetValue("role", out var role) && (string)role != "outer")) continue;
+                        if ((string)mem["type"] != "way") continue;
                         long wid = (long)Num(mem["ref"]);
                         if (!ways.TryGetValue(wid, out var ids)) continue;
                         var pts = Points(ids, nodes, out bool closed);
-                        if (closed && pts.Count >= 3) data.Buildings.Add(Building(Id(e), tags, pts));
+                        if (!closed || pts.Count < 3) continue;
+                        string role = mem.TryGetValue("role", out var r) ? (string)r : "outer";
+                        if (role == "inner") holes.Add(new GeoRing { Points = pts });
+                        else
+                        {
+                            var b = Building(Id(e), tags, pts);
+                            first ??= b;
+                            data.Buildings.Add(b);
+                        }
                     }
+                    if (first != null) first.Holes.AddRange(holes);
                 }
             }
             return data;

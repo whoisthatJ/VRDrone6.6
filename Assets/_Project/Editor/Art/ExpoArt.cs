@@ -19,27 +19,8 @@ namespace GateRush.EditorTools.Art
     /// </summary>
     public static class ExpoArt
     {
-        // Nur Alem: 80 m sphere, 100 m above the plinth, on a glazed base drum and a 6 m podium.
-        public const float SphereRadius = 40f, SphereCentreY = 60f;
-        public const float BaseRadius = 26f, BaseHeight = 24f;
-        public const float PodiumHalfX = 50f, PodiumHalfZ = 50f, PodiumHeight = 6f;
+        // Paved hub round the sphere (to the petal tips).
         public const float HubRadius = 132f;
-        // Petal pavilions (satellite view, map + OSM): fans from 124 to 284 m out, 52 degrees wide at the ring and 36 at
-        // the hub. Each has a curved courtyard behind a 16 m hub-side wing, 32 m deep, open at one end: the two northern
-        // petals open to the north, the two southern ones towards the south walkway.
-        public const float PetalInner = 124f, PetalOuter = 284f, PetalHalfOuter = 26f, PetalHalfInner = 18f;
-        public const float CourtyardFrom = 140f, CourtyardTo = 172f, CourtyardEndMargin = 30f;
-        /// <summary>Which side each petal's courtyard opens to: +1 towards larger bearings, -1 towards smaller.</summary>
-        public static float CourtyardSide(float bearing) => bearing > 150f && bearing < 190f ? 1f : -1f;
-        public const float CrescentWall = 15f, CrescentEave = 5f;
-        public static float CrescentRoof => CrescentWall + CrescentEave;
-        public static readonly float[] CrescentAzimuths = { 41f, 97f, 161f, 227f };
-        // Lens-shaped lobes attached to the round base (bearing, distance, length, width), long axis tangential.
-        public static readonly Vector4[] Pods =
-        {
-            new Vector4(68f, 78f, 54f, 40f), new Vector4(140f, 80f, 54f, 40f), new Vector4(200f, 80f, 54f, 40f),
-        };
-        public const float PodHeight = 9f;
         // Walkways from the hub to the ring road through the gaps (and the north-west lawn).
         public static readonly float[] WalkwayBearings = { 129f, 194f, 291f, 316f };
         // Ring road: two carriageways of two 3.5 m lanes and a 4 m median, interrupted by the park.
@@ -79,9 +60,8 @@ namespace GateRush.EditorTools.Art
             var ground = ArtPass.TileGround(ctx, "M_Expo_Lawn");
             ctx.Log.Append(ground != null ? " ground;" : " no ground;");
             BuildGrounds(ctx);
-            BuildSphere(ctx);
-            foreach (float az in CrescentAzimuths) BuildCrescent(ctx, az);
-            for (int i = 0; i < Pods.Length; i++) BuildPod(ctx, i);
+            // Hero buildings from the OSM footprints (Sphere District E2 generators).
+            ctx.Log.Append(GateRush.EditorTools.SphereDistrict.SphereDistrictHeroes.Build(ctx));
             BuildRoad(ctx);
             BuildPark(ctx);
             BuildOutside(ctx);
@@ -206,19 +186,6 @@ namespace GateRush.EditorTools.Art
             Ring(mb, Vector2.zero, 0f, HubRadius, 0.02f, 120, 0);
             foreach (float b in WalkwayBearings)
                 Strip(mb, b, HubRadius - 4f, b == 291f || b == 316f ? RoadOuter + 40f : RoadInner, b == 194f ? 14f : 9f, 0.025f, 0);
-            // Pavement apron round each pavilion (a 6 m band outside its plan).
-            foreach (float az in CrescentAzimuths)
-            {
-                var plan = PetalOutline(az);
-                var outside = Offset(plan, -6f);
-                for (int i = 0; i < plan.Count; i++)
-                {
-                    int j = (i + 1) % plan.Count;
-                    Vector3 p0 = new Vector3(plan[i].x, 0.02f, plan[i].y), p1 = new Vector3(outside[i].x, 0.02f, outside[i].y);
-                    Vector3 p2 = new Vector3(outside[j].x, 0.02f, outside[j].y), p3 = new Vector3(plan[j].x, 0.02f, plan[j].y);
-                    mb.Quad(p0, p1, p2, p3, Xz(p0), Xz(p1), Xz(p2), Xz(p3), 1);
-                }
-            }
             // The path ringing the lawn just inside the road.
             Ring(mb, Vector2.zero, RoadInner - 9f, RoadInner - 5f, 0.022f, 180, 1, RoadGapTo, RoadGapFrom);
             // Curving paths across the open north-west lawn.
@@ -231,393 +198,6 @@ namespace GateRush.EditorTools.Art
             Ring(pool, Xz(Polar(Vector2.zero, 318f, 190f)), 17f, 19f, 0.08f, 48, 1);
             Add(ctx, "Ground", "Pool", pool.Build("ExpoPool"), ArtPass.Mats("M_Water", "M_Concrete_Wall"), false);
             ctx.Log.Append(" plaza;");
-        }
-
-        // ---------- Nur Alem ----------
-
-        private static void BuildSphere(ArtContext ctx)
-        {
-            // Sphere from just under the podium roof to the top, glass with an elliptical glazed oculus (darker) at the
-            // top tilted south, as seen from the air.
-            var mb = new MB();
-            const int lat = 40, lon = 96;
-            float minLat = Mathf.Asin((BaseHeight - 1f - SphereCentreY) / SphereRadius);
-            var c = new Vector3(0f, SphereCentreY, 0f);
-            var oculusAxis = Quaternion.Euler(-18f, 0f, 0f) * Vector3.up;
-            for (int i = 0; i < lat; i++)
-            {
-                float t0 = Mathf.Lerp(minLat, Mathf.PI / 2f, (float)i / lat), t1 = Mathf.Lerp(minLat, Mathf.PI / 2f, (float)(i + 1) / lat);
-                for (int j = 0; j < lon; j++)
-                {
-                    float p0 = 2f * Mathf.PI * j / lon, p1 = 2f * Mathf.PI * (j + 1) / lon;
-                    Vector3 Pt(float t, float p) => c + SphereRadius * new Vector3(Mathf.Cos(t) * Mathf.Sin(p), Mathf.Sin(t), Mathf.Cos(t) * Mathf.Cos(p));
-                    Vector2 Uv(float t, float p) => new Vector2(p * SphereRadius * Mathf.Cos((t0 + t1) * 0.5f), t * SphereRadius);
-                    Vector3 a = Pt(t0, p0), b = Pt(t0, p1), d = Pt(t1, p1), e = Pt(t1, p0);
-                    Vector3 mid = ((a + d) * 0.5f - c).normalized;
-                    // Oculus: an ellipse ~26 x 18 m round the tilted axis.
-                    Vector3 local = Quaternion.Inverse(Quaternion.FromToRotation(Vector3.up, oculusAxis)) * mid;
-                    bool oculus = local.y > 0.9f && (local.x * local.x) / 0.14f + (local.z * local.z) / 0.065f < 1f;
-                    mb.Quad(a, e, d, b, Uv(t0, p0), Uv(t1, p0), Uv(t1, p1), Uv(t0, p1), oculus ? 1 : 0);
-                }
-            }
-            var sphere = Add(ctx, "Nur Alem", "Sphere", mb.Build("Sphere"), ArtPass.Mats("M_Expo_SphereGlass", "M_Expo_Skylight"));
-            var col = new GameObject("Sphere Collider") { layer = ArtPass.TrackGeometryLayer };
-            col.transform.SetParent(sphere.transform, false);
-            col.AddComponent<SphereCollider>().center = c;
-            col.GetComponent<SphereCollider>().radius = SphereRadius;
-
-            // Glazed base drum under the sphere, the low podium round it and the flat canopy on the south side.
-            var pod = new MB();
-            // 0 curtain wall, 1 roof, 2 steel, 3 dark glazing
-            var drum = new List<Vector3>();
-            for (int j = 0; j <= 72; j++) drum.Add(Polar(Vector2.zero, -j * 5f, BaseRadius));
-            Wall(pod, drum, 0f, BaseHeight, 0);
-            Ring(pod, Vector2.zero, 0f, BaseRadius, BaseHeight, 72, 1);
-            var podium = new List<Vector3>();
-            for (int j = 0; j <= 96; j++)
-            {
-                float t = -j * Mathf.PI * 2f / 96f;
-                podium.Add(new Vector3(Mathf.Sin(t) * PodiumHalfX, 0f, Mathf.Cos(t) * PodiumHalfZ));
-            }
-            Wall(pod, podium, 0f, PodiumHeight - 0.8f, 3);
-            Wall(pod, podium, PodiumHeight - 0.8f, PodiumHeight, 2);
-            for (int j = 0; j < 96; j++)
-            {
-                // Podium roof: fan from the drum outwards (between the drum circle and the ellipse).
-                Vector3 o0 = podium[j], o1 = podium[j + 1];
-                Vector3 i0 = o0.normalized * BaseRadius, i1 = o1.normalized * BaseRadius;
-                o0.y = o1.y = i0.y = i1.y = PodiumHeight;
-                pod.Quad(i1, i0, o0, o1, Xz(i1), Xz(i0), Xz(o0), Xz(o1), 1);
-            }
-            var podiumGo = Add(ctx, "Nur Alem", "Base", pod.Build("NurAlemBase"), ArtPass.Mats("M_Expo_CurtainWall", "M_Expo_Roof", "M_Expo_Steel", "M_Glass_Dirty"));
-            Solid(podiumGo);
-
-            ctx.Log.Append(" sphere;");
-        }
-
-        // ---------- petal pavilions ----------
-
-        /// <summary>
-        /// The plan of one petal pavilion (from the satellite view): a fan between <see cref="PetalInner"/> and
-        /// <see cref="PetalOuter"/> metres from the sphere, narrower at the hub, with a courtyard cut in from the hub
-        /// side (so the pavilion reads as a C opening towards the sphere), corners rounded. Anticlockwise from above.
-        /// </summary>
-        public static List<Vector2> PetalOutline(float bearing)
-        {
-            var pts = new List<Vector2>();
-            void P(float b, float r) => pts.Add(Xz(Polar(Vector2.zero, bearing + b, r)));
-            float Half(float r) => Mathf.Lerp(PetalHalfInner, PetalHalfOuter, (r - PetalInner) / (PetalOuter - PetalInner));
-            float side = CourtyardSide(bearing);
-            // The closed end of the courtyard, CourtyardEndMargin metres short of the far side.
-            float End(float r) => -side * (Half(r) - CourtyardEndMargin / r * Mathf.Rad2Deg);
-            float mid = (CourtyardFrom + CourtyardTo) * 0.5f, half = (CourtyardTo - CourtyardFrom) * 0.5f;
-
-            // Outer edge along the ring road (-half to +half), then the +side in to the hub, the hub edge, the -side out.
-            for (int i = 0; i <= 16; i++) P(Mathf.Lerp(-PetalHalfOuter, PetalHalfOuter, i / 16f), PetalOuter);
-            void SideDown(float sgn)
-            {
-                // From the ring down to the hub along the side with sign sgn; cut the courtyard in if it opens here.
-                for (int i = 1; i <= 8; i++)
-                {
-                    float r = Mathf.Lerp(PetalOuter, CourtyardTo, i / 8f);
-                    P(sgn * Half(r), r);
-                }
-                if (sgn == side)
-                {
-                    for (int i = 1; i <= 12; i++) P(Mathf.Lerp(sgn * Half(CourtyardTo), End(CourtyardTo), i / 12f), CourtyardTo);
-                    for (int i = 1; i < 8; i++)
-                    {
-                        float t = Mathf.PI * i / 8f;
-                        float r = mid + half * Mathf.Cos(t);
-                        P(End(r) - side * half * Mathf.Sin(t) / r * Mathf.Rad2Deg, r);
-                    }
-                    for (int i = 0; i <= 12; i++) P(Mathf.Lerp(End(CourtyardFrom), sgn * Half(CourtyardFrom), i / 12f), CourtyardFrom);
-                }
-                else
-                {
-                    for (int i = 1; i <= 3; i++) P(sgn * Half(Mathf.Lerp(CourtyardTo, CourtyardFrom, i / 3f)), Mathf.Lerp(CourtyardTo, CourtyardFrom, i / 3f));
-                }
-                for (int i = 1; i <= 2; i++)
-                {
-                    float r = Mathf.Lerp(CourtyardFrom, PetalInner, i / 2f);
-                    P(sgn * Half(r), r);
-                }
-            }
-            SideDown(1f);
-            for (int i = 1; i < 10; i++) P(Mathf.Lerp(PetalHalfInner, -PetalHalfInner, i / 10f), PetalInner);
-            // The -side, walked from the ring down then reversed so the outline stays continuous.
-            var start = pts.Count;
-            SideDown(-1f);
-            pts.Reverse(start, pts.Count - start);
-            pts.Insert(start, Xz(Polar(Vector2.zero, bearing - PetalHalfInner, PetalInner)));
-            // Drop near-duplicate points (where the sides meet the courtyard and hub edges).
-            var clean = new List<Vector2>();
-            foreach (var q in pts)
-                if (clean.Count == 0 || Vector2.Distance(clean[clean.Count - 1], q) > 0.5f) clean.Add(q);
-            if (Vector2.Distance(clean[0], clean[clean.Count - 1]) < 0.5f) clean.RemoveAt(clean.Count - 1);
-            pts = clean;
-            // Round the corners (Chaikin), then make the winding anticlockwise seen from above.
-            for (int it = 0; it < 2; it++)
-            {
-                var sm = new List<Vector2>(pts.Count * 2);
-                for (int i = 0; i < pts.Count; i++)
-                {
-                    Vector2 a = pts[i], b = pts[(i + 1) % pts.Count];
-                    sm.Add(Vector2.Lerp(a, b, 0.25f));
-                    sm.Add(Vector2.Lerp(a, b, 0.75f));
-                }
-                pts = sm;
-            }
-            if (SignedArea(pts) < 0f) pts.Reverse();
-            return pts;
-        }
-
-        private static float SignedArea(List<Vector2> p)
-        {
-            float a = 0f;
-            for (int i = 0; i < p.Count; i++) a += p[i].x * p[(i + 1) % p.Count].y - p[(i + 1) % p.Count].x * p[i].y;
-            return a * 0.5f;
-        }
-
-        /// <summary>The polygon moved <paramref name="d"/> metres inwards along the vertex normals.</summary>
-        private static List<Vector2> Offset(List<Vector2> p, float d)
-        {
-            var r = new List<Vector2>(p.Count);
-            for (int i = 0; i < p.Count; i++)
-            {
-                Vector2 prev = p[(i - 1 + p.Count) % p.Count], cur = p[i], next = p[(i + 1) % p.Count];
-                Vector2 e0 = (cur - prev).normalized, e1 = (next - cur).normalized;
-                // Anticlockwise: the inside is to the left of each edge.
-                Vector2 n0 = new Vector2(-e0.y, e0.x), n1 = new Vector2(-e1.y, e1.x);
-                Vector2 n = (n0 + n1).normalized;
-                float k = Mathf.Max(0.5f, Vector2.Dot(n, n1));
-                r.Add(cur + n * (d / k));
-            }
-            return r;
-        }
-
-        /// <summary>Removes the small loops an inset creates at tight corners (keeps the polygon simple).</summary>
-        private static List<Vector2> RemoveLoops(List<Vector2> p)
-        {
-            var r = new List<Vector2>(p);
-            bool changed = true;
-            int guard = 0;
-            while (changed && guard++ < 200)
-            {
-                changed = false;
-                for (int i = 0; i < r.Count && !changed; i++)
-                    for (int k = 2; k <= 16 && k < r.Count - 1 && !changed; k++)
-                    {
-                        int j = (i + k) % r.Count;
-                        if (SegmentHit(r[i], r[(i + 1) % r.Count], r[j], r[(j + 1) % r.Count], out var hit))
-                        {
-                            // Replace the loop i+1 .. j with the crossing point.
-                            var next = new List<Vector2>();
-                            for (int m = 0; m < r.Count; m++)
-                            {
-                                int off = (m - i - 1 + r.Count) % r.Count;
-                                if (off < k) continue;               // inside the loop
-                                next.Add(r[m]);
-                                if (m == i) next.Add(hit);
-                            }
-                            r = next;
-                            changed = true;
-                        }
-                    }
-            }
-            return r;
-        }
-
-        private static bool SegmentHit(Vector2 a, Vector2 b, Vector2 c, Vector2 d, out Vector2 hit)
-        {
-            hit = default;
-            Vector2 r = b - a, s = d - c;
-            float den = r.x * s.y - r.y * s.x;
-            if (Mathf.Abs(den) < 1e-6f) return false;
-            float t = ((c.x - a.x) * s.y - (c.y - a.y) * s.x) / den, u = ((c.x - a.x) * r.y - (c.y - a.y) * r.x) / den;
-            if (t <= 0f || t >= 1f || u <= 0f || u >= 1f) return false;
-            hit = a + r * t;
-            return true;
-        }
-
-        private static bool Inside(List<Vector2> poly, Vector2 q)
-        {
-            bool inside = false;
-            for (int i = 0, j = poly.Count - 1; i < poly.Count; j = i++)
-                if ((poly[i].y > q.y) != (poly[j].y > q.y) && q.x < (poly[j].x - poly[i].x) * (q.y - poly[i].y) / (poly[j].y - poly[i].y) + poly[i].x)
-                    inside = !inside;
-            return inside;
-        }
-
-        /// <summary>Ear-clipping triangulation of a simple anticlockwise polygon (indices into it).</summary>
-        private static List<int> Triangulate(List<Vector2> poly)
-        {
-            var idx = new List<int>();
-            for (int i = 0; i < poly.Count; i++) idx.Add(i);
-            var tris = new List<int>();
-            int guard = poly.Count * poly.Count;
-            while (idx.Count > 3 && guard-- > 0)
-            {
-                bool clipped = false;
-                for (int i = 0; i < idx.Count; i++)
-                {
-                    int ia = idx[(i - 1 + idx.Count) % idx.Count], ib = idx[i], ic = idx[(i + 1) % idx.Count];
-                    Vector2 a = poly[ia], b = poly[ib], c = poly[ic];
-                    float cross = (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
-                    if (Mathf.Abs(cross) < 1e-3f)
-                    {
-                        // Collinear (or duplicate): drop the vertex without a triangle.
-                        idx.RemoveAt(i);
-                        clipped = true;
-                        break;
-                    }
-                    if (cross < 0f) continue; // reflex
-                    bool any = false;
-                    foreach (int j in idx)
-                    {
-                        if (j == ia || j == ib || j == ic) continue;
-                        if (InTriangle(poly[j], a, b, c)) { any = true; break; }
-                    }
-                    if (any) continue;
-                    tris.AddRange(new[] { ia, ib, ic });
-                    idx.RemoveAt(i);
-                    clipped = true;
-                    break;
-                }
-                if (!clipped) break;
-            }
-            if (idx.Count == 3) tris.AddRange(new[] { idx[0], idx[1], idx[2] });
-            return tris;
-        }
-
-        private static bool InTriangle(Vector2 p, Vector2 a, Vector2 b, Vector2 c)
-        {
-            float d1 = (p.x - b.x) * (a.y - b.y) - (a.x - b.x) * (p.y - b.y);
-            float d2 = (p.x - c.x) * (b.y - c.y) - (b.x - c.x) * (p.y - c.y);
-            float d3 = (p.x - a.x) * (c.y - a.y) - (c.x - a.x) * (p.y - a.y);
-            bool neg = d1 < 0 || d2 < 0 || d3 < 0, pos = d1 > 0 || d2 > 0 || d3 > 0;
-            return !(neg && pos);
-        }
-
-        private static List<Vector3> At(List<Vector2> p, float y)
-        {
-            var r = new List<Vector3>(p.Count);
-            foreach (var q in p) r.Add(new Vector3(q.x, y, q.y));
-            return r;
-        }
-
-        /// <summary>
-        /// One petal pavilion: dark glazed ground floor, curtain-wall facade, a quarter-round metal eave, the flat roof
-        /// and a grid of skylights on it.
-        /// </summary>
-        private static void BuildCrescent(ArtContext ctx, float bearing)
-        {
-            var plan = PetalOutline(bearing);
-            var mb = new MB();
-            // 0 curtain wall, 1 metal roof and eave, 2 skylights, 3 dark ground-floor glazing
-            Wall(mb, At(plan, 0f), 0f, 4.5f, 3, true);
-            Wall(mb, At(plan, 0f), 4.5f, CrescentWall, 0, true);
-            var prev = plan;
-            float prevY = CrescentWall;
-            for (int s = 1; s <= 4; s++)
-            {
-                float ang = s / 4f * Mathf.PI / 2f;
-                float inset = CrescentEave * (1f - Mathf.Cos(ang));
-                float y = CrescentWall + CrescentEave * Mathf.Sin(ang);
-                var ring = Offset(plan, inset);
-                for (int i = 0; i < ring.Count; i++)
-                {
-                    int j = (i + 1) % ring.Count;
-                    Vector3 a = new Vector3(prev[i].x, prevY, prev[i].y), b = new Vector3(prev[j].x, prevY, prev[j].y);
-                    Vector3 c = new Vector3(ring[j].x, y, ring[j].y), d = new Vector3(ring[i].x, y, ring[i].y);
-                    mb.Quad(a, b, c, d, new Vector2(i * 2f, s), new Vector2(i * 2f + 2f, s), new Vector2(i * 2f + 2f, s + 1f), new Vector2(i * 2f, s + 1f), 1);
-                }
-                prev = ring;
-                prevY = y;
-            }
-            // Flat roof.
-            var roof = RemoveLoops(prev);
-            int first = mb.V.Count;
-            foreach (var q in roof) mb.Vert(new Vector3(q.x, CrescentRoof, q.y), q);
-            var tris = Triangulate(roof);
-            for (int i = 0; i < tris.Count; i += 3) mb.Tri(first + tris[i], first + tris[i + 1], first + tris[i + 2], 1);
-            // Skylight panels on a 12 m grid (aligned with the petal), where they fit inside the roof.
-            var inner = Offset(plan, CrescentEave + 6f);
-            var axis = Polar(Vector2.zero, bearing, 1f);
-            var side = new Vector3(axis.z, 0f, -axis.x);
-            for (float u = -150f; u <= 150f; u += 12f)
-                for (float v = PetalInner; v <= PetalOuter; v += 9f)
-                {
-                    Vector3 cen = axis * v + side * u;
-                    var corners = new[] { cen - side * 4f - axis * 1.6f, cen + side * 4f - axis * 1.6f, cen + side * 4f + axis * 1.6f, cen - side * 4f + axis * 1.6f };
-                    bool fits = true;
-                    foreach (var k in corners) fits &= Inside(inner, Xz(k));
-                    if (!fits) continue;
-                    for (int k = 0; k < 4; k++) corners[k].y = CrescentRoof + 0.05f;
-                    mb.Quad(corners[0], corners[1], corners[2], corners[3], Xz(corners[0]), Xz(corners[1]), Xz(corners[2]), Xz(corners[3]), 2);
-                }
-            var go = Add(ctx, "Pavilions", $"Petal {bearing:0}", mb.Build($"Petal_{bearing:0}"),
-                ArtPass.Mats("M_Expo_CurtainWall", "M_Expo_Roof", "M_Expo_Skylight", "M_Glass_Dirty"));
-            Solid(go);
-        }
-
-        // ---------- lens pavilions ----------
-
-        private static void BuildPod(ArtContext ctx, int index)
-        {
-            var spec = Pods[index];
-            var c = Xz(Polar(Vector2.zero, spec.x, spec.y));
-            float length = spec.z, width = spec.w;
-            // Long axis tangential (perpendicular to the bearing from the sphere).
-            var along = Xz(Polar(Vector2.zero, spec.x + 90f, 1f));
-            var across = Xz(Polar(Vector2.zero, spec.x, 1f));
-            var mb = new MB();
-            var outline = new List<Vector3>();
-            const int steps = 48;
-            for (int i = 0; i < steps; i++)
-            {
-                float t = 2f * Mathf.PI * i / steps;
-                float a = Mathf.Cos(t) * length * 0.5f;
-                float b = Mathf.Sign(Mathf.Sin(t)) * Mathf.Pow(Mathf.Abs(Mathf.Sin(t)), 0.8f) * width * 0.5f;
-                var p = c + along * a + across * b;
-                outline.Add(new Vector3(p.x, 0f, p.y));
-            }
-            // Keep the walk anticlockwise seen from above (outward-facing walls).
-            float area = 0f;
-            for (int i = 0; i < outline.Count; i++)
-            {
-                var p = outline[i];
-                var q = outline[(i + 1) % outline.Count];
-                area += p.x * q.z - q.x * p.z;
-            }
-            if (area < 0f) outline.Reverse();
-            float wall = PodHeight - 3f;
-            Wall(mb, outline, 0f, wall, 0, true);
-            var prev = outline;
-            float prevY = wall;
-            for (int s = 1; s <= 5; s++)
-            {
-                float k = 1f - s / 5f * 0.92f;
-                float y = wall + 3f * Mathf.Sin(s / 5f * Mathf.PI / 2f);
-                var ring = new List<Vector3>();
-                foreach (var p in outline) ring.Add(new Vector3(c.x + (p.x - c.x) * k, y, c.y + (p.z - c.y) * k));
-                for (int i = 0; i < ring.Count; i++)
-                {
-                    Vector3 a = prev[i], b = prev[(i + 1) % ring.Count], d = ring[(i + 1) % ring.Count], e = ring[i];
-                    a.y = b.y = prevY;
-                    mb.Quad(a, b, d, e, Xz(a), Xz(b), Xz(d), Xz(e), 1);
-                }
-                prev = ring;
-                prevY = y;
-            }
-            int top = mb.Vert(new Vector3(c.x, PodHeight, c.y), c);
-            for (int i = 0; i < prev.Count; i++)
-            {
-                int a = mb.Vert(prev[i], Xz(prev[i])), b = mb.Vert(prev[(i + 1) % prev.Count], Xz(prev[(i + 1) % prev.Count]));
-                mb.Tri(top, a, b, 1);
-            }
-            var go = Add(ctx, "Pavilions", $"Lens {index + 1}", mb.Build($"Lens_{index + 1}"), ArtPass.Mats("M_Expo_CurtainWall", "M_Expo_Roof"));
-            Solid(go);
         }
 
         // ---------- ring road ----------
@@ -703,14 +283,6 @@ namespace GateRush.EditorTools.Art
             }
             Add(ctx, "Park", "Park Paths", mb.Build("ParkPaths"), ArtPass.Mats("M_Expo_Paving", "M_Concrete_PaintedFloor"), false);
 
-            // The 25th Anniversary of Independence monument: a white needle with a gold tip on a stepped base.
-            var spire = new List<(Mesh, Matrix4x4, int)>
-            {
-                (ProcMesh.Cone(SpireHeight - 3f, 1.4f, 0.12f, 16), Matrix4x4.Translate(SpirePosition + Vector3.up * 1.2f), 0),
-                (ProcMesh.Cone(3f, 0.3f, 0.02f, 12), Matrix4x4.Translate(SpirePosition + Vector3.up * (SpireHeight - 1.9f)), 1),
-                ProcMesh.Part(SpirePosition + Vector3.up * 0.6f, new Vector3(12f, 1.2f, 12f), Quaternion.Euler(0f, ParkBearing, 0f), 0),
-            };
-            Add(ctx, "Park", "Spire", ProcMesh.Combine("ExpoSpire", spire), ArtPass.Mats("M_Paint_White", "M_Garage_Gold"));
             ctx.Log.Append(" park;");
         }
 
@@ -739,17 +311,10 @@ namespace GateRush.EditorTools.Art
 
         private static void BuildOutside(ArtContext ctx)
         {
-            // Congress Centre (NW, 119 m square-ish glass building) and the Mega Silk Way mall (W).
+            // The Mega Silk Way mall (W); the Congress Centre and the hotel are hero landmarks now.
             var big = new MB();
-            Superellipse(big, Xz(Polar(Vector2.zero, 316f, 480f)), 70f, 66f, 316f, 26f, 0, 1, 2.2f);
             Superellipse(big, Xz(Polar(Vector2.zero, 267f, 640f)), 120f, 245f, 0f, 16f, 2, 1, 8f);
             Add(ctx, "Outside", "Congress And Mall", big.Build("ExpoCongressMall"), ArtPass.Mats("M_Expo_CurtainWall", "M_Expo_Roof", "M_Concrete_Wall"));
-
-            // Two capsule-shaped buildings to the west (white rounded roofs, satellite view).
-            var capsules = new MB();
-            Superellipse(capsules, Xz(Polar(Vector2.zero, 281f, 430f)), 24f, 78f, 4f, 24f, 0, 1, 2.4f);
-            Superellipse(capsules, Xz(Polar(Vector2.zero, 287f, 385f)), 22f, 70f, 4f, 22f, 0, 1, 2.4f);
-            Add(ctx, "Outside", "Capsules", capsules.Build("ExpoCapsules"), ArtPass.Mats("M_Expo_CurtainWall", "M_Paint_White"));
 
             // Offices along the east side towards Mangilik El.
             var east = new List<(Mesh, Matrix4x4, int)>

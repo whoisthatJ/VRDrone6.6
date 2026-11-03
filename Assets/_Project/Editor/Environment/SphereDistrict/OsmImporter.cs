@@ -59,13 +59,28 @@ namespace GateRush.EditorTools.SphereDistrict
 
         public static void ImportCli() => Import();
 
-        /// <summary>Adds an override for each complex footprint that has none yet (sphere / pod / pavilion by distance).</summary>
+        /// <summary>Landmarks round the complex built by hero generators (OSM ids, checked against the extract).</summary>
+        public static readonly System.Collections.Generic.Dictionary<long, string> Landmarks = new System.Collections.Generic.Dictionary<long, string>
+        {
+            [456508223] = "arena",      // round congress centre, 478 m at 316 deg
+            [454853233] = "hall",       // long exhibition hall, 533 m at 43 deg
+            [487262847] = "hotel",      // hotel, 438 m at 291 deg
+            [1460763574] = "monument",  // 25th anniversary of independence needle, 472 m at 12 deg
+        };
+
+        /// <summary>Adds an override for each complex footprint that has none yet (sphere / pod / pavilion by distance) and the landmarks.</summary>
         private static int SeedHeroes(GeoData data, GeoOverrides overrides)
         {
             int added = 0;
             foreach (var b in data.Buildings)
             {
                 if (overrides.Find(b.Id) != null) continue;
+                if (Landmarks.TryGetValue(b.Id, out var landmark))
+                {
+                    overrides.Entries.Add(new GeoOverrides.Entry { Id = b.Id, Hero = true, HeroRole = landmark, Note = $"landmark: {(b.Name.Length > 0 ? b.Name : landmark)}" });
+                    added++;
+                    continue;
+                }
                 var c = Centroid(b.Footprint);
                 float r = c.magnitude;
                 if (r > HeroRadius) continue;

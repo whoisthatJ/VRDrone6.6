@@ -49,49 +49,52 @@ MonoBehaviour:
       - Position: {x: -36.772114, y: 0, z: -147.48495}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: -24.423546, y: 0, z: -125.64828}
+      - Position: {x: -23.286121, y: 0, z: -109.55253}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: -0.000009791351, y: 0, z: -112}
+      - Position: {x: -12.827619, y: 0, z: -80.99045}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: 38.306263, y: 0, z: -105.245575}
+      - Position: {x: -0.0000053327894, y: 0, z: -61}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: 71.99222, y: 0, z: -85.796974}
+      - Position: {x: 20.863234, y: 0, z: -57.32125}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: 96.99484, y: 0, z: -56.000008}
+      - Position: {x: 39.210045, y: 0, z: -46.72871}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: 110.29846, y: 0, z: -19.448597}
+      - Position: {x: 52.82755, y: 0, z: -30.500004}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: 110.29846, y: 0, z: 19.4486}
+      - Position: {x: 60.073273, y: 0, z: -10.59254}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: 96.99485, y: 0, z: 55.999996}
+      - Position: {x: 60.073273, y: 0, z: 10.592542}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: 71.99221, y: 0, z: 85.796974}
+      - Position: {x: 52.827553, y: 0, z: 30.499998}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: 38.306255, y: 0, z: 105.245575}
+      - Position: {x: 39.21004, y: 0, z: 46.72871}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: 0, y: 0, z: 112}
+      - Position: {x: 20.863228, y: 0, z: 57.32125}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: -38.306255, y: 0, z: 105.245575}
+      - Position: {x: 0, y: 0, z: 61}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: -71.99221, y: 0, z: 85.796974}
+      - Position: {x: -20.863228, y: 0, z: 57.32125}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: -96.99485, y: 0, z: 55.999996}
+      - Position: {x: -39.21004, y: 0, z: 46.72871}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: -110.29846, y: 0, z: 19.4486}
+      - Position: {x: -52.827553, y: 0, z: 30.499998}
+        TangentIn: {x: 0, y: 0, z: 0}
+        TangentOut: {x: 0, y: 0, z: 0}
+      - Position: {x: -60.073273, y: 0, z: 10.592542}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
       - Position: {x: -149.6346, y: 0, z: 10.463485}
@@ -165,7 +168,7 @@ MonoBehaviour:
         Color: red
         IsCheckpoint: 1
       - Type: Single
-        Distance: 237
+        Distance: 260.5
         Lateral: 0
         Height: 0
         Yaw: 0
@@ -173,7 +176,7 @@ MonoBehaviour:
         Color: blue
         IsCheckpoint: 1
       - Type: Ladder
-        Distance: 354.25
+        Distance: 324.5
         Lateral: 0
         Height: 0
         Yaw: 0
@@ -181,7 +184,7 @@ MonoBehaviour:
         Color: green
         IsCheckpoint: 1
       - Type: Single
-        Distance: 471.5
+        Distance: 388.25
         Lateral: 0
         Height: 0
         Yaw: 0
@@ -189,7 +192,7 @@ MonoBehaviour:
         Color: red
         IsCheckpoint: 1
       - Type: Single
-        Distance: 549.75
+        Distance: 431
         Lateral: 0
         Height: 0
         Yaw: 0
@@ -197,7 +200,7 @@ MonoBehaviour:
         Color: red
         IsCheckpoint: 1
       - Type: Ladder
-        Distance: 627.75
+        Distance: 473.5
         Lateral: 0
         Height: 0
         Yaw: 0
@@ -205,7 +208,7 @@ MonoBehaviour:
         Color: green
         IsCheckpoint: 1
       - Type: Single
-        Distance: 812.75
+        Distance: 672.25
         Lateral: 0
         Height: 0
         Yaw: 0
@@ -213,7 +216,7 @@ MonoBehaviour:
         Color: blue
         IsCheckpoint: 1
       - Type: Single
-        Distance: 980
+        Distance: 839.5
         Lateral: 0
         Height: 0
         Yaw: 0
@@ -221,7 +224,7 @@ MonoBehaviour:
         Color: red
         IsCheckpoint: 1
       - Type: Ladder
-        Distance: 1065.25
+        Distance: 924.75
         Lateral: 0
         Height: 0
         Yaw: 0
@@ -229,7 +232,7 @@ MonoBehaviour:
         Color: green
         IsCheckpoint: 1
       - Type: Cube
-        Distance: 1150.25
+        Distance: 1010
         Lateral: 0
         Height: 0
         Yaw: 0
@@ -237,7 +240,7 @@ MonoBehaviour:
         Color: green
         IsCheckpoint: 1
       - Type: Ladder
-        Distance: 1235.5
+        Distance: 1095
         Lateral: 0
         Height: 0
         Yaw: 0

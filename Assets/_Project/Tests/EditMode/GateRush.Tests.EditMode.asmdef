@@ -17,7 +17,8 @@
         "GateRush.Net",
         "Unity.Netcode.Runtime",
         "Unity.Collections",
-        "Unity.Localization"
+        "Unity.Localization",
+        "GateRush.EditorTools"
     ],
     "includePlatforms": [
         "Editor"

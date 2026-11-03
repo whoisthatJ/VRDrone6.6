@@ -20,6 +20,15 @@ namespace GateRush.Track.Geo
         public bool Hero;
         public string HeroRole = "";
         public List<Vector2> Footprint = new List<Vector2>();
+        /// <summary>Inner rings (courtyards) of multipolygon buildings.</summary>
+        public List<GeoRing> Holes = new List<GeoRing>();
+    }
+
+    /// <summary>A closed ring of points (a courtyard hole).</summary>
+    [Serializable]
+    public sealed class GeoRing
+    {
+        public List<Vector2> Points = new List<Vector2>();
     }
 
     /// <summary>A road centreline.</summary>

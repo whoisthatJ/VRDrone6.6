@@ -28,6 +28,7 @@ namespace GateRush.EditorTools.Art
             ExpoRoof();
             ExpoApartment();
             ExpoLeaves();
+            SphereFrit();
             AssetDatabase.Refresh();
             return "kit textures written";
         }
@@ -411,6 +412,34 @@ namespace GateRush.EditorTools.Art
                 }
             }
             Save(File("ExpoLeaves", "Albedo"), n, n, px, alpha: true);
+        }
+
+        /// <summary>
+        /// Sphere District sphere glazing (fritted hemisphere), one texture = 3 m: 2 × 2 panels of low-iron glass with
+        /// a ceramic frit dot screen whose density changes from panel to panel, thin silver joints, sky gradient.
+        /// </summary>
+        public static void SphereFrit()
+        {
+            const int n = 512;
+            var px = new Color32[n * n];
+            var rng = new System.Random(2017);
+            var density = new float[4];
+            for (int i = 0; i < 4; i++) density[i] = 0.25f + (float)rng.NextDouble() * 0.5f;
+            for (int y = 0; y < n; y++)
+            for (int x = 0; x < n; x++)
+            {
+                float u = (x + 0.5f) / n, v = (y + 0.5f) / n;
+                int panel = (u < 0.5f ? 0 : 1) + (v < 0.5f ? 0 : 2);
+                var c = Color.Lerp(new Color(0.1f, 0.2f, 0.24f), new Color(0.26f, 0.4f, 0.44f), Mathf.Repeat(v * 2f, 1f) * 0.6f + 0.2f);
+                // Frit dots on a 2 cm grid (16 px), radius set by the panel's density.
+                float gx = Mathf.Repeat(x, 16f) - 8f, gy = Mathf.Repeat(y, 16f) - 8f;
+                float rad = 7f * Mathf.Sqrt(density[panel]);
+                if (gx * gx + gy * gy < rad * rad) c = Color.Lerp(c, new Color(0.62f, 0.7f, 0.72f), 0.3f);
+                float pu = Mathf.Repeat(u * 2f, 1f), pv = Mathf.Repeat(v * 2f, 1f);
+                if (pu < 0.012f || pu > 0.988f || pv < 0.012f || pv > 0.988f) c = new Color(0.36f, 0.42f, 0.45f);
+                px[y * n + x] = C(c.r, c.g, c.b);
+            }
+            Save(File("SphereFrit", "Albedo"), n, n, px);
         }
 
         // ---------- 5×7 bitmap font for the brand and slot numbers ----------

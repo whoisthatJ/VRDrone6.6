@@ -13,12 +13,30 @@ MonoBehaviour:
   m_Name: SphereDistrict_Overrides
   m_EditorClassIdentifier: GateRush.Track::GateRush.Track.Geo.GeoOverrides
   Entries:
+  - Id: 454853233
+    Note: 'landmark: EXPO'
+    Exclude: 0
+    Height: 0
+    Hero: 1
+    HeroRole: hall
   - Id: 454857501
     Note: 'Alem.ai: 9 m at 149 deg'
     Exclude: 0
     Height: 0
     Hero: 1
     HeroRole: sphere
+  - Id: 456508223
+    Note: 'landmark: arena'
+    Exclude: 0
+    Height: 0
+    Hero: 1
+    HeroRole: arena
+  - Id: 487262847
+    Note: 'landmark: hotel'
+    Exclude: 0
+    Height: 0
+    Hero: 1
+    HeroRole: hotel
   - Id: 607960215
     Note: 'office: 99 m at 224 deg'
     Exclude: 0
@@ -37,6 +55,12 @@ MonoBehaviour:
     Height: 0
     Hero: 1
     HeroRole: pod
+  - Id: 1460763574
+    Note: "landmark: \u0422\u04D9\u0443\u0435\u043B\u0441\u0456\u0437\u0434\u0456\u043A\u0442\u0456\u04A3 25 \u0436\u044B\u043B\u0434\u044B\u0493\u044B"
+    Exclude: 0
+    Height: 0
+    Hero: 1
+    HeroRole: monument
   - Id: 1461813336
     Note: 'roof: 38 m at 157 deg'
     Exclude: 0

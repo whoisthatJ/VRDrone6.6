@@ -214,7 +214,7 @@ namespace GateRush.EditorTools.Art
                 var shots = new List<Bookmark>
                 {
                     // The reference photo: high over the south-south-west edge, looking up the axis (bearing 14).
-                    new Bookmark("expo_reference", RouteLibrary.ExpoPoint(194f, 650f, 330f), RouteLibrary.ExpoPoint(14f, 40f), 58f),
+                    new Bookmark("expo_reference", RouteLibrary.ExpoPoint(194f, 470f, 235f), RouteLibrary.ExpoPoint(14f, 60f), 66f),
                     // Straight down, north up, like the satellite view (Docs/reference/ref_expo_astana_top.png).
                     new Bookmark("expo_top", new Vector3(0f, 900f, -0.5f), Vector3.zero, 50f),
                     new Bookmark("expo_overview", RouteLibrary.ExpoPoint(245f, 420f, 170f), new Vector3(0f, 20f, 0f), 50f),

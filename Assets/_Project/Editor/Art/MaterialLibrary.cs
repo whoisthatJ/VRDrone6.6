@@ -135,7 +135,7 @@ namespace GateRush.EditorTools.Art
             // Expo (Astana EXPO 2017 site): Nur Alem glass sphere, pavilion curtain walls and metal roofs, plaza, ring road, city
             new MatDef { Name = "M_Expo_SphereGlass", Texture = "proc:ExpoSphereGlass", TileMeters = 4f, Smoothness = 0.97f, Metallic = 0f, Macro = 0f },
             new MatDef { Name = "M_Expo_CurtainWall", Texture = "proc:ExpoCurtainWall", TileMeters = 6f, Smoothness = 0.92f, Metallic = 0f, Macro = 0f },
-            new MatDef { Name = "M_Expo_Roof", Texture = "proc:ExpoRoof", TileMeters = 4f, Smoothness = 0.6f, Metallic = 0f, Macro = 0f },
+            new MatDef { Name = "M_Expo_Roof", Texture = "proc:ExpoRoof", Tint = new Color(0.72f, 0.74f, 0.78f), TileMeters = 4f, Smoothness = 0.72f, Metallic = 0.55f, Macro = 0f },
             new MatDef { Name = "M_Expo_Apartment", Texture = "proc:ExpoApartment", TileMeters = 7.2f, Smoothness = 0.25f, Metallic = 0f, Macro = 0f },
             Plain("M_Expo_Skylight", new Color(0.18f, 0.3f, 0.4f), 0.95f),
             Plain("M_Expo_Steel", new Color(0.8f, 0.82f, 0.84f), 0.7f, 0.9f),
@@ -143,6 +143,13 @@ namespace GateRush.EditorTools.Art
             Tint("M_Expo_Lawn", "Grass_Field", new Color(0.6f, 0.78f, 0.5f), smooth: 0.3f, macro: 0.35f),
             new MatDef { Name = "M_Expo_Leaves", Texture = "proc:ExpoLeaves", TileMeters = 1f, AlphaClip = true, Cutoff = 0.45f, DoubleSided = true, Smoothness = 0.25f, Metallic = 0f, Macro = 0f },
             Plain("M_Expo_Bark", new Color(0.24f, 0.2f, 0.16f), 0.2f),
+            // Sphere District hero buildings (E2)
+            new MatDef { Name = "M_Sphere_Clear", Tint = new Color(0.5f, 0.64f, 0.74f, 0.32f), Smoothness = 0.97f, Metallic = 0f, Macro = 0f, Transparent = true, DoubleSided = true },
+            new MatDef { Name = "M_Sphere_Frit", Texture = "proc:SphereFrit", TileMeters = 3f, Smoothness = 0.95f, Metallic = 0.35f, Macro = 0f },
+            Plain("M_Sphere_PV", new Color(0.035f, 0.06f, 0.12f), 0.9f, 0.2f),
+            new MatDef { Name = "M_Sphere_LED", Shader = MatDef.Led, Tint = new Color(0.55f, 0.82f, 1f), LedIntensity = 1.2f },
+            Plain("M_Expo_Floor", new Color(0.66f, 0.66f, 0.64f), 0.3f),
+            Plain("M_Expo_Cladding", new Color(0.64f, 0.66f, 0.69f), 0.55f, 0.6f),
             Plain("M_Expo_Asphalt", new Color(0.2f, 0.21f, 0.22f), 0.25f),
             Plain("M_Expo_Tower", new Color(0.2f, 0.27f, 0.33f), 0.9f, 0.3f),
             // T7 garage
