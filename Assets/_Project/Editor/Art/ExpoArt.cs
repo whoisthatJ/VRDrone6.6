@@ -57,17 +57,16 @@ namespace GateRush.EditorTools.Art
                 ctx.Sun.lightmapBakeType = LightmapBakeType.Realtime;
             }
 
-            var ground = ArtPass.TileGround(ctx, "M_Expo_Lawn");
+            // Urban paving everywhere OSM maps no other surface; dry steppe beyond the mapped 3 km.
+            var ground = ArtPass.TileGround(ctx, "M_Expo_Paving");
             ctx.Log.Append(ground != null ? " ground;" : " no ground;");
-            BuildGrounds(ctx);
+            BuildSteppe(ctx);
             // Hero buildings from the OSM footprints (Sphere District E2 generators).
             ctx.Log.Append(GateRush.EditorTools.SphereDistrict.SphereDistrictHeroes.Build(ctx));
-            BuildRoad(ctx);
-            BuildPark(ctx);
+            BuildStreetscape(ctx);
             BuildOutside(ctx);
             BuildCity(ctx);
             BuildSkyline(ctx);
-            BuildTrees(ctx);
             ArtPass.AddProbe(ctx, "Hub Probe", new Vector3(0f, 20f, 0f), new Vector3(700f, 120f, 700f), false, 256);
         }
 
@@ -166,127 +165,37 @@ namespace GateRush.EditorTools.Art
         }
 
 
-        // ---------- ground: hub plaza, walkways, lawns and paths ----------
+        // ---------- ground and streetscape (Sphere District E3, from OSM) ----------
 
-        /// <summary>A straight paved strip from <paramref name="r0"/> to <paramref name="r1"/> along a bearing.</summary>
-        private static void Strip(MB mb, float bearing, float r0, float r1, float halfWidth, float y, int sub)
+        private static void BuildStreetscape(ArtContext ctx)
         {
-            var dir = Polar(Vector2.zero, bearing, 1f);
-            var right = new Vector3(dir.z, 0f, -dir.x);
-            Vector3 a = dir * r0, b = dir * r1;
-            Vector3 p0 = a - right * halfWidth, p1 = a + right * halfWidth, p2 = b + right * halfWidth, p3 = b - right * halfWidth;
-            p0.y = p1.y = p2.y = p3.y = y;
-            mb.Quad(p0, p1, p2, p3, Xz(p0), Xz(p1), Xz(p2), Xz(p3), sub);
+            var geo = AssetDatabase.LoadAssetAtPath<GateRush.Track.Geo.GeoDataAsset>(GateRush.EditorTools.SphereDistrict.OsmImporter.DataPath);
+            if (geo == null)
+            {
+                ctx.Log.Append(" no geo data;");
+                return;
+            }
+            var st = new GateRush.EditorTools.SphereDistrict.StreetscapeGenerator(geo.Data, GateRush.EditorTools.Builders.RouteLibrary.ExpoKnots());
+            st.BuildRoads();
+            st.BuildAreas();
+            st.BuildFootwayProps();
+            st.BuildTrees();
+            st.BuildSolar();
+            st.Write(ctx, G(ctx, "Sphere District Streetscape"));
+            var sb = new System.Text.StringBuilder(" streetscape:");
+            foreach (var kv in st.Counts) sb.Append(' ').Append(kv.Key).Append(' ').Append(kv.Value);
+            ctx.Log.Append(sb.Append(';'));
         }
 
-        private static void BuildGrounds(ArtContext ctx)
+        /// <summary>A band of dry steppe grass beyond the mapped area (1.5-3 km), fading the city out.</summary>
+        private static void BuildSteppe(ArtContext ctx)
         {
             var mb = new MB();
-            // 0 plaza paving, 1 path paving
-            Ring(mb, Vector2.zero, 0f, HubRadius, 0.02f, 120, 0);
-            foreach (float b in WalkwayBearings)
-                Strip(mb, b, HubRadius - 4f, b == 291f || b == 316f ? RoadOuter + 40f : RoadInner, b == 194f ? 14f : 9f, 0.025f, 0);
-            // The path ringing the lawn just inside the road.
-            Ring(mb, Vector2.zero, RoadInner - 9f, RoadInner - 5f, 0.022f, 180, 1, RoadGapTo, RoadGapFrom);
-            // Curving paths across the open north-west lawn.
-            Ring(mb, new Vector2(-150f, 150f), 70f, 73f, 0.022f, 48, 1, 60f, 250f);
-            Ring(mb, new Vector2(-210f, 40f), 55f, 58f, 0.022f, 40, 1, -40f, 140f);
-            Add(ctx, "Ground", "Plaza", mb.Build("Plaza"), ArtPass.Mats("M_Expo_Paving", "M_Concrete_PaintedFloor"), false);
-            // The round pool on the north-west lawn.
-            var pool = new MB();
-            Ring(pool, Xz(Polar(Vector2.zero, 318f, 190f)), 0f, 17f, 0.06f, 48, 0);
-            Ring(pool, Xz(Polar(Vector2.zero, 318f, 190f)), 17f, 19f, 0.08f, 48, 1);
-            Add(ctx, "Ground", "Pool", pool.Build("ExpoPool"), ArtPass.Mats("M_Water", "M_Concrete_Wall"), false);
-            ctx.Log.Append(" plaza;");
+            Ring(mb, Vector2.zero, 1520f, 3000f, 0.01f, 128, 0);
+            Add(ctx, "Ground", "Steppe", mb.Build("Steppe"), ArtPass.Mats("M_Expo_Steppe"), false);
         }
 
-        // ---------- ring road ----------
-
-        private static void BuildRoad(ArtContext ctx)
-        {
-            var mb = new MB();
-            float from = RoadGapTo, to = RoadGapFrom;                    // the road runs the long way round, clear of the park
-            const int segs = 220;
-            float inner1 = RoadInner, outer1 = RoadInner + 2f * LaneWidth;
-            float inner2 = outer1 + Median, outer2 = RoadOuter;
-            Ring(mb, Vector2.zero, inner1, outer1, 0.03f, segs, 0, from, to);
-            Ring(mb, Vector2.zero, inner2, outer2, 0.03f, segs, 0, from, to);
-            Ring(mb, Vector2.zero, outer1, inner2, 0.12f, segs, 2, from, to);
-            foreach (float r in new[] { inner1 + 0.3f, outer1 - 0.3f, inner2 + 0.3f, outer2 - 0.3f })
-                Ring(mb, Vector2.zero, r - 0.08f, r + 0.08f, 0.035f, segs, 1, from, to);
-            foreach (float r in new[] { inner1 + LaneWidth, inner2 + LaneWidth })
-            {
-                float circ = 2f * Mathf.PI * r;
-                int dashes = Mathf.RoundToInt(circ * (to - from) / 360f / 12f);
-                for (int i = 0; i < dashes; i++)
-                {
-                    float s0 = from + (to - from) * i / dashes, s1 = s0 + 360f * 4f / circ;
-                    Ring(mb, Vector2.zero, r - 0.07f, r + 0.07f, 0.035f, 1, 1, s0, s1);
-                }
-            }
-            // Zebra crossings where the walkways meet the road.
-            foreach (float az in WalkwayBearings)
-                for (int k = -5; k <= 5; k++)
-                {
-                    float off = k * 1.2f;
-                    var dir = Polar(Vector2.zero, az, 1f);
-                    var right = new Vector3(dir.z, 0f, -dir.x);
-                    Vector3 a = dir * inner1 + right * (off - 0.3f), b = dir * outer2 + right * (off - 0.3f);
-                    Vector3 d = dir * outer2 + right * (off + 0.3f), e = dir * inner1 + right * (off + 0.3f);
-                    a.y = b.y = d.y = e.y = 0.036f;
-                    mb.Quad(a, e, d, b, Xz(a), Xz(e), Xz(d), Xz(b), 1);
-                }
-            // Mangilik El avenue to the east, running north-north-east.
-            var ave = new MB();
-            Vector3 s = Polar(Vector2.zero, 95f, 600f) + Polar(Vector2.zero, 193f, 2500f), f = Polar(Vector2.zero, 95f, 600f) + Polar(Vector2.zero, 13f, 4500f);
-            var side = Polar(Vector2.zero, 103f, 1f);
-            Vector3 q0 = s - side * 16f, q1 = s + side * 16f, q2 = f + side * 16f, q3 = f - side * 16f;
-            q0.y = q1.y = q2.y = q3.y = 0.03f;
-            ave.Quad(q0, q3, q2, q1, Xz(q0), Xz(q3), Xz(q2), Xz(q1), 0);
-            Add(ctx, "Road", "Ring Road", mb.Build("RingRoad"), ArtPass.Mats("M_Asphalt_Old", "M_Stadium_LinePaint", "M_Expo_Lawn"), false);
-            Add(ctx, "Road", "Mangilik El", ave.Build("MangilikEl"), ArtPass.Mats("M_Asphalt_Old"), false);
-
-            var poles = new List<(Mesh, Matrix4x4, int)>();
-            for (float az = from + 3f; az < to - 2f; az += 5.5f)
-            {
-                Vector3 p = Polar(Vector2.zero, az, RoadInner - 1.5f);
-                poles.Add(ProcMesh.Part(p + Vector3.up * 5f, new Vector3(0.22f, 10f, 0.22f), Quaternion.identity));
-                Vector3 arm = Polar(Vector2.zero, az, RoadInner + 0.5f, 10f);
-                poles.Add(ProcMesh.Part(arm, new Vector3(0.18f, 0.15f, 4f), Quaternion.LookRotation(new Vector3(arm.x, 0f, arm.z))));
-            }
-            Add(ctx, "Road", "Street Lights", ProcMesh.Combine("ExpoStreetLights", poles), ArtPass.Mats("M_Expo_Steel"));
-            ctx.Log.Append(" road;");
-        }
-
-        // ---------- the park to the north-north-east ----------
-
-        /// <summary>A point in park coordinates: <paramref name="along"/> the axis from the sphere, <paramref name="across"/> to its right.</summary>
-        private static Vector3 Park(float along, float across, float y = 0f)
-        {
-            var p = Polar(Vector2.zero, ParkBearing, along) + Polar(Vector2.zero, ParkBearing + 90f, across);
-            p.y = y;
-            return p;
-        }
-
-        private static void BuildPark(ArtContext ctx)
-        {
-            var mb = new MB();
-            Strip(mb, ParkBearing, ParkFrom - 20f, ParkTo, 12f, 0.025f, 0);
-            var sp = Xz(SpirePosition);
-            Ring(mb, sp, 0f, 40f, 0.03f, 64, 0);
-            // Flowing paths: arcs either side of the axis.
-            for (int k = 0; k < 6; k++)
-            {
-                float along = ParkFrom + 40f + k * 85f;
-                Ring(mb, Xz(Park(along, -70f)), 52f, 55f, 0.026f, 40, 1, ParkBearing + 20f, ParkBearing + 160f);
-                Ring(mb, Xz(Park(along + 40f, 70f)), 52f, 55f, 0.026f, 40, 1, ParkBearing + 200f, ParkBearing + 340f);
-            }
-            Add(ctx, "Park", "Park Paths", mb.Build("ParkPaths"), ArtPass.Mats("M_Expo_Paving", "M_Concrete_PaintedFloor"), false);
-
-            ctx.Log.Append(" park;");
-        }
-
-        // ---------- outside the ring: neighbours, parking, solar field ----------
+        // ---------- outside the ring: neighbours ----------
 
         private static void Superellipse(MB mb, Vector2 c, float halfX, float halfZ, float rotDeg, float h, int wallSub, int roofSub, float power = 4f)
         {
@@ -325,35 +234,6 @@ namespace GateRush.EditorTools.Art
             };
             Add(ctx, "Outside", "East Buildings", ProcMesh.Combine("ExpoEast", east), ArtPass.Mats("M_Expo_Tower", "M_Concrete_Wall"));
 
-            // Car parks east and south-west of the ring, with bay lines.
-            var lots = new MB();
-            foreach (var (bearing, r0, r1, half) in new[] { (95f, 350f, 420f, 70f), (222f, 355f, 450f, 80f) })
-            {
-                Strip(lots, bearing, r0, r1, half, 0.02f, 0);
-                for (float k = -half + 2f; k < half; k += 2.6f)
-                    for (int row = 0; row < 3; row++)
-                    {
-                        float a0 = r0 + 6f + row * 22f;
-                        var dir = Polar(Vector2.zero, bearing, 1f);
-                        var right = new Vector3(dir.z, 0f, -dir.x);
-                        Vector3 p = dir * a0 + right * (k - 0.06f), q = dir * a0 + right * (k + 0.06f), r = dir * (a0 + 5f) + right * (k + 0.06f), t = dir * (a0 + 5f) + right * (k - 0.06f);
-                        p.y = q.y = r.y = t.y = 0.025f;
-                        lots.Quad(p, q, r, t, Xz(p), Xz(q), Xz(r), Xz(t), 1);
-                    }
-            }
-            Add(ctx, "Outside", "Car Parks", lots.Build("CarParks"), ArtPass.Mats("M_Expo_Asphalt", "M_Stadium_LinePaint"), false);
-
-            // Solar field just outside the ring to the south (seen in the reference photo).
-            var solar = new List<(Mesh, Matrix4x4, int)>();
-            for (int row = 0; row < 5; row++)
-                for (float b = 168f; b <= 205f; b += 3.4f)
-                {
-                    var p = Polar(Vector2.zero, b, RoadOuter + 22f + row * 9f, 1.1f);
-                    var yaw = Quaternion.Euler(0f, b, 0f);                 // rows run tangentially
-                    solar.Add(ProcMesh.Part(p, new Vector3(18f, 0.08f, 3.4f), yaw * Quaternion.Euler(-30f, 0f, 0f), 0));
-                    solar.Add(ProcMesh.Part(p + Vector3.down * 0.6f, new Vector3(17f, 1.1f, 0.12f), yaw, 1));
-                }
-            Add(ctx, "Outside", "Solar Field", ProcMesh.Combine("ExpoSolar", solar), ArtPass.Mats("M_Glass_Night", "M_Expo_Steel"));
             ctx.Log.Append(" outside;");
         }
 
@@ -440,69 +320,6 @@ namespace GateRush.EditorTools.Art
             m.RecalculateTangents();
             m.RecalculateBounds();
             return m;
-        }
-
-        private static void BuildTrees(ArtContext ctx)
-        {
-            const int variants = 6;
-            var meshes = new Mesh[variants];
-            for (int i = 0; i < variants; i++)
-            {
-                int seed = 100 + i;
-                meshes[i] = ArtPass.MeshAsset("ExpoTree_" + i, () => TreeMesh(seed, 8f));
-            }
-            var rng = new System.Random(2017);
-            // Chunks so whole groups are culled when out of view.
-            var chunks = new Dictionary<Vector2Int, List<(Mesh, Matrix4x4, int)>>();
-            int count = 0;
-            void Tree(Vector3 p, float scale)
-            {
-                var key = new Vector2Int(Mathf.FloorToInt(p.x / 200f), Mathf.FloorToInt(p.z / 200f));
-                if (!chunks.TryGetValue(key, out var list)) chunks[key] = list = new List<(Mesh, Matrix4x4, int)>();
-                var mesh = meshes[rng.Next(variants)];
-                var m = Matrix4x4.TRS(new Vector3(p.x, 0f, p.z), Quaternion.Euler(0f, (float)rng.NextDouble() * 360f, 0f), Vector3.one * scale);
-                list.Add((mesh, m, 0));
-                list.Add((mesh, m, 1));
-                count++;
-            }
-            // Park: young trees in loose groups either side of the promenade.
-            for (int i = 0; i < 1800 && count < 460; i++)
-            {
-                float along = ParkFrom + 10f + (float)rng.NextDouble() * (ParkTo - ParkFrom - 10f);
-                float across = (float)(rng.NextDouble() * 2 - 1) * ParkHalfWidth;
-                var p = Park(along, across);
-                if (Mathf.Abs(across) < 20f || Vector3.Distance(p, SpirePosition) < 48f) continue;
-                if (Mathf.PerlinNoise(along * 0.02f + 7f, across * 0.02f + 3f) < 0.5f) continue;
-                Tree(p, 0.7f + (float)rng.NextDouble() * 0.35f);
-            }
-            // The north-west lawn: scattered groups clear of the race corridor (bearing 268-276).
-            for (int i = 0; i < 900 && count < 620; i++)
-            {
-                float b = 255f + (float)rng.NextDouble() * 95f, r = 150f + (float)rng.NextDouble() * 150f;
-                if (Mathf.Abs(Mathf.DeltaAngle(b, 272f)) < 9f || Mathf.Abs(Mathf.DeltaAngle(b, 291f)) < 4f || Mathf.Abs(Mathf.DeltaAngle(b, 316f)) < 4f) continue;
-                if (r > RoadInner - 22f && b < 300f) continue;                           // the lawn loop runs here
-                if (Vector3.Distance(Polar(Vector2.zero, b, r), Polar(Vector2.zero, 318f, 190f)) < 26f) continue;
-                if (Mathf.PerlinNoise(b * 0.05f, r * 0.02f) < 0.55f) continue;
-                Tree(Polar(Vector2.zero, b, r), 0.6f + (float)rng.NextDouble() * 0.3f);
-            }
-            // A row along the outer edge of the ring road.
-            for (float az = RoadGapTo + 2f; az < RoadGapFrom - 2f; az += 2.6f)
-            {
-                bool walkway = false;
-                foreach (float b in WalkwayBearings) walkway |= Mathf.Abs(Mathf.DeltaAngle(az, b)) < 3f;
-                if (walkway) continue;
-                Tree(Polar(Vector2.zero, az, RoadOuter + 9f), 0.75f + (float)rng.NextDouble() * 0.25f);
-            }
-            var group = G(ctx, "Trees");
-            int c = 0;
-            foreach (var kv in chunks)
-            {
-                var go = ArtPass.AddMesh(group, "Trees " + c, ArtPass.MeshAsset("ExpoTrees_" + c, () => ProcMesh.Combine("ExpoTrees_" + c, kv.Value)),
-                    ArtPass.Mats("M_Expo_Bark", "M_Expo_Leaves"), Vector3.zero, Quaternion.identity, Vector3.one);
-                go.GetComponent<MeshRenderer>().shadowCastingMode = ShadowCastingMode.On;
-                c++;
-            }
-            ctx.Log.Append($" trees {count} in {c} chunks;");
         }
 
         // ---------- the city round the site ----------

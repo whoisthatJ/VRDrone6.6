@@ -137,6 +137,7 @@ namespace GateRush.Track.Geo
             if (tags.TryGetValue("lanes", out var ln)) int.TryParse(ln.Trim(), NumberStyles.Integer, CultureInfo.InvariantCulture, out r.Lanes);
             r.Width = tags.TryGetValue("width", out var w) && Metres(w) is float width && width > 0f ? width : DefaultWidth(kind, r.Lanes);
             r.OneWay = tags.TryGetValue("oneway", out var ow) && ow == "yes";
+            r.Crossing = (tags.TryGetValue("footway", out var fw) && fw == "crossing") || tags.ContainsKey("crossing");
             return r;
         }
 

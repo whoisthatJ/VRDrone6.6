@@ -345,6 +345,7 @@ namespace GateRush.EditorTools.Art
                 cam.cullingMask = mask;
                 // GPU-instanced crowds of seats are queued per camera.
                 GateRush.Core.InstancedSeats.DrawAll(cam);
+                GateRush.Core.InstancedProps.DrawAll(cam);
 
                 // Camera.CopyFrom does not copy URP's per-camera data: mirror post-processing and AA from the game camera.
                 var data = cam.GetUniversalAdditionalCameraData();

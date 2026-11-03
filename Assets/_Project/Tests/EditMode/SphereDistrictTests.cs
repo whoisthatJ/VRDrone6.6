@@ -63,5 +63,16 @@ namespace GateRush.Tests
             Assert.AreEqual(1, asset.Data.Buildings.Count(b => b.HeroRole == "arena"));
             Assert.AreEqual(3, asset.Data.Buildings.Count(b => b.HeroRole == "pod"));
         }
+
+        [Test]
+        public void Streetscape_KeepsPropsOffTheRaceCorridor_AndOffsetsLines()
+        {
+            var st = new StreetscapeGenerator(new GeoData(), new List<Vector3> { new Vector3(0, 0, 0), new Vector3(100, 0, 0), new Vector3(100, 0, 100) });
+            Assert.IsTrue(st.NearCorridor(new Vector2(50f, 3f)), "3 m from the corridor");
+            Assert.IsFalse(st.NearCorridor(new Vector2(50f, 20f)), "20 m away");
+            var line = StreetscapeGenerator.OffsetLine(new List<Vector2> { new Vector2(0, 0), new Vector2(10, 0) }, 2f);
+            Assert.AreEqual(2f, line[0].y, 1e-4f, "left of an eastbound line is north");
+            Assert.AreEqual(2f, line[1].y, 1e-4f);
+        }
     }
 }

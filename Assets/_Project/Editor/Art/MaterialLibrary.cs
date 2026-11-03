@@ -139,7 +139,7 @@ namespace GateRush.EditorTools.Art
             new MatDef { Name = "M_Expo_Apartment", Texture = "proc:ExpoApartment", TileMeters = 7.2f, Smoothness = 0.25f, Metallic = 0f, Macro = 0f },
             Plain("M_Expo_Skylight", new Color(0.18f, 0.3f, 0.4f), 0.95f),
             Plain("M_Expo_Steel", new Color(0.8f, 0.82f, 0.84f), 0.7f, 0.9f),
-            Tint("M_Expo_Paving", "Concrete_PaintedFloor", new Color(1.02f, 1.12f, 1.3f), smooth: 0.6f, macro: 0.2f),
+            Tint("M_Expo_Paving", "Concrete_PaintedFloor", new Color(0.92f, 1.02f, 1.22f), smooth: 0.12f, macro: 0.2f),
             Tint("M_Expo_Lawn", "Grass_Field", new Color(0.6f, 0.78f, 0.5f), smooth: 0.3f, macro: 0.35f),
             new MatDef { Name = "M_Expo_Leaves", Texture = "proc:ExpoLeaves", TileMeters = 1f, AlphaClip = true, Cutoff = 0.45f, DoubleSided = true, Smoothness = 0.25f, Metallic = 0f, Macro = 0f },
             Plain("M_Expo_Bark", new Color(0.24f, 0.2f, 0.16f), 0.2f),
@@ -150,7 +150,8 @@ namespace GateRush.EditorTools.Art
             new MatDef { Name = "M_Sphere_LED", Shader = MatDef.Led, Tint = new Color(0.55f, 0.82f, 1f), LedIntensity = 1.2f },
             Plain("M_Expo_Floor", new Color(0.66f, 0.66f, 0.64f), 0.3f),
             Plain("M_Expo_Cladding", new Color(0.64f, 0.66f, 0.69f), 0.55f, 0.6f),
-            Plain("M_Expo_Asphalt", new Color(0.2f, 0.21f, 0.22f), 0.25f),
+            Tint("M_Expo_Steppe", "Grass_Field", new Color(1.05f, 0.95f, 0.62f), smooth: 0.2f, macro: 0.5f),
+            Plain("M_Expo_Asphalt", new Color(0.2f, 0.21f, 0.22f), 0.08f),
             Plain("M_Expo_Tower", new Color(0.2f, 0.27f, 0.33f), 0.9f, 0.3f),
             // T7 garage
             new MatDef { Name = "M_Garage_CuttingMat", Texture = "proc:CuttingMat", TileMeters = 0.3f, Smoothness = 0.35f, Metallic = 0f, Macro = 0f },

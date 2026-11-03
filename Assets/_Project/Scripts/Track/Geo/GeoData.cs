@@ -43,6 +43,8 @@ namespace GateRush.Track.Geo
         /// <summary>Carriageway width in metres (tagged, or from lanes / the kind).</summary>
         public float Width;
         public bool OneWay;
+        /// <summary>A pedestrian crossing (footway=crossing / crossing=*): drawn as a zebra.</summary>
+        public bool Crossing;
         public List<Vector2> Points = new List<Vector2>();
     }
 
