@@ -1759,6 +1759,58 @@ MonoBehaviour:
     m_Key: Everything else is procedural or our own.
     m_Metadata:
       m_Items: []
+  - m_Id: 246772708405248
+    m_Key: NEW PERSONAL BEST
+    m_Metadata:
+      m_Items: []
+  - m_Id: 246772767125504
+    m_Key: first race here
+    m_Metadata:
+      m_Items: []
+  - m_Id: 246772767125505
+    m_Key: faster than {0:0}% of your races
+    m_Metadata:
+      m_Items: []
+  - m_Id: 246772767125506
+    m_Key: Crashes
+    m_Metadata:
+      m_Items: []
+  - m_Id: 246772767125507
+    m_Key: Resets
+    m_Metadata:
+      m_Items: []
+  - m_Id: 246772767125508
+    m_Key: Top speed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 246772767125509
+    m_Key: Distance
+    m_Metadata:
+      m_Items: []
+  - m_Id: 246772767125510
+    m_Key: '{0:0} km/h'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 246772767125511
+    m_Key: '{0:0} m'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 246772767125512
+    m_Key: Lap {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 246772767125513
+    m_Key: Restart (T)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 246772767125514
+    m_Key: Exit (Esc)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 246772767125515
+    m_Key: Next (N)
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

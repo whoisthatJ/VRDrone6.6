@@ -196,6 +196,46 @@ namespace GateRush.EditorTools.Art
         }
 
         /// <summary>
+        /// The finish cube (T6) on the Serpent Arena at night: from the approach, from the side, and the finish-moment
+        /// cinematic view (inside the cube through the hexagon, the quad moved to the hover spot).
+        /// </summary>
+        public static string CaptureFinish(string tag)
+        {
+            ArtJobs.RequireCleanScenes();
+            const string sceneName = "Track_Stadium";
+            EditorSceneManager.OpenScene(ArtJobs.ScenePath(sceneName), OpenSceneMode.Single);
+            var prefabs = AssetDatabase.LoadAssetAtPath<TrackPrefabs>(PrefabsPath);
+            var track = TrackLoader.Load(RouteLibrary.SerpentArena(), prefabs);
+            try
+            {
+                var source = GameObject.Find("Main Camera")?.GetComponent<Camera>();
+                var cube = track.Root.GetComponentInChildren<GateRush.Race.FinishCube>();
+                if (cube == null) return "no finish cube";
+                var t = cube.transform;
+                var quad = Object.FindAnyObjectByType<GateRush.Vehicle.QuadVehicle>();
+                if (quad != null)
+                {
+                    quad.enabled = false;
+                    quad.transform.SetPositionAndRotation(cube.HoverAnchor.position, cube.HoverAnchor.rotation);
+                    Physics.SyncTransforms();
+                }
+                Vector3 centre = t.position + Vector3.up * 2f;
+                var shots = new List<Bookmark>
+                {
+                    new Bookmark("finish_approach", t.TransformPoint(new Vector3(-1.2f, 1.6f, -9f)), centre, 60f),
+                    new Bookmark("finish_side", t.TransformPoint(new Vector3(-7f, 3f, -5f)), centre, 55f),
+                    new Bookmark("finish_cinematic", cube.CameraAnchor.position, cube.CameraAnchor.position + cube.CameraAnchor.forward, 40f) { Rotation = cube.CameraAnchor.rotation },
+                };
+                return sceneName + ": " + CaptureSet(sceneName, shots, source, tag);
+            }
+            finally
+            {
+                Object.DestroyImmediate(track.Root.gameObject);
+                ArtJobs.ReturnToBoot();
+            }
+        }
+
+        /// <summary>
         /// Expo Astana: the reference view (aerial from the south like Docs/reference/ref_expo_astana.webp), an overview,
         /// the walkway, the sphere orbit and the spawn / FPV.
         /// </summary>

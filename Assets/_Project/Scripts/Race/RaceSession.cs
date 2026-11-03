@@ -58,6 +58,8 @@ namespace GateRush.Race
         /// <summary>Display name (falls back to the id).</summary>
         public string TrackName => string.IsNullOrEmpty(_trackName) ? trackId : _trackName;
         public int GateCount => gates.Length;
+        /// <summary>A copy of the course in race order (gate 0 = start/finish).</summary>
+        public Gate[] CourseGates => (Gate[])gates.Clone();
         /// <summary>The gate to fly through next, or null without a course or after the finish.</summary>
         public Gate NextGate => _timer != null && !_timer.Finished && gates.Length > 0
             ? gates[Mathf.Clamp(_timer.NextCheckpoint, 0, gates.Length - 1)]
@@ -88,6 +90,20 @@ namespace GateRush.Race
         public int LastRank { get; private set; } = -1;
         public bool LastRaceSetTrackBestLap { get; private set; }
         public TrackBoard Board => _board.Board(trackId);
+        /// <summary>Share (0–100) of your earlier races on this track that the last one beat; -1 for the first race.</summary>
+        public float LastPercentile { get; private set; } = -1f;
+        /// <summary>The start/finish obstacle (race gate 0), e.g. the finish cube.</summary>
+        public Gate FinishGate => gates.Length > 0 ? gates[0] : null;
+
+        // Race statistics for the results screen (reset at GO).
+        public int Crashes { get; private set; }
+        /// <summary>Respawns that weren't crashes (the pilot's reset button).</summary>
+        public int Resets { get; private set; }
+        /// <summary>Metres per second.</summary>
+        public float TopSpeed { get; private set; }
+        /// <summary>Metres flown during the race (respawn jumps excluded).</summary>
+        public float Distance { get; private set; }
+        private bool _crashPending;
         public GhostSystem Ghosts => ghosts;
 
         /// <summary>
@@ -141,6 +157,7 @@ namespace GateRush.Race
         private void Start()
         {
             vehicle.Respawned += OnRespawned;
+            vehicle.Crashed += OnCrashed;
             ReloadGhost();
             UpdateGateVisuals();
         }
@@ -167,7 +184,16 @@ namespace GateRush.Race
 
         private void OnDestroy()
         {
-            if (vehicle != null) vehicle.Respawned -= OnRespawned;
+            if (vehicle == null) return;
+            vehicle.Respawned -= OnRespawned;
+            vehicle.Crashed -= OnCrashed;
+        }
+
+        private void OnCrashed()
+        {
+            if (_phase != RacePhase.Racing) return;
+            Crashes++;
+            _crashPending = true;
         }
 
         public void Restart()
@@ -221,6 +247,9 @@ namespace GateRush.Race
                         if (ghosts != null) ghosts.BeginLap(_countdownEnd);
                         _hasPrev = false;
                         LastRank = -1;
+                        Crashes = Resets = 0;
+                        TopSpeed = Distance = 0f;
+                        _crashPending = false;
                         SetPhase(RacePhase.Racing);
                         UpdateGateVisuals();
                     }
@@ -235,6 +264,13 @@ namespace GateRush.Race
                             _holdForRelease = false;
                             vehicle.HoldAtSpawn = false;
                         }
+                    }
+                    if (_hasPrev && !vehicle.HoldAtSpawn)
+                    {
+                        var q = vehicle.State.Position;
+                        float step = Vector3.Distance(_prevPos, new Vector3(q.x, q.y, q.z));
+                        Distance += step;
+                        if (now > _prevTime) TopSpeed = Mathf.Max(TopSpeed, step / (float)(now - _prevTime));
                     }
                     CheckGates(now);
                     if (ghosts != null && _phase == RacePhase.Racing)
@@ -310,7 +346,8 @@ namespace GateRush.Race
                 BestLap = (float)_timer.BestLap,
                 Date = DateTime.Now.ToString("yyyy-MM-dd HH:mm"),
             };
-            LastRank = _board.Submit(trackId, entry, out bool trackBest);
+            LastRank = _board.Submit(trackId, entry, out bool trackBest, out float percentile);
+            LastPercentile = percentile;
             LastRaceSetTrackBestLap = trackBest;
             _board.Save(LocalLeaderboard.DefaultPath);
             SetPhase(RacePhase.Finished);
@@ -320,6 +357,11 @@ namespace GateRush.Race
         private void OnRespawned()
         {
             _hasPrev = false;
+            if (_phase == RacePhase.Racing)
+            {
+                if (_crashPending) _crashPending = false;
+                else Resets++;
+            }
             // Mid-race respawns at a checkpoint are in the air: hold there until the pilot re-arms and adds throttle.
             if (_phase == RacePhase.Racing && _timer.LastCheckpoint >= 0) _holdForRelease = true;
         }

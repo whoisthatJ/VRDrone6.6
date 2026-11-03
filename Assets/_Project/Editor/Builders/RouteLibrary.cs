@@ -188,7 +188,7 @@ namespace GateRush.EditorTools.Builders
         /// <summary>
         /// The stadium race track (T4): one closed ~470 m route over the whole pitch with four overpasses, two landing-pad
         /// loops, a figure-eight crossing at the centre spot, a tight S at the west end and a loop at the north-east end.
-        /// 22 obstacles; the finish is an arch until the finish cube (T6).
+        /// 22 obstacles; the finish is the finish cube (T6).
         /// </summary>
         public static TrackData SerpentArena()
         {
@@ -203,7 +203,7 @@ namespace GateRush.EditorTools.Builders
             void Add(string type, int knot, string color) =>
                 r.Obstacles.Add(new RouteObstacle { Type = type, Distance = At(knot), Color = color, IsCheckpoint = true });
 
-            Add("Arch", 3, "white");      // finish, beside the start pad
+            Add("Finish", 3, "");         // the finish cube (T6), beside the start pad
             Add("Ladder", 5, "green");    // white-pad loop
             Add("Single", 8, "red");
             Add("Single", 12, "red");
@@ -226,9 +226,9 @@ namespace GateRush.EditorTools.Builders
             Add("Dive", 72, "blue");      // dive off it into the pad-1 loop
             Add("Ladder", 75, "green");
             r.Obstacles.Sort((a, b) => a.Distance.CompareTo(b.Distance));
-            r.FinishObstacle = r.Obstacles.FindIndex(o => o.Type == "Arch");
+            r.FinishObstacle = r.Obstacles.FindIndex(o => o.Type == "Finish");
 
-            // Start pad south of the start straight, 12 m before the finish arch (TrackBuilder lays the start grid at the spawn).
+            // Start pad south of the start straight, 12 m before the finish cube (TrackBuilder lays the start grid at the spawn).
             var pad = route.Sample(At(3) - 12f);
             Vector3 padPos = pad.Position + pad.Right * 4.5f;
             t.Spawn.Position = new Vector3(padPos.x, r.GroundHeight + 0.15f, padPos.z);

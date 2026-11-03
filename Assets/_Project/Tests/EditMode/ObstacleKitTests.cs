@@ -10,7 +10,7 @@ namespace GateRush.Tests
     /// <summary>The T2 obstacle kit: every prefab is registered, LOD'd, collides with primitives only and has its checkpoints.</summary>
     public class ObstacleKitTests
     {
-        private static readonly string[] GateTypes = { "Single", "Double", "Slalom", "Cube", "Ladder", "Dive", "Ramp", "Arch" };
+        private static readonly string[] GateTypes = { "Single", "Double", "Slalom", "Cube", "Ladder", "Dive", "Ramp", "Arch", "Finish" };
         private static readonly string[] PropTypes = { "ChevronBoard", "ChevronBoardLeft", "Flag", "LandingPad", "StartPad" };
 
         private static TrackPrefabs Prefabs => AssetDatabase.LoadAssetAtPath<TrackPrefabs>("Assets/_Project/Data/TrackPrefabs.asset");
@@ -63,6 +63,19 @@ namespace GateRush.Tests
             Assert.IsEmpty(prefab.GetComponentsInChildren<MeshCollider>(true));
             Assert.IsEmpty(prefab.GetComponentsInChildren<Gate>(true), "props are not checkpoints");
             if (type == "Flag") Assert.IsNotNull(prefab.GetComponent<FlagWind>(), "flags move in the wind");
+        }
+
+        [Test]
+        public void FinishCube_HexagonOnTheFront_CameraLooksOutAtTheHover()
+        {
+            var prefab = Prefabs.Gate("Finish");
+            var cube = prefab.GetComponent<FinishCube>();
+            Assert.IsNotNull(cube, "finish cube marker");
+            var gate = prefab.GetComponentInChildren<Gate>(true);
+            Assert.Less(gate.OpeningCenterWorld.z, -1.5f, "the checkpoint is the hexagon on the entry (front) face");
+            Assert.Less(cube.HoverAnchor.position.z, gate.OpeningCenterWorld.z, "the quad hovers in front of the hexagon");
+            Vector3 toHover = (cube.HoverAnchor.position - cube.CameraAnchor.position).normalized;
+            Assert.Greater(Vector3.Dot(cube.CameraAnchor.forward, toHover), 0.99f, "the camera looks out through the hexagon at the quad");
         }
 
         [Test]

@@ -172,6 +172,19 @@ namespace GateRush.Tests
         }
 
         [Test]
+        public void Submit_ReportsShareOfEarlierRacesBeaten()
+        {
+            var lb = new LocalLeaderboard();
+            lb.Submit("t", E("a", 60, 19), out _, out float first);
+            Assert.AreEqual(-1f, first, "no history yet");
+            lb.Submit("t", E("a", 50, 19), out _, out _);
+            lb.Submit("t", E("a", 70, 19), out _, out _);
+            lb.Submit("t", E("a", 55, 19), out _, out float pct);
+            Assert.AreEqual(200f / 3f, pct, 0.01f, "faster than 60 and 70, slower than 50");
+            Assert.AreEqual(4, lb.Board("t").History.Count);
+        }
+
+        [Test]
         public void Json_RoundTrip_KeepsTracksSeparate()
         {
             var lb = new LocalLeaderboard();

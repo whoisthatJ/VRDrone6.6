@@ -19,14 +19,15 @@ namespace GateRush.EditorTools.Art
     /// </list>
     /// Obstacles (local +Z = flying direction, base on y = 0): Single, Double (stacked), Slalom (3 offset gates, 3
     /// checkpoints), Cube, Ladder (H hurdle, fly under or between the rungs), Dive (frame tilted 45° down), Ramp
-    /// (gate on a raised platform at the top of a ramp), Arch. Every obstacle has LOD0/1/2 + cull, box colliders only,
+    /// (gate on a raised platform at the top of a ramp), Arch, Finish (T6: the 4 m truss cube entered through a glowing
+    /// hexagon, with the <see cref="FinishCube"/> camera and hover anchors). Every obstacle has LOD0/1/2 + cull, box colliders only,
     /// and one or more directional <see cref="Gate"/> checkpoints. Prefabs go to Prefabs/Obstacles and are registered
     /// in <see cref="TrackPrefabs"/> by type name.
     /// </summary>
     public static class ObstacleKit
     {
         public const string PrefabDir = "Assets/_Project/Prefabs/Obstacles";
-        public static readonly string[] GateTypes = { "Single", "Double", "Slalom", "Cube", "Ladder", "Dive", "Ramp", "Arch" };
+        public static readonly string[] GateTypes = { "Single", "Double", "Slalom", "Cube", "Ladder", "Dive", "Ramp", "Arch", "Finish" };
         public static readonly string[] PropTypes = { "ChevronBoard", "ChevronBoardLeft", "Flag", "LandingPad", "StartPad" };
 
         public const float TrussSize = 0.29f;
@@ -447,6 +448,70 @@ namespace GateRush.EditorTools.Art
                     break;
                 }
 
+                case "Finish":
+                {
+                    // T6 finish cube: 4 m black box truss, nets on the sides, top and round the entry, red foam tubes
+                    // along the bottom edges, and a white LED hexagon (2.2 m across) set into the front face (−Z).
+                    // The quad flies in through the hexagon and out of the open back.
+                    float C = FinishSize, e = C / 2 - TrussSize / 2, inner = C - 2f * TrussSize, half = inner / 2;
+                    foreach (float sx in new[] { -1f, 1f })
+                    foreach (float sz in new[] { -1f, 1f })
+                    {
+                        Truss(g, new Vector3(sx * e, 0f, sz * e), new Vector3(sx * e, C, sz * e));
+                        Base(g, new Vector3(sx * e, 0f, sz * e), sx > 0f ? 0f : 180f, barrel: sz > 0f);
+                    }
+                    foreach (float y in new[] { TrussSize / 2, C - TrussSize / 2 })
+                    foreach (float s in new[] { -1f, 1f })
+                    {
+                        Truss(g, new Vector3(-e + TrussSize / 2, y, s * e), new Vector3(e - TrussSize / 2, y, s * e));
+                        Truss(g, new Vector3(s * e, y, -e + TrussSize / 2), new Vector3(s * e, y, e - TrussSize / 2));
+                    }
+                    foreach (float s in new[] { -1f, 1f })
+                        Net(g, new Vector3(s * e, C / 2, 0f), new Vector2(inner, inner), new Vector3(s, 0f, 0f), Vector3.up);
+                    Net(g, new Vector3(0f, C - TrussSize / 2, 0f), new Vector2(inner, inner), Vector3.up, Vector3.forward);
+
+                    // Hexagon (points left and right), held by six short struts, nets filling the face round it.
+                    float hy = FinishHexHeight, R = FinishHexRadius, ry = R * 0.8660254f, fz = -e;
+                    var hex = new Vector3[7];
+                    for (int k = 0; k <= 6; k++)
+                    {
+                        float a = k * Mathf.PI / 3f;
+                        hex[k] = new Vector3(Mathf.Cos(a) * R, hy + Mathf.Sin(a) * R, fz);
+                    }
+                    for (int lod = 0; lod < 2; lod++) g.M(lod, Slot.Metal).AddTube(0, hex, 0.055f, lod == 0 ? 10 : 6);
+                    g.M(2, Slot.Metal).AddTube(0, hex, 0.07f, 4);
+                    for (int k = 0; k < 6; k++)
+                    {
+                        Vector3 h0 = hex[k], h1 = hex[k + 1], mid = (h0 + h1) * 0.5f;
+                        Vector3 outward = new Vector3(mid.x, mid.y - hy, 0f).normalized;
+                        foreach (float face in new[] { 1f, -1f })
+                            Led(g, h0 + outward * 0.02f + Vector3.forward * face * 0.06f, h1 + outward * 0.02f + Vector3.forward * face * 0.06f, new Vector3(0f, 0f, face));
+                        g.Collider(mid, new Vector3(0.12f, 0.12f, Vector3.Distance(h0, h1)), Quaternion.LookRotation(h1 - h0, Vector3.forward));
+                    }
+                    foreach (float s in new[] { -1f, 1f })
+                    {
+                        for (int lod = 0; lod < 2; lod++)
+                        {
+                            g.M(lod, Slot.Metal).AddBeam(0, new Vector3(s * R, hy, fz), new Vector3(s * half, hy, fz), 0.05f);
+                            g.M(lod, Slot.Metal).AddBeam(0, new Vector3(s * R / 2, hy + ry, fz), new Vector3(s * R / 2, C - TrussSize, fz), 0.05f);
+                            g.M(lod, Slot.Metal).AddBeam(0, new Vector3(s * R / 2, hy - ry, fz), new Vector3(s * R / 2, TrussSize, fz), 0.05f);
+                        }
+                        Net(g, new Vector3(s * (R + half) / 2, C / 2, fz), new Vector2(half - R, inner), Vector3.back, Vector3.up);
+                    }
+                    float top = hy + ry, bottom = hy - ry;
+                    Net(g, new Vector3(0f, (top + C - TrussSize) / 2, fz), new Vector2(2f * R, C - TrussSize - top), Vector3.back, Vector3.up);
+                    Net(g, new Vector3(0f, (TrussSize + bottom) / 2, fz), new Vector2(2f * R, bottom - TrussSize), Vector3.back, Vector3.up);
+
+                    // Red foam tubes on the bottom front and side edges.
+                    Pad(g, new Vector3(0f, TrussSize + 0.12f, -e - 0.02f), new Vector3(inner, 0.24f, 0.24f));
+                    foreach (float s in new[] { -1f, 1f })
+                        Pad(g, new Vector3(s * (e + 0.02f), TrussSize + 0.12f, 0f), new Vector3(0.24f, 0.24f, inner));
+
+                    // The checkpoint is the hexagon (its bounding box: the frame and nets stop anything outside it).
+                    gates.Add((new Vector3(0f, hy, fz), new Vector2(2f * R, 2f * ry), Quaternion.identity));
+                    break;
+                }
+
                 default: throw new System.ArgumentException("unknown obstacle " + type);
             }
 
@@ -489,7 +554,26 @@ namespace GateRush.EditorTools.Art
             var hl = root.AddComponent<NextGateHighlight>();
             hl.Leds = new[] { ledRenderer };
             hl.Show(GateVisualState.Idle, idle);
+            if (type == "Finish") AddFinishAnchors(root);
             return root;
+        }
+
+        public const float FinishSize = 4f, FinishHexRadius = 1.1f, FinishHexHeight = 1.75f;
+
+        /// <summary>Finish cube anchors: the camera inside the cube looking out through the hexagon, the hover spot 2.2 m out.</summary>
+        private static void AddFinishAnchors(GameObject root)
+        {
+            float front = -(FinishSize / 2 - TrussSize / 2);
+            var cam = new GameObject("Finish Camera").transform;
+            cam.SetParent(root.transform, false);
+            cam.SetLocalPositionAndRotation(new Vector3(0.25f, FinishHexHeight + 0.15f, 0.9f), Quaternion.LookRotation(new Vector3(-0.03f, -0.03f, -1f)));
+            var hover = new GameObject("Finish Hover").transform;
+            hover.SetParent(root.transform, false);
+            // Nose tipped 25° down so the camera sees the top of the quad (head-on it is only a thin sliver).
+            hover.SetLocalPositionAndRotation(new Vector3(0f, FinishHexHeight - 0.15f, front - 2.2f), Quaternion.Euler(25f, 0f, 0f));
+            var fc = root.AddComponent<FinishCube>();
+            fc.CameraAnchor = cam;
+            fc.HoverAnchor = hover;
         }
 
         /// <summary>A padded rectangular gate (posts, top bar, bottom bar), its LEDs and bases, in the current frame.</summary>

@@ -27,6 +27,8 @@ namespace GateRush.Race
         public float BestLap;
         public string BestLapPilot;
         public string BestLapQuad;
+        /// <summary>Total times of every finished race here (newest last, capped), for "faster than N% of your races".</summary>
+        public List<float> History = new List<float>();
     }
 
     [Serializable]
@@ -39,6 +41,7 @@ namespace GateRush.Race
     public sealed class LocalLeaderboard
     {
         public const int MaxEntries = 10;
+        public const int MaxHistory = 500;
 
         public LeaderboardData Data { get; private set; } = new LeaderboardData();
 
@@ -54,9 +57,19 @@ namespace GateRush.Race
         }
 
         /// <summary>Adds a finished race. Returns its 1-based rank, or -1 if it didn't make the top <see cref="MaxEntries"/>.</summary>
-        public int Submit(string trackId, LeaderboardEntry entry, out bool newBestLap)
+        public int Submit(string trackId, LeaderboardEntry entry, out bool newBestLap) => Submit(trackId, entry, out newBestLap, out _);
+
+        /// <summary>
+        /// As <see cref="Submit(string, LeaderboardEntry, out bool)"/>; <paramref name="percentile"/> is the share (0–100)
+        /// of the earlier races on this track that were slower, or -1 when this is the first one.
+        /// </summary>
+        public int Submit(string trackId, LeaderboardEntry entry, out bool newBestLap, out float percentile)
         {
             var board = Board(trackId);
+            board.History ??= new List<float>();
+            percentile = Percentile(board.History, entry.TotalTime);
+            board.History.Add(entry.TotalTime);
+            if (board.History.Count > MaxHistory) board.History.RemoveRange(0, board.History.Count - MaxHistory);
             newBestLap = board.BestLap <= 0f || entry.BestLap < board.BestLap;
             if (newBestLap)
             {
@@ -78,6 +91,16 @@ namespace GateRush.Race
             board.Entries.Insert(index, entry);
             if (board.Entries.Count > MaxEntries) board.Entries.RemoveRange(MaxEntries, board.Entries.Count - MaxEntries);
             return index + 1;
+        }
+
+        /// <summary>Share (0–100) of <paramref name="history"/> slower than <paramref name="time"/>; -1 for an empty history.</summary>
+        public static float Percentile(List<float> history, float time)
+        {
+            if (history == null || history.Count == 0) return -1f;
+            int slower = 0;
+            foreach (float t in history)
+                if (t > time) slower++;
+            return 100f * slower / history.Count;
         }
 
         public string ToJson() => JsonUtility.ToJson(Data, true);

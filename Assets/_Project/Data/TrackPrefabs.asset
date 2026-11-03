@@ -35,6 +35,8 @@ MonoBehaviour:
     Prefab: {fileID: 6358162088031008227, guid: 17d8041e376ec71419691b898d2bfb3d, type: 3}
   - Type: Arch
     Prefab: {fileID: 6188823859593458276, guid: 100c7b0d357d98c478faed7ede34e169, type: 3}
+  - Type: Finish
+    Prefab: {fileID: 8848074689520399958, guid: 9956fb1cde8e07a40aece26f770e547c, type: 3}
   Props:
   - Type: Crate
     Prefab: {fileID: 6230052360999783274, guid: 45538f4ce20ee214cad7cb29047cab5f, type: 3}

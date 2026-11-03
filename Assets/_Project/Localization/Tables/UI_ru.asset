@@ -1746,6 +1746,58 @@ MonoBehaviour:
     m_Localized: "\u0412\u0441\u0451 \u043E\u0441\u0442\u0430\u043B\u044C\u043D\u043E\u0435 \u043F\u0440\u043E\u0446\u0435\u0434\u0443\u0440\u043D\u043E\u0435 \u0438\u043B\u0438 \u043D\u0430\u0448\u0435 \u0441\u043E\u0431\u0441\u0442\u0432\u0435\u043D\u043D\u043E\u0435."
     m_Metadata:
       m_Items: []
+  - m_Id: 246772708405248
+    m_Localized: "\u041D\u041E\u0412\u042B\u0419 \u041B\u0418\u0427\u041D\u042B\u0419 \u0420\u0415\u041A\u041E\u0420\u0414"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 246772767125504
+    m_Localized: "\u043F\u0435\u0440\u0432\u0430\u044F \u0433\u043E\u043D\u043A\u0430 \u0437\u0434\u0435\u0441\u044C"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 246772767125505
+    m_Localized: "\u0431\u044B\u0441\u0442\u0440\u0435\u0435 {0:0}% \u0432\u0430\u0448\u0438\u0445 \u0433\u043E\u043D\u043E\u043A"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 246772767125506
+    m_Localized: "\u0410\u0432\u0430\u0440\u0438\u0438"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 246772767125507
+    m_Localized: "\u0421\u0431\u0440\u043E\u0441\u044B"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 246772767125508
+    m_Localized: "\u041C\u0430\u043A\u0441. \u0441\u043A\u043E\u0440\u043E\u0441\u0442\u044C"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 246772767125509
+    m_Localized: "\u0414\u0438\u0441\u0442\u0430\u043D\u0446\u0438\u044F"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 246772767125510
+    m_Localized: "{0:0} \u043A\u043C/\u0447"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 246772767125511
+    m_Localized: "{0:0} \u043C"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 246772767125512
+    m_Localized: "\u041A\u0440\u0443\u0433 {0}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 246772767125513
+    m_Localized: "\u0417\u0430\u043D\u043E\u0432\u043E (T)"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 246772767125514
+    m_Localized: "\u0412\u044B\u0445\u043E\u0434 (Esc)"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 246772767125515
+    m_Localized: "\u0414\u0430\u043B\u0435\u0435 (N)"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

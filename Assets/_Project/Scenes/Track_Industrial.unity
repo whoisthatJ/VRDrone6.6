@@ -34564,6 +34564,7 @@ GameObject:
   - component: {fileID: 1528449955}
   - component: {fileID: 1528449954}
   - component: {fileID: 1528449953}
+  - component: {fileID: 1528449958}
   m_Layer: 0
   m_Name: OSD
   m_TagString: Untagged
@@ -34715,6 +34716,23 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
+--- !u!114 &1528449958
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1528449951}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b3df43bba21fba04d85cc3b6d36d0d63, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GateRush.UI::GateRush.UI.FinishSequence
+  session: {fileID: 629951082}
+  vehicle: {fileID: 358346723}
+  slowMotionScale: 0.3
+  slowMotionSeconds: 0.5
+  focusDistance: 4.9
 --- !u!1 &1545381702
 GameObject:
   m_ObjectHideFlags: 0

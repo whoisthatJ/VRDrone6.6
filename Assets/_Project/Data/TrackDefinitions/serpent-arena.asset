@@ -299,13 +299,13 @@ MonoBehaviour:
       GroundHeight: 0
       FinishObstacle: 0
       Obstacles:
-      - Type: Arch
+      - Type: Finish
         Distance: 21.75
         Lateral: 0
         Height: 0
         Yaw: 0
         Scale: 1
-        Color: white
+        Color: 
         IsCheckpoint: 1
       - Type: Ladder
         Distance: 39.5

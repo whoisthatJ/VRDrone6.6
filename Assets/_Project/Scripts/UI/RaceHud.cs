@@ -53,9 +53,15 @@ namespace GateRush.UI
             _lapFlashBest = session.LastLapWasPersonalBest;
         }
 
+        // The T6 finish screen replaces the plain results panel for offline races.
+        private bool FinishScreen => _finish != null && !session.ExternalStart;
+        private FinishSequence _finish;
+
+        private void Awake() => _finish = GetComponent<FinishSequence>();
+
         private void OnPhaseChanged(RacePhase phase)
         {
-            if (resultsPanel != null) resultsPanel.SetActive(phase == RacePhase.Finished);
+            if (resultsPanel != null) resultsPanel.SetActive(phase == RacePhase.Finished && !FinishScreen);
             if (phase == RacePhase.Finished && resultsText != null) resultsText.SetText(BuildResults());
         }
 
@@ -110,7 +116,8 @@ namespace GateRush.UI
                     else SetCentre(CentreMode.None, "");
                     break;
                 case RacePhase.Finished:
-                    SetCentre(CentreMode.Finish, L.T("FINISH"));
+                    if (FinishScreen && _finish.ResultsShown) SetCentre(CentreMode.None, "");
+                    else SetCentre(CentreMode.Finish, L.T("FINISH"));
                     break;
             }
         }

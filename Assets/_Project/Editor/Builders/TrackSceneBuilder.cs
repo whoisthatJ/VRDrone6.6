@@ -435,7 +435,7 @@ namespace GateRush.EditorTools.Builders
 
             BuildOsd(canvasGo.transform, quad, vtx, views);
             BuildNextGate(canvasGo.transform, race, quad);
-            BuildRaceHud(canvasGo.transform, race);
+            BuildRaceHud(canvasGo.transform, race, quad);
             BuildHotplugOverlay(canvasGo.transform, guard);
             return debugGo;
         }
@@ -559,7 +559,7 @@ namespace GateRush.EditorTools.Builders
             so.ApplyModifiedPropertiesWithoutUndo();
         }
 
-        private static void BuildRaceHud(Transform canvas, RaceSession race)
+        private static void BuildRaceHud(Transform canvas, RaceSession race, QuadVehicle quad)
         {
             var lap = Label(canvas, "Lap Info", 0, 28);
             var lrt = (RectTransform)lap.transform;
@@ -605,6 +605,7 @@ namespace GateRush.EditorTools.Builders
             flashImage.raycastTarget = false;
             flashImage.enabled = false;
 
+            canvas.gameObject.AddComponent<FinishSequence>().Configure(race, quad);
             var hud = canvas.gameObject.AddComponent<RaceHud>();
             var so = new SerializedObject(hud);
             so.FindProperty("session").objectReferenceValue = race;
