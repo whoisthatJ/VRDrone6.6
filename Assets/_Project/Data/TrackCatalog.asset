@@ -37,6 +37,10 @@ MonoBehaviour:
     DisplayName: Serpent Arena
     Description: 'The stadium race track: loops round the landing pads, a figure-eight at the centre spot and four overpasses.'
     Json: {fileID: 4900000, guid: ce521c4b474270e46a5b63650c7880bf, type: 3}
+  - Id: expo-astana
+    DisplayName: Expo Astana
+    Description: 'The EXPO 2017 site in Astana: up the south walkway, round the Nur Alem sphere, out between the pavilions and back along the ring road.'
+    Json: {fileID: 4900000, guid: 5a0cc74c110b27d45ab2f6313f733b84, type: 3}
   Environments:
   - Environment: field
     SceneName: Track_Field
@@ -46,3 +50,5 @@ MonoBehaviour:
     SceneName: Track_Industrial
   - Environment: stadium
     SceneName: Track_Stadium
+  - Environment: expo
+    SceneName: Track_Expo

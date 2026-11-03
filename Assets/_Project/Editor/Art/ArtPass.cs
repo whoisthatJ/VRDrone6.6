@@ -64,7 +64,7 @@ namespace GateRush.EditorTools.Art
         public const int TrackGeometryLayer = 8;
         public const string MeshDir = "Assets/_Project/Art/Meshes";
         public const string VolumeDir = "Assets/_Project/Art/Volumes";
-        public static readonly string[] Scenes = { "Field", "Hangar", "Industrial", "Stadium", "Menu" };
+        public static readonly string[] Scenes = { "Field", "Hangar", "Industrial", "Stadium", "Expo", "Menu" };
 
         [MenuItem("Tools/Art/Apply Art Pass (all scenes)")]
         private static void MenuAll() => Debug.Log(ApplyAll());
@@ -97,6 +97,7 @@ namespace GateRush.EditorTools.Art
                     case "Hangar": HangarArt.Apply(ctx); break;
                     case "Industrial": IndustrialArt.Apply(ctx); break;
                     case "Stadium": StadiumArt.Apply(ctx); break;
+                    case "Expo": ExpoArt.Apply(ctx); break;
                     case "Menu": MenuArt.Apply(ctx); break;
                 }
                 if (env != "Menu") PrefabArt.ApplyQuad(ctx);

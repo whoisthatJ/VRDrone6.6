@@ -16,6 +16,7 @@ namespace GateRush.EditorTools.Builders
                 case "hangar": Hangar(parent, layer, grid); break;
                 case "industrial": Industrial(parent, layer, grid); break;
                 case "stadium": Stadium(parent, layer, grid); break;
+                case "expo": Expo(parent, layer, grid); break;
                 default: Field(parent, layer, grid); break;
             }
             ConfigureLighting(environment, parent);
@@ -38,7 +39,7 @@ namespace GateRush.EditorTools.Builders
                 UnityEditor.AssetDatabase.CreateAsset(s, path);
             }
             // The stadium switches time of day at runtime (StadiumLighting): nothing baked there.
-            bool baked = environment != "stadium";
+            bool baked = environment != "stadium" && environment != "expo";
             s.bakedGI = baked;
             s.realtimeGI = false;
             s.mixedBakeMode = MixedLightingMode.IndirectOnly;
@@ -100,6 +101,19 @@ namespace GateRush.EditorTools.Builders
             Sun(new Vector3(40f, -30f, 0f), 1.2f, new Color(1f, 0.95f, 0.88f));
             Ambient(new Color(0.4f, 0.45f, 0.55f), new Color(0.3f, 0.32f, 0.35f), new Color(0.15f, 0.15f, 0.14f));
             Ground(parent, layer, Tinted(grid, "GroundStadium", new Color(0.3f, 0.42f, 0.26f)), 1200f);
+        }
+
+        // ---------- Astana EXPO ----------
+
+        /// <summary>
+        /// The Astana EXPO 2017 site: a large flat ground and a high summer sun; the sphere, pavilions, road, park and
+        /// city are built by the art pass (ExpoArt). Realtime lighting (a 3 km scene is not worth baking).
+        /// </summary>
+        private static void Expo(Transform parent, int layer, Material grid)
+        {
+            Sun(new Vector3(50f, -35f, 0f), 1.3f, new Color(1f, 0.96f, 0.9f));
+            Ambient(new Color(0.45f, 0.52f, 0.62f), new Color(0.35f, 0.37f, 0.4f), new Color(0.18f, 0.2f, 0.16f));
+            Ground(parent, layer, Tinted(grid, "GroundExpo", new Color(0.32f, 0.45f, 0.26f)), 4000f);
         }
 
         // ---------- open field ----------

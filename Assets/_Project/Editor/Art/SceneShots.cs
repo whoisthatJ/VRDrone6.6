@@ -195,6 +195,50 @@ namespace GateRush.EditorTools.Art
             return sb.ToString();
         }
 
+        /// <summary>
+        /// Expo Astana: the reference view (aerial from the south like Docs/reference/ref_expo_astana.webp), an overview,
+        /// the walkway, the sphere orbit and the spawn / FPV.
+        /// </summary>
+        public static string CaptureExpo(string tag)
+        {
+            ArtJobs.RequireCleanScenes();
+            const string sceneName = "Track_Expo";
+            EditorSceneManager.OpenScene(ArtJobs.ScenePath(sceneName), OpenSceneMode.Single);
+            var prefabs = AssetDatabase.LoadAssetAtPath<TrackPrefabs>(PrefabsPath);
+            var track = TrackLoader.Load(RouteLibrary.ExpoAstana(), prefabs);
+            bool asyncShaders = ShaderUtil.allowAsyncCompilation;
+            ShaderUtil.allowAsyncCompilation = false;
+            try
+            {
+                var source = GameObject.Find("Main Camera")?.GetComponent<Camera>();
+                var shots = new List<Bookmark>
+                {
+                    // The reference photo: high over the south-south-west edge, looking up the axis (bearing 14).
+                    new Bookmark("expo_reference", RouteLibrary.ExpoPoint(194f, 650f, 330f), RouteLibrary.ExpoPoint(14f, 40f), 58f),
+                    // Straight down, north up, like the satellite view (Docs/reference/ref_expo_astana_top.png).
+                    new Bookmark("expo_top", new Vector3(0f, 900f, -0.5f), Vector3.zero, 50f),
+                    new Bookmark("expo_overview", RouteLibrary.ExpoPoint(245f, 420f, 170f), new Vector3(0f, 20f, 0f), 50f),
+                    new Bookmark("expo_walkway", RouteLibrary.ExpoPoint(194f, 236f, 4f), RouteLibrary.ExpoPoint(14f, 30f, 30f), 62f),
+                    new Bookmark("expo_orbit", RouteLibrary.ExpoPoint(170f, 112f, 2.5f), RouteLibrary.ExpoPoint(120f, 112f, 8f), 66f),
+                    new Bookmark("expo_trees", RouteLibrary.ExpoPoint(300f, 165f, 5f), RouteLibrary.ExpoPoint(290f, 260f, 3f), 60f),
+                    new Bookmark("expo_lawn", RouteLibrary.ExpoPoint(250f, 305f, 3f), RouteLibrary.ExpoPoint(215f, 305f, 6f), 60f),
+                };
+                foreach (var g in TrackBookmarks(track).FindAll(b => b.Name == "spawn" || b.Name == "fpv"))
+                {
+                    var b = g;
+                    b.Name = "expo_" + b.Name;
+                    shots.Add(b);
+                }
+                return sceneName + ": " + CaptureSet(sceneName, shots, source, tag);
+            }
+            finally
+            {
+                ShaderUtil.allowAsyncCompilation = asyncShaders;
+                Object.DestroyImmediate(track.Root.gameObject);
+                ArtJobs.ReturnToBoot();
+            }
+        }
+
         public static string CaptureMenu(string tag)
         {
             EditorSceneManager.OpenScene(ArtJobs.ScenePath("Menu"), OpenSceneMode.Single);

@@ -1727,6 +1727,14 @@ MonoBehaviour:
     m_Key: START
     m_Metadata:
       m_Items: []
+  - m_Id: 77934280830976
+    m_Key: Expo Astana
+    m_Metadata:
+      m_Items: []
+  - m_Id: 77934666706944
+    m_Key: 'The EXPO 2017 site in Astana: up the south walkway, round the Nur Alem sphere, out between the pavilions and back along the ring road.'
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

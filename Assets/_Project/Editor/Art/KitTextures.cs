@@ -23,6 +23,11 @@ namespace GateRush.EditorTools.Art
             LedBanner();
             CuttingMat();
             Pegboard();
+            ExpoCurtainWall();
+            ExpoSphereGlass();
+            ExpoRoof();
+            ExpoApartment();
+            ExpoLeaves();
             AssetDatabase.Refresh();
             return "kit textures written";
         }
@@ -270,6 +275,142 @@ namespace GateRush.EditorTools.Art
                 px[y * n + x] = C(c.r, c.g, c.b);
             }
             Save(File("Pegboard", "Albedo"), n, n, px);
+        }
+
+        // ---------- Expo (Astana EXPO 2017 site) ----------
+
+        /// <summary>
+        /// Curtain wall for the Expo pavilions, one texture = 6 m wide × 4.5 m (one floor): four tall blue-grey glass
+        /// panels with light aluminium mullions and a darker spandrel band at the slab.
+        /// </summary>
+        public static void ExpoCurtainWall()
+        {
+            const int w = 512, h = 384;
+            var px = new Color32[w * h];
+            for (int y = 0; y < h; y++)
+            for (int x = 0; x < w; x++)
+            {
+                float u = (x + 0.5f) / w, v = (y + 0.5f) / h;
+                // Sky reflection gradient in each pane (brighter at the top), with slight per-pane tint variation.
+                int pane = (int)(u * 4f);
+                float tint = 0.92f + 0.08f * Mathf.Sin(pane * 2.7f + 1.3f);
+                var c = Color.Lerp(new Color(0.16f, 0.26f, 0.33f), new Color(0.42f, 0.55f, 0.64f), v * 0.85f) * tint;
+                if (v < 0.14f) c = new Color(0.2f, 0.23f, 0.26f);                       // spandrel at the floor slab
+                float mu = Mathf.Repeat(u * 4f, 1f);
+                if (mu < 0.02f || mu > 0.98f || v < 0.012f || Mathf.Abs(v - 0.14f) < 0.01f || v > 0.99f)
+                    c = new Color(0.78f, 0.8f, 0.82f);                                    // mullions and transoms
+                px[y * w + x] = C(c.r, c.g, c.b);
+            }
+            Save(File("ExpoCurtainWall", "Albedo"), w, h, px);
+        }
+
+        /// <summary>
+        /// Nur Alem sphere glazing, one texture = 4 m: diamond-shaped glass panels in a fine silver grid over a deep
+        /// blue reflection, so the sphere reads as a faceted glass ball from the air.
+        /// </summary>
+        public static void ExpoSphereGlass()
+        {
+            const int n = 512;
+            var px = new Color32[n * n];
+            for (int y = 0; y < n; y++)
+            for (int x = 0; x < n; x++)
+            {
+                float u = (x + 0.5f) / n, v = (y + 0.5f) / n;
+                float a = Mathf.Repeat(u + v, 0.5f) / 0.5f, b = Mathf.Repeat(u - v, 0.5f) / 0.5f;
+                float edge = Mathf.Min(Mathf.Min(a, 1f - a), Mathf.Min(b, 1f - b));
+                float shade = 0.9f + 0.1f * Mathf.Sin((Mathf.Floor((u + v) * 2f) * 3.1f + Mathf.Floor((u - v) * 2f + 4f) * 1.7f));
+                var c = new Color(0.22f, 0.34f, 0.44f) * shade;
+                if (edge < 0.02f) c = new Color(0.72f, 0.76f, 0.8f);
+                px[y * n + x] = C(c.r, c.g, c.b);
+            }
+            Save(File("ExpoSphereGlass", "Albedo"), n, n, px);
+        }
+
+        /// <summary>
+        /// Standing-seam metal roof of the Expo pavilions, one texture = 4 m: silver panels 0.5 m wide with raised
+        /// seams and faint weathering.
+        /// </summary>
+        public static void ExpoRoof()
+        {
+            const int n = 256;
+            var px = new Color32[n * n];
+            for (int y = 0; y < n; y++)
+            for (int x = 0; x < n; x++)
+            {
+                float u = (x + 0.5f) / n, v = (y + 0.5f) / n;
+                float grime = Fbm(u * 2f, v * 2f, 16, 3, 41);
+                var c = new Color(0.72f, 0.74f, 0.77f) * (0.9f + grime * 0.12f);
+                float s = Mathf.Repeat(u * 8f, 1f);
+                if (s < 0.06f) c *= 1.12f;
+                else if (s < 0.1f) c *= 0.78f;
+                px[y * n + x] = C(c.r, c.g, c.b);
+            }
+            Save(File("ExpoRoof", "Albedo"), n, n, px);
+        }
+
+        /// <summary>
+        /// Astana apartment block facade, one texture = 7.2 m wide × 3 m (one floor): warm render with two windows,
+        /// one with a glazed loggia. Tinted per building.
+        /// </summary>
+        public static void ExpoApartment()
+        {
+            const int w = 512, h = 256;
+            var px = new Color32[w * h];
+            for (int y = 0; y < h; y++)
+            for (int x = 0; x < w; x++)
+            {
+                float u = (x + 0.5f) / w, v = (y + 0.5f) / h;
+                var c = new Color(0.9f, 0.86f, 0.78f) * (0.94f + Fbm(u * 3f, v * 3f, 16, 2, 77) * 0.08f);
+                bool win1 = u > 0.08f && u < 0.4f && v > 0.25f && v < 0.85f;
+                bool win2 = u > 0.56f && u < 0.92f && v > 0.18f && v < 0.85f;
+                if (win1 || win2)
+                {
+                    c = Color.Lerp(new Color(0.12f, 0.16f, 0.2f), new Color(0.35f, 0.45f, 0.52f), v);
+                    float wu = win1 ? (u - 0.08f) / 0.32f : (u - 0.56f) / 0.36f;
+                    if (Mathf.Abs(wu - 0.5f) < 0.02f) c = new Color(0.85f, 0.85f, 0.83f);
+                }
+                if (win2 && v < 0.3f) c = new Color(0.82f, 0.8f, 0.76f);                 // loggia parapet
+                if (v < 0.04f) c = new Color(0.7f, 0.66f, 0.6f);                          // floor band
+                px[y * w + x] = C(c.r, c.g, c.b);
+            }
+            Save(File("ExpoApartment", "Albedo"), w, h, px);
+        }
+
+        /// <summary>
+        /// Leaf cluster for the procedural trees (alpha-cut, one texture per card): ~260 overlapping leaves in a rough
+        /// disc, each an ellipse with a midrib, in several greens, lighter towards the top (sky light), with gaps.
+        /// </summary>
+        public static void ExpoLeaves()
+        {
+            const int n = 512;
+            var px = new Color32[n * n];
+            for (int i = 0; i < px.Length; i++) px[i] = new Color32(52, 74, 30, 0);
+            var rng = new System.Random(77);
+            for (int k = 0; k < 260; k++)
+            {
+                // Leaf centre inside a disc, denser towards the middle.
+                float ang = (float)rng.NextDouble() * Mathf.PI * 2f, rad = Mathf.Sqrt((float)rng.NextDouble()) * 0.42f;
+                float cx = 0.5f + Mathf.Cos(ang) * rad, cy = 0.5f + Mathf.Sin(ang) * rad;
+                float len = 0.035f + (float)rng.NextDouble() * 0.03f, wid = len * 0.45f;
+                float rot = (float)rng.NextDouble() * Mathf.PI;
+                float cs = Mathf.Cos(rot), sn = Mathf.Sin(rot);
+                float shade = 0.75f + (float)rng.NextDouble() * 0.35f + (cy - 0.5f) * 0.5f;
+                var baseCol = new Color(0.2f + (float)rng.NextDouble() * 0.08f, 0.36f + (float)rng.NextDouble() * 0.12f, 0.1f) * shade;
+                int x0 = Mathf.Max(0, (int)((cx - len) * n)), x1 = Mathf.Min(n - 1, (int)((cx + len) * n));
+                int y0 = Mathf.Max(0, (int)((cy - len) * n)), y1 = Mathf.Min(n - 1, (int)((cy + len) * n));
+                for (int y = y0; y <= y1; y++)
+                for (int x = x0; x <= x1; x++)
+                {
+                    float dx = (x + 0.5f) / n - cx, dy = (y + 0.5f) / n - cy;
+                    float u = dx * cs + dy * sn, v = -dx * sn + dy * cs;
+                    float e = (u * u) / (len * len) + (v * v) / (wid * wid);
+                    if (e > 1f) continue;
+                    var c = baseCol * (0.85f + 0.15f * (1f - e));
+                    if (Mathf.Abs(v) < wid * 0.08f) c *= 1.25f;            // midrib
+                    px[y * n + x] = C(c.r, c.g, c.b, 1f);
+                }
+            }
+            Save(File("ExpoLeaves", "Albedo"), n, n, px, alpha: true);
         }
 
         // ---------- 5×7 bitmap font for the brand and slot numbers ----------
