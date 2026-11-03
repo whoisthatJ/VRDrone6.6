@@ -1,0 +1,7 @@
+lighting,date,gpu,resolution,preset,scene,avg_fps,low1_fps,avg_ms,worst_ms,cpu_ms,gpu_ms
+day,2026-11-04 01:47,NVIDIA GeForce GTX 1650 Ti,1920x1080,Low,Track_Expo,75.4,51.6,13.26,27.22,13.26,6.61
+day,2026-11-04 01:47,NVIDIA GeForce GTX 1650 Ti,1920x1080,High,Track_Expo,69.3,53.7,14.42,22.59,14.44,6.88
+golden,2026-11-04 01:55,NVIDIA GeForce GTX 1650 Ti,1920x1080,Low,Track_Expo,80.8,67.3,12.38,20.14,12.38,6.15
+golden,2026-11-04 01:55,NVIDIA GeForce GTX 1650 Ti,1920x1080,High,Track_Expo,72.3,59.6,13.84,20.96,13.84,6.59
+night,2026-11-04 01:56,NVIDIA GeForce GTX 1650 Ti,1920x1080,Low,Track_Expo,81.1,67.5,12.33,20.26,12.33,6.08
+night,2026-11-04 01:56,NVIDIA GeForce GTX 1650 Ti,1920x1080,High,Track_Expo,69.1,46.4,14.47,24.95,14.47,6.66
