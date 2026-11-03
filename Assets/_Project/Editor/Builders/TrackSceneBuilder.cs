@@ -26,6 +26,10 @@ namespace GateRush.EditorTools.Builders
         public const string LocalQuadLayerName = "LocalQuad";
         public static readonly string[] Environments = { "field", "hangar", "industrial", "stadium", "expo" };
         private const string MatDir = "Assets/_Project/Art/Materials";
+
+        /// <summary>Camera far plane: the Expo city and its skyline reach 4.5 km, the other venues end well inside 1.5 km.</summary>
+        public static float FarClipFor(string environment) => environment == "expo" ? 6000f : 1500f;
+        private static float _farClip = 1500f;
         private const string DataDir = "Assets/_Project/Data";
 
         public static string ScenePath(string environment) =>
@@ -43,6 +47,7 @@ namespace GateRush.EditorTools.Builders
         {
             // NewScene unloads unused assets, so create the scene before loading anything it will reference.
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+            _farClip = FarClipFor(environment);
 
             int trackLayer = EnsureLayer(TrackLayerName, 8);
             int quadLayer = EnsureLayer(LocalQuadLayerName, 9);
@@ -213,7 +218,7 @@ namespace GateRush.EditorTools.Builders
             camGo.transform.SetParent(root.transform, false);
             camGo.transform.localPosition = new Vector3(0f, 0.02f, 0.095f);
             var vcam = camGo.AddComponent<CinemachineCamera>();
-            vcam.Lens = new LensSettings { FieldOfView = 80f, NearClipPlane = 0.02f, FarClipPlane = 1500f, Dutch = 0f };
+            vcam.Lens = new LensSettings { FieldOfView = 80f, NearClipPlane = 0.02f, FarClipPlane = _farClip, Dutch = 0f };
             camGo.AddComponent<FpvCamera>();
             foreach (var t in visual.GetComponentsInChildren<Transform>(true)) t.gameObject.layer = quadLayer;
 
@@ -301,7 +306,7 @@ namespace GateRush.EditorTools.Builders
             var chaseGo = new GameObject("Chase Camera");
             chaseGo.transform.SetParent(viewsGo.transform, false);
             var chase = chaseGo.AddComponent<CinemachineCamera>();
-            chase.Lens = new LensSettings { FieldOfView = 70f, NearClipPlane = 0.05f, FarClipPlane = 1500f };
+            chase.Lens = new LensSettings { FieldOfView = 70f, NearClipPlane = 0.05f, FarClipPlane = _farClip };
             chase.Follow = quad.transform;
             chase.LookAt = quad.transform;
             var follow = chaseGo.AddComponent<CinemachineFollow>();
@@ -322,7 +327,7 @@ namespace GateRush.EditorTools.Builders
             losGo.transform.SetParent(stand, false);
             losGo.transform.localPosition = new Vector3(0f, 1.6f, 0f);
             var los = losGo.AddComponent<CinemachineCamera>();
-            los.Lens = new LensSettings { FieldOfView = 50f, NearClipPlane = 0.05f, FarClipPlane = 1500f };
+            los.Lens = new LensSettings { FieldOfView = 50f, NearClipPlane = 0.05f, FarClipPlane = _farClip };
             los.LookAt = quad.transform;
             var losAim = losGo.AddComponent<CinemachineRotationComposer>();
             losAim.Damping = new Vector2(0.1f, 0.1f);

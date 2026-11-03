@@ -1,0 +1,3 @@
+date,gpu,resolution,preset,scene,avg_fps,low1_fps,avg_ms,worst_ms,cpu_ms,gpu_ms
+2026-11-03 17:39,NVIDIA GeForce GTX 1650 Ti,1920x1080,Low,Track_Expo,85.3,64.9,11.72,17.14,11.72,5.91
+2026-11-03 17:39,NVIDIA GeForce GTX 1650 Ti,1920x1080,High,Track_Expo,75.2,58.7,13.30,20.50,13.31,6.44

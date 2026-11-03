@@ -333,7 +333,7 @@ namespace GateRush.EditorTools.Art
                 cam.fieldOfView = bm.VerticalFov;
                 cam.aspect = Width / (float)Height;
                 cam.nearClipPlane = 0.05f;
-                cam.farClipPlane = Mathf.Max(source != null ? source.farClipPlane : 0f, 1500f);
+                cam.farClipPlane = Mathf.Max(source != null ? source.farClipPlane : 0f, 6000f);
                 if (bm.LensShiftY != 0f)
                 {
                     var proj = cam.projectionMatrix;

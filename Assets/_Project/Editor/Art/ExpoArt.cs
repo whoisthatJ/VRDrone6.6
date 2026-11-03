@@ -64,7 +64,6 @@ namespace GateRush.EditorTools.Art
             // Hero buildings from the OSM footprints (Sphere District E2 generators).
             ctx.Log.Append(GateRush.EditorTools.SphereDistrict.SphereDistrictHeroes.Build(ctx));
             BuildStreetscape(ctx);
-            BuildOutside(ctx);
             BuildCity(ctx);
             BuildSkyline(ctx);
             ArtPass.AddProbe(ctx, "Hub Probe", new Vector3(0f, 20f, 0f), new Vector3(700f, 120f, 700f), false, 256);
@@ -195,48 +194,6 @@ namespace GateRush.EditorTools.Art
             Add(ctx, "Ground", "Steppe", mb.Build("Steppe"), ArtPass.Mats("M_Expo_Steppe"), false);
         }
 
-        // ---------- outside the ring: neighbours ----------
-
-        private static void Superellipse(MB mb, Vector2 c, float halfX, float halfZ, float rotDeg, float h, int wallSub, int roofSub, float power = 4f)
-        {
-            var outline = new List<Vector3>();
-            var rot = Quaternion.Euler(0f, rotDeg, 0f);
-            for (int i = 0; i < 64; i++)
-            {
-                float t = 2f * Mathf.PI * i / 64f;
-                float cx = Mathf.Sign(Mathf.Cos(t)) * Mathf.Pow(Mathf.Abs(Mathf.Cos(t)), 2f / power) * halfX;
-                float cz = Mathf.Sign(Mathf.Sin(t)) * Mathf.Pow(Mathf.Abs(Mathf.Sin(t)), 2f / power) * halfZ;
-                var p = rot * new Vector3(cx, 0f, cz);
-                outline.Add(new Vector3(c.x + p.x, 0f, c.y + p.z));
-            }
-            Wall(mb, outline, 0f, h, wallSub, true);
-            int top = mb.Vert(new Vector3(c.x, h, c.y), c);
-            for (int i = 0; i < outline.Count; i++)
-            {
-                Vector3 a = outline[i] + Vector3.up * h, b = outline[(i + 1) % outline.Count] + Vector3.up * h;
-                mb.Tri(top, mb.Vert(a, Xz(a)), mb.Vert(b, Xz(b)), roofSub);
-            }
-        }
-
-        private static void BuildOutside(ArtContext ctx)
-        {
-            // The Mega Silk Way mall (W); the Congress Centre and the hotel are hero landmarks now.
-            var big = new MB();
-            Superellipse(big, Xz(Polar(Vector2.zero, 267f, 640f)), 120f, 245f, 0f, 16f, 2, 1, 8f);
-            Add(ctx, "Outside", "Congress And Mall", big.Build("ExpoCongressMall"), ArtPass.Mats("M_Expo_CurtainWall", "M_Expo_Roof", "M_Concrete_Wall"));
-
-            // Offices along the east side towards Mangilik El.
-            var east = new List<(Mesh, Matrix4x4, int)>
-            {
-                ProcMesh.Part(Polar(Vector2.zero, 60f, 430f, 30f), new Vector3(36f, 60f, 36f), Quaternion.Euler(0f, 30f, 0f), 0),
-                ProcMesh.Part(Polar(Vector2.zero, 120f, 450f, 18f), new Vector3(70f, 36f, 40f), Quaternion.Euler(0f, -15f, 0f), 0),
-                ProcMesh.Part(Polar(Vector2.zero, 62f, 500f, 9f), new Vector3(170f, 18f, 70f), Quaternion.Euler(0f, 150f, 0f), 1),
-            };
-            Add(ctx, "Outside", "East Buildings", ProcMesh.Combine("ExpoEast", east), ArtPass.Mats("M_Expo_Tower", "M_Concrete_Wall"));
-
-            ctx.Log.Append(" outside;");
-        }
-
         // ---------- trees: the park and along the ring road ----------
 
         /// <summary>
@@ -324,47 +281,14 @@ namespace GateRush.EditorTools.Art
 
         // ---------- the city round the site ----------
 
-        private static bool KeepClear(float x, float z)
-        {
-            float r = Mathf.Sqrt(x * x + z * z);
-            if (r < 560f) return true;
-            // The park corridor and its continuation towards the Baiterek axis.
-            var axis = Polar(Vector2.zero, ParkBearing, 1f);
-            float along = x * axis.x + z * axis.z, across = Mathf.Abs(x * axis.z - z * axis.x);
-            if (along > 0f && along < 1100f && across < ParkHalfWidth + 30f) return true;
-            // Mega Silk Way and the Congress Centre.
-            if (Vector2.Distance(new Vector2(x, z), Xz(Polar(Vector2.zero, 267f, 640f))) < 280f) return true;
-            if (Vector2.Distance(new Vector2(x, z), Xz(Polar(Vector2.zero, 316f, 480f))) < 110f) return true;
-            return false;
-        }
-
+        /// <summary>The city from the OSM footprints (E4) and the far ring of blocks beyond the mapped area.</summary>
         private static void BuildCity(ArtContext ctx)
         {
-            var rng = new System.Random(2017);
-            var blocks = new List<(Mesh, Matrix4x4, int)>();
-            var towers = new List<(Mesh, Matrix4x4, int)>();
-            var roofs = new List<(Mesh, Matrix4x4, int)>();
-            for (float x = -1700f; x <= 1700f; x += 110f)
-                for (float z = -1500f; z <= 1900f; z += 110f)
-                {
-                    float jx = (float)(rng.NextDouble() - 0.5) * 20f, jz = (float)(rng.NextDouble() - 0.5) * 20f;
-                    if (KeepClear(x + jx, z + jz) || rng.NextDouble() < 0.18) continue;
-                    float h = (9 + rng.Next(0, 9)) * 3f;
-                    float w = 50f + (float)rng.NextDouble() * 30f, d = 14f + (float)rng.NextDouble() * 4f;
-                    // Two slabs forming an L (the typical Astana courtyard block).
-                    blocks.Add(ProcMesh.Part(new Vector3(x + jx, h / 2f, z + jz), new Vector3(w, h, d), Quaternion.identity, 0));
-                    blocks.Add(ProcMesh.Part(new Vector3(x + jx - w / 2f + d / 2f, h / 2f, z + jz - 20f), new Vector3(d, h, 40f), Quaternion.identity, 0));
-                    roofs.Add(ProcMesh.Part(new Vector3(x + jx, h + 0.4f, z + jz), new Vector3(w + 0.4f, 0.8f, d + 0.4f), Quaternion.identity, 0));
-                    if (rng.NextDouble() < 0.14)
-                    {
-                        float th = 60f + (float)rng.NextDouble() * 80f;
-                        towers.Add(ProcMesh.Part(new Vector3(x + jx + 30f, th / 2f, z + jz + 30f), new Vector3(24f, th, 24f), Quaternion.identity, 0));
-                    }
-                }
-            Add(ctx, "City", "Apartments", ProcMesh.Combine("ExpoApartments", blocks), ArtPass.Mats("M_Expo_Apartment"), true);
-            Add(ctx, "City", "Apartment Roofs", ProcMesh.Combine("ExpoApartmentRoofs", roofs), ArtPass.Mats("M_Concrete_Wall"), false);
-            Add(ctx, "City", "Towers", ProcMesh.Combine("ExpoTowers", towers), ArtPass.Mats("M_Expo_Tower"), true);
-            ctx.Log.Append($" city {blocks.Count / 2} blocks;");
+            var geo = AssetDatabase.LoadAssetAtPath<GateRush.Track.Geo.GeoDataAsset>(GateRush.EditorTools.SphereDistrict.OsmImporter.DataPath);
+            if (geo == null) return;
+            var group = G(ctx, "Sphere District City");
+            ctx.Log.Append(GateRush.EditorTools.SphereDistrict.CityGenerator.Build(ctx, geo.Data, group));
+            ctx.Log.Append(GateRush.EditorTools.SphereDistrict.CityGenerator.BuildFarRing(group, ParkBearing));
         }
 
         /// <summary>
