@@ -55,6 +55,7 @@ namespace GateRush.Game
 
         private void Start()
         {
+            GameFlow.Catalog = tracks;
             var settings = SaveSystem.Settings;
             ApplySettings(settings);
             SaveSystem.SettingsChanged += ApplySettings;
@@ -75,8 +76,9 @@ namespace GateRush.Game
                 return;
             }
             if (editor != null) editor.gameObject.SetActive(false);
-            LoadTrack(settings.TrackId);
+            LoadTrack(GameFlow.TakeTrackToLoad());
             if (views != null) views.Apply((ViewMode)settings.Camera.ViewMode);
+            if (GateRush.Net.NetRace.InRace && Track != null) gameObject.AddComponent<OnlineRaceDriver>().Configure(this, vehicle, race, buildMaterials);
         }
 
         private void OnDestroy()
@@ -111,6 +113,10 @@ namespace GateRush.Game
         private void OnPhaseChanged(RacePhase phase)
         {
             if (quadAudio != null && phase == RacePhase.Racing) quadAudio.Beep();
+            // Opt-in (Settings > Pilot): the race's best lap goes to the track's online leaderboard.
+            if (phase == RacePhase.Finished && SaveSystem.Settings.Online.PostLapTimes && race.Timer.HasBestLap
+                && GateRush.Net.OnlineLeaderboards.Has(race.TrackId))
+                _ = GateRush.Net.OnlineLeaderboards.PostLapAsync(race.TrackId, (float)race.Timer.BestLap, vehicle.Profile.Name);
         }
 
         // ---------- editor / test fly ----------

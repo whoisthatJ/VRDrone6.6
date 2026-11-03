@@ -9,7 +9,8 @@
         "GateRush.Cameras",
         "GateRush.Race",
         "GateRush.Track",
-        "GateRush.TrackEditor"
+        "GateRush.TrackEditor",
+        "GateRush.Net"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -90,6 +90,38 @@ namespace GateRush.Race
         public TrackBoard Board => _board.Board(trackId);
         public GhostSystem Ghosts => ghosts;
 
+        /// <summary>
+        /// Online races: the start comes from <see cref="ScheduleStart"/> (same moment for every pilot) instead of
+        /// arming, the countdown is not cancelled by disarming, and Restart only respawns at the last checkpoint.
+        /// </summary>
+        public bool ExternalStart { get; set; }
+
+        /// <summary>Starts the countdown so that GO is at <paramref name="goTime"/> (<see cref="Now"/> clock).</summary>
+        public void ScheduleStart(double goTime)
+        {
+            Restart();
+            _countdownEnd = goTime;
+            vehicle.HoldAtSpawn = true;
+            SetPhase(RacePhase.Countdown);
+        }
+
+        /// <summary>
+        /// Distance along the race in gates: gates passed (holeshot included) plus the fraction of the current leg
+        /// flown. Comparable between pilots on the same course; used for online standings.
+        /// </summary>
+        public float Progress
+        {
+            get
+            {
+                if (_timer == null || !_timer.Started || gates.Length == 0) return 0f;
+                if (_timer.Finished) return _timer.TotalLaps * gates.Length + 1;
+                int passed = RaceProgress.GatesPassed(_timer.LastCheckpoint >= 0, _timer.CompletedLaps, _timer.NextCheckpoint, gates.Length);
+                Vector3 to = gates[_timer.NextCheckpoint].OpeningCenterWorld;
+                Vector3 from = passed == 0 ? (startPad != null ? startPad.position : to) : gates[(_timer.NextCheckpoint - 1 + gates.Length) % gates.Length].OpeningCenterWorld;
+                return passed + RaceProgress.LegFraction(from, to, vehicle.transform.position);
+            }
+        }
+
         public string PilotName
         {
             get => pilotName;
@@ -154,8 +186,12 @@ namespace GateRush.Race
         {
             if (RestartPressed())
             {
-                Restart();
-                return;
+                if (!ExternalStart)
+                {
+                    Restart();
+                    return;
+                }
+                if (_phase == RacePhase.Racing) vehicle.Respawn();
             }
 
             double now = Now;
@@ -164,7 +200,7 @@ namespace GateRush.Race
             switch (_phase)
             {
                 case RacePhase.Idle:
-                    if (armed && !vehicle.IsCrashed)
+                    if (!ExternalStart && armed && !vehicle.IsCrashed)
                     {
                         _countdownEnd = now + countdownSeconds;
                         vehicle.HoldAtSpawn = true;
@@ -173,7 +209,7 @@ namespace GateRush.Race
                     break;
 
                 case RacePhase.Countdown:
-                    if (!vehicle.LastInput.Arm)
+                    if (!ExternalStart && !vehicle.LastInput.Arm)
                     {
                         vehicle.HoldAtSpawn = false;
                         SetPhase(RacePhase.Idle);

@@ -70,7 +70,9 @@ namespace GateRush.Race
             }
             _armRequested = false;
 
-            if (session.Phase == RacePhase.Countdown || session.Phase == RacePhase.Finished)
+            // Online races start on the host's signal: wait on the pad until then.
+            if (session.Phase == RacePhase.Countdown || session.Phase == RacePhase.Finished
+                || (session.Phase == RacePhase.Idle && session.ExternalStart))
             {
                 pilot.Throttle = 0f;
                 return;

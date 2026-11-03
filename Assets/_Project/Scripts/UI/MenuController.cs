@@ -38,6 +38,7 @@ namespace GateRush.UI
         {
             UiKit.Image(UiKit.Fill(root, "Panel"), UiKit.PanelColor);
             ShowMain();
+            StartOnline();
         }
 
         // ---------- pages ----------
@@ -56,7 +57,7 @@ namespace GateRush.UI
             return _page;
         }
 
-        private void BackButton(RectTransform page, UnityEngine.Events.UnityAction back = null) =>
+        private Button BackButton(RectTransform page, UnityEngine.Events.UnityAction back = null) =>
             UiKit.Button(page, "Back", new Vector2(Margin, -(Height - 110f)), new Vector2(240f, 70f), back ?? ShowMain);
 
         private void ShowMain()
@@ -83,6 +84,7 @@ namespace GateRush.UI
             UiKit.Button(p, "Input diagnostics", new Vector2(Margin + half + 30f, y), new Vector2(half, 90f), () => { CommitIfDirty(); GameFlow.Diagnostics(); });
             y -= 120f;
             UiKit.Button(p, "Quit", new Vector2(Margin, y), new Vector2(half, 90f), GameFlow.Quit);
+            UiKit.Button(p, "Online", new Vector2(Margin + half + 30f, y), new Vector2(half, 90f), ShowOnline);
 
             UiKit.Label(p, "Mouse, keyboard or gamepad. In flight: V switches the camera, Esc returns here.",
                 new Vector2(Margin, -(Height - 100f)), new Vector2(ContentWidth, 60f), 26f, TextAlignmentOptions.MidlineLeft, UiKit.DimTextColor);
@@ -432,12 +434,16 @@ namespace GateRush.UI
             int index = System.Array.IndexOf(Callsigns, S.PilotName);
             if (index < 0) index = 0;
             UiKit.StepperRow(c, "Callsign", 0f, Callsigns, index, i => { S.PilotName = Callsigns[i]; Changed(); }, ContentWidth);
-            UiKit.Label(c, "Shown on the leaderboard. (Free text entry comes with a VR keyboard later.)",
-                new Vector2(0f, -100f), new Vector2(ContentWidth, 60f), 26f, TextAlignmentOptions.TopLeft, UiKit.DimTextColor);
+            UiKit.Label(c, "Shown on the leaderboard and to other pilots online. (Free text entry comes with a VR keyboard later.)",
+                new Vector2(0f, -70f), new Vector2(ContentWidth, 60f), 26f, TextAlignmentOptions.TopLeft, UiKit.DimTextColor);
+            UiKit.StepperRow(c, "Post lap times online", -160f, new[] { "Off", "On" }, S.Online.PostLapTimes ? 1 : 0, i => { S.Online.PostLapTimes = i == 1; Changed(); }, ContentWidth);
+            UiKit.Label(c, "On: the best lap of each finished race on a built-in track goes to its online leaderboard (signs in anonymously).",
+                new Vector2(0f, -230f), new Vector2(ContentWidth, 60f), 26f, TextAlignmentOptions.TopLeft, UiKit.DimTextColor);
         }
 
         private void OnDestroy()
         {
+            UnhookOnline();
             if (_dirty) SaveSystem.Commit();
         }
     }

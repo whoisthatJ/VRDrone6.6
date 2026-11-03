@@ -40,8 +40,31 @@ namespace GateRush.Game
             return catalog.Load(catalog.Find(trackId));
         }
 
+        /// <summary>The catalog of whichever scene is running (menu or track), for online race loads.</summary>
+        public static TrackCatalog Catalog { get; set; }
+
+        /// <summary>Track an online race loads instead of the saved choice (the player's own pick stays as it was).</summary>
+        public static string OnlineTrackId { get; private set; }
+
+        /// <summary>Loads an online race's track without changing the saved track choice.</summary>
+        public static bool RaceOnline(TrackCatalog catalog, string trackId)
+        {
+            OnlineTrackId = trackId;
+            return Race(catalog, trackId, false);
+        }
+
+        /// <summary>Track the next track scene should load: the online race's, else the saved choice.</summary>
+        public static string TakeTrackToLoad()
+        {
+            string id = OnlineTrackId;
+            OnlineTrackId = null;
+            return string.IsNullOrEmpty(id) ? SaveSystem.Settings.TrackId : id;
+        }
+
         /// <summary>Selects a track, saves the choice and loads its environment scene.</summary>
-        public static bool Race(TrackCatalog catalog, string trackId)
+        public static bool Race(TrackCatalog catalog, string trackId) => Race(catalog, trackId, true);
+
+        private static bool Race(TrackCatalog catalog, string trackId, bool remember)
         {
             var data = Resolve(catalog, trackId);
             if (data == null)
@@ -56,8 +79,11 @@ namespace GateRush.Game
                 return false;
             }
 
-            SaveSystem.Settings.TrackId = trackId;
-            SaveSystem.Commit();
+            if (remember)
+            {
+                SaveSystem.Settings.TrackId = trackId;
+                SaveSystem.Commit();
+            }
             PendingEdit = null;
             SceneManager.LoadScene(scene);
             return true;

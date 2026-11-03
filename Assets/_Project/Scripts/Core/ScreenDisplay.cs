@@ -44,7 +44,7 @@ namespace GateRush.Core
 
         public static void Apply(GraphicsPrefs prefs)
         {
-            if (Application.isEditor) return;
+            if (Application.isEditor || WindowFromCommandLine) return;
             var size = TargetSize(prefs, Native);
             switch (prefs.DisplayMode)
             {
@@ -65,6 +65,10 @@ namespace GateRush.Core
                     break;
             }
         }
+
+        /// <summary>The window was set on the command line (-screen-fullscreen, -screen-width...): leave it alone.</summary>
+        private static bool WindowFromCommandLine =>
+            Array.Exists(Environment.GetCommandLineArgs(), a => a.StartsWith("-screen-", StringComparison.OrdinalIgnoreCase) || a == "-popupwindow");
 
         // ---------- maximize (Win32) ----------
 

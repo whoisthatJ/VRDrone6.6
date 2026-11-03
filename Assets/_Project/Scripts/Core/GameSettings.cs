@@ -62,6 +62,14 @@ namespace GateRush.Core
         public bool GhostLanes;
     }
 
+    /// <summary>Online features. Everything is off until the player opts in (the game never connects on its own).</summary>
+    [Serializable]
+    public sealed class OnlinePrefs
+    {
+        /// <summary>Post the best lap of each finished race on a built-in track to the online leaderboard.</summary>
+        public bool PostLapTimes;
+    }
+
     [Serializable]
     public sealed class PhysicsPrefs
     {
@@ -96,6 +104,7 @@ namespace GateRush.Core
         public FeedPrefs Feed = new FeedPrefs();
         public GraphicsPrefs Graphics = new GraphicsPrefs();
         public GuidancePrefs Guidance = new GuidancePrefs();
+        public OnlinePrefs Online = new OnlinePrefs();
 
         /// <summary>Brings every value into its valid range (after loading or editing).</summary>
         public void Clamp()
@@ -110,6 +119,7 @@ namespace GateRush.Core
             Feed ??= new FeedPrefs();
             Graphics ??= new GraphicsPrefs();
             Guidance ??= new GuidancePrefs();
+            Online ??= new OnlinePrefs();
             Guidance.RouteGuidance = Mathf.Clamp(Guidance.RouteGuidance, 0, 2);
             Graphics.Clamp();
             Feed.VtxNoise = Mathf.Clamp(Feed.VtxNoise, 0, 2);

@@ -1,0 +1,26 @@
+{
+    "name": "GateRush.Net",
+    "rootNamespace": "GateRush.Net",
+    "references": [
+        "GateRush.Flight",
+        "GateRush.Core",
+        "GateRush.Vehicle",
+        "GateRush.Race",
+        "Unity.Netcode.Runtime",
+        "Unity.Networking.Transport",
+        "Unity.Collections",
+        "Unity.Services.Core",
+        "Unity.Services.Authentication",
+        "Unity.Services.Multiplayer",
+        "Unity.Services.Leaderboards"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
