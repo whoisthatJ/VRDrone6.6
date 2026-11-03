@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Globalization;
+using GateRush.Core;
 using GateRush.Game;
 using GateRush.Net;
 using TMPro;
@@ -87,7 +88,7 @@ namespace GateRush.UI
 
         private void ShowOnline()
         {
-            var p = NewPage("ONLINE");
+            var p = NewPage(L.T("ONLINE"));
             _onlinePage = OnlinePage.Home;
             HookOnline();
             float half = (ContentWidth - 30f) * 0.5f;
@@ -98,45 +99,45 @@ namespace GateRush.UI
 
             float y = -190f;
             var track = OnlineTrack();
-            UiKit.Button(p, "Quick race", new Vector2(Margin, y), new Vector2(half, 90f), () => Go(OnlineLobby.QuickRaceAsync(track.Id, track.DisplayName), "Finding a race..."));
-            UiKit.Button(p, "Host a race", new Vector2(Margin + half + 30f, y), new Vector2(half, 90f), () => Go(OnlineLobby.CreateAsync(track.Id, track.DisplayName, false), "Opening your race..."));
+            UiKit.Button(p, L.T("Quick race"), new Vector2(Margin, y), new Vector2(half, 90f), () => Go(OnlineLobby.QuickRaceAsync(track.Id, track.DisplayName), L.T("Finding a race...")));
+            UiKit.Button(p, L.T("Host a race"), new Vector2(Margin + half + 30f, y), new Vector2(half, 90f), () => Go(OnlineLobby.CreateAsync(track.Id, track.DisplayName, false), L.T("Opening your race...")));
             y -= 110f;
-            UiKit.Button(p, "Host a private race", new Vector2(Margin, y), new Vector2(half, 90f), () => Go(OnlineLobby.CreateAsync(track.Id, track.DisplayName, true), "Opening your race..."));
+            UiKit.Button(p, L.T("Host a private race"), new Vector2(Margin, y), new Vector2(half, 90f), () => Go(OnlineLobby.CreateAsync(track.Id, track.DisplayName, true), L.T("Opening your race...")));
             float codeW = half - 230f;
             var codeBox = UiKit.Rect(p, "Code", new Vector2(Margin + half + 30f, y), new Vector2(codeW, 90f));
-            _codeField = InputField(codeBox, "Race code");
-            UiKit.Button(p, "Join", new Vector2(Margin + half + 30f + codeW + 20f, y), new Vector2(210f, 90f), () => Go(OnlineLobby.JoinByCodeAsync(_codeField.text), "Joining..."));
+            _codeField = InputField(codeBox, L.T("Race code"));
+            UiKit.Button(p, L.T("Join"), new Vector2(Margin + half + 30f + codeW + 20f, y), new Vector2(210f, 90f), () => Go(OnlineLobby.JoinByCodeAsync(_codeField.text), L.T("Joining...")));
             y -= 120f;
 
-            UiKit.Label(p, "Open races", new Vector2(Margin, y), new Vector2(half, 60f), 34f, TextAlignmentOptions.MidlineLeft, UiKit.AccentColor);
-            UiKit.Button(p, "Refresh", new Vector2(Width - Margin - 240f, y), new Vector2(240f, 60f), RefreshOpenRaces, 28f);
+            UiKit.Label(p, L.T("Open races"), new Vector2(Margin, y), new Vector2(half, 60f), 34f, TextAlignmentOptions.MidlineLeft, UiKit.AccentColor);
+            UiKit.Button(p, L.T("Refresh"), new Vector2(Width - Margin - 240f, y), new Vector2(240f, 60f), RefreshOpenRaces, 28f);
             y -= 75f;
             if (_openRaces.Count == 0)
-                UiKit.Label(p, "No open races listed. Refresh, start a quick race, or host one.", new Vector2(Margin, y), new Vector2(ContentWidth, 60f), 28f, TextAlignmentOptions.MidlineLeft, UiKit.DimTextColor);
+                UiKit.Label(p, L.T("No open races listed. Refresh, start a quick race, or host one."), new Vector2(Margin, y), new Vector2(ContentWidth, 60f), 28f, TextAlignmentOptions.MidlineLeft, UiKit.DimTextColor);
             for (int i = 0; i < _openRaces.Count && i < 4; i++)
             {
                 var r = _openRaces[i];
-                UiKit.Label(p, $"{r.Name}   <color=#aab>{r.TrackName}</color>   {r.Pilots}/{r.MaxPilots}", new Vector2(Margin, y), new Vector2(ContentWidth - 260f, 60f), 30f);
+                UiKit.Label(p, $"{r.Name}   <color=#aab>{L.T(r.TrackName)}</color>   {r.Pilots}/{r.MaxPilots}", new Vector2(Margin, y), new Vector2(ContentWidth - 260f, 60f), 30f);
                 string id = r.Id;
-                UiKit.Button(p, "Join", new Vector2(Width - Margin - 240f, y), new Vector2(240f, 60f), () => Go(OnlineLobby.JoinAsync(id), "Joining..."), 28f);
+                UiKit.Button(p, L.T("Join"), new Vector2(Width - Margin - 240f, y), new Vector2(240f, 60f), () => Go(OnlineLobby.JoinAsync(id), L.T("Joining...")), 28f);
                 y -= 70f;
             }
 
-            UiKit.Label(p, $"Hosted races use your selected track ({track.DisplayName}); built-in tracks only. Up to {OnlineRules.MaxPilots} pilots.",
+            UiKit.Label(p, L.F("Hosted races use your selected track ({0}); built-in tracks only. Up to {1} pilots.", L.T(track.DisplayName), OnlineRules.MaxPilots),
                 new Vector2(Margin, -(Height - 185f)), new Vector2(ContentWidth, 50f), 24f, TextAlignmentOptions.MidlineLeft, UiKit.DimTextColor);
             BackButton(p, () =>
             {
                 _onlinePage = OnlinePage.None;
                 ShowMain();
             });
-            UiKit.Button(p, "Online leaderboards", new Vector2(Width - Margin - 420f, -(Height - 110f)), new Vector2(420f, 70f), ShowOnlineBoards, 28f);
+            UiKit.Button(p, L.T("Online leaderboards"), new Vector2(Width - Margin - 420f, -(Height - 110f)), new Vector2(420f, 70f), ShowOnlineBoards, 28f);
         }
 
         private async void RefreshOpenRaces()
         {
             if (_onlineBusy) return;
             _onlineBusy = true;
-            SetOnlineStatus("Looking for races...");
+            SetOnlineStatus(L.T("Looking for races..."));
             var list = await OnlineLobby.ListAsync();
             _onlineBusy = false;
             if (this == null || _onlinePage != OnlinePage.Home) return;
@@ -182,7 +183,7 @@ namespace GateRush.UI
 
         private void ShowOnlineLobby()
         {
-            var p = NewPage("ONLINE RACE");
+            var p = NewPage(L.T("ONLINE RACE"));
             _onlinePage = OnlinePage.Lobby;
             HookOnline();
             if (!OnlineLobby.InSession)
@@ -193,7 +194,7 @@ namespace GateRush.UI
             bool host = OnlineLobby.IsHost;
             var net = NetRace.Instance;
 
-            string code = string.IsNullOrEmpty(OnlineLobby.Code) ? "" : $"   Code <color=#fff>{OnlineLobby.Code}</color> (share it to invite)";
+            string code = string.IsNullOrEmpty(OnlineLobby.Code) ? "" : "   " + L.F("Code {0} (share it to invite)", $"<color=#fff>{OnlineLobby.Code}</color>");
             UiKit.Label(p, OnlineLobby.Name + code, new Vector2(Margin, -110f), new Vector2(ContentWidth, 60f), 30f, TextAlignmentOptions.MidlineLeft, UiKit.DimTextColor);
             _onlineStatus = UiKit.Label(p, "", new Vector2(Margin, -165f), new Vector2(ContentWidth, 50f), 26f, TextAlignmentOptions.MidlineLeft, UiKit.AccentColor);
 
@@ -203,21 +204,21 @@ namespace GateRush.UI
             int index = Mathf.Max(0, list.FindIndex(t => t.Id == trackId));
             if (host)
             {
-                var names = list.ConvertAll(t => t.DisplayName).ToArray();
+                var names = list.ConvertAll(t => L.T(t.DisplayName)).ToArray();
                 var row = UiKit.Rect(p, "Track row", new Vector2(Margin, -230f), new Vector2(ContentWidth, 60f));
-                UiKit.StepperRow(row, "Track", 0f, names, index, i => _ = OnlineLobby.SetTrackAsync(list[i].Id, list[i].DisplayName), ContentWidth);
+                UiKit.StepperRow(row, L.T("Track"), 0f, names, index, i => _ = OnlineLobby.SetTrackAsync(list[i].Id, list[i].DisplayName), ContentWidth);
                 var lapsRow = UiKit.Rect(p, "Laps row", new Vector2(Margin, -300f), new Vector2(ContentWidth, 60f));
-                var lapNames = new[] { "Track default", "1", "2", "3", "4", "5" };
-                UiKit.StepperRow(lapsRow, "Laps", 0f, lapNames, Mathf.Clamp(OnlineFlow.Laps, 0, 5), i => OnlineFlow.Laps = i, ContentWidth);
+                var lapNames = new[] { L.T("Track default"), "1", "2", "3", "4", "5" };
+                UiKit.StepperRow(lapsRow, L.T("Laps"), 0f, lapNames, Mathf.Clamp(OnlineFlow.Laps, 0, 5), i => OnlineFlow.Laps = i, ContentWidth);
             }
             else
             {
-                UiKit.Label(p, "Track", new Vector2(Margin, -230f), new Vector2(420f, 60f), 30f);
-                UiKit.Label(p, OnlineLobby.TrackName, new Vector2(Margin + 440f, -230f), new Vector2(ContentWidth - 440f, 60f), 30f);
+                UiKit.Label(p, L.T("Track"), new Vector2(Margin, -230f), new Vector2(420f, 60f), 30f);
+                UiKit.Label(p, L.T(OnlineLobby.TrackName), new Vector2(Margin + 440f, -230f), new Vector2(ContentWidth - 440f, 60f), 30f);
             }
 
             // Pilots: the race network's roster (with quads), or the session's names while it connects.
-            UiKit.Label(p, $"Pilots  {OnlineLobby.PlayerCount}/{OnlineLobby.MaxPlayers}", new Vector2(Margin, -385f), new Vector2(ContentWidth, 60f), 34f, TextAlignmentOptions.MidlineLeft, UiKit.AccentColor);
+            UiKit.Label(p, L.F("Pilots  {0}/{1}", OnlineLobby.PlayerCount, OnlineLobby.MaxPlayers), new Vector2(Margin, -385f), new Vector2(ContentWidth, 60f), 34f, TextAlignmentOptions.MidlineLeft, UiKit.AccentColor);
             float y = -445f;
             var rows = new List<string>();
             if (net != null && net.Pilots.Count > 0)
@@ -227,8 +228,8 @@ namespace GateRush.UI
                 foreach (var pilot in pilots)
                 {
                     var build = RemotePilotView.Parse(pilot.BuildJson);
-                    string me = pilot.ClientId == net.LocalClientId ? "  <color=#fa3>(you)</color>" : "";
-                    rows.Add($"{pilot.Slot + 1}.  {pilot.Name}{me}   <color=#aab>{build.Name}</color>");
+                    string me = pilot.ClientId == net.LocalClientId ? "  <color=#fa3>" + L.T("(you)") + "</color>" : "";
+                    rows.Add($"{pilot.Slot + 1}.  {pilot.Name}{me}   <color=#aab>{L.T(build.Name)}</color>");
                 }
             }
             else rows.AddRange(OnlineLobby.PlayerNames());
@@ -239,14 +240,14 @@ namespace GateRush.UI
             }
 
             if (host)
-                UiKit.Button(p, "START RACE", new Vector2(Width - Margin - 520f, -(Height - 220f)), new Vector2(520f, 100f), () =>
+                UiKit.Button(p, L.T("START RACE"), new Vector2(Width - Margin - 520f, -(Height - 220f)), new Vector2(520f, 100f), () =>
                 {
                     CommitIfDirty();
                     OnlineFlow.PrepareLocalPilot();
                     OnlineFlow.HostStart(OnlineLobby.TrackId);
                 }, 44f);
             else
-                UiKit.Label(p, "Waiting for the host to start the race.", new Vector2(Margin, -(Height - 220f)), new Vector2(ContentWidth, 60f), 30f, TextAlignmentOptions.MidlineLeft, UiKit.DimTextColor);
+                UiKit.Label(p, L.T("Waiting for the host to start the race."), new Vector2(Margin, -(Height - 220f)), new Vector2(ContentWidth, 60f), 30f, TextAlignmentOptions.MidlineLeft, UiKit.DimTextColor);
 
             var leave = BackButton(p, async () =>
             {
@@ -254,14 +255,14 @@ namespace GateRush.UI
                 await OnlineLobby.LeaveAsync();
                 if (this != null) ShowOnline();
             });
-            UiKit.SetButtonText(leave, "Leave race");
+            UiKit.SetButtonText(leave, L.T("Leave race"));
         }
 
         // ---------- leaderboards ----------
 
         private void ShowOnlineBoards()
         {
-            var p = NewPage("ONLINE LEADERBOARDS");
+            var p = NewPage(L.T("ONLINE LEADERBOARDS"));
             _onlinePage = OnlinePage.Leaderboards;
             var ids = OnlineLeaderboards.Tracks;
             _boardTrack = Mathf.Clamp(_boardTrack, 0, ids.Length - 1);
@@ -269,17 +270,17 @@ namespace GateRush.UI
             for (int i = 0; i < ids.Length; i++)
             {
                 var t = tracks.Find(ids[i]);
-                names[i] = t != null ? t.DisplayName : ids[i];
+                names[i] = t != null ? L.T(t.DisplayName) : ids[i];
             }
             var row = UiKit.Rect(p, "Track row", new Vector2(Margin, -120f), new Vector2(ContentWidth, 60f));
-            UiKit.StepperRow(row, "Track", 0f, names, _boardTrack, i =>
+            UiKit.StepperRow(row, L.T("Track"), 0f, names, _boardTrack, i =>
             {
                 _boardTrack = i;
                 ShowOnlineBoards();
             }, ContentWidth);
-            _onlineStatus = UiKit.Label(p, "Loading...", new Vector2(Margin, -200f), new Vector2(ContentWidth, 50f), 26f, TextAlignmentOptions.MidlineLeft, UiKit.AccentColor);
+            _onlineStatus = UiKit.Label(p, L.T("Loading..."), new Vector2(Margin, -200f), new Vector2(ContentWidth, 50f), 26f, TextAlignmentOptions.MidlineLeft, UiKit.AccentColor);
             var body = UiKit.Rect(p, "Scores", new Vector2(Margin, -260f), new Vector2(ContentWidth, 600f));
-            string posting = S.Online.PostLapTimes ? "Your best laps are posted (Settings > Pilot)." : "Posting your laps is off: turn it on in Settings > Pilot.";
+            string posting = S.Online.PostLapTimes ? L.T("Your best laps are posted (Settings > Pilot).") : L.T("Posting your laps is off: turn it on in Settings > Pilot.");
             UiKit.Label(p, posting, new Vector2(Margin, -(Height - 185f)), new Vector2(ContentWidth, 50f), 24f, TextAlignmentOptions.MidlineLeft, UiKit.DimTextColor);
             BackButton(p, ShowOnline);
             LoadBoard(ids[_boardTrack], body);
@@ -289,7 +290,7 @@ namespace GateRush.UI
         {
             var rows = await OnlineLeaderboards.TopAsync(trackId);
             if (this == null || body == null || _onlinePage != OnlinePage.Leaderboards) return;
-            SetOnlineStatus(OnlineLeaderboards.LastError.Length > 0 ? OnlineLeaderboards.LastError : rows.Count == 0 ? "No laps posted yet." : "");
+            SetOnlineStatus(OnlineLeaderboards.LastError.Length > 0 ? OnlineLeaderboards.LastError : rows.Count == 0 ? L.T("No laps posted yet.") : "");
             float y = 0f;
             foreach (var r in rows)
             {

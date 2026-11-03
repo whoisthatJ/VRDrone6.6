@@ -1,4 +1,5 @@
 using GateRush.Cameras;
+using GateRush.Core;
 using GateRush.Flight;
 using GateRush.Vehicle;
 using TMPro;
@@ -33,11 +34,6 @@ namespace GateRush.UI
         private const string ModeAcro = "ACRO";
         private const string ModeAngle = "ANGL";
         private const string ModeHorizon = "HOR";
-        private const string Disarmed = "DISARMED";
-        private const string ThrottleToArm = "THROTTLE LOW TO ARM";
-        private const string ArmSwitchBlocked = "ARM SWITCH OFF, THEN ON";
-        private const string LowBattery = "LOW BATTERY";
-        private const string LinkLost = "LINK";
 
         private string _modeShown, _warningShown;
         private float _armedTime;
@@ -55,7 +51,7 @@ namespace GateRush.UI
             float cell = volts / cells;
             if (battery != null) battery.SetText("{0:1}V {1:2}\n{2:0}MAH", volts, cell, s.BatteryUsedMah);
 
-            string m = !s.Armed ? Disarmed : input.Mode == FlightMode.Angle ? ModeAngle : input.Mode == FlightMode.Horizon ? ModeHorizon : ModeAcro;
+            string m = !s.Armed ? L.T("DISARMED") : input.Mode == FlightMode.Angle ? ModeAngle : input.Mode == FlightMode.Horizon ? ModeHorizon : ModeAcro;
             SetIfChanged(mode, m, ref _modeShown);
 
             if (timer != null)
@@ -70,10 +66,10 @@ namespace GateRush.UI
             if (link != null) link.SetText("LQ {0:0}", lq * 100f);
 
             bool blink = (Time.time * 2f) % 1f < 0.6f;
-            string w = cell < lowCellVoltage && s.Armed && blink ? LowBattery : lq < 0.3f && blink ? LinkLost : "";
+            string w = cell < lowCellVoltage && s.Armed && blink ? L.T("LOW BATTERY") : lq < 0.3f && blink ? L.T("LINK") : "";
             // Why an arm attempt did nothing (Betaflight shows "THROTTLE" in the same place).
             if (w.Length == 0 && !s.Armed && Time.unscaledTime < GateRush.Input.PilotInputSource.RefusalShownUntil)
-                w = GateRush.Input.PilotInputSource.LastRefusal == GateRush.Input.PilotInputSource.ArmRefusal.SwitchBlocked ? ArmSwitchBlocked : ThrottleToArm;
+                w = GateRush.Input.PilotInputSource.LastRefusal == GateRush.Input.PilotInputSource.ArmRefusal.SwitchBlocked ? L.T("ARM SWITCH OFF, THEN ON") : L.T("THROTTLE LOW TO ARM");
             SetIfChanged(warning, w, ref _warningShown);
 
             bool fpv = views == null || views.Mode == ViewMode.Fpv;

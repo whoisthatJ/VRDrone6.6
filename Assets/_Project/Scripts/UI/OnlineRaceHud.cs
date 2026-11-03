@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
+using GateRush.Core;
 using GateRush.Game;
 using GateRush.Net;
 using GateRush.Race;
@@ -81,7 +82,7 @@ namespace GateRush.UI
             var race = driver != null ? driver.Race : null;
             var order = OnlineRules.Standings(net.Pilots.Values);
 
-            _centre.text = net.Phase == OnlinePhase.Loading ? "Waiting for all pilots to reach the grid..." : "";
+            _centre.text = net.Phase == OnlinePhase.Loading ? L.T("Waiting for all pilots to reach the grid...") : "";
             UpdateStandings(net, order);
             UpdateTags(net, driver);
 
@@ -101,7 +102,7 @@ namespace GateRush.UI
                 var p = order[i];
                 bool isMe = p.ClientId == net.LocalClientId;
                 _sb.Append(isMe ? "<color=#fa3>" : "<color=#fff>").Append(i + 1).Append(". ").Append(p.Name);
-                _sb.Append(p.Finished ? "  <color=#8f8>FIN</color>" : "  <color=#aab>L" + Mathf.Max(1, p.Lap) + "</color>").Append("</color>\n");
+                _sb.Append(p.Finished ? "  <color=#8f8>" + L.T("FIN") + "</color>" : "  <color=#aab>" + L.F("L{0}", Mathf.Max(1, p.Lap)) + "</color>").Append("</color>\n");
             }
             _standings.text = _sb.ToString();
         }
@@ -109,20 +110,20 @@ namespace GateRush.UI
         private void UpdateResults(NetRace net, List<NetPilot> order)
         {
             _sb.Clear();
-            _sb.Append("<size=40><color=#fa3>ONLINE RESULTS</color></size>\n\n");
+            _sb.Append("<size=40><color=#fa3>").Append(L.T("ONLINE RESULTS")).Append("</color></size>\n\n");
             for (int i = 0; i < order.Count; i++)
             {
                 var p = order[i];
                 string colour = p.ClientId == net.LocalClientId ? "#fa3" : "#fff";
                 _sb.Append("<color=").Append(colour).Append(">").Append(i + 1).Append(". ").Append(p.Name).Append("</color>");
-                _sb.Append("<pos=55%>").Append(p.Finished ? Time(p.TotalTime) : "<color=#aab>racing...</color>");
-                if (p.Finished && p.BestLap > 0f) _sb.Append("<pos=78%><color=#aab>lap ").Append(Time(p.BestLap)).Append("</color>");
+                _sb.Append("<pos=55%>").Append(p.Finished ? Time(p.TotalTime) : "<color=#aab>" + L.T("racing...") + "</color>");
+                if (p.Finished && p.BestLap > 0f) _sb.Append("<pos=78%><color=#aab>").Append(L.F("lap {0}", Time(p.BestLap))).Append("</color>");
                 _sb.Append('\n');
             }
             _sb.Append('\n');
-            _sb.Append(net.IsHost
-                ? "<color=#aab>[Enter] back to the lobby    [F] race again</color>"
-                : "<color=#aab>Waiting for the host.  [Esc] menu</color>");
+            _sb.Append("<color=#aab>").Append(net.IsHost
+                ? L.T("[Enter] back to the lobby    [F] race again")
+                : L.T("Waiting for the host.  [Esc] menu")).Append("</color>");
             _results.text = _sb.ToString();
         }
 

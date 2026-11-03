@@ -107,7 +107,7 @@ namespace GateRush.Net
         {
             string m = e.Message;
             if (e is AuthenticationException || e is RequestFailedException)
-                return "Online services unavailable (" + m + ")";
+                return L.F("Online services unavailable ({0})", m);
             return m;
         }
     }

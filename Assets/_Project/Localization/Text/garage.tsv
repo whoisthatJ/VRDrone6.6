@@ -1,0 +1,124 @@
+# Garage / quad builder: tabs, stats, part cards, data sheet, build checks, part descriptions. Columns: English (key) <TAB> Kazakh <TAB> Russian
+<   BACK	<   АРТҚА	<   НАЗАД
+FRAMES	РАМАЛАР	РАМЫ
+MOTORS	МОТОРЛАР	МОТОРЫ
+PROPS	ВИНТТЕР	ВИНТЫ
+LIPOS	БАТАРЕЯЛАР	БАТАРЕИ
+EXTRAS	ҚОСЫМША	ДОПОЛНЕНИЯ
+STYLE	СТИЛЬ	СТИЛЬ
+COLOR	ТҮС	ЦВЕТ
+SAVE DRONE	САҚТАУ	СОХРАНИТЬ
+NAME	АТАУЫ	ИМЯ
+THRUST	ТАРТУ	ТЯГА
+WEIGHT	САЛМАҚ	ВЕС
+TOP SPEED	ЖЫЛДАМДЫҚ	СКОРОСТЬ
+TORQUE	МОМЕНТ	МОМЕНТ
+DRAG	КЕДЕРГІ	СОПРОТИВЛЕНИЕ
+RPM	АЙН/МИН	ОБ/МИН
+PEAK TEMP	МАКС. ТЕМП.	МАКС. ТЕМП.
+T/W {0}:1   HOVER {1}%   HOVER TIME {2} MIN	T/W {0}:1   ҚАЛҚУ {1}%   УАҚЫТ {2} МИН	T/W {0}:1   ВИСЕНИЕ {1}%   ВРЕМЯ {2} МИН
+ADVANCED\nDRAG MODEL	КЕҢЕЙТІЛГЕН\nКЕДЕРГІ МОДЕЛІ	РАСШИРЕННАЯ\nМОДЕЛЬ СОПРОТИВЛЕНИЯ
+SIMPLE\nDRAG MODEL	ҚАРАПАЙЫМ\nКЕДЕРГІ МОДЕЛІ	ПРОСТАЯ\nМОДЕЛЬ СОПРОТИВЛЕНИЯ
+MOI ELLIPSOID   ON	MOI ЭЛЛИПСОИДЫ   ҚОСУЛЫ	ЭЛЛИПСОИД MOI   ВКЛ
+MOI ELLIPSOID   OFF	MOI ЭЛЛИПСОИДЫ   ӨШІРУЛІ	ЭЛЛИПСОИД MOI   ВЫКЛ
+SPIN  ON	АЙНАЛУ: ИӘ	ВРАЩ.: ВКЛ
+SPIN  OFF	АЙНАЛУ: ЖОҚ	ВРАЩ.: ВЫКЛ
+DATA  >	ДЕРЕКТЕР  >	ДАННЫЕ  >
+SEE	БӨЛШЕКТЕУ	РАЗОБРАТЬ
+ASSEMBLE	ЖИНАУ	СОБРАТЬ
+FLY  >	ҰШУ  >	ЛЕТЕТЬ  >
+<   PREVIOUS	<   АЛДЫҢҒЫ	<   НАЗАД
+NEXT   >	КЕЛЕСІ   >	ДАЛЕЕ   >
+(click: size)	(басыңыз: өлшем)	(нажмите: размер)
+NO EXTRAS	ҚОСЫМШАЛАР ЖОҚ	НЕТ ДОПОЛНЕНИЙ
+Click a card to add or remove it.	Қосу не алып тастау үшін карточканы басыңыз.	Нажмите на карточку, чтобы добавить или убрать.
+SIZE: {0} mm   ({1})	ӨЛШЕМІ: {0} mm   ({1})	РАЗМЕР: {0} mm   ({1})
+WEIGHT: {0} g   PROPS UP TO {1}"	САЛМАҒЫ: {0} g   ВИНТТЕР {1}" ДЕЙІН	ВЕС: {0} g   ВИНТЫ ДО {1}"
+STATOR: {0}   {1} KV	СТАТОР: {0}   {1} KV	СТАТОР: {0}   {1} KV
+WEIGHT: {0} g   Rm {1} mΩ	САЛМАҒЫ: {0} g   Rm {1} mΩ	ВЕС: {0} g   Rm {1} mΩ
+SIZE: {0}	ӨЛШЕМІ: {0}	РАЗМЕР: {0}
+WEIGHT: {0} g	САЛМАҒЫ: {0} g	ВЕС: {0} g
+WEIGHT: +{0} g	САЛМАҒЫ: +{0} g	ВЕС: +{0} g
+Saved "{0}" and selected it for flying.	«{0}» сақталды және ұшуға таңдалды.	«{0}» сохранён и выбран для полёта.
+SAVED: {0}	САҚТАЛҒАН: {0}	СОХРАНЁН: {0}
+Extras: {0}	Қосымшалар: {0}	Дополнения: {0}
+Mass {0} g     Inertia (pitch/yaw/roll) {1} / {2} / {3} (x10^-6 kg m²)	Массасы {0} g     Инерция (тангаж/бағыт/крен) {1} / {2} / {3} (x10^-6 kg m²)	Масса {0} g     Инерция (тангаж/рыскание/крен) {1} / {2} / {3} (x10^-6 kg m²)
+Arms {0} × {1} mm     Drag (side/top/front) {2} / {3} / {4} kg/m	Иіндер {0} × {1} mm     Кедергі (бүйір/үсті/алды) {2} / {3} / {4} kg/m	Лучи {0} × {1} mm     Сопротивление (бок/верх/перед) {2} / {3} / {4} kg/m
+Full throttle: {0} A per motor at {1} V,  {2} rpm,  {3} g per motor	Толық газ: {1} V кезінде әр моторға {0} A,  {2} айн/мин,  әр моторға {3} g	Полный газ: {0} A на мотор при {1} V,  {2} об/мин,  {3} g на мотор
+Prop pitch speed {0} m/s     Motor spool {1} ms     Yaw torque/thrust {2} m	Винт қадамы бойынша жылдамдық {0} m/s     Мотордың үдеуі {1} ms     Бағыт моменті/тарту {2} m	Скорость по шагу винта {0} m/s     Раскрутка мотора {1} ms     Момент рыскания/тяга {2} m
+Top speed {0} km/h     T/W {1}:1     Hover {2} %, {3} min     Peak motor temp ~{4} °C (estimate)	Макс. жылдамдық {0} km/h     T/W {1}:1     Қалқу {2} %, {3} мин     Мотордың шекті темп. ~{4} °C (бағалау)	Макс. скорость {0} km/h     T/W {1}:1     Висение {2} %, {3} мин     Пик. темп. мотора ~{4} °C (оценка)
+PID pitch P {0} I {1} D {2}    yaw P {3}	PID тангаж P {0} I {1} D {2}    бағыт P {3}	PID тангаж P {0} I {1} D {2}    рыскание P {3}
+THROTTLE   THRUST (all)   CURRENT/motor   RPM	ГАЗ   ТАРТУ (барлығы)   ТОК/мотор   АЙН/МИН	ГАЗ   ТЯГА (всего)   ТОК/мотор   ОБ/МИН
+Stats are computed from the parts: motor and prop operating point on the battery under load, drag areas and part masses. The same numbers fly in the simulator.	Көрсеткіштер бөлшектерден есептеледі: жүктемедегі батареядан жұмыс істейтін мотор мен винттің жұмыс нүктесі, кедергі аудандары және бөлшектердің массасы. Симуляторда дәл осы сандар ұшады.	Характеристики рассчитываются по деталям: рабочая точка мотора и винта на батарее под нагрузкой, площади сопротивления и массы деталей. В симуляторе летают те же числа.
+CLOSE	ЖАБУ	ЗАКРЫТЬ
+MENU	МӘЗІР	МЕНЮ
+RADIO	ПУЛЬТ	ПУЛЬТ
+GAMEPAD	ГЕЙМПАД	ГЕЙМПАД
+KEYBOARD	ПЕРНЕТАҚТА	КЛАВИАТУРА
+# Build checks (BuildComposer.Validate)
+No frame.	Рама жоқ.	Нет рамы.
+No motors.	Моторлар жоқ.	Нет моторов.
+No props.	Винттер жоқ.	Нет винтов.
+No battery.	Батарея жоқ.	Нет батареи.
+{0} doesn't fit a {1} frame.	{0} {1} рамаға сай келмейді.	{0} не подходит для рамы {1}.
+{0} is too big for {1} (max {2}").	{0} {1} үшін тым үлкен (макс. {2}").	{0} слишком велик для {1} (макс. {2}").
+{0} doesn't fit a {1} quad.	{0} {1} дронға сай келмейді.	{0} не подходит для дрона {1}.
+# Size classes (PartCatalog.SizeLabel) and frame geometry
+Whoop	Вуп	Вуп
+2.5 inch	2.5 дюйм	2.5 дюйма
+3 inch	3 дюйм	3 дюйма
+5 inch	5 дюйм	5 дюймов
+7 inch	7 дюйм	7 дюймов
+Ducted	Қоршаулы	С кольцами
+# Generic part names (extras, styles, colours); product/model names are not translated
+Action camera	Экшн-камера	Экшн-камера
+HD camera	HD камера	HD-камера
+LED kit	LED жинағы	LED-комплект
+Long-range antenna	Алыс қашықтық антеннасы	Дальнобойная антенна
+Raw carbon	Таза карбон	Чистый карбон
+Gold edge	Алтын жиек	Золотая кромка
+Tiger wrap	Жолбарыс өрнегі	Тигровый окрас
+Stealth	Стелс	Стелс
+Rush orange	Rush қызғылт сары	Оранжевый Rush
+Gold	Алтын	Золотой
+Signal red	Сигнал қызыл	Сигнальный красный
+Gate green	Gate жасыл	Зелёный Gate
+Electric blue	Электр көк	Электрик синий
+Purple	Күлгін	Фиолетовый
+White	Ақ	Белый
+Black	Қара	Чёрный
+# Part descriptions (PartCatalog)
+65 mm ducted whoop. Bumps off walls, flies indoors.	65 mm қоршаулы вуп. Қабырғадан серпіліп кетеді, үй ішінде ұшады.	65-мм вуп с защитой винтов. Отскакивает от стен, летает в помещении.
+2.5" ducted cinewhoop: soft, stable, slow.	2.5" қоршаулы синевуп: жұмсақ, тұрақты, баяу.	2.5" синевуп в кольцах: мягкий, стабильный, медленный.
+Featherweight 3" toothpick. Light, nimble, fragile.	Мамықтай жеңіл 3" toothpick. Жеңіл, епті, нәзік.	Сверхлёгкий 3" toothpick. Лёгкий, вёрткий, хрупкий.
+3.5" ducted cine rig on 6S: lifts a small HD camera.	6S-тегі 3.5" қоршаулы кино-дрон: шағын HD камераны көтереді.	3.5" кино-дрон в кольцах на 6S: поднимает небольшую HD-камеру.
+Race-proven true-X. Low drag, slim arms, light.	Жарыста сыналған true-X. Кедергісі аз, иіндері жіңішке, жеңіл.	Проверенный в гонках true-X. Низкое сопротивление, тонкие лучи, лёгкий.
+Ultralight race frame. Thinner arms: fast, but bends.	Аса жеңіл жарыс рамасы. Иіндері жіңішке: жылдам, бірақ майысады.	Сверхлёгкая гоночная рама. Тонкие лучи: быстрая, но гнётся.
+Tough stretched-X for freestyle. Thick 6 mm arms.	Фристайлға арналған берік stretched-X. Қалыңдығы 6 mm иіндер.	Прочный stretched-X для фристайла. Толстые лучи 6 mm.
+Deadcat geometry: props out of the camera view.	Deadcat геометриясы: винттер камераның көрінісіне түспейді.	Геометрия Deadcat: винты не попадают в кадр.
+7" long-range cruiser. Efficient, stable, far.	7" алысқа ұшатын круизер. Үнемді, тұрақты, алысқа жетеді.	7" дальнобойный крузер. Экономичный, стабильный, летит далеко.
+Whoop motor for 1S.	1S-ке арналған вуп моторы.	Мотор для вупа на 1S.
+Tiny 2S motor for 2.5" ducts.	2.5" қоршауларға арналған кішкентай 2S моторы.	Крошечный 2S-мотор для 2.5" колец.
+3" toothpick motor for 4S.	4S-ке арналған 3" toothpick моторы.	Мотор для 3" toothpick на 4S.
+Torquey 6S motor for 3.5" ducts.	3.5" қоршауларға арналған моменті күшті 6S моторы.	Моментный 6S-мотор для 3.5" колец.
+4S race motor: punchy and fast.	4S жарыс моторы: серпінді әрі жылдам.	Гоночный мотор на 4S: резкий и быстрый.
+6S freestyle motor: torque and top end.	6S фристайл моторы: момент және жоғары жылдамдық.	Фристайл-мотор на 6S: момент и высокая скорость.
+Lighter 4S motor, smooth and efficient.	Жеңілірек 4S моторы, жұмсақ әрі үнемді.	Более лёгкий мотор на 4S, плавный и экономичный.
+Long-range 6S motor for 7" props.	7" винттерге арналған алыс қашықтық 6S моторы.	Дальнобойный 6S-мотор для 7" винтов.
+Whoop props.	Вуп винттері.	Винты для вупа.
+Ducted tri-blade.	Қоршауға арналған үш қалақты винт.	Трёхлопастной винт для колец.
+Toothpick tri-blade.	Toothpick үшін үш қалақты винт.	Трёхлопастной винт для toothpick.
+Five blades for ducts: thrust in a small disc.	Қоршауларға арналған бес қалақ: шағын дискіде көп тарту.	Пять лопастей для колец: тяга в малом диске.
+Race tri-blade: grip and top speed.	Жарыс үш қалақты винті: ұстасым және жоғары жылдамдық.	Гоночный трёхлопастной: хватка и высокая скорость.
+Freestyle tri-blade, durable.	Фристайлға арналған үш қалақты винт, берік.	Трёхлопастной для фристайла, прочный.
+Low pitch: efficient and smooth, less top speed.	Қадамы кіші: үнемді әрі жұмсақ, бірақ жылдамдығы төмен.	Малый шаг: экономично и плавно, но ниже скорость.
+Long-range tri-blade.	Алыс қашықтыққа арналған үш қалақты винт.	Дальнобойный трёхлопастной винт.
+Full-size action camera on the top plate: cinematic footage, more weight and drag.	Жоғарғы пластинадағы толық өлшемді экшн-камера: кинематографиялық түсірілім, салмақ пен кедергі көбірек.	Полноразмерная экшн-камера на верхней пластине: кинематографичная съёмка, больше веса и сопротивления.
+Small HD camera for 3" rigs.	3" дрондарға арналған шағын HD камера.	Небольшая HD-камера для 3" сборок.
+Bright LED strips along the frame. Night racing look.	Рама бойындағы жарқын LED таспалар. Түнгі жарыс көрінісі.	Яркие LED-ленты вдоль рамы. Стиль ночных гонок.
+Tall stubby-free antenna: better range, a little drag.	Stubby емес биік антенна: байланыс алысырақ, кедергі сәл көбірек.	Высокая антенна вместо stubby: связь дальше, чуть больше сопротивления.
+Plain 3K carbon weave.	Қарапайым 3K карбон өрімі.	Простое плетение карбона 3K.
+Carbon with gold-anodised plate edges and standoffs.	Пластина жиектері мен тіректері алтын түске анодталған карбон.	Карбон с золотыми анодированными кромками пластин и стойками.
+Printed tiger-stripe skin on the plates.	Пластиналарға басылған жолбарыс жолақты жабын.	Тигровые полосы, напечатанные на пластинах.
+Matte black everything.	Бәрі күңгірт қара.	Всё матово-чёрное.
+Accent colour for motors, props and LEDs.	Моторлар, винттер мен LED-тарға арналған екпін түсі.	Акцентный цвет для моторов, винтов и LED.

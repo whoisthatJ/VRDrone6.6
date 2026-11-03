@@ -19,7 +19,12 @@
         "Unity.RenderPipelines.Core.Runtime",
         "UnityEditor.TestRunner",
         "UnityEngine.TestRunner",
-        "Unity.Cinemachine"
+        "Unity.Cinemachine",
+        "Unity.Localization",
+        "Unity.Localization.Editor",
+        "Unity.ResourceManager",
+        "Unity.Addressables",
+        "Unity.Addressables.Editor"
     ],
     "includePlatforms": [
         "Editor"

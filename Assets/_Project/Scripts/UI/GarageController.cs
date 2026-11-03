@@ -198,9 +198,10 @@ namespace GateRush.UI
             RefreshStats(null);
             RefreshCards();
             RefreshInfo(CurrentPart(_tab));
-            if (_name != null && _name.text != _build.Name) _name.SetTextWithoutNotify(_build.Name);
-            if (_summary != null) _summary.text = $"{_build.Name.ToUpperInvariant()}   <color=#9aa>{PartCatalog.SizeLabel(_build.Size).ToUpperInvariant()}  ·  {_build.Frame.Name.ToUpperInvariant()}</color>";
-            if (_dragButton != null) UiKit.SetButtonText(_dragButton, _build.AdvancedDrag ? "ADVANCED\nDRAG MODEL" : "SIMPLE\nDRAG MODEL");
+            string shownName = L.T(_build.Name);
+            if (_name != null && _name.text != shownName) _name.SetTextWithoutNotify(shownName);
+            if (_summary != null) _summary.text = $"{shownName.ToUpperInvariant()}   <color=#9aa>{L.T(PartCatalog.SizeLabel(_build.Size)).ToUpperInvariant()}  ·  {_build.Frame.Name.ToUpperInvariant()}</color>";
+            if (_dragButton != null) UiKit.SetButtonText(_dragButton, _build.AdvancedDrag ? L.T("ADVANCED\nDRAG MODEL") : L.T("SIMPLE\nDRAG MODEL"));
             if (_dataPanel != null && _dataPanel.gameObject.activeSelf) _dataText.text = SpecSheet();
         }
 
@@ -326,7 +327,7 @@ namespace GateRush.UI
             }
             var s = alt ?? _stats;
             if (_extraStats != null)
-                _extraStats.text = Inv($"T/W {s.ThrustToWeight:0.0}:1   HOVER {s.HoverThrottle * 100f:0}%   HOVER TIME {s.HoverMinutes:0} MIN");
+                _extraStats.text = L.F("T/W {0}:1   HOVER {1}%   HOVER TIME {2} MIN", N(s.ThrustToWeight, "0.0"), N(s.HoverThrottle * 100f, "0"), N(s.HoverMinutes, "0"));
         }
 
         private static void SetFill(Image fill, float f)
@@ -354,7 +355,7 @@ namespace GateRush.UI
             int pages = Mathf.Max(1, (parts.Count + CardsPerPage - 1) / CardsPerPage);
             _page = Mathf.Clamp(_page, 0, pages - 1);
             _pageLabel.text = pages > 1 ? $"{_page + 1}/{pages}" : "";
-            _sizeLabel.text = (_tab == PartSlot.Frame ? PartCatalog.SizeLabel(_sizeFilter) : PartCatalog.SizeLabel(_build.Size)).ToUpperInvariant() + (_tab == PartSlot.Frame ? "  (click: size)" : "");
+            _sizeLabel.text = L.T(_tab == PartSlot.Frame ? PartCatalog.SizeLabel(_sizeFilter) : PartCatalog.SizeLabel(_build.Size)).ToUpperInvariant() + (_tab == PartSlot.Frame ? "  " + L.T("(click: size)") : "");
             const float cell = 128f, gap = 9f;
             for (int i = 0; i < CardsPerPage; i++)
             {
@@ -385,7 +386,7 @@ namespace GateRush.UI
                 raw.texture = Thumbnail(part);
                 raw.raycastTarget = false;
             }
-            var label = UiKit.Label(rt, part.Name.ToUpperInvariant(), new Vector2(4f, -cell + 30f), new Vector2(cell - 8f, 28f), 13f, TextAlignmentOptions.Bottom, Color.white);
+            var label = UiKit.Label(rt, PartName(part).ToUpperInvariant(), new Vector2(4f, -cell + 30f), new Vector2(cell - 8f, 28f), 13f, TextAlignmentOptions.Bottom, Color.white);
             label.textWrappingMode = TextWrappingModes.Normal;
             label.fontStyle = FontStyles.Bold;
             if (selected) Outline(rt, Green, 4f);
@@ -422,37 +423,37 @@ namespace GateRush.UI
             if (_infoName == null) return;
             if (part == null)
             {
-                _infoName.text = _tab == PartSlot.Extra ? "NO EXTRAS" : "";
-                _infoBody.text = _tab == PartSlot.Extra ? "Click a card to add or remove it." : "";
+                _infoName.text = _tab == PartSlot.Extra ? L.T("NO EXTRAS") : "";
+                _infoBody.text = _tab == PartSlot.Extra ? L.T("Click a card to add or remove it.") : "";
                 _infoBrand.text = "";
                 return;
             }
-            _infoName.text = part.Name.ToUpperInvariant();
+            _infoName.text = PartName(part).ToUpperInvariant();
             _infoBrand.text = (part.Brand ?? "GateRush").ToUpperInvariant();
             var sb = new StringBuilder();
             switch (part)
             {
                 case FrameDef f:
-                    sb.AppendLine(Inv($"SIZE: {f.WheelbaseMm:0} mm   ({f.Geometry})"));
-                    sb.AppendLine(Inv($"WEIGHT: {f.MassG:0} g   PROPS UP TO {f.MaxPropIn:0.#}\""));
+                    sb.AppendLine(L.F("SIZE: {0} mm   ({1})", N(f.WheelbaseMm, "0"), L.T(f.Geometry.ToString())));
+                    sb.AppendLine(L.F("WEIGHT: {0} g   PROPS UP TO {1}\"", N(f.MassG, "0"), N(f.MaxPropIn, "0.#")));
                     break;
                 case MotorDef m:
-                    sb.AppendLine(Inv($"STATOR: {m.StatorCode}   {m.Kv:0} KV"));
-                    sb.AppendLine(Inv($"WEIGHT: {m.MassG:0.#} g   Rm {m.Rm * 1000f:0} mΩ"));
+                    sb.AppendLine(L.F("STATOR: {0}   {1} KV", m.StatorCode, N(m.Kv, "0")));
+                    sb.AppendLine(L.F("WEIGHT: {0} g   Rm {1} mΩ", N(m.MassG, "0.#"), N(m.Rm * 1000f, "0")));
                     break;
                 case PropDef p:
-                    sb.AppendLine(Inv($"SIZE: {p.DiameterIn:0.##}x{p.PitchIn:0.##}x{p.Blades}"));
-                    sb.AppendLine(Inv($"WEIGHT: {p.MassG:0.#} g"));
+                    sb.AppendLine(L.F("SIZE: {0}", Inv($"{p.DiameterIn:0.##}x{p.PitchIn:0.##}x{p.Blades}")));
+                    sb.AppendLine(L.F("WEIGHT: {0} g", N(p.MassG, "0.#")));
                     break;
                 case BatteryDef bt:
                     sb.AppendLine(Inv($"{bt.Cells}S  {bt.CapacityMah:0} mAh  {bt.CRating:0}C"));
-                    sb.AppendLine(Inv($"WEIGHT: {bt.MassG:0} g"));
+                    sb.AppendLine(L.F("WEIGHT: {0} g", N(bt.MassG, "0")));
                     break;
                 default:
-                    if (part.MassG > 0f) sb.AppendLine(Inv($"WEIGHT: +{part.MassG:0} g"));
+                    if (part.MassG > 0f) sb.AppendLine(L.F("WEIGHT: +{0} g", N(part.MassG, "0")));
                     break;
             }
-            sb.Append("<color=#ffd84a>").Append(part.Description).Append("</color>");
+            sb.Append("<color=#ffd84a>").Append(L.T(part.Description)).Append("</color>");
             _infoBody.text = sb.ToString();
         }
 
@@ -548,7 +549,7 @@ namespace GateRush.UI
             SaveSystem.Commit();
             _dirty = false;
             LoadChoices();
-            Toast($"Saved \"{_build.Name}\" and selected it for flying.");
+            Toast(L.F("Saved \"{0}\" and selected it for flying.", L.T(_build.Name)));
         }
 
         private void Fly()
@@ -572,7 +573,8 @@ namespace GateRush.UI
             if (_choices.Count == 0) return "";
             var c = _choices[_choice];
             bool preset = c.Id.StartsWith("preset-", StringComparison.Ordinal);
-            return (preset ? "" : "SAVED: ") + c.Name.ToUpperInvariant() + $"  <color=#9aa>{_choice + 1}/{_choices.Count}</color>";
+            string name = preset ? L.T(c.Name).ToUpperInvariant() : L.F("SAVED: {0}", c.Name.ToUpperInvariant());
+            return name + $"  <color=#9aa>{_choice + 1}/{_choices.Count}</color>";
         }
 
         /// <summary>Grid Previous/Next: pages when the tab has several pages, otherwise selects the previous/next part.</summary>
@@ -618,31 +620,36 @@ namespace GateRush.UI
             var p = BuildComposer.Compose(_build);
             var s = _stats;
             var sb = new StringBuilder();
-            sb.AppendLine($"<b><size=130%>{_build.Name.ToUpperInvariant()}</size></b>");
+            sb.AppendLine($"<b><size=130%>{L.T(_build.Name).ToUpperInvariant()}</size></b>");
             sb.AppendLine(Inv($"{_build.Frame.Name} · {_build.Motor.Name} · {_build.Prop.Name} · {_build.Battery.Name}"));
-            if (_build.Extras.Any()) sb.AppendLine("Extras: " + string.Join(", ", _build.Extras.Select(e => e.Name)));
+            if (_build.Extras.Any()) sb.AppendLine(L.F("Extras: {0}", string.Join(", ", _build.Extras.Select(e => PartName(e)))));
             sb.AppendLine();
-            sb.AppendLine(Inv($"Mass {p.Mass * 1000f:0} g     Inertia (pitch/yaw/roll) {p.Inertia.x * 1e6f:0} / {p.Inertia.y * 1e6f:0} / {p.Inertia.z * 1e6f:0} (x10^-6 kg m²)"));
-            sb.AppendLine(Inv($"Arms {p.ArmX * 1000f:0} × {p.ArmZ * 1000f:0} mm     Drag (side/top/front) {p.Aero.QuadraticDrag.x:0.0000} / {p.Aero.QuadraticDrag.y:0.0000} / {p.Aero.QuadraticDrag.z:0.0000} kg/m"));
-            sb.AppendLine(Inv($"Full throttle: {s.CurrentA:0.0} A per motor at {s.VoltageV:0.0} V,  {s.Rpm:0} rpm,  {s.ThrustG / 4f:0} g per motor"));
-            sb.AppendLine(Inv($"Prop pitch speed {p.Motors.PropPitchSpeed:0} m/s     Motor spool {p.Motors.TimeConstantUp * 1000f:0} ms     Yaw torque/thrust {p.Motors.YawTorquePerThrust:0.0000} m"));
-            sb.AppendLine(Inv($"Top speed {s.TopSpeedKmh:0} km/h     T/W {s.ThrustToWeight:0.0}:1     Hover {s.HoverThrottle * 100f:0} %, {s.HoverMinutes:0} min     Peak motor temp ~{s.PeakTempC:0} °C (estimate)"));
-            sb.AppendLine(Inv($"PID pitch P {p.Pid.Pitch.P:0.000} I {p.Pid.Pitch.I:0.000} D {p.Pid.Pitch.D:0.00000}    yaw P {p.Pid.Yaw.P:0.000}"));
+            sb.AppendLine(L.F("Mass {0} g     Inertia (pitch/yaw/roll) {1} / {2} / {3} (x10^-6 kg m²)",
+                N(p.Mass * 1000f, "0"), N(p.Inertia.x * 1e6f, "0"), N(p.Inertia.y * 1e6f, "0"), N(p.Inertia.z * 1e6f, "0")));
+            sb.AppendLine(L.F("Arms {0} × {1} mm     Drag (side/top/front) {2} / {3} / {4} kg/m",
+                N(p.ArmX * 1000f, "0"), N(p.ArmZ * 1000f, "0"), N(p.Aero.QuadraticDrag.x, "0.0000"), N(p.Aero.QuadraticDrag.y, "0.0000"), N(p.Aero.QuadraticDrag.z, "0.0000")));
+            sb.AppendLine(L.F("Full throttle: {0} A per motor at {1} V,  {2} rpm,  {3} g per motor",
+                N(s.CurrentA, "0.0"), N(s.VoltageV, "0.0"), N(s.Rpm, "0"), N(s.ThrustG / 4f, "0")));
+            sb.AppendLine(L.F("Prop pitch speed {0} m/s     Motor spool {1} ms     Yaw torque/thrust {2} m",
+                N(p.Motors.PropPitchSpeed, "0"), N(p.Motors.TimeConstantUp * 1000f, "0"), N(p.Motors.YawTorquePerThrust, "0.0000")));
+            sb.AppendLine(L.F("Top speed {0} km/h     T/W {1}:1     Hover {2} %, {3} min     Peak motor temp ~{4} °C (estimate)",
+                N(s.TopSpeedKmh, "0"), N(s.ThrustToWeight, "0.0"), N(s.HoverThrottle * 100f, "0"), N(s.HoverMinutes, "0"), N(s.PeakTempC, "0")));
+            sb.AppendLine(L.F("PID pitch P {0} I {1} D {2}    yaw P {3}",
+                N(p.Pid.Pitch.P, "0.000"), N(p.Pid.Pitch.I, "0.000"), N(p.Pid.Pitch.D, "0.00000"), N(p.Pid.Yaw.P, "0.000")));
             sb.AppendLine();
-            sb.AppendLine("<b>THROTTLE   THRUST (all)   CURRENT/motor   RPM</b>");
+            sb.AppendLine("<b>" + L.T("THROTTLE   THRUST (all)   CURRENT/motor   RPM") + "</b>");
             foreach (var (t, g, a, rpm) in BuildComposer.Curve(_build))
                 sb.AppendLine(Inv($"{t * 100f,6:0} %   {g,10:0} g   {a,12:0.0} A   {rpm,9:0}"));
             sb.AppendLine();
-            sb.AppendLine("<color=#9aa>Stats are computed from the parts: motor and prop operating point on the battery under load, " +
-                          "drag areas and part masses. The same numbers fly in the simulator.</color>");
+            sb.AppendLine("<color=#9aa>" + L.T("Stats are computed from the parts: motor and prop operating point on the battery under load, drag areas and part masses. The same numbers fly in the simulator.") + "</color>");
             return sb.ToString();
         }
 
         private static string DeviceName()
         {
-            if (Joystick.current != null) return "RADIO";
-            if (Gamepad.current != null) return "GAMEPAD";
-            return "KEYBOARD";
+            if (Joystick.current != null) return L.T("RADIO");
+            if (Gamepad.current != null) return L.T("GAMEPAD");
+            return L.T("KEYBOARD");
         }
 
         // ---------- layout ----------
@@ -655,20 +662,20 @@ namespace GateRush.UI
             // Top bar.
             var top = Anchored(root, "Top Bar", new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0f, -58f), Vector2.zero);
             UiKit.Image(top, Bar);
-            var back = FlatButton(top, "<   BACK", new Vector2(10f, -6f), new Vector2(190f, 46f), new Color(0f, 0f, 0f, 0f), Back, 24f);
+            var back = FlatButton(top, L.T("<   BACK"), new Vector2(10f, -6f), new Vector2(190f, 46f), new Color(0f, 0f, 0f, 0f), Back, 24f);
             Outline((RectTransform)back.transform, PanelLine, 2f);
             _tabBar = UiKit.Rect(top, "Tabs", new Vector2(370f, -6f), new Vector2(1180f, 46f));
             float x = 0f;
             foreach (var (slot, label, line) in Tabs)
             {
                 var s = slot;
-                var tb = FlatButton(_tabBar, label, new Vector2(x, 0f), new Vector2(160f, 46f), new Color(0.3f, 0.32f, 0.36f, 0.95f), () => SelectTab(s), 22f);
+                var tb = FlatButton(_tabBar, L.T(label), new Vector2(x, 0f), new Vector2(160f, 46f), new Color(0.3f, 0.32f, 0.36f, 0.95f), () => SelectTab(s), 22f);
                 var ul = UiKit.Rect(tb.transform, "Underline", new Vector2(0f, -42f), new Vector2(160f, 4f));
                 UiKit.Image(ul, line);
                 _tabButtons.Add(tb);
                 x += 168f;
             }
-            var save = FlatButton(top, "SAVE DRONE", Vector2.zero, new Vector2(210f, 46f), Green, Save, 24f);
+            var save = FlatButton(top, L.T("SAVE DRONE"), Vector2.zero, new Vector2(210f, 46f), Green, Save, 24f);
             var srt = (RectTransform)save.transform;
             srt.anchorMin = srt.anchorMax = srt.pivot = new Vector2(1f, 1f);
             srt.anchoredPosition = new Vector2(-10f, -6f);
@@ -709,7 +716,7 @@ namespace GateRush.UI
                 var deltaBar = UiKit.Image(UiKit.Rect(track, "Delta", Vector2.zero, Vector2.zero), Good);
                 deltaBar.rectTransform.offsetMin = deltaBar.rectTransform.offsetMax = Vector2.zero;
                 deltaBar.gameObject.SetActive(false);
-                UiKit.Label(row, label, new Vector2(12f, -6f), new Vector2(170f, 44f), 21f, TextAlignmentOptions.MidlineLeft, Color.white);
+                UiKit.Label(row, L.T(label), new Vector2(12f, -6f), new Vector2(170f, 44f), 21f, TextAlignmentOptions.MidlineLeft, Color.white);
                 var delta = UiKit.Label(row, "", new Vector2(140f, -6f), new Vector2(110f, 44f), 17f, TextAlignmentOptions.MidlineRight, Good);
                 var value = UiKit.Label(row, "", new Vector2(250f, -6f), new Vector2(104f, 44f), 17f, TextAlignmentOptions.MidlineRight, Color.white);
                 _rows[st] = new StatRow { Delta = delta, Value = value, Fill = fill, DeltaBar = deltaBar };
@@ -724,11 +731,11 @@ namespace GateRush.UI
             SetTextColor(_moiButton, Color.white, TextAlignmentOptions.MidlineLeft);
             _spinButton = FlatButton(left, "", new Vector2(0f, by - 148f), new Vector2(176f, 52f), Panel, () => { _spin = !_spin; RefreshToggles(); }, 21f);
             SetTextColor(_spinButton, Color.white, TextAlignmentOptions.MidlineLeft);
-            var data = FlatButton(left, "DATA  >", new Vector2(184f, by - 148f), new Vector2(176f, 52f), Panel, ToggleData, 21f);
+            var data = FlatButton(left, L.T("DATA  >"), new Vector2(184f, by - 148f), new Vector2(176f, 52f), Panel, ToggleData, 21f);
             SetTextColor(data, Color.white, TextAlignmentOptions.MidlineLeft);
             _seeButton = FlatButton(left, "", new Vector2(0f, by - 208f), new Vector2(176f, 52f), Blue, () => { _see = !_see; RefreshToggles(); }, 21f);
             SetTextColor(_seeButton, Color.white, TextAlignmentOptions.MidlineLeft);
-            var fly = FlatButton(left, "FLY  >", new Vector2(184f, by - 208f), new Vector2(176f, 52f), Orange, Fly, 21f);
+            var fly = FlatButton(left, L.T("FLY  >"), new Vector2(184f, by - 208f), new Vector2(176f, 52f), Orange, Fly, 21f);
             SetTextColor(fly, Color.white, TextAlignmentOptions.MidlineLeft);
             RefreshToggles();
 
@@ -750,9 +757,9 @@ namespace GateRush.UI
                 RefreshCards();
             });
             _grid = UiKit.Rect(right, "Grid", new Vector2(0f, -60f), new Vector2(415f, 410f));
-            var prev = FlatButton(right, "<   PREVIOUS", new Vector2(0f, -482f), new Vector2(200f, 50f), new Color(0, 0, 0, 0), () => PageOrStep(-1), 20f);
+            var prev = FlatButton(right, L.T("<   PREVIOUS"), new Vector2(0f, -482f), new Vector2(200f, 50f), new Color(0, 0, 0, 0), () => PageOrStep(-1), 20f);
             Outline((RectTransform)prev.transform, new Color(1f, 1f, 1f, 0.4f), 1f);
-            var next = FlatButton(right, "NEXT   >", new Vector2(215f, -482f), new Vector2(200f, 50f), Panel, () => PageOrStep(1), 20f);
+            var next = FlatButton(right, L.T("NEXT   >"), new Vector2(215f, -482f), new Vector2(200f, 50f), Panel, () => PageOrStep(1), 20f);
             Outline((RectTransform)next.transform, PanelLine, 2f);
             _pageLabel = UiKit.Label(right, "", new Vector2(0f, -536f), new Vector2(415f, 26f), 16f, TextAlignmentOptions.Center, UiKit.DimTextColor);
 
@@ -784,7 +791,7 @@ namespace GateRush.UI
             dev.anchorMin = dev.anchorMax = dev.pivot = new Vector2(1f, 0f);
             dev.anchoredPosition = new Vector2(-170f, 0f);
             _device = UiKit.Label(dev, "", Vector2.zero, new Vector2(200f, 64f), 22f, TextAlignmentOptions.Center, Color.white);
-            var menu = FlatButton(bottom, "MENU", Vector2.zero, new Vector2(150f, 64f), new Color(0.12f, 0.13f, 0.16f), Back, 22f);
+            var menu = FlatButton(bottom, L.T("MENU"), Vector2.zero, new Vector2(150f, 64f), new Color(0.12f, 0.13f, 0.16f), Back, 22f);
             var mrt = (RectTransform)menu.transform;
             mrt.anchorMin = mrt.anchorMax = mrt.pivot = new Vector2(1f, 0f);
             mrt.anchoredPosition = Vector2.zero;
@@ -797,7 +804,7 @@ namespace GateRush.UI
             Outline(_dataPanel, PanelLine, 2f);
             _dataText = UiKit.Label(_dataPanel, "", new Vector2(30f, -24f), new Vector2(960f, 720f), 20f, TextAlignmentOptions.TopLeft, Color.white);
             _dataText.textWrappingMode = TextWrappingModes.Normal;
-            FlatButton(_dataPanel, "CLOSE", new Vector2(860f, -760f), new Vector2(140f, 46f), Panel, ToggleData, 20f);
+            FlatButton(_dataPanel, L.T("CLOSE"), new Vector2(860f, -760f), new Vector2(140f, 46f), Panel, ToggleData, 20f);
             _dataPanel.gameObject.SetActive(false);
 
             LoadChoices();
@@ -824,9 +831,9 @@ namespace GateRush.UI
 
         private void RefreshToggles()
         {
-            UiKit.SetButtonText(_moiButton, "   MOI ELLIPSOID   " + (_moi ? "ON" : "OFF"));
-            UiKit.SetButtonText(_spinButton, "   SPIN  " + (_spin ? "ON" : "OFF"));
-            UiKit.SetButtonText(_seeButton, _see ? "   ASSEMBLE" : "   SEE");
+            UiKit.SetButtonText(_moiButton, "   " + (_moi ? L.T("MOI ELLIPSOID   ON") : L.T("MOI ELLIPSOID   OFF")));
+            UiKit.SetButtonText(_spinButton, "   " + (_spin ? L.T("SPIN  ON") : L.T("SPIN  OFF")));
+            UiKit.SetButtonText(_seeButton, "   " + (_see ? L.T("ASSEMBLE") : L.T("SEE")));
         }
 
         private TMP_InputField NameField(RectTransform parent)
@@ -843,7 +850,7 @@ namespace GateRush.UI
                 _dirty = true;
             });
             field.onEndEdit.AddListener(_ => Rebuild(false));
-            UiKit.Label(parent, "NAME", new Vector2(12f, 0f), new Vector2(80f, 48f), 16f, TextAlignmentOptions.MidlineLeft, UiKit.DimTextColor);
+            UiKit.Label(parent, L.T("NAME"), new Vector2(12f, 0f), new Vector2(80f, 48f), 16f, TextAlignmentOptions.MidlineLeft, UiKit.DimTextColor);
             return field;
         }
 
@@ -899,5 +906,9 @@ namespace GateRush.UI
         }
 
         private static string Inv(FormattableString s) => s.ToString(CultureInfo.InvariantCulture);
+        private static string N(float v, string format) => v.ToString(format, CultureInfo.InvariantCulture);
+
+        /// <summary>Generic part names (extras, styles, colours) are translated; product/model names stay as they are.</summary>
+        private static string PartName(PartDef p) => p is ExtraDef || p is StyleDef || p is ColorDef ? L.T(p.Name) : p.Name;
     }
 }

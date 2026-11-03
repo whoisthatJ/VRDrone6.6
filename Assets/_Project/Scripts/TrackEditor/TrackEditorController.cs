@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using GateRush.Core;
 using GateRush.Track;
 using TMPro;
 using UnityEngine;
@@ -83,7 +84,7 @@ namespace GateRush.TrackEditor
             PlaceViewerBehindSpawn();
             OnModelChanged();
             _model.MarkSaved();
-            _message = "Point at a gate and pull the trigger to move it.";
+            _message = L.T("Point at a gate and pull the trigger to move it.");
             RefreshPanel();
         }
 
@@ -271,12 +272,12 @@ namespace GateRush.TrackEditor
             {
                 int insert = _selTarget == EditTarget.Gate && _selIndex >= 0 ? _selIndex + 1 : _model.Data.Gates.Count;
                 Select(EditTarget.Gate, _model.AddGate(type, pos, yaw, insert));
-                _message = $"Added {type} gate #{_selIndex}.";
+                _message = L.F("Added {0} gate #{1}.", type, _selIndex);
             }
             else
             {
                 Select(EditTarget.Prop, _model.AddProp(type, pos, yaw));
-                _message = $"Added {type}.";
+                _message = L.F("Added {0}.", type);
             }
             RefreshPanel();
         }
@@ -288,7 +289,7 @@ namespace GateRush.TrackEditor
             {
                 if (_model.Data.Gates.Count <= 1)
                 {
-                    _message = "A track needs at least one gate.";
+                    _message = L.T("A track needs at least one gate.");
                     RefreshPanel();
                     return;
                 }
@@ -297,7 +298,7 @@ namespace GateRush.TrackEditor
             else if (_selTarget == EditTarget.Prop) _model.RemoveProp(_selIndex);
             else return;
             Select(EditTarget.Gate, -1);
-            _message = "Deleted.";
+            _message = L.T("Deleted.");
             RefreshPanel();
         }
 
@@ -305,19 +306,19 @@ namespace GateRush.TrackEditor
         {
             if (_selTarget != EditTarget.Gate || _selIndex < 0) return;
             Select(EditTarget.Gate, _model.MoveOrder(_selIndex, _selIndex + delta));
-            _message = _selIndex == 0 ? "This gate is now the start/finish." : $"Gate is now #{_selIndex} in the race order.";
+            _message = _selIndex == 0 ? L.T("This gate is now the start/finish.") : L.F("Gate is now #{0} in the race order.", _selIndex);
             RefreshPanel();
         }
 
         private void DoUndo()
         {
-            _message = _model.Undo() ? "Undone." : "Nothing to undo.";
+            _message = _model.Undo() ? L.T("Undone.") : L.T("Nothing to undo.");
             RefreshPanel();
         }
 
         private void DoRedo()
         {
-            _message = _model.Redo() ? "Redone." : "Nothing to redo.";
+            _message = _model.Redo() ? L.T("Redone.") : L.T("Nothing to redo.");
             RefreshPanel();
         }
 
@@ -336,14 +337,14 @@ namespace GateRush.TrackEditor
             {
                 string path = TrackLibrary.Default.Save(_model.Data);
                 _model.MarkSaved();
-                _message = errors.Count == 0 ? $"Saved {Path.GetFileName(path)}." : $"Saved with warnings: {errors[0]}";
+                _message = errors.Count == 0 ? L.F("Saved {0}.", Path.GetFileName(path)) : L.F("Saved with warnings: {0}", errors[0]);
                 Debug.Log($"[GateRush] Track saved: {path}");
                 RefreshPanel();
                 return path;
             }
             catch (IOException e)
             {
-                _message = "Save failed: " + e.Message;
+                _message = L.F("Save failed: {0}", e.Message);
                 RefreshPanel();
                 return null;
             }
@@ -482,7 +483,7 @@ namespace GateRush.TrackEditor
             _buttons["snap"].Clicked = () => { _model.Snap = !_model.Snap; RefreshPanel(); };
             _buttons["Earlier"].Clicked = () => MoveOrder(-1);
             _buttons["Later"].Clicked = () => MoveOrder(1);
-            _buttons["Reverse"].Clicked = () => { _model.ReverseDirection(); _message = "Race direction reversed."; RefreshPanel(); };
+            _buttons["Reverse"].Clicked = () => { _model.ReverseDirection(); _message = L.T("Race direction reversed."); RefreshPanel(); };
             _buttons["Laps -"].Clicked = () => _model.SetLaps(_model.Data.Laps - 1);
             _buttons["laps"].Clicked = () => { };
             _buttons["Laps +"].Clicked = () => _model.SetLaps(_model.Data.Laps + 1);
@@ -492,6 +493,21 @@ namespace GateRush.TrackEditor
             _buttons["Test fly"].Clicked = TestFly;
             _buttons["Spawn"].Clicked = () => Select(EditTarget.Spawn, 0);
             _buttons["Exit"].Clicked = Exit;
+
+            // Ids stay English; the labels are in the player's language ("piece", "snap" and "laps" are set in RefreshPanel).
+            _buttons["Add"].Label.text = L.T("Add");
+            _buttons["Delete"].Label.text = L.T("Delete");
+            _buttons["Earlier"].Label.text = L.T("Earlier");
+            _buttons["Later"].Label.text = L.T("Later");
+            _buttons["Reverse"].Label.text = L.T("Reverse");
+            _buttons["Laps -"].Label.text = L.T("Laps -");
+            _buttons["Laps +"].Label.text = L.T("Laps +");
+            _buttons["Undo"].Label.text = L.T("Undo");
+            _buttons["Redo"].Label.text = L.T("Redo");
+            _buttons["Save"].Label.text = L.T("Save");
+            _buttons["Test fly"].Label.text = L.T("Test fly");
+            _buttons["Spawn"].Label.text = L.T("Spawn");
+            _buttons["Exit"].Label.text = L.T("Exit");
 
             AttachPanel();
         }
@@ -556,17 +572,19 @@ namespace GateRush.TrackEditor
             var d = _model.Data;
             string type = CurrentPiece;
             bool isGate = prefabs.Gate(type) != null;
-            _buttons["piece"].Label.text = (isGate ? "Gate: " : "Prop: ") + type;
-            _buttons["snap"].Label.text = _model.Snap ? "Snap: on" : "Snap: off";
-            _buttons["laps"].Label.text = $"{d.Laps} laps";
+            _buttons["piece"].Label.text = isGate ? L.F("Gate: {0}", type) : L.F("Prop: {0}", type);
+            _buttons["snap"].Label.text = _model.Snap ? L.T("Snap: on") : L.T("Snap: off");
+            _buttons["laps"].Label.text = L.F("{0} laps", d.Laps);
             SetColor(_buttons["Save"].Background, _model.Dirty ? new Color(0.55f, 0.35f, 0.1f, 1f) : new Color(0.2f, 0.23f, 0.3f, 1f));
 
-            string sel = _selTarget == EditTarget.Spawn ? "spawn pad"
-                : _selIndex < 0 ? "nothing"
-                : _selTarget == EditTarget.Gate ? (_selIndex == 0 ? "start/finish gate" : $"gate #{_selIndex}") + $" ({d.Gates[_selIndex].Type})"
-                : $"prop ({d.Props[_selIndex].Type})";
-            _status.text = $"<b>{d.Name}</b>  {d.Gates.Count} gates, {d.Props.Count} props{(_model.Dirty ? "  <color=#ffb347>unsaved</color>" : "")}\n" +
-                           $"Selected: {sel}\n<color=#9ab>{_message}</color>";
+            string sel = _selTarget == EditTarget.Spawn ? L.T("spawn pad")
+                : _selIndex < 0 ? L.T("nothing")
+                : _selTarget == EditTarget.Gate
+                    ? (_selIndex == 0 ? L.F("start/finish gate ({0})", d.Gates[_selIndex].Type) : L.F("gate #{0} ({1})", _selIndex, d.Gates[_selIndex].Type))
+                : L.F("prop ({0})", d.Props[_selIndex].Type);
+            _status.text = $"<b>{d.Name}</b>  " + L.F("{0} gates, {1} props", d.Gates.Count, d.Props.Count) +
+                           (_model.Dirty ? "  <color=#ffb347>" + L.T("unsaved") + "</color>" : "") + "\n" +
+                           L.F("Selected: {0}", sel) + $"\n<color=#9ab>{_message}</color>";
         }
 
         private static void SetColor(Renderer r, Color c)

@@ -91,6 +91,8 @@ namespace GateRush.Core
 
         public int Version = CurrentVersion;
         public string PilotName = "Pilot";
+        /// <summary>Interface language, a code from <see cref="L.Codes"/>; Kazakh by default.</summary>
+        public string Language = L.Default;
         /// <summary>Id in the quad catalog ("race5", "freestyle5", "whoop65").</summary>
         public string QuadId = "race5";
         /// <summary>Id in the track catalog.</summary>
@@ -110,6 +112,7 @@ namespace GateRush.Core
         public void Clamp()
         {
             if (string.IsNullOrWhiteSpace(PilotName)) PilotName = "Pilot";
+            if (Array.IndexOf(L.Codes, Language) < 0) Language = L.Default;
             if (PilotName.Length > 20) PilotName = PilotName.Substring(0, 20);
             if (string.IsNullOrEmpty(QuadId)) QuadId = "race5";
             if (string.IsNullOrEmpty(TrackId)) TrackId = "field";

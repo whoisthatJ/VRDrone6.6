@@ -16,7 +16,8 @@
         "UnityEditor.TestRunner",
         "GateRush.Net",
         "Unity.Netcode.Runtime",
-        "Unity.Collections"
+        "Unity.Collections",
+        "Unity.Localization"
     ],
     "includePlatforms": [
         "Editor"

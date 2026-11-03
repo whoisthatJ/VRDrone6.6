@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using GateRush.Core;
 using GateRush.Race;
 using GateRush.Track;
 using TMPro;
@@ -62,7 +63,7 @@ namespace GateRush.TrackEditor
                 if (gate != null) gate.SetVisualState(selected ? GateVisualState.Next : i == 0 ? GateVisualState.Upcoming : GateVisualState.Idle);
 
                 var label = _labels[i];
-                label.text = i == 0 ? "START" : i.ToString();
+                label.text = i == 0 ? L.T("START") : i.ToString();
                 label.color = selected ? new Color(0.3f, 1f, 0.4f) : Color.white;
                 Vector3 top = gate != null ? gate.OpeningCenterWorld + Vector3.up * (gate.OpeningSize.y * 0.5f + 0.6f) : g.Position + Vector3.up * 3f;
                 label.transform.position = top;

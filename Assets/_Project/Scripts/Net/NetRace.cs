@@ -148,7 +148,7 @@ namespace GateRush.Net
         {
             bool had = _registered;
             ResetState();
-            if (had) Disconnected?.Invoke(wasHost ? "The race was closed." : "Lost the connection to the host.");
+            if (had) Disconnected?.Invoke(wasHost ? Core.L.T("The race was closed.") : Core.L.T("Lost the connection to the host."));
         }
 
         private void OnClientConnected(ulong clientId)

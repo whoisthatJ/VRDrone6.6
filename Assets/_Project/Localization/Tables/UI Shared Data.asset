@@ -1,0 +1,1740 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b11a58205ec3474ca216360e9fa74a8, type: 3}
+  m_Name: UI Shared Data
+  m_EditorClassIdentifier: Unity.Localization::UnityEngine.Localization.Tables.SharedTableData
+  m_TableCollectionName: UI
+  m_TableCollectionNameGuidString: fe19b7fa1a802764599e4c6fb5bdbb70
+  m_Entries:
+  - m_Id: 1876946944
+    m_Key: FLY
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1935667200
+    m_Key: Language
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872945143808
+    m_Key: <   BACK
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872953532416
+    m_Key: FRAMES
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726720
+    m_Key: MOTORS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726721
+    m_Key: PROPS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726722
+    m_Key: LIPOS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726723
+    m_Key: EXTRAS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726724
+    m_Key: STYLE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726725
+    m_Key: COLOR
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726726
+    m_Key: SAVE DRONE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726727
+    m_Key: NAME
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726728
+    m_Key: THRUST
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726729
+    m_Key: WEIGHT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726730
+    m_Key: TOP SPEED
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726731
+    m_Key: TORQUE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726732
+    m_Key: DRAG
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726733
+    m_Key: RPM
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726734
+    m_Key: PEAK TEMP
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726735
+    m_Key: T/W {0}:1   HOVER {1}%   HOVER TIME {2} MIN
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726736
+    m_Key: 'ADVANCED
+
+      DRAG MODEL'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726737
+    m_Key: 'SIMPLE
+
+      DRAG MODEL'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726738
+    m_Key: MOI ELLIPSOID   ON
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726739
+    m_Key: MOI ELLIPSOID   OFF
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726740
+    m_Key: SPIN  ON
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726741
+    m_Key: SPIN  OFF
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726742
+    m_Key: DATA  >
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726743
+    m_Key: SEE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726744
+    m_Key: ASSEMBLE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726745
+    m_Key: FLY  >
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726746
+    m_Key: <   PREVIOUS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726747
+    m_Key: NEXT   >
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726748
+    m_Key: '(click: size)'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726749
+    m_Key: NO EXTRAS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726750
+    m_Key: Click a card to add or remove it.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726751
+    m_Key: 'SIZE: {0} mm   ({1})'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726752
+    m_Key: 'WEIGHT: {0} g   PROPS UP TO {1}"'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726753
+    m_Key: 'STATOR: {0}   {1} KV'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726754
+    m_Key: "WEIGHT: {0} g   Rm {1} m\u03A9"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726755
+    m_Key: 'SIZE: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726756
+    m_Key: 'WEIGHT: {0} g'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726757
+    m_Key: 'WEIGHT: +{0} g'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726758
+    m_Key: Saved "{0}" and selected it for flying.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726759
+    m_Key: 'SAVED: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726760
+    m_Key: 'Extras: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726761
+    m_Key: "Mass {0} g     Inertia (pitch/yaw/roll) {1} / {2} / {3} (x10^-6 kg m\xB2)"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726762
+    m_Key: "Arms {0} \xD7 {1} mm     Drag (side/top/front) {2} / {3} / {4} kg/m"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726763
+    m_Key: 'Full throttle: {0} A per motor at {1} V,  {2} rpm,  {3} g per motor'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726764
+    m_Key: Prop pitch speed {0} m/s     Motor spool {1} ms     Yaw torque/thrust {2} m
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726765
+    m_Key: "Top speed {0} km/h     T/W {1}:1     Hover {2} %, {3} min     Peak motor temp ~{4} \xB0C (estimate)"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726766
+    m_Key: PID pitch P {0} I {1} D {2}    yaw P {3}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726767
+    m_Key: THROTTLE   THRUST (all)   CURRENT/motor   RPM
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726768
+    m_Key: 'Stats are computed from the parts: motor and prop operating point on the battery under load, drag areas and part masses. The same numbers fly in the simulator.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726769
+    m_Key: CLOSE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726770
+    m_Key: MENU
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726771
+    m_Key: RADIO
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726772
+    m_Key: GAMEPAD
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726773
+    m_Key: KEYBOARD
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726774
+    m_Key: No frame.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726775
+    m_Key: No motors.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726776
+    m_Key: No props.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726777
+    m_Key: No battery.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726778
+    m_Key: '{0} doesn''t fit a {1} frame.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726779
+    m_Key: '{0} is too big for {1} (max {2}").'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726780
+    m_Key: '{0} doesn''t fit a {1} quad.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726781
+    m_Key: Whoop
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726782
+    m_Key: 2.5 inch
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726783
+    m_Key: 3 inch
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726784
+    m_Key: 5 inch
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726785
+    m_Key: 7 inch
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726786
+    m_Key: Ducted
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726787
+    m_Key: Action camera
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726788
+    m_Key: HD camera
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726789
+    m_Key: LED kit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726790
+    m_Key: Long-range antenna
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726791
+    m_Key: Raw carbon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726792
+    m_Key: Gold edge
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872957726793
+    m_Key: Tiger wrap
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872961921024
+    m_Key: Stealth
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872961921025
+    m_Key: Rush orange
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872961921026
+    m_Key: Gold
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872961921027
+    m_Key: Signal red
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872961921028
+    m_Key: Gate green
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872961921029
+    m_Key: Electric blue
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872961921030
+    m_Key: Purple
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872961921031
+    m_Key: White
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872961921032
+    m_Key: Black
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872961921033
+    m_Key: 65 mm ducted whoop. Bumps off walls, flies indoors.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872961921034
+    m_Key: '2.5" ducted cinewhoop: soft, stable, slow.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872961921035
+    m_Key: Featherweight 3" toothpick. Light, nimble, fragile.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872961921036
+    m_Key: '3.5" ducted cine rig on 6S: lifts a small HD camera.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872961921037
+    m_Key: Race-proven true-X. Low drag, slim arms, light.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872961921038
+    m_Key: 'Ultralight race frame. Thinner arms: fast, but bends.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872961921039
+    m_Key: Tough stretched-X for freestyle. Thick 6 mm arms.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872961921040
+    m_Key: 'Deadcat geometry: props out of the camera view.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872961921041
+    m_Key: 7" long-range cruiser. Efficient, stable, far.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872961921042
+    m_Key: Whoop motor for 1S.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872961921043
+    m_Key: Tiny 2S motor for 2.5" ducts.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872961921044
+    m_Key: 3" toothpick motor for 4S.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872961921045
+    m_Key: Torquey 6S motor for 3.5" ducts.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872961921046
+    m_Key: '4S race motor: punchy and fast.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872961921047
+    m_Key: '6S freestyle motor: torque and top end.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872961921048
+    m_Key: Lighter 4S motor, smooth and efficient.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872961921049
+    m_Key: Long-range 6S motor for 7" props.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872961921050
+    m_Key: Whoop props.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872961921051
+    m_Key: Ducted tri-blade.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872961921052
+    m_Key: Toothpick tri-blade.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872961921053
+    m_Key: 'Five blades for ducts: thrust in a small disc.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872961921054
+    m_Key: 'Race tri-blade: grip and top speed.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872961921055
+    m_Key: Freestyle tri-blade, durable.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872961921056
+    m_Key: 'Low pitch: efficient and smooth, less top speed.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872961921057
+    m_Key: Long-range tri-blade.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872961921058
+    m_Key: 'Full-size action camera on the top plate: cinematic footage, more weight and drag.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872961921059
+    m_Key: Small HD camera for 3" rigs.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872961921060
+    m_Key: Bright LED strips along the frame. Night racing look.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872961921061
+    m_Key: 'Tall stubby-free antenna: better range, a little drag.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872961921062
+    m_Key: Plain 3K carbon weave.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872961921063
+    m_Key: Carbon with gold-anodised plate edges and standoffs.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872961921064
+    m_Key: Printed tiger-stripe skin on the plates.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872961921065
+    m_Key: Matte black everything.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872961921066
+    m_Key: Accent colour for motors, props and LEDs.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872961921067
+    m_Key: 'LAP {0:0}/{1:0}   {2:2}
+
+      TOTAL {3:2}   BEST {4:2}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872961921068
+    m_Key: ARM TO START
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872961921069
+    m_Key: ARM + THROTTLE UP
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872961921070
+    m_Key: <color=#ff4a3d>MISSED GATE - GO BACK</color>
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872961921071
+    m_Key: GO!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872961921072
+    m_Key: FINISH
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872961921073
+    m_Key: RESULTS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872961921074
+    m_Key: Lap {0}   {1:F2}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872961921075
+    m_Key: best
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872961921076
+    m_Key: Total   {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872961921077
+    m_Key: Leaderboard #{0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872961921078
+    m_Key: Not in the top 10
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872961921079
+    m_Key: New track lap record!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872961921080
+    m_Key: lap record {0:F2} ({1})
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872961921081
+    m_Key: best {0:F2}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872961921082
+    m_Key: 'Restart: T  /  gamepad L-stick click     Menu: Esc'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872961921083
+    m_Key: DISARMED
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872961921084
+    m_Key: THROTTLE LOW TO ARM
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872961921085
+    m_Key: ARM SWITCH OFF, THEN ON
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872961921086
+    m_Key: LOW BATTERY
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872961921087
+    m_Key: LINK
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872961921088
+    m_Key: Waiting for all pilots to reach the grid...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115328
+    m_Key: FIN
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115329
+    m_Key: L{0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115330
+    m_Key: ONLINE RESULTS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115331
+    m_Key: racing...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115332
+    m_Key: lap {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115333
+    m_Key: '[Enter] back to the lobby    [F] race again'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115334
+    m_Key: Waiting for the host.  [Esc] menu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115335
+    m_Key: ONLINE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115336
+    m_Key: Quick race
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115337
+    m_Key: Finding a race...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115338
+    m_Key: Host a race
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115339
+    m_Key: Opening your race...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115340
+    m_Key: Host a private race
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115341
+    m_Key: Race code
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115342
+    m_Key: Join
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115343
+    m_Key: Joining...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115344
+    m_Key: Open races
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115345
+    m_Key: Refresh
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115346
+    m_Key: No open races listed. Refresh, start a quick race, or host one.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115347
+    m_Key: Hosted races use your selected track ({0}); built-in tracks only. Up to {1} pilots.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115348
+    m_Key: Online leaderboards
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115349
+    m_Key: Looking for races...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115350
+    m_Key: ONLINE RACE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115351
+    m_Key: Code {0} (share it to invite)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115352
+    m_Key: Track default
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115353
+    m_Key: Laps
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115354
+    m_Key: Pilots  {0}/{1}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115355
+    m_Key: (you)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115356
+    m_Key: START RACE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115357
+    m_Key: Waiting for the host to start the race.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115358
+    m_Key: Leave race
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115359
+    m_Key: ONLINE LEADERBOARDS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115360
+    m_Key: Loading...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115361
+    m_Key: Your best laps are posted (Settings > Pilot).
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115362
+    m_Key: 'Posting your laps is off: turn it on in Settings > Pilot.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115363
+    m_Key: No laps posted yet.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115364
+    m_Key: The race was closed.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115365
+    m_Key: Lost the connection to the host.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115366
+    m_Key: Type the race code first.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115367
+    m_Key: No race with that code (it may have started or closed).
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115368
+    m_Key: That race is full.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115369
+    m_Key: That race has already started.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115370
+    m_Key: Could not join the race ({0}).
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115371
+    m_Key: '{0}''s race'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115372
+    m_Key: You left the race.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115373
+    m_Key: The host closed the race.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115374
+    m_Key: Online services unavailable ({0})
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115375
+    m_Key: Could not load the race track '{0}'.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115376
+    m_Key: Back
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115377
+    m_Key: Choose quad
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115378
+    m_Key: Choose track
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115379
+    m_Key: Settings
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115380
+    m_Key: Radio setup
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115381
+    m_Key: Track editor
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115382
+    m_Key: Input diagnostics
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115383
+    m_Key: Quit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115384
+    m_Key: Online
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115385
+    m_Key: 'Mouse, keyboard or gamepad. In flight: V switches the camera, Esc returns here.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115386
+    m_Key: Pilot
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115387
+    m_Key: Quad
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115388
+    m_Key: Track
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115389
+    m_Key: 'Your track: {0}, {1} gates, {2} laps'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115390
+    m_Key: Lap record {0:F2}s ({1})
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115391
+    m_Key: No lap record yet
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115392
+    m_Key: Fly
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115393
+    m_Key: Reset all to defaults
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115394
+    m_Key: Rates
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115395
+    m_Key: Camera
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115396
+    m_Key: Input
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115397
+    m_Key: Graphics
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115398
+    m_Key: Feed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115399
+    m_Key: Physics
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115400
+    m_Key: Quad default
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115401
+    m_Key: Custom
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115402
+    m_Key: 'Flying {0}''s own rates:'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115403
+    m_Key: the quad
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115404
+    m_Key: Rates type
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115405
+    m_Key: Roll
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115406
+    m_Key: Pitch
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115407
+    m_Key: Yaw
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115408
+    m_Key: '{0} centre'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115409
+    m_Key: '{0} max'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115410
+    m_Key: '{0} RC rate'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115411
+    m_Key: '{0} super'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115412
+    m_Key: '{0} expo'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115413
+    m_Key: '{0} rates, max roll {1:0} / pitch {2:0} / yaw {3:0} deg/s'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115414
+    m_Key: Camera tilt
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115415
+    m_Key: FOV (horizontal)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115416
+    m_Key: View
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115417
+    m_Key: FPV (drone camera)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115418
+    m_Key: Chase
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115419
+    m_Key: Line of sight
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115420
+    m_Key: Lens distortion (FPV)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115421
+    m_Key: Switch views in flight with V, gamepad LB or the radio's view switch (Radio setup).
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115422
+    m_Key: Full stick (radio-style)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115423
+    m_Key: Centre = hover
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115424
+    m_Key: Trigger
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115425
+    m_Key: Gamepad throttle
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115426
+    m_Key: Stick deadband
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115427
+    m_Key: Stick expo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115428
+    m_Key: Invert pitch (right stick)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115429
+    m_Key: Invert roll (right stick)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115430
+    m_Key: Display mode
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115431
+    m_Key: Fullscreen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115432
+    m_Key: Exclusive fullscreen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115433
+    m_Key: Maximized window
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115434
+    m_Key: Window
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115435
+    m_Key: Native ({0} x {1})
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115436
+    m_Key: Resolution
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115437
+    m_Key: Quality preset
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115438
+    m_Key: Low
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115439
+    m_Key: Medium
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872966115440
+    m_Key: High
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309632
+    m_Key: Ultra
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309633
+    m_Key: Render scale
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309634
+    m_Key: Anti-aliasing
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309635
+    m_Key: Shadows
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309636
+    m_Key: Ambient occlusion
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309637
+    m_Key: Grass density
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309638
+    m_Key: Post-processing
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309639
+    m_Key: Uncapped
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309640
+    m_Key: Frame limit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309641
+    m_Key: Off
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309642
+    m_Key: On
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309643
+    m_Key: Motor volume
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309644
+    m_Key: Debug readout
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309645
+    m_Key: Stadium lighting
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309646
+    m_Key: Night (floodlights)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309647
+    m_Key: Dusk
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309648
+    m_Key: Day
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309649
+    m_Key: Route guidance
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309650
+    m_Key: Standard
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309651
+    m_Key: Trainer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309652
+    m_Key: Ghost lanes
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309653
+    m_Key: 'Trainer adds a racing line (green: fast, yellow: brake, red: slow) and an arrow to the next gate. Ghost lanes: fly through the lane posts.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309654
+    m_Key: Crash speed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309655
+    m_Key: m/s
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309656
+    m_Key: Air drag
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309657
+    m_Key: Motor lag
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309658
+    m_Key: Battery sag
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309659
+    m_Key: Lower drag = floatier and faster. Higher motor lag = softer, slower throttle response.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309660
+    m_Key: Callsign
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309661
+    m_Key: Shown on the leaderboard and to other pilots online.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309662
+    m_Key: Post lap times online
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309663
+    m_Key: 'On: the best lap of each finished race on a built-in track goes to its online leaderboard (signs in anonymously).'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309664
+    m_Key: Open Field
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309665
+    m_Key: Big outdoor loop with a floating gate and a hurdle. Room to learn.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309666
+    m_Key: Hangar 7
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309667
+    m_Key: 'Indoor hall: tight turns between crates, columns and walls. Whoop heaven.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309668
+    m_Key: Dockyard
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309669
+    m_Key: Container corridors and a gate above a container stack.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309670
+    m_Key: Spline Test Loop
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309671
+    m_Key: Figure-eight lane track with an overpass (spline track system test).
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309672
+    m_Key: Stadium Oval
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309673
+    m_Key: 'Floodlit football stadium: an easy oval around the pitch. Learn the lanes and gates.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309674
+    m_Key: Serpent Arena
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309675
+    m_Key: 'The stadium race track: loops round the landing pads, a figure-eight at the centre spot and four overpasses.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309676
+    m_Key: 5" Race
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309677
+    m_Key: 5" Freestyle
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309678
+    m_Key: 65mm Whoop
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309679
+    m_Key: 3" Toothpick
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309680
+    m_Key: 3.5" Cinewhoop
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309681
+    m_Key: 65 mm Whoop
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309682
+    m_Key: 7" Long Range
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309683
+    m_Key: My quad
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309684
+    m_Key: '650 g, ~10:1 thrust-to-weight. Light, fast and twitchy: the race class.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309685
+    m_Key: 750 g with an action cam, ~7.5:1. More momentum, smoother, Actual rates.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309686
+    m_Key: '32 g ducted tiny whoop, ~3:1. Slow, floaty and forgiving: great indoors and for learning.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309687
+    m_Key: Calibrate
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309688
+    m_Key: Use preset
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309689
+    m_Key: 'Calibration cleared: using the preset / default mapping.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309690
+    m_Key: 'Reader: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309691
+    m_Key: Auto
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309692
+    m_Key: Connection help
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309693
+    m_Key: See {0}.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309694
+    m_Key: No radio found.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309695
+    m_Key: Plug it in with USB (joystick / HID mode) or pair it over Bluetooth in Windows settings.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309696
+    m_Key: Power the radio on, plug it into the PC by USB and pick {0}.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309697
+    m_Key: '{0} detected in Xbox mode: it flies as a gamepad with radio-style throttle.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309698
+    m_Key: via {0}, {1} channels
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309699
+    m_Key: 'Preset: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309700
+    m_Key: (verified)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309701
+    m_Key: (not yet verified on hardware)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309702
+    m_Key: none (generic AETR guess)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309703
+    m_Key: 'Mapping: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309704
+    m_Key: your calibration
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309705
+    m_Key: preset/default. Calibrate for best results
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309706
+    m_Key: Connect a radio first.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309707
+    m_Key: BetaFPV radio (generic)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309708
+    m_Key: EdgeTX / OpenTX radio (generic)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309709
+    m_Key: BetaFPV LiteRadio 2 SIM (joystick mode)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309710
+    m_Key: BetaFPV LiteRadio 2 SIM (Xbox mode)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309711
+    m_Key: RadioMaster Pocket (EdgeTX USB joystick)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309712
+    m_Key: Calibrate radio
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309713
+    m_Key: Cancel
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309714
+    m_Key: Skip
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309715
+    m_Key: Next
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309716
+    m_Key: Step {0}/{1}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309717
+    m_Key: 'Move BOTH sticks to every corner a few times. ({0}/4 axes found)
+
+      Don''t touch the switches.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309718
+    m_Key: Now let both sticks centre, THROTTLE DOWN, and hold still...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309719
+    m_Key: Push THROTTLE fully UP and hold.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309720
+    m_Key: Throttle back down. Push YAW fully RIGHT and hold.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309721
+    m_Key: Centre yaw. Push PITCH fully FORWARD (nose down) and hold.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309722
+    m_Key: Centre pitch. Push ROLL fully RIGHT and hold.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309723
+    m_Key: 'Centre the sticks. Flip your ARM switch to ARMED and hold.
+
+      (Skip if you want to arm with throttle low instead.)'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309724
+    m_Key: 'Put the MODE switch in ACRO, then move it to ANGLE and hold.
+
+      (Skip if you don''t use a mode switch.)'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309725
+    m_Key: 'If the mode switch has a third position, move it to HORIZON and hold.
+
+      (Skips by itself after a few seconds.)'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309726
+    m_Key: 'Optional: flip the switch (or press the button) you want for CAMERA VIEW and hold.
+
+      (Skip if you don''t want one.)'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309727
+    m_Key: Done! Flip the arm switch off.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309728
+    m_Key: Cancelled.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309729
+    m_Key: 'Calibration incomplete: not all four stick axes were found. Try again.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309730
+    m_Key: Calibration saved ({0}). Throttle ch{1}, yaw ch{2}, pitch ch{3}, roll ch{4}{5}.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309731
+    m_Key: ', arm ch{0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309732
+    m_Key: ', arm with throttle low'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309733
+    m_Key: ', view ch{0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309734
+    m_Key: Connecting a radio
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309735
+    m_Key: '<b>RadioMaster Pocket / EdgeTX radios (PC):</b> power the radio <b>on</b>, plug in USB and pick <b>USB Joystick (HID)</b>. No driver is needed. If Windows shows "STM32 BOOTLOADER", the radio is in firmware mode: unplug it and power it on normally first. In the model''s mixes, put SA on CH5 (arm) and SB on CH6 (flight mode).'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309736
+    m_Key: <b>LiteRadio 2 SE / LiteRadio 3 (USB-C):</b> power the radio on in <b>joystick (HID) mode</b> and plug it into the PC. If the sticks don't move in {0}, enable joystick compatibility in <b>BETAFPV Configurator</b>.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309737
+    m_Key: <b>LiteRadio 2 SIM:</b> joystick mode (default) shows up as "BETAFPV Joystick". In Xbox mode it works as a gamepad; throttle is then full-range, like a radio.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309738
+    m_Key: <b>LiteRadio 4 / 4 SE (ELRS):</b> USB-C, or <b>Bluetooth joystick mode</b> paired in <b>Windows Settings > Bluetooth & devices</b>. Over USB-C, joystick mode only works with the radio <b>switched off</b> and powered by the cable.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309739
+    m_Key: <b>Then:</b> Menu > {0} > <b>{1}</b>. Arm with your arm switch (throttle low). The calibration can also assign a <b>camera view</b> switch. If some sticks or switches don't move in {0}, check {2}.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309740
+    m_Key: 'Report saved: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309741
+    m_Key: No devices
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309742
+    m_Key: layout {0}   interface {1}   {2}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309743
+    m_Key: product {0}   manufacturer {1}   {2} axes/buttons
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309744
+    m_Key: '{0} input devices'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309745
+    m_Key: 'Left/Right: select   Up/Down: page'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309746
+    m_Key: page {0}/{1}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309747
+    m_Key: 'Enter / A: save report'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309748
+    m_Key: Hangar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309749
+    m_Key: 'New track in:'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309750
+    m_Key: 'Copy and edit:'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309751
+    m_Key: '{0} (copy)'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309752
+    m_Key: 'Your tracks:'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309753
+    m_Key: None yet. Start a new one above.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309754
+    m_Key: '{0} gates, {1} props'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309755
+    m_Key: Edit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309756
+    m_Key: Sure?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872970309757
+    m_Key: Delete
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872974503936
+    m_Key: Share tracks by copying the .json files in {0}. Files you copy in show up here.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872974503937
+    m_Key: My {0} track {1}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872974503938
+    m_Key: Point at a gate and pull the trigger to move it.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872974503939
+    m_Key: Added {0} gate #{1}.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872974503940
+    m_Key: Added {0}.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872974503941
+    m_Key: A track needs at least one gate.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872974503942
+    m_Key: Deleted.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872974503943
+    m_Key: This gate is now the start/finish.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872974503944
+    m_Key: Gate is now #{0} in the race order.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872974503945
+    m_Key: Undone.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872974503946
+    m_Key: Nothing to undo.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872974503947
+    m_Key: Redone.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872974503948
+    m_Key: Nothing to redo.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872974503949
+    m_Key: Saved {0}.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872974503950
+    m_Key: 'Saved with warnings: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872974503951
+    m_Key: 'Save failed: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872974503952
+    m_Key: Race direction reversed.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872974503953
+    m_Key: Add
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872974503954
+    m_Key: Earlier
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872974503955
+    m_Key: Later
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872974503956
+    m_Key: Reverse
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872974503957
+    m_Key: Laps -
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872974503958
+    m_Key: Laps +
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872974503959
+    m_Key: Undo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872974503960
+    m_Key: Redo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872974503961
+    m_Key: Save
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872974503962
+    m_Key: Test fly
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872974503963
+    m_Key: Spawn
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872974503964
+    m_Key: Exit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872974503965
+    m_Key: 'Gate: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872974503966
+    m_Key: 'Prop: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872974503967
+    m_Key: 'Snap: on'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872974503968
+    m_Key: 'Snap: off'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872974503969
+    m_Key: '{0} laps'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872974503970
+    m_Key: spawn pad
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872974503971
+    m_Key: nothing
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872974503972
+    m_Key: start/finish gate ({0})
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872974503973
+    m_Key: gate #{0} ({1})
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872974503974
+    m_Key: prop ({0})
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872974503975
+    m_Key: unsaved
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872974503976
+    m_Key: 'Selected: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2872974503977
+    m_Key: START
+    m_Metadata:
+      m_Items: []
+  m_Metadata:
+    m_Items: []
+  m_KeyGenerator:
+    rid: 4456110691819454575
+  references:
+    version: 2
+    RefIds:
+    - rid: 4456110691819454575
+      type: {class: DistributedUIDGenerator, ns: UnityEngine.Localization.Tables, asm: Unity.Localization}
+      data:
+        m_CustomEpoch: 1793677852077

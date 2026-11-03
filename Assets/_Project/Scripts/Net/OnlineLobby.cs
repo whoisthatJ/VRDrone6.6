@@ -70,7 +70,7 @@ namespace GateRush.Net
             code = (code ?? "").Trim().ToUpperInvariant();
             if (code.Length == 0)
             {
-                LastError = "Type the race code first.";
+                LastError = Core.L.T("Type the race code first.");
                 return false;
             }
             return await Run(async () => await MultiplayerService.Instance.JoinSessionByCodeAsync(code, JoinOptions()));
@@ -205,10 +205,10 @@ namespace GateRush.Net
         private static string Friendly(SessionException e)
         {
             string m = e.Error.ToString();
-            if (m.Contains("NotFound")) return "No race with that code (it may have started or closed).";
-            if (m.Contains("Full")) return "That race is full.";
-            if (m.Contains("Locked")) return "That race has already started.";
-            return "Could not join the race (" + m + ").";
+            if (m.Contains("NotFound")) return Core.L.T("No race with that code (it may have started or closed).");
+            if (m.Contains("Full")) return Core.L.T("That race is full.");
+            if (m.Contains("Locked")) return Core.L.T("That race has already started.");
+            return Core.L.F("Could not join the race ({0}).", m);
         }
 
         private static SessionOptions SessionOptions(string trackId, string trackName)
@@ -216,7 +216,7 @@ namespace GateRush.Net
             string pilot = OnlineServices.DisplayName(OnlineServices.PlayerName(Core.SaveSystem.Settings.PilotName));
             return new SessionOptions
             {
-                Name = pilot + "'s race",
+                Name = Core.L.F("{0}'s race", pilot),
                 MaxPlayers = OnlineRules.MaxPilots,
                 SessionProperties = new Dictionary<string, SessionProperty>
                 {
@@ -273,8 +273,8 @@ namespace GateRush.Net
 
         private static void OnChanged() => Changed?.Invoke();
         private static void OnPlayer(string _) => Changed?.Invoke();
-        private static void OnRemoved() => End("You left the race.");
-        private static void OnDeleted() => End("The host closed the race.");
+        private static void OnRemoved() => End(Core.L.T("You left the race."));
+        private static void OnDeleted() => End(Core.L.T("The host closed the race."));
 
         private static void End(string reason)
         {

@@ -1,0 +1,75 @@
+# Race HUD, OSD warnings, online race HUD, online menu pages and online messages. Columns: English (key) <TAB> Kazakh <TAB> Russian
+LAP {0:0}/{1:0}   {2:2}\nTOTAL {3:2}   BEST {4:2}	АЙНАЛЫМ {0:0}/{1:0}   {2:2}\nЖАЛПЫ {3:2}   ҮЗДІК {4:2}	КРУГ {0:0}/{1:0}   {2:2}\nВСЕГО {3:2}   ЛУЧШИЙ {4:2}
+ARM TO START	СТАРТ ҮШІН ARM ҚОСЫҢЫЗ	ВКЛЮЧИТЕ ARM ДЛЯ СТАРТА
+ARM + THROTTLE UP	ARM + ГАЗДЫ КӨТЕРІҢІЗ	ARM + ГАЗ ВВЕРХ
+<color=#ff4a3d>MISSED GATE - GO BACK</color>	<color=#ff4a3d>ҚАҚПА ӨТКІЗІЛДІ - ҚАЙТЫҢЫЗ</color>	<color=#ff4a3d>ПРОПУЩЕНЫ ВОРОТА - НАЗАД</color>
+GO!	АЛҒА!	ВПЕРЁД!
+FINISH	МӘРЕ	ФИНИШ
+RESULTS	НӘТИЖЕЛЕР	РЕЗУЛЬТАТЫ
+Lap {0}   {1:F2}	{0}-айналым   {1:F2}	Круг {0}   {1:F2}
+best	үздік	лучший
+Total   {0}	Барлығы   {0}	Итого   {0}
+Leaderboard #{0}	Рейтингтегі орын: #{0}	Место в рейтинге: #{0}
+Not in the top 10	Үздік 10-дыққа кірмедіңіз	Не вошли в топ-10
+New track lap record!	Трассаның жаңа айналым рекорды!	Новый рекорд круга на трассе!
+lap record {0:F2} ({1})	айналым рекорды {0:F2} ({1})	рекорд круга {0:F2} ({1})
+best {0:F2}	үздік {0:F2}	лучший {0:F2}
+Restart: T  /  gamepad L-stick click     Menu: Esc	Қайта бастау: T  /  геймпадтың сол стигін басу     Мәзір: Esc	Заново: T  /  нажатие левого стика геймпада     Меню: Esc
+# OSD warnings (technical abbreviations such as V, MAH, THR, LQ, ACRO stay in English)
+DISARMED	ӨШІРУЛІ	ВЫКЛЮЧЕН
+THROTTLE LOW TO ARM	ARM ҮШІН ГАЗДЫ ТӨМЕНДЕТІҢІЗ	ГАЗ ВНИЗ ДЛЯ ARM
+ARM SWITCH OFF, THEN ON	ARM ҚОСҚЫШЫН ӨШІРІП, ҚАЙТА ҚОСЫҢЫЗ	ВЫКЛЮЧИТЕ ARM И ВКЛЮЧИТЕ СНОВА
+LOW BATTERY	БАТАРЕЯ ТӨМЕН	НИЗКИЙ ЗАРЯД
+LINK	БАЙЛАНЫС	СВЯЗЬ
+# Online race HUD
+Waiting for all pilots to reach the grid...	Барлық ұшқыштардың стартқа шығуын күтудеміз...	Ждём, пока все пилоты выйдут на старт...
+FIN	МӘРЕ	ФИН
+L{0}	А{0}	К{0}
+ONLINE RESULTS	ОНЛАЙН НӘТИЖЕЛЕР	ОНЛАЙН-РЕЗУЛЬТАТЫ
+racing...	жарыста...	в гонке...
+lap {0}	айналым {0}	круг {0}
+[Enter] back to the lobby    [F] race again	[Enter] лоббиге оралу    [F] қайта жарысу	[Enter] в лобби    [F] ещё раз
+Waiting for the host.  [Esc] menu	Хостты күтудеміз.  [Esc] мәзір	Ждём хоста.  [Esc] меню
+# Online menu pages
+ONLINE	ОНЛАЙН	ОНЛАЙН
+Quick race	Жылдам жарыс	Быстрая гонка
+Finding a race...	Жарыс ізделуде...	Ищем гонку...
+Host a race	Жарыс ашу	Создать гонку
+Opening your race...	Жарысыңыз ашылуда...	Создаём вашу гонку...
+Host a private race	Жабық жарыс ашу	Создать закрытую гонку
+Race code	Жарыс коды	Код гонки
+Join	Қосылу	Войти
+Joining...	Қосылуда...	Подключение...
+Open races	Ашық жарыстар	Открытые гонки
+Refresh	Жаңарту	Обновить
+No open races listed. Refresh, start a quick race, or host one.	Ашық жарыстар жоқ. Тізімді жаңартыңыз, жылдам жарыс бастаңыз немесе өз жарысыңызды ашыңыз.	Открытых гонок нет. Обновите список, начните быструю гонку или создайте свою.
+Hosted races use your selected track ({0}); built-in tracks only. Up to {1} pilots.	Сіз ашқан жарыс таңдалған трассада өтеді ({0}); тек кірістірілген трассалар. {1} ұшқышқа дейін.	Ваша гонка идёт на выбранной трассе ({0}); только встроенные трассы. До {1} пилотов.
+Online leaderboards	Онлайн рейтингтер	Онлайн-рейтинги
+Looking for races...	Жарыстар ізделуде...	Ищем гонки...
+ONLINE RACE	ОНЛАЙН ЖАРЫС	ОНЛАЙН-ГОНКА
+Code {0} (share it to invite)	Код {0} (шақыру үшін бөлісіңіз)	Код {0} (поделитесь, чтобы пригласить)
+Track default	Трасса бойынша	Как у трассы
+Laps	Айналымдар	Круги
+Pilots  {0}/{1}	Ұшқыштар  {0}/{1}	Пилоты  {0}/{1}
+(you)	(сіз)	(вы)
+START RACE	ЖАРЫСТЫ БАСТАУ	НАЧАТЬ ГОНКУ
+Waiting for the host to start the race.	Хосттың жарысты бастауын күтудеміз.	Ждём, когда хост начнёт гонку.
+Leave race	Жарыстан шығу	Покинуть гонку
+ONLINE LEADERBOARDS	ОНЛАЙН РЕЙТИНГТЕР	ОНЛАЙН-РЕЙТИНГИ
+Loading...	Жүктелуде...	Загрузка...
+Your best laps are posted (Settings > Pilot).	Үздік айналымдарыңыз жарияланады (Баптаулар > Ұшқыш).	Ваши лучшие круги публикуются (Настройки > Пилот).
+Posting your laps is off: turn it on in Settings > Pilot.	Айналымдарды жариялау өшірулі: Баптаулар > Ұшқыш бөлімінде қосыңыз.	Публикация кругов выключена: включите в Настройки > Пилот.
+No laps posted yet.	Әзірге айналымдар жарияланбаған.	Пока нет опубликованных кругов.
+# Online messages (lobby, connection, services)
+The race was closed.	Жарыс жабылды.	Гонка закрыта.
+Lost the connection to the host.	Хостпен байланыс үзілді.	Потеряна связь с хостом.
+Type the race code first.	Алдымен жарыс кодын енгізіңіз.	Сначала введите код гонки.
+No race with that code (it may have started or closed).	Бұл кодпен жарыс жоқ (ол басталған не жабылған болуы мүмкін).	Гонки с таким кодом нет (возможно, она началась или закрыта).
+That race is full.	Бұл жарыста бос орын жоқ.	В этой гонке нет мест.
+That race has already started.	Бұл жарыс басталып кетті.	Эта гонка уже началась.
+Could not join the race ({0}).	Жарысқа қосылу мүмкін болмады ({0}).	Не удалось войти в гонку ({0}).
+{0}'s race	{0} жарысы	Гонка {0}
+You left the race.	Сіз жарыстан шықтыңыз.	Вы покинули гонку.
+The host closed the race.	Хост жарысты жапты.	Хост закрыл гонку.
+Online services unavailable ({0})	Онлайн қызметтер қолжетімсіз ({0})	Онлайн-сервисы недоступны ({0})
+Could not load the race track '{0}'.	'{0}' жарыс трассасын жүктеу мүмкін болмады.	Не удалось загрузить трассу '{0}'.

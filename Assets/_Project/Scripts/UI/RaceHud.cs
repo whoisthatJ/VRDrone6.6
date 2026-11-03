@@ -1,4 +1,5 @@
 using System.Text;
+using GateRush.Core;
 using GateRush.Race;
 using TMPro;
 using UnityEngine;
@@ -68,7 +69,7 @@ namespace GateRush.UI
             if (lapInfo != null)
             {
                 float best = timer.HasBestLap ? (float)timer.BestLap : 0f;
-                lapInfo.SetText("LAP {0:0}/{1:0}   {2:2}\nTOTAL {3:2}   BEST {4:2}",
+                lapInfo.SetText(L.T("LAP {0:0}/{1:0}   {2:2}\nTOTAL {3:2}   BEST {4:2}"),
                     timer.CurrentLap, timer.TotalLaps, (float)timer.CurrentLapTime(now), (float)timer.TotalTime(now), best);
             }
 
@@ -90,7 +91,7 @@ namespace GateRush.UI
             switch (session.Phase)
             {
                 case RacePhase.Idle:
-                    SetCentre(CentreMode.ArmToStart, "ARM TO START");
+                    SetCentre(CentreMode.ArmToStart, L.T("ARM TO START"));
                     break;
                 case RacePhase.Countdown:
                     int n = Mathf.CeilToInt(session.CountdownRemaining);
@@ -102,14 +103,14 @@ namespace GateRush.UI
                     }
                     break;
                 case RacePhase.Racing:
-                    if (session.WaitingForRelease) SetCentre(CentreMode.Hold, "ARM + THROTTLE UP");
-                    else if (now < session.WrongGateUntil) SetCentre(CentreMode.MissedGate, "<color=#ff4a3d>MISSED GATE - GO BACK</color>");
+                    if (session.WaitingForRelease) SetCentre(CentreMode.Hold, L.T("ARM + THROTTLE UP"));
+                    else if (now < session.WrongGateUntil) SetCentre(CentreMode.MissedGate, L.T("<color=#ff4a3d>MISSED GATE - GO BACK</color>"));
                     else if (now < _lapFlashUntil) ShowLapFlash();
-                    else if (now - timer.StartTime < goSeconds) SetCentre(CentreMode.Go, "GO!");
+                    else if (now - timer.StartTime < goSeconds) SetCentre(CentreMode.Go, L.T("GO!"));
                     else SetCentre(CentreMode.None, "");
                     break;
                 case RacePhase.Finished:
-                    SetCentre(CentreMode.Finish, "FINISH");
+                    SetCentre(CentreMode.Finish, L.T("FINISH"));
                     break;
             }
         }
@@ -132,24 +133,24 @@ namespace GateRush.UI
         {
             var t = session.Timer;
             var sb = new StringBuilder();
-            sb.AppendLine("<b>RESULTS</b>");
+            sb.AppendLine("<b>" + L.T("RESULTS") + "</b>");
             for (int i = 0; i < t.CompletedLaps; i++)
-                sb.AppendLine(Inv($"Lap {i + 1}   {t.LapTime(i):F2}{(i == t.BestLapIndex ? "  <color=#5f5>best</color>" : "")}"));
-            sb.AppendLine(Inv($"Total   <b>{t.TotalTime(0):F2}</b>"));
-            sb.AppendLine(session.LastRank > 0 ? $"Leaderboard #{session.LastRank}" : "Not in the top 10");
-            if (session.LastRaceSetTrackBestLap) sb.AppendLine("<color=#5f5>New track lap record!</color>");
+                sb.AppendLine(L.F("Lap {0}   {1:F2}", i + 1, t.LapTime(i)) + (i == t.BestLapIndex ? "  <color=#5f5>" + L.T("best") + "</color>" : ""));
+            sb.AppendLine(L.F("Total   {0}", Inv($"<b>{t.TotalTime(0):F2}</b>")));
+            sb.AppendLine(session.LastRank > 0 ? L.F("Leaderboard #{0}", session.LastRank) : L.T("Not in the top 10"));
+            if (session.LastRaceSetTrackBestLap) sb.AppendLine("<color=#5f5>" + L.T("New track lap record!") + "</color>");
             sb.AppendLine();
 
             var board = session.Board;
-            sb.AppendLine(Inv($"<b>{session.TrackName}</b>   lap record {board.BestLap:F2} ({board.BestLapPilot})"));
+            sb.AppendLine("<b>" + L.T(session.TrackName) + "</b>   " + L.F("lap record {0:F2} ({1})", board.BestLap, board.BestLapPilot));
             int shown = Mathf.Min(5, board.Entries.Count);
             for (int i = 0; i < shown; i++)
             {
                 var e = board.Entries[i];
-                sb.AppendLine(Inv($"{i + 1}. {e.TotalTime:F2}   best {e.BestLap:F2}   {e.Pilot}   {e.Quad}   {e.Date}"));
+                sb.AppendLine(Inv($"{i + 1}. {e.TotalTime:F2}   ") + L.F("best {0:F2}", e.BestLap) + $"   {e.Pilot}   {L.T(e.Quad)}   {e.Date}");
             }
             sb.AppendLine();
-            sb.AppendLine("<size=80%>Restart: T  /  gamepad L-stick click     Menu: Esc</size>");
+            sb.AppendLine("<size=80%>" + L.T("Restart: T  /  gamepad L-stick click     Menu: Esc") + "</size>");
             return sb.ToString();
         }
 

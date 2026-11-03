@@ -95,7 +95,7 @@ namespace GateRush.Game
             var catalog = GameFlow.Catalog;
             if (catalog == null || !GameFlow.RaceOnline(catalog, trackId))
             {
-                Notice = "Could not load the race track '" + trackId + "'.";
+                Notice = L.F("Could not load the race track '{0}'.", trackId);
                 Leave();
             }
         }

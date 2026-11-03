@@ -1,0 +1,121 @@
+# Radio setup, calibration wizard, connection help, input diagnostics, track editor (menu home + in-game). Columns: English (key) <TAB> Kazakh <TAB> Russian
+# --- radio setup page ---
+Calibrate	Калибрлеу	Калибровать
+Use preset	Пресетті қолдану	Взять пресет
+Calibration cleared: using the preset / default mapping.	Калибрлеу өшірілді: пресет / әдепкі сәйкестендіру қолданылады.	Калибровка сброшена: используется пресет / раскладка по умолчанию.
+Reader: {0}	Енгізу: {0}	Ввод: {0}
+Auto	Авто	Авто
+Connection help	Қалай қосу керек	Как подключить
+See {0}.	«{0}» бөлімін қараңыз.	См. раздел «{0}».
+No radio found.	Пульт табылмады.	Пульт не найден.
+Plug it in with USB (joystick / HID mode) or pair it over Bluetooth in Windows settings.	Оны USB арқылы жалғаңыз (джойстик / HID режимі) немесе Windows баптауларында Bluetooth арқылы жұптаңыз.	Подключите его по USB (режим джойстика / HID) или выполните сопряжение по Bluetooth в настройках Windows.
+Power the radio on, plug it into the PC by USB and pick {0}.	Пультті қосып, компьютерге USB арқылы жалғаңыз да, {0} таңдаңыз.	Включите пульт, подключите его к ПК по USB и выберите {0}.
+{0} detected in Xbox mode: it flies as a gamepad with radio-style throttle.	{0} Xbox режимінде анықталды: ол газы пульттегідей геймпад ретінде ұшады.	{0} обнаружен в режиме Xbox: управление как с геймпада, но газ как на пульте.
+via {0}, {1} channels	{0} арқылы, {1} арна	через {0}, каналов: {1}
+Preset: {0}	Пресет: {0}	Пресет: {0}
+(verified)	(тексерілген)	(проверен)
+(not yet verified on hardware)	(құрылғыда әлі тексерілмеген)	(ещё не проверен на устройстве)
+none (generic AETR guess)	жоқ (жалпы AETR болжамы)	нет (типовая схема AETR)
+Mapping: {0}	Сәйкестендіру: {0}	Раскладка: {0}
+your calibration	сіздің калибрлеуіңіз	ваша калибровка
+preset/default. Calibrate for best results	пресет/әдепкі. Жақсы нәтиже үшін калибрлеңіз	пресет/по умолчанию. Откалибруйте для лучшего результата
+Connect a radio first.	Алдымен пультті қосыңыз.	Сначала подключите пульт.
+# radio preset names (the parts that are not product names)
+BetaFPV radio (generic)	BetaFPV пульті (жалпы)	Пульт BetaFPV (общий)
+EdgeTX / OpenTX radio (generic)	EdgeTX / OpenTX пульті (жалпы)	Пульт EdgeTX / OpenTX (общий)
+BetaFPV LiteRadio 2 SIM (joystick mode)	BetaFPV LiteRadio 2 SIM (джойстик режимі)	BetaFPV LiteRadio 2 SIM (режим джойстика)
+BetaFPV LiteRadio 2 SIM (Xbox mode)	BetaFPV LiteRadio 2 SIM (Xbox режимі)	BetaFPV LiteRadio 2 SIM (режим Xbox)
+RadioMaster Pocket (EdgeTX USB joystick)	RadioMaster Pocket (EdgeTX USB джойстигі)	RadioMaster Pocket (USB-джойстик EdgeTX)
+# --- calibration wizard ---
+Calibrate radio	Пультті калибрлеу	Калибровка пульта
+Cancel	Болдырмау	Отмена
+Skip	Өткізу	Пропустить
+Next	Келесі	Далее
+Step {0}/{1}	Қадам {0}/{1}	Шаг {0}/{1}
+Move BOTH sticks to every corner a few times. ({0}/4 axes found)\nDon't touch the switches.	ЕКІ стикті де әр бұрышқа бірнеше рет жылжытыңыз. ({0}/4 ось табылды)\nАуыстырғыштарды ұстамаңыз.	Несколько раз отведите ОБА стика во все углы. (найдено осей: {0}/4)\nНе трогайте переключатели.
+Now let both sticks centre, THROTTLE DOWN, and hold still...	Енді екі стикті ортаға жіберіңіз, ГАЗ ТӨМЕН, қозғалтпай ұстаңыз...	Теперь отпустите оба стика в центр, ГАЗ ВНИЗ, и не двигайте...
+Push THROTTLE fully UP and hold.	ГАЗДЫ толық ЖОҒАРЫ итеріп, ұстап тұрыңыз.	Поднимите ГАЗ полностью ВВЕРХ и держите.
+Throttle back down. Push YAW fully RIGHT and hold.	Газды қайта түсіріңіз. РЫСКАНИЕНІ толық ОҢҒА итеріп, ұстап тұрыңыз.	Газ обратно вниз. Отведите РЫСКАНИЕ полностью ВПРАВО и держите.
+Centre yaw. Push PITCH fully FORWARD (nose down) and hold.	Рысканиені ортаға қайтарыңыз. ТАНГАЖДЫ толық АЛҒА (тұмсығы төмен) итеріп, ұстап тұрыңыз.	Рыскание в центр. Отведите ТАНГАЖ полностью ВПЕРЁД (нос вниз) и держите.
+Centre pitch. Push ROLL fully RIGHT and hold.	Тангажды ортаға қайтарыңыз. КРЕНДІ толық ОҢҒА итеріп, ұстап тұрыңыз.	Тангаж в центр. Отведите КРЕН полностью ВПРАВО и держите.
+Centre the sticks. Flip your ARM switch to ARMED and hold.\n(Skip if you want to arm with throttle low instead.)	Стиктерді ортаға қайтарыңыз. ARM ауыстырғышын ARMED күйіне ауыстырып, ұстап тұрыңыз.\n(Газ төмен кезде іске қосқыңыз келсе, өткізіп жіберіңіз.)	Стики в центр. Переведите переключатель ARM в положение ARMED и держите.\n(Пропустите, если хотите взводить моторы газом в нижнем положении.)
+Put the MODE switch in ACRO, then move it to ANGLE and hold.\n(Skip if you don't use a mode switch.)	MODE ауыстырғышын ACRO күйіне қойып, содан кейін ANGLE күйіне ауыстырып, ұстап тұрыңыз.\n(Режим ауыстырғышын қолданбасаңыз, өткізіп жіберіңіз.)	Поставьте переключатель MODE в ACRO, затем переведите в ANGLE и держите.\n(Пропустите, если не используете переключатель режимов.)
+If the mode switch has a third position, move it to HORIZON and hold.\n(Skips by itself after a few seconds.)	Режим ауыстырғышында үшінші күй болса, оны HORIZON күйіне ауыстырып, ұстап тұрыңыз.\n(Бірнеше секундтан кейін өздігінен өтеді.)	Если у переключателя режимов есть третье положение, переведите его в HORIZON и держите.\n(Через несколько секунд шаг пропустится сам.)
+Optional: flip the switch (or press the button) you want for CAMERA VIEW and hold.\n(Skip if you don't want one.)	Қосымша: КАМЕРА КӨРІНІСІ үшін ауыстырғышты ауыстырып (немесе батырманы басып), ұстап тұрыңыз.\n(Қажет болмаса, өткізіп жіберіңіз.)	Необязательно: переключите тумблер (или нажмите кнопку) для ВИДА КАМЕРЫ и держите.\n(Пропустите, если не нужно.)
+Done! Flip the arm switch off.	Дайын! ARM ауыстырғышын өшіріңіз.	Готово! Выключите переключатель ARM.
+Cancelled.	Тоқтатылды.	Отменено.
+Calibration incomplete: not all four stick axes were found. Try again.	Калибрлеу аяқталмады: стиктердің төрт осінің бәрі табылмады. Қайталап көріңіз.	Калибровка не завершена: найдены не все четыре оси стиков. Попробуйте ещё раз.
+Calibration saved ({0}). Throttle ch{1}, yaw ch{2}, pitch ch{3}, roll ch{4}{5}.	Калибрлеу сақталды ({0}). Газ ch{1}, рыскание ch{2}, тангаж ch{3}, крен ch{4}{5}.	Калибровка сохранена ({0}). Газ ch{1}, рыскание ch{2}, тангаж ch{3}, крен ch{4}{5}.
+, arm ch{0}	, іске қосу ch{0}	, взвод ch{0}
+, arm with throttle low	, іске қосу газ төмен кезде	, взвод при газе внизу
+, view ch{0}	, камера ch{0}	, вид ch{0}
+# --- connection help ---
+Connecting a radio	Пультті қосу	Подключение пульта
+<b>RadioMaster Pocket / EdgeTX radios (PC):</b> power the radio <b>on</b>, plug in USB and pick <b>USB Joystick (HID)</b>. No driver is needed. If Windows shows "STM32 BOOTLOADER", the radio is in firmware mode: unplug it and power it on normally first. In the model's mixes, put SA on CH5 (arm) and SB on CH6 (flight mode).	<b>RadioMaster Pocket / EdgeTX пульттері (ДК):</b> пультті <b>қосыңыз</b>, USB жалғап, <b>USB Joystick (HID)</b> таңдаңыз. Драйвер қажет емес. Windows "STM32 BOOTLOADER" деп көрсетсе, пульт микробағдарлама режимінде: оны ажыратып, алдымен әдеттегідей қосыңыз. Модель микстерінде SA-ны CH5-ке (arm), SB-ны CH6-ға (ұшу режимі) қойыңыз.	<b>RadioMaster Pocket / пульты EdgeTX (ПК):</b> <b>включите</b> пульт, подключите USB и выберите <b>USB Joystick (HID)</b>. Драйвер не нужен. Если Windows показывает "STM32 BOOTLOADER", пульт в режиме прошивки: отключите его и сначала включите обычным способом. В миксах модели назначьте SA на CH5 (взвод) и SB на CH6 (полётный режим).
+<b>LiteRadio 2 SE / LiteRadio 3 (USB-C):</b> power the radio on in <b>joystick (HID) mode</b> and plug it into the PC. If the sticks don't move in {0}, enable joystick compatibility in <b>BETAFPV Configurator</b>.	<b>LiteRadio 2 SE / LiteRadio 3 (USB-C):</b> пультті <b>джойстик (HID) режимінде</b> қосып, компьютерге жалғаңыз. «{0}» бөлімінде стиктер қозғалмаса, <b>BETAFPV Configurator</b> ішінде джойстик үйлесімділігін қосыңыз.	<b>LiteRadio 2 SE / LiteRadio 3 (USB-C):</b> включите пульт в <b>режиме джойстика (HID)</b> и подключите к ПК. Если стики не двигаются в разделе «{0}», включите совместимость с джойстиком в <b>BETAFPV Configurator</b>.
+<b>LiteRadio 2 SIM:</b> joystick mode (default) shows up as "BETAFPV Joystick". In Xbox mode it works as a gamepad; throttle is then full-range, like a radio.	<b>LiteRadio 2 SIM:</b> джойстик режимі (әдепкі) "BETAFPV Joystick" болып көрінеді. Xbox режимінде ол геймпад сияқты жұмыс істейді; бұл кезде газ пульттегідей толық ауқымды болады.	<b>LiteRadio 2 SIM:</b> режим джойстика (по умолчанию) определяется как "BETAFPV Joystick". В режиме Xbox он работает как геймпад; газ тогда полнодиапазонный, как на пульте.
+<b>LiteRadio 4 / 4 SE (ELRS):</b> USB-C, or <b>Bluetooth joystick mode</b> paired in <b>Windows Settings > Bluetooth & devices</b>. Over USB-C, joystick mode only works with the radio <b>switched off</b> and powered by the cable.	<b>LiteRadio 4 / 4 SE (ELRS):</b> USB-C немесе <b>Windows Settings > Bluetooth & devices</b> ішінде жұптастырылған <b>Bluetooth джойстик режимі</b>. USB-C арқылы джойстик режимі пульт <b>өшірулі</b> тұрып, кабельден қуат алғанда ғана жұмыс істейді.	<b>LiteRadio 4 / 4 SE (ELRS):</b> USB-C или <b>режим Bluetooth-джойстика</b> с сопряжением в <b>Параметры Windows > Bluetooth и устройства</b>. По USB-C режим джойстика работает, только если пульт <b>выключен</b> и питается от кабеля.
+<b>Then:</b> Menu > {0} > <b>{1}</b>. Arm with your arm switch (throttle low). The calibration can also assign a <b>camera view</b> switch. If some sticks or switches don't move in {0}, check {2}.	<b>Содан кейін:</b> Мәзір > {0} > <b>{1}</b>. ARM ауыстырғышымен іске қосыңыз (газ төмен). Калибрлеу <b>камера көрінісі</b> ауыстырғышын да тағайындай алады. «{0}» бөлімінде кейбір стиктер не ауыстырғыштар қозғалмаса, «{2}» бөлімін тексеріңіз.	<b>Затем:</b> Меню > {0} > <b>{1}</b>. Взводите моторы переключателем ARM (газ внизу). Калибровка также может назначить переключатель <b>вида камеры</b>. Если какие-то стики или переключатели не двигаются в разделе «{0}», проверьте «{2}».
+# --- input diagnostics ---
+Report saved: {0}	Есеп сақталды: {0}	Отчёт сохранён: {0}
+No devices	Құрылғылар жоқ	Нет устройств
+layout {0}   interface {1}   {2}	макет {0}   интерфейс {1}   {2}	раскладка {0}   интерфейс {1}   {2}
+product {0}   manufacturer {1}   {2} axes/buttons	өнім {0}   өндіруші {1}   {2} ось/батырма	продукт {0}   производитель {1}   осей/кнопок: {2}
+{0} input devices	{0} енгізу құрылғысы	устройств ввода: {0}
+Left/Right: select   Up/Down: page	Сол/Оң: таңдау   Жоғары/Төмен: бет	Влево/Вправо: выбор   Вверх/Вниз: страница
+page {0}/{1}	бет {0}/{1}	стр. {0}/{1}
+Enter / A: save report	Enter / A: есепті сақтау	Enter / A: сохранить отчёт
+# --- track editor home (menu) ---
+Hangar	Ангар	Ангар
+New track in:	Жаңа трасса:	Новая трасса:
+Copy and edit:	Көшіріп өңдеу:	Копировать и изменить:
+{0} (copy)	{0} (көшірме)	{0} (копия)
+Your tracks:	Сіздің трассаларыңыз:	Ваши трассы:
+None yet. Start a new one above.	Әзірге жоқ. Жоғарыда жаңасын бастаңыз.	Пока нет. Создайте новую выше.
+{0} gates, {1} props	{0} қақпа, {1} объект	ворот: {0}, объектов: {1}
+Edit	Өңдеу	Изменить
+Sure?	Нақты ма?	Точно?
+Delete	Жою	Удалить
+Share tracks by copying the .json files in {0}. Files you copy in show up here.	Трассалармен бөлісу үшін {0} ішіндегі .json файлдарын көшіріңіз. Сол жерге көшірілген файлдар осында шығады.	Делитесь трассами, копируя .json-файлы в {0}. Скопированные туда файлы появятся здесь.
+My {0} track {1}	Менің трассам ({0}) {1}	Моя трасса ({0}) {1}
+# --- in-game track editor ---
+Point at a gate and pull the trigger to move it.	Қақпаны жылжыту үшін оған нұсқап, триггерді басыңыз.	Наведитесь на ворота и нажмите курок, чтобы их передвинуть.
+Added {0} gate #{1}.	{0} қақпасы қосылды, №{1}.	Добавлены ворота {0} №{1}.
+Added {0}.	{0} қосылды.	Добавлено: {0}.
+A track needs at least one gate.	Трассада кемінде бір қақпа болуы керек.	На трассе должны быть хотя бы одни ворота.
+Deleted.	Жойылды.	Удалено.
+This gate is now the start/finish.	Бұл қақпа енді старт/мәре.	Эти ворота теперь старт/финиш.
+Gate is now #{0} in the race order.	Қақпа енді жарыс ретінде №{0}.	Ворота теперь №{0} в порядке гонки.
+Undone.	Кері қайтарылды.	Отменено.
+Nothing to undo.	Болдырмайтын әрекет жоқ.	Нечего отменять.
+Redone.	Қайталанды.	Повторено.
+Nothing to redo.	Қайталайтын әрекет жоқ.	Нечего повторять.
+Saved {0}.	{0} сақталды.	Сохранено: {0}.
+Saved with warnings: {0}	Ескертулермен сақталды: {0}	Сохранено с предупреждениями: {0}
+Save failed: {0}	Сақтау сәтсіз: {0}	Не удалось сохранить: {0}
+Race direction reversed.	Жарыс бағыты керісінше өзгертілді.	Направление гонки изменено на обратное.
+Add	Қосу	Добавить
+Earlier	Ертерек	Раньше
+Later	Кейінірек	Позже
+Reverse	Кері бағыт	Реверс
+Laps -	Айналым -	Круги -
+Laps +	Айналым +	Круги +
+Undo	Қайтару	Отменить
+Redo	Қайталау	Вернуть
+Save	Сақтау	Сохранить
+Test fly	Сынап ұшу	Тест-полёт
+Spawn	Старт	Старт
+Exit	Шығу	Выход
+Gate: {0}	Қақпа: {0}	Ворота: {0}
+Prop: {0}	Объект: {0}	Объект: {0}
+Snap: on	Торға: қосулы	Привязка: вкл
+Snap: off	Торға: өшірулі	Привязка: выкл
+{0} laps	{0} айналым	кругов: {0}
+spawn pad	старт алаңы	стартовая площадка
+nothing	ештеңе	ничего
+start/finish gate ({0})	старт/мәре қақпасы ({0})	ворота старт/финиш ({0})
+gate #{0} ({1})	№{0} қақпа ({1})	ворота №{0} ({1})
+prop ({0})	объект ({0})	объект ({0})
+unsaved	сақталмаған	не сохранено
+Selected: {0}	Таңдалған: {0}	Выбрано: {0}
+START	СТАРТ	СТАРТ

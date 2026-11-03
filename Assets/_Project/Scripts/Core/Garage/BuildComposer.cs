@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using GateRush.Core;
 using GateRush.Flight;
 using UnityEngine;
 
@@ -52,20 +54,22 @@ namespace GateRush.Garage
             var f = b.Frame;
             if (f == null)
             {
-                problems.Add("No frame.");
+                problems.Add(L.T("No frame."));
                 return problems;
             }
-            void Check(PartDef p, string what)
+            string Size() => L.T(PartCatalog.SizeLabel(f.Size));
+            void Check(PartDef p, int what)
             {
-                if (p == null) problems.Add($"No {what}.");
-                else if (!p.Fits(f.Size)) problems.Add($"{p.Name} doesn't fit a {PartCatalog.SizeLabel(f.Size)} frame.");
+                if (p == null) problems.Add(what == 0 ? L.T("No motors.") : what == 1 ? L.T("No props.") : L.T("No battery."));
+                else if (!p.Fits(f.Size)) problems.Add(L.F("{0} doesn't fit a {1} frame.", p.Name, Size()));
             }
-            Check(b.Motor, "motors");
-            Check(b.Prop, "props");
-            Check(b.Battery, "battery");
-            if (b.Prop != null && b.Prop.DiameterIn > f.MaxPropIn + 0.05f) problems.Add($"{b.Prop.Name} is too big for {f.Name} (max {f.MaxPropIn:0.#}\").");
+            Check(b.Motor, 0);
+            Check(b.Prop, 1);
+            Check(b.Battery, 2);
+            if (b.Prop != null && b.Prop.DiameterIn > f.MaxPropIn + 0.05f)
+                problems.Add(L.F("{0} is too big for {1} (max {2}\").", b.Prop.Name, f.Name, f.MaxPropIn.ToString("0.#", CultureInfo.InvariantCulture)));
             foreach (var e in b.Extras)
-                if (!e.Fits(f.Size)) problems.Add($"{e.Name} doesn't fit a {PartCatalog.SizeLabel(f.Size)} quad.");
+                if (!e.Fits(f.Size)) problems.Add(L.F("{0} doesn't fit a {1} quad.", L.T(e.Name), Size()));
             return problems;
         }
 

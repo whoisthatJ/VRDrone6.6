@@ -1,4 +1,4 @@
-using System.Globalization;
+using GateRush.Core;
 using GateRush.Input;
 using TMPro;
 using UnityEngine;
@@ -37,19 +37,19 @@ namespace GateRush.UI
 
         private void ShowRadio()
         {
-            var p = NewPage("Radio setup");
+            var p = NewPage(L.T("Radio setup"));
             _radioStatus = UiKit.Label(p, "", new Vector2(Margin, -110f), new Vector2(ContentWidth, 150f), 28f, TextAlignmentOptions.TopLeft);
             BuildChannelBars(p, -270f);
 
             float y = -(Height - 200f);
             float w = (ContentWidth - 3f * 20f) / 4f;
-            UiKit.Button(p, "Calibrate", new Vector2(Margin, y), new Vector2(w, 80f), StartWizard, 30f);
-            UiKit.Button(p, "Use preset", new Vector2(Margin + (w + 20f), y), new Vector2(w, 80f), () =>
+            UiKit.Button(p, L.T("Calibrate"), new Vector2(Margin, y), new Vector2(w, 80f), StartWizard, 30f);
+            UiKit.Button(p, L.T("Use preset"), new Vector2(Margin + (w + 20f), y), new Vector2(w, 80f), () =>
             {
                 if (radio != null) radio.ClearCalibration();
-                _radioMessage = "Calibration cleared: using the preset / default mapping.";
+                _radioMessage = L.T("Calibration cleared: using the preset / default mapping.");
             }, 30f);
-            UiKit.Button(p, "Reader: " + BackendName(S.Input.RadioBackend), new Vector2(Margin + 2f * (w + 20f), y), new Vector2(w, 80f), () =>
+            UiKit.Button(p, L.F("Reader: {0}", BackendName(S.Input.RadioBackend)), new Vector2(Margin + 2f * (w + 20f), y), new Vector2(w, 80f), () =>
             {
                 // Auto → Input System → the platform's raw reader (Windows HID on PC, Android raw on Android) → Auto.
                 int raw = Application.platform == RuntimePlatform.Android ? (int)RadioBackend.AndroidRaw : (int)RadioBackend.WindowsHid;
@@ -59,12 +59,12 @@ namespace GateRush.UI
                 _dirty = true;
                 ShowRadio();
             }, 26f);
-            UiKit.Button(p, "Connection help", new Vector2(Margin + 3f * (w + 20f), y), new Vector2(w, 80f), ShowRadioHelp, 30f);
+            UiKit.Button(p, L.T("Connection help"), new Vector2(Margin + 3f * (w + 20f), y), new Vector2(w, 80f), ShowRadioHelp, 30f);
             BackButton(p);
             UpdateRadioStatus();
         }
 
-        private static string BackendName(int b) => b == 1 ? "Input System" : b == 2 ? "Android raw" : b == 3 ? "Windows HID" : "Auto";
+        private static string BackendName(int b) => b == 1 ? "Input System" : b == 2 ? "Android raw" : b == 3 ? "Windows HID" : L.T("Auto");
 
         private void BuildChannelBars(RectTransform p, float top)
         {
@@ -137,18 +137,27 @@ namespace GateRush.UI
             if (reader == null)
             {
                 string pad = radio != null && radio.GamepadPreset != null
-                    ? $"\n<color=#ffb347>{radio.GamepadPreset.DisplayName} detected in Xbox mode: it flies as a gamepad with radio-style throttle.</color>"
+                    ? "\n<color=#ffb347>" + L.F("{0} detected in Xbox mode: it flies as a gamepad with radio-style throttle.", L.T(radio.GamepadPreset.DisplayName)) + "</color>"
                     : "";
+                string seeHelp = "\n" + L.F("See {0}.", L.T("Connection help"));
                 _radioStatus.text = Application.platform == RuntimePlatform.Android
-                    ? "<b>No radio found.</b> Plug it in with USB (joystick / HID mode) or pair it over Bluetooth in Windows settings.\nSee Connection help." + pad
-                    : "<b>No radio found.</b> Power the radio on, plug it into the PC by USB and pick <b>USB Joystick (HID)</b>.\nSee Connection help." + pad;
+                    ? "<b>" + L.T("No radio found.") + "</b> " + L.T("Plug it in with USB (joystick / HID mode) or pair it over Bluetooth in Windows settings.") + seeHelp + pad
+                    : "<b>" + L.T("No radio found.") + "</b> " + L.F("Power the radio on, plug it into the PC by USB and pick {0}.", "<b>USB Joystick (HID)</b>") + seeHelp + pad;
                 return;
             }
             var preset = radio.Preset;
+            string presetText = preset != null
+                ? L.T(preset.DisplayName) + (preset.Verified
+                    ? " <color=#5f5>" + L.T("(verified)") + "</color>"
+                    : " <color=#ffb347>" + L.T("(not yet verified on hardware)") + "</color>")
+                : L.T("none (generic AETR guess)");
+            string mappingText = radio.IsCalibrated
+                ? "<color=#5f5>" + L.T("your calibration") + "</color>"
+                : L.T("preset/default. Calibrate for best results");
             _radioStatus.text =
-                $"<b>{reader.DisplayName}</b>   via {reader.Backend}, {reader.ChannelCount} channels\n" +
-                $"Preset: {(preset != null ? preset.DisplayName + (preset.Verified ? " <color=#5f5>(verified)</color>" : " <color=#ffb347>(not yet verified on hardware)</color>") : "none (generic AETR guess)")}\n" +
-                $"Mapping: {(radio.IsCalibrated ? "<color=#5f5>your calibration</color>" : "preset/default. Calibrate for best results")}\n" +
+                $"<b>{reader.DisplayName}</b>   " + L.F("via {0}, {1} channels", reader.Backend, reader.ChannelCount) + "\n" +
+                L.F("Preset: {0}", presetText) + "\n" +
+                L.F("Mapping: {0}", mappingText) + "\n" +
                 (_radioMessage.Length > 0 ? $"<color=#ffb347>{_radioMessage}</color>" : "");
         }
 
@@ -172,11 +181,11 @@ namespace GateRush.UI
         {
             if (radio == null || radio.Reader == null)
             {
-                _radioMessage = "Connect a radio first.";
+                _radioMessage = L.T("Connect a radio first.");
                 UpdateRadioStatus();
                 return;
             }
-            var p = NewPage("Calibrate radio");
+            var p = NewPage(L.T("Calibrate radio"));
             _wizard = new CalibrationWizard(radio.Reader.ChannelCount);
             _wizardText = UiKit.Label(p, "", new Vector2(Margin, -110f), new Vector2(ContentWidth, 130f), 34f, TextAlignmentOptions.TopLeft);
             var bar = UiKit.Rect(p, "Progress", new Vector2(Margin, -245f), new Vector2(ContentWidth, 14f));
@@ -189,9 +198,9 @@ namespace GateRush.UI
             BuildChannelBars(p, -280f);
 
             float y = -(Height - 110f);
-            UiKit.Button(p, "Cancel", new Vector2(Margin, y), new Vector2(240f, 70f), () => { _wizard?.Cancel(); ShowRadio(); });
-            UiKit.Button(p, "Skip", new Vector2(Width - Margin - 540f, y), new Vector2(240f, 70f), () => _wizard?.Skip(_values));
-            UiKit.Button(p, "Next", new Vector2(Width - Margin - 280f, y), new Vector2(280f, 70f), () => _wizard?.Next(_values));
+            UiKit.Button(p, L.T("Cancel"), new Vector2(Margin, y), new Vector2(240f, 70f), () => { _wizard?.Cancel(); ShowRadio(); });
+            UiKit.Button(p, L.T("Skip"), new Vector2(Width - Margin - 540f, y), new Vector2(240f, 70f), () => _wizard?.Skip(_values));
+            UiKit.Button(p, L.T("Next"), new Vector2(Width - Margin - 280f, y), new Vector2(280f, 70f), () => _wizard?.Next(_values));
         }
 
         private void UpdateWizard()
@@ -200,7 +209,7 @@ namespace GateRush.UI
             if (kb != null && kb.enterKey.wasPressedThisFrame) _wizard.Next(_values);
 
             _wizard.Feed(_values, Time.unscaledDeltaTime);
-            _wizardText.text = $"Step {Mathf.Min((int)_wizard.Step + 1, 9)}/9\n{_wizard.Instruction}";
+            _wizardText.text = L.F("Step {0}/{1}", Mathf.Min((int)_wizard.Step + 1, 9), 9) + "\n" + WizardInstruction();
             _wizardProgress.anchorMax = new Vector2(_wizard.HoldProgress, 1f);
 
             if (_wizard.Step == CalibrationStep.Done)
@@ -209,37 +218,41 @@ namespace GateRush.UI
                 _wizard = null;
                 if (!result.Throttle.IsAssigned || !result.Yaw.IsAssigned || !result.Pitch.IsAssigned || !result.Roll.IsAssigned)
                 {
-                    _radioMessage = "Calibration incomplete: not all four stick axes were found. Try again.";
+                    _radioMessage = L.T("Calibration incomplete: not all four stick axes were found. Try again.");
                 }
                 else
                 {
                     radio.SaveCalibration(result);
-                    _radioMessage = string.Format(CultureInfo.InvariantCulture, "Calibration saved ({0}). Throttle ch{1}, yaw ch{2}, pitch ch{3}, roll ch{4}{5}.",
-                        radio.Reader?.DisplayName, result.Throttle.Channel, result.Yaw.Channel, result.Pitch.Channel, result.Roll.Channel,
-                        result.Arm.IsAssigned ? $", arm ch{result.Arm.Channel}" : ", arm with throttle low")
-                        + (result.View.IsAssigned ? $", view ch{result.View.Channel}" : "");
+                    string extras = (result.Arm.IsAssigned ? L.F(", arm ch{0}", result.Arm.Channel) : L.T(", arm with throttle low"))
+                        + (result.View.IsAssigned ? L.F(", view ch{0}", result.View.Channel) : "");
+                    _radioMessage = L.F("Calibration saved ({0}). Throttle ch{1}, yaw ch{2}, pitch ch{3}, roll ch{4}{5}.",
+                        radio.Reader?.DisplayName, result.Throttle.Channel, result.Yaw.Channel, result.Pitch.Channel, result.Roll.Channel, extras);
                 }
                 ShowRadio();
             }
+        }
+
+        /// <summary>The wizard's instruction in the current language (the stick step carries a live count).</summary>
+        private string WizardInstruction()
+        {
+            if (_wizard.Step == CalibrationStep.Sticks && _wizard.StickChannelsFound < 4)
+                return L.F("Move BOTH sticks to every corner a few times. ({0}/4 axes found)\nDon't touch the switches.", _wizard.StickChannelsFound);
+            return L.T(_wizard.Instruction);
         }
 
         // ---------- help ----------
 
         private void ShowRadioHelp()
         {
-            var p = NewPage("Connecting a radio");
+            var p = NewPage(L.T("Connecting a radio"));
+            string setup = L.T("Radio setup"), diagnostics = L.T("Input diagnostics");
             UiKit.Label(p,
-                "<b>RadioMaster Pocket / EdgeTX radios (PC):</b> power the radio <b>on</b>, plug in USB and pick <b>USB Joystick (HID)</b>. " +
-                "No driver is needed. If Windows shows \"STM32 BOOTLOADER\", the radio is in firmware mode: unplug it and power it on normally first. " +
-                "In the model's mixes, put SA on CH5 (arm) and SB on CH6 (flight mode).\n\n" +
-                "<b>LiteRadio 2 SE / LiteRadio 3 (USB-C):</b> power the radio on in <b>joystick (HID) mode</b> and plug it into the PC. " +
-                "If the sticks don't move in Input diagnostics, enable joystick compatibility in <b>BETAFPV Configurator</b>.\n\n" +
-                "<b>LiteRadio 2 SIM:</b> joystick mode (default) shows up as \"BETAFPV Joystick\". In Xbox mode it works as a gamepad; " +
-                "throttle is then full-range, like a radio.\n\n" +
-                "<b>LiteRadio 4 / 4 SE (ELRS):</b> USB-C, or <b>Bluetooth joystick mode</b> paired in <b>Windows Settings > Bluetooth & devices</b>. " +
-                "Over USB-C, joystick mode only works with the radio <b>switched off</b> and powered by the cable.\n\n" +
-                "<b>Then:</b> Menu > Radio setup > <b>Calibrate</b>. Arm with your arm switch (throttle low). " +
-                "The calibration can also assign a <b>camera view</b> switch. If some sticks or switches don't move in Radio setup, check Input diagnostics.",
+                // One literal per L.T/L.F call on one line: the localization test scans them line by line.
+                L.T("<b>RadioMaster Pocket / EdgeTX radios (PC):</b> power the radio <b>on</b>, plug in USB and pick <b>USB Joystick (HID)</b>. No driver is needed. If Windows shows \"STM32 BOOTLOADER\", the radio is in firmware mode: unplug it and power it on normally first. In the model's mixes, put SA on CH5 (arm) and SB on CH6 (flight mode).") + "\n\n" +
+                L.F("<b>LiteRadio 2 SE / LiteRadio 3 (USB-C):</b> power the radio on in <b>joystick (HID) mode</b> and plug it into the PC. If the sticks don't move in {0}, enable joystick compatibility in <b>BETAFPV Configurator</b>.", diagnostics) + "\n\n" +
+                L.T("<b>LiteRadio 2 SIM:</b> joystick mode (default) shows up as \"BETAFPV Joystick\". In Xbox mode it works as a gamepad; throttle is then full-range, like a radio.") + "\n\n" +
+                L.T("<b>LiteRadio 4 / 4 SE (ELRS):</b> USB-C, or <b>Bluetooth joystick mode</b> paired in <b>Windows Settings > Bluetooth & devices</b>. Over USB-C, joystick mode only works with the radio <b>switched off</b> and powered by the cable.") + "\n\n" +
+                L.F("<b>Then:</b> Menu > {0} > <b>{1}</b>. Arm with your arm switch (throttle low). The calibration can also assign a <b>camera view</b> switch. If some sticks or switches don't move in {0}, check {2}.", setup, L.T("Calibrate"), diagnostics),
                 new Vector2(Margin, -110f), new Vector2(ContentWidth, 720f), 30f, TextAlignmentOptions.TopLeft);
             BackButton(p, ShowRadio);
         }

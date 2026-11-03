@@ -100,7 +100,7 @@ namespace GateRush.UI
             }
             if (save)
             {
-                _status = "Report saved: " + InputDeviceReport.WriteReport();
+                _status = L.F("Report saved: {0}", InputDeviceReport.WriteReport());
                 _pageDirty = true;
             }
         }
@@ -134,7 +134,7 @@ namespace GateRush.UI
             _pageDirty = true;
             if (_devices.Count == 0)
             {
-                details.SetText("No devices");
+                details.SetText(L.T("No devices"));
                 return;
             }
 
@@ -153,8 +153,9 @@ namespace GateRush.UI
             string caps = device.description.capabilities ?? "";
             if (caps.Length > 700) caps = caps.Substring(0, 700) + "...";
             details.SetText(
-                $"<b>{device.displayName}</b>\nlayout {device.layout}   interface {device.description.interfaceName}   {InputDeviceReport.VidPidText(device)}\n" +
-                $"product \"{device.description.product}\"   manufacturer \"{device.description.manufacturer}\"   {_controls.Count} axes/buttons\n" +
+                $"<b>{device.displayName}</b>\n" +
+                L.F("layout {0}   interface {1}   {2}", device.layout, device.description.interfaceName, InputDeviceReport.VidPidText(device)) + "\n" +
+                L.F("product {0}   manufacturer {1}   {2} axes/buttons", $"\"{device.description.product}\"", $"\"{device.description.manufacturer}\"", _controls.Count) + "\n" +
                 $"<size=70%>{caps}</size>");
 
             DrawDeviceList();
@@ -163,7 +164,7 @@ namespace GateRush.UI
         private void DrawDeviceList()
         {
             var sb = new System.Text.StringBuilder();
-            sb.AppendLine($"<b>{_devices.Count} input devices</b>   Left/Right: select   Up/Down: page");
+            sb.AppendLine("<b>" + L.F("{0} input devices", _devices.Count) + "</b>   " + L.T("Left/Right: select   Up/Down: page"));
             for (int i = 0; i < _devices.Count; i++)
                 sb.AppendLine((i == _deviceIndex ? "<color=#ffb347>> " : "   ") + InputDeviceReport.Summary(_devices[i]) + (i == _deviceIndex ? "</color>" : ""));
             deviceList.SetText(sb.ToString());
@@ -185,7 +186,7 @@ namespace GateRush.UI
             }
 
             int pages = Mathf.Max(1, (_controls.Count + rowCount - 1) / rowCount);
-            footer.SetText($"page {_page + 1}/{pages}    Enter / A: save report\n{_status}");
+            footer.SetText(L.F("page {0}/{1}", _page + 1, pages) + "    " + L.T("Enter / A: save report") + "\n" + _status);
         }
 
         private void UpdateRows()

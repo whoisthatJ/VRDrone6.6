@@ -1,3 +1,4 @@
+using GateRush.Core;
 using GateRush.Game;
 using GateRush.Track;
 using TMPro;
@@ -13,14 +14,14 @@ namespace GateRush.UI
         private string _confirmDelete;
 
         private static string EnvironmentName(string env) =>
-            env == "hangar" ? "Hangar" : env == "industrial" ? "Dockyard" : "Open Field";
+            env == "hangar" ? L.T("Hangar") : env == "industrial" ? L.T("Dockyard") : L.T("Open Field");
 
         private void ShowEditorHome()
         {
-            var p = NewPage("Track editor");
+            var p = NewPage(L.T("Track editor"));
             var library = TrackLibrary.Default;
 
-            UiKit.Label(p, "New track in:", new Vector2(Margin, -115f), new Vector2(400f, 60f), 30f);
+            UiKit.Label(p, L.T("New track in:"), new Vector2(Margin, -115f), new Vector2(400f, 60f), 30f);
             float w = (ContentWidth - 400f - 2f * 20f) / 3f;
             string[] envs = { "field", "hangar", "industrial" };
             for (int i = 0; i < envs.Length; i++)
@@ -34,34 +35,34 @@ namespace GateRush.UI
                 }, 28f);
             }
 
-            UiKit.Label(p, "Copy and edit:", new Vector2(Margin, -200f), new Vector2(400f, 60f), 30f);
+            UiKit.Label(p, L.T("Copy and edit:"), new Vector2(Margin, -200f), new Vector2(400f, 60f), 30f);
             for (int i = 0; i < tracks.Tracks.Count && i < 3; i++)
             {
                 var entry = tracks.Tracks[i];
-                UiKit.Button(p, entry.DisplayName, new Vector2(Margin + 400f + i * (w + 20f), -195f), new Vector2(w, 70f), () =>
+                UiKit.Button(p, L.T(entry.DisplayName), new Vector2(Margin + 400f + i * (w + 20f), -195f), new Vector2(w, 70f), () =>
                 {
                     CommitIfDirty();
                     var source = tracks.Load(entry);
-                    if (source != null) GameFlow.Edit(tracks, library.Duplicate(source, entry.DisplayName + " (copy)"));
+                    if (source != null) GameFlow.Edit(tracks, library.Duplicate(source, L.F("{0} (copy)", L.T(entry.DisplayName))));
                 }, 26f);
             }
 
-            UiKit.Label(p, "Your tracks:", new Vector2(Margin, -290f), new Vector2(400f, 50f), 30f, TextAlignmentOptions.MidlineLeft, UiKit.AccentColor);
+            UiKit.Label(p, L.T("Your tracks:"), new Vector2(Margin, -290f), new Vector2(400f, 50f), 30f, TextAlignmentOptions.MidlineLeft, UiKit.AccentColor);
             var mine = library.LoadAll();
             int pages = Mathf.Max(1, (mine.Count + UserTracksPerPage - 1) / UserTracksPerPage);
             _userPage = Mathf.Clamp(_userPage, 0, pages - 1);
             float y = -350f;
             if (mine.Count == 0)
-                UiKit.Label(p, "None yet. Start a new one above.", new Vector2(Margin, y), new Vector2(ContentWidth, 60f), 28f, TextAlignmentOptions.MidlineLeft, UiKit.DimTextColor);
+                UiKit.Label(p, L.T("None yet. Start a new one above."), new Vector2(Margin, y), new Vector2(ContentWidth, 60f), 28f, TextAlignmentOptions.MidlineLeft, UiKit.DimTextColor);
             for (int i = _userPage * UserTracksPerPage; i < mine.Count && i < (_userPage + 1) * UserTracksPerPage; i++)
             {
                 var t = mine[i];
-                UiKit.Label(p, $"<b>{t.Name}</b>   <color=#bbb>{EnvironmentName(t.Environment)}, {t.Gates.Count} gates, {t.Props.Count} props</color>",
+                UiKit.Label(p, $"<b>{t.Name}</b>   <color=#bbb>{EnvironmentName(t.Environment)}, " + L.F("{0} gates, {1} props", t.Gates.Count, t.Props.Count) + "</color>",
                     new Vector2(Margin, y), new Vector2(ContentWidth - 640f, 80f), 28f);
-                UiKit.Button(p, "Edit", new Vector2(Width - Margin - 620f, y), new Vector2(190f, 75f), () => { CommitIfDirty(); GameFlow.Edit(tracks, t); }, 28f);
-                UiKit.Button(p, "Fly", new Vector2(Width - Margin - 410f, y), new Vector2(190f, 75f), () => { CommitIfDirty(); GameFlow.Race(tracks, t.Id); }, 28f);
+                UiKit.Button(p, L.T("Edit"), new Vector2(Width - Margin - 620f, y), new Vector2(190f, 75f), () => { CommitIfDirty(); GameFlow.Edit(tracks, t); }, 28f);
+                UiKit.Button(p, L.T("Fly"), new Vector2(Width - Margin - 410f, y), new Vector2(190f, 75f), () => { CommitIfDirty(); GameFlow.Race(tracks, t.Id); }, 28f);
                 bool confirming = _confirmDelete == t.Id;
-                var del = UiKit.Button(p, confirming ? "Sure?" : "Delete", new Vector2(Width - Margin - 200f, y), new Vector2(200f, 75f), () =>
+                var del = UiKit.Button(p, confirming ? L.T("Sure?") : L.T("Delete"), new Vector2(Width - Margin - 200f, y), new Vector2(200f, 75f), () =>
                 {
                     if (_confirmDelete == t.Id)
                     {
@@ -84,8 +85,7 @@ namespace GateRush.UI
 
             UiKit.Label(p,
                 // Forward slashes: TMP would turn "\t" in a Windows path into a tab.
-                $"<size=80%>Share tracks by copying the .json files in <b>{library.Folder.Replace('\\', '/')}</b>. " +
-                "Files you copy in show up here.</size>",
+                "<size=80%>" + L.F("Share tracks by copying the .json files in {0}. Files you copy in show up here.", $"<b>{library.Folder.Replace('\\', '/')}</b>") + "</size>",
                 new Vector2(Margin, -(Height - 210f)), new Vector2(ContentWidth, 90f), 26f, TextAlignmentOptions.TopLeft, UiKit.DimTextColor);
             BackButton(p);
         }
@@ -93,7 +93,7 @@ namespace GateRush.UI
         private static string NewTrackName(TrackLibrary library, string env)
         {
             int n = library.LoadAll().Count + 1;
-            return $"My {env} track {n}";
+            return L.F("My {0} track {1}", env, n);
         }
     }
 }
