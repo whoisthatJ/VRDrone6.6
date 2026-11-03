@@ -90,7 +90,25 @@ namespace GateRush.UI
             UiKit.Button(p, L.T("Online"), new Vector2(Margin + half + 30f, y), new Vector2(half, 90f), ShowOnline);
 
             UiKit.Label(p, L.T("Mouse, keyboard or gamepad. In flight: V switches the camera, Esc returns here."),
-                new Vector2(Margin, -(Height - 100f)), new Vector2(ContentWidth, 60f), 26f, TextAlignmentOptions.MidlineLeft, UiKit.DimTextColor);
+                new Vector2(Margin, -(Height - 100f)), new Vector2(ContentWidth - 260f, 60f), 26f, TextAlignmentOptions.MidlineLeft, UiKit.DimTextColor);
+            UiKit.Button(p, L.T("Credits"), new Vector2(Width - Margin - 240f, -(Height - 105f)), new Vector2(240f, 60f), ShowCredits, 26f);
+        }
+
+        /// <summary>Data and asset credits (licence attributions).</summary>
+        private void ShowCredits()
+        {
+            var p = NewPage(L.T("Credits"));
+            string text =
+                "<color=#fa3>GATERUSH</color>\n" +
+                L.T("A desktop FPV drone racing simulator.") + "\n\n" +
+                "<color=#fa3>" + L.T("Map data") + "</color>\n" +
+                "© OpenStreetMap contributors (ODbL), openstreetmap.org/copyright\n" +
+                L.T("Used for the Expo Astana district: roads, building footprints and heights, parks, parking, trees.") + "\n\n" +
+                "<color=#fa3>" + L.T("Textures, skies and models") + "</color>\n" +
+                "Poly Haven, ambientCG (CC0)\n" +
+                L.T("Everything else is procedural or our own.");
+            UiKit.Label(p, text, new Vector2(Margin, -130f), new Vector2(ContentWidth, 700f), 30f, TextAlignmentOptions.TopLeft);
+            BackButton(p);
         }
 
         private void UpdateSummary()

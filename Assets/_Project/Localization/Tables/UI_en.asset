@@ -1738,6 +1738,30 @@ MonoBehaviour:
     m_Localized: 'The EXPO 2017 site in Astana: up the south walkway, round the Nur Alem sphere, out between the pavilions and back along the ring road.'
     m_Metadata:
       m_Items: []
+  - m_Id: 91357320310784
+    m_Localized: Credits
+    m_Metadata:
+      m_Items: []
+  - m_Id: 91357383225344
+    m_Localized: A desktop FPV drone racing simulator.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 91357383225345
+    m_Localized: Map data
+    m_Metadata:
+      m_Items: []
+  - m_Id: 91357383225346
+    m_Localized: 'Used for the Expo Astana district: roads, building footprints and heights, parks, parking, trees.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 91357383225347
+    m_Localized: Textures, skies and models
+    m_Metadata:
+      m_Items: []
+  - m_Id: 91357383225348
+    m_Localized: Everything else is procedural or our own.
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

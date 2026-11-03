@@ -45,3 +45,14 @@ Missing for the plan: `com.unity.cinemachine` (6.6.0 available), `com.unity.spli
 | Track = spline + obstacle list | Track = gate list JSON | T1 adds `TrackDefinition` next to `TrackData`; existing tracks keep working. |
 | Quality Low/Medium/High/Ultra | Medium/High/Ultra | T0 adds Low. |
 | Gates are checkpoints by route distance | Gates ordered by list index | T1 orders checkpoints by distance along the spline. |
+
+## Prerequisites for TRACK_EXPO_PLAN (checked 2026-11-03)
+| Prerequisite | State |
+|---|---|
+| Spline `TrackDefinition` / `TrackBuilder` (T1) | Present: `Scripts/Track/TrackBuilder.cs`, `TrackRoute`, `RouteLibrary`, definitions in `Data/TrackDefinitions` |
+| Obstacle kit (T2) | Present: single, double, slalom, cube gate, ladder, dive, arch, flags, pads, landing pads |
+| Route guidance Off / Standard / Trainer (T5) | Present: `RaceSession.Guidance`, `RacingLine`, `NextGateIndicator`; no vertical beacon yet (planned in E6) |
+| **Finish cube + finish moment (T6)** | **Missing.** Courses finish through an arch; the results are a text panel in `RaceHud` (no slow-mo / cinematic camera) |
+| Quality presets | Present: Low / Medium / High / Ultra (`GraphicsQuality`), High is the default |
+| `FLIGHT_PHYSICS.md` | Not in the repo; the code is the reference |
+| Existing Expo work | Track `expo-astana` (commit ba564fd, `Editor/Art/ExpoArt.cs`, scene Track_Expo): real-scale layout from OSM measurements and the reference images, real names in the track text; predates this plan |

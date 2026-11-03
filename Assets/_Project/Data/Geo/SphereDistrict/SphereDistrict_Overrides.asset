@@ -1,0 +1,69 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 462b4a6e1e1647447872eb4d5ac241b6, type: 3}
+  m_Name: SphereDistrict_Overrides
+  m_EditorClassIdentifier: GateRush.Track::GateRush.Track.Geo.GeoOverrides
+  Entries:
+  - Id: 454857501
+    Note: 'Alem.ai: 9 m at 149 deg'
+    Exclude: 0
+    Height: 0
+    Hero: 1
+    HeroRole: sphere
+  - Id: 607960215
+    Note: 'office: 99 m at 224 deg'
+    Exclude: 0
+    Height: 0
+    Hero: 1
+    HeroRole: pod
+  - Id: 607960216
+    Note: 'office: 97 m at 162 deg'
+    Exclude: 0
+    Height: 0
+    Hero: 1
+    HeroRole: pod
+  - Id: 607960217
+    Note: 'yes: 91 m at 99 deg'
+    Exclude: 0
+    Height: 0
+    Hero: 1
+    HeroRole: pod
+  - Id: 1461813336
+    Note: 'roof: 38 m at 157 deg'
+    Exclude: 0
+    Height: 0
+    Hero: 1
+    HeroRole: canopy
+  - Id: 8448517
+    Note: "\u041F\u0430\u0432\u0438\u043B\u044C\u043E\u043D \u04211: 210 m at 41 deg"
+    Exclude: 0
+    Height: 0
+    Hero: 1
+    HeroRole: pavilion
+  - Id: 8448518
+    Note: "\u041F\u0430\u0432\u0438\u043B\u044C\u043E\u043D \u04212: 214 m at 97 deg"
+    Exclude: 0
+    Height: 0
+    Hero: 1
+    HeroRole: pavilion
+  - Id: 8448519
+    Note: "\u041F\u0430\u0432\u0438\u043B\u044C\u043E\u043D \u04213: 204 m at 160 deg"
+    Exclude: 0
+    Height: 0
+    Hero: 1
+    HeroRole: pavilion
+  - Id: 8448520
+    Note: "\u041F\u0430\u0432\u0438\u043B\u044C\u043E\u043D \u04214: 209 m at 226 deg"
+    Exclude: 0
+    Height: 0
+    Hero: 1
+    HeroRole: pavilion
