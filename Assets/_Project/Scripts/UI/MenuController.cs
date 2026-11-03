@@ -334,32 +334,67 @@ namespace GateRush.UI
         private void BuildGraphics(RectTransform c)
         {
             var g = S.Graphics;
+            const float row = 66f;
+            float y = 0f;
+
+            // Window: display mode and resolution (applied straight away; the build opens fullscreen by default).
+            UiKit.StepperRow(c, "Display mode", y, ScreenDisplay.Modes, g.DisplayMode, i => { g.DisplayMode = i; ApplyDisplay(); }, ContentWidth);
+            y -= row;
+            var native = ScreenDisplay.Native;
+            var sizes = ScreenDisplay.Resolutions();
+            sizes.Remove(native);
+            var resNames = new string[sizes.Count + 1];
+            resNames[0] = $"Native ({native.x} x {native.y})";
+            for (int k = 0; k < sizes.Count; k++) resNames[k + 1] = $"{sizes[k].x} x {sizes[k].y}";
+            int res = g.ResolutionWidth <= 0 ? 0 : 1 + sizes.IndexOf(new Vector2Int(g.ResolutionWidth, g.ResolutionHeight));
+            UiKit.StepperRow(c, "Resolution", y, resNames, Mathf.Max(0, res), i =>
+            {
+                g.ResolutionWidth = i == 0 ? 0 : sizes[i - 1].x;
+                g.ResolutionHeight = i == 0 ? 0 : sizes[i - 1].y;
+                ApplyDisplay();
+            }, ContentWidth);
+            y -= row;
+
             if (string.IsNullOrEmpty(g.Preset)) g.Preset = GraphicsQuality.Current != null ? GraphicsQuality.Current.Preset : "High";
             int preset = Mathf.Max(0, System.Array.IndexOf(GraphicsQuality.Presets, g.Preset));
-            UiKit.StepperRow(c, "Quality preset", 0f, GraphicsQuality.Presets, preset, i =>
+            UiKit.StepperRow(c, "Quality preset", y, GraphicsQuality.Presets, preset, i =>
             {
-                S.Graphics = GraphicsPrefs.ForPreset(GraphicsQuality.Presets[i]);
+                S.Graphics = g.WithPreset(GraphicsQuality.Presets[i]);
                 ApplyGraphics();
                 ShowSettings();
             }, ContentWidth);
-            UiKit.SliderRow(c, "Render scale", -75f, 50f, 100f, g.RenderScale * 100f, v => F(v, "0") + " %", v => { g.RenderScale = v / 100f; ApplyGraphics(); }, ContentWidth, true);
-            UiKit.StepperRow(c, "Anti-aliasing", -150f, new[] { "Off", "SMAA", "MSAA 2x", "MSAA 4x" }, g.AntiAliasing, i => { g.AntiAliasing = i; ApplyGraphics(); }, ContentWidth);
-            UiKit.StepperRow(c, "Shadows", -225f, new[] { "Off", "Low", "Medium", "High" }, g.Shadows, i => { g.Shadows = i; ApplyGraphics(); }, ContentWidth);
-            UiKit.StepperRow(c, "Ambient occlusion", -300f, new[] { "Off", "On" }, g.Ssao ? 1 : 0, i => { g.Ssao = i == 1; ApplyGraphics(); }, ContentWidth);
-            UiKit.SliderRow(c, "Grass density", -375f, 0f, 100f, g.Vegetation * 100f, v => F(v, "0") + " %", v => { g.Vegetation = v / 100f; ApplyGraphics(); }, ContentWidth, true);
-            UiKit.StepperRow(c, "Post-processing", -450f, new[] { "Off", "On" }, g.PostProcessing ? 1 : 0, i => { g.PostProcessing = i == 1; ApplyGraphics(); }, ContentWidth);
+            y -= row;
+            UiKit.SliderRow(c, "Render scale", y, 50f, 100f, g.RenderScale * 100f, v => F(v, "0") + " %", v => { g.RenderScale = v / 100f; ApplyGraphics(); }, ContentWidth, true);
+            y -= row;
+            UiKit.StepperRow(c, "Anti-aliasing", y, new[] { "Off", "SMAA", "MSAA 2x", "MSAA 4x" }, g.AntiAliasing, i => { g.AntiAliasing = i; ApplyGraphics(); }, ContentWidth);
+            y -= row;
+            UiKit.StepperRow(c, "Shadows", y, new[] { "Off", "Low", "Medium", "High" }, g.Shadows, i => { g.Shadows = i; ApplyGraphics(); }, ContentWidth);
+            y -= row;
+            UiKit.StepperRow(c, "Ambient occlusion", y, new[] { "Off", "On" }, g.Ssao ? 1 : 0, i => { g.Ssao = i == 1; ApplyGraphics(); }, ContentWidth);
+            y -= row;
+            UiKit.SliderRow(c, "Grass density", y, 0f, 100f, g.Vegetation * 100f, v => F(v, "0") + " %", v => { g.Vegetation = v / 100f; ApplyGraphics(); }, ContentWidth, true);
+            y -= row;
+            UiKit.StepperRow(c, "Post-processing", y, new[] { "Off", "On" }, g.PostProcessing ? 1 : 0, i => { g.PostProcessing = i == 1; ApplyGraphics(); }, ContentWidth);
+            y -= row;
             // Frame limit: VSync, or VSync off with an optional cap (GraphicsPrefs.FrameCaps).
             var caps = GraphicsPrefs.FrameCaps;
             var limits = new string[caps.Length + 1];
             limits[0] = "VSync";
             for (int k = 0; k < caps.Length; k++) limits[k + 1] = caps[k] == 0 ? "Uncapped" : caps[k] + " fps";
             int limit = g.VSync ? 0 : 1 + Mathf.Max(0, System.Array.IndexOf(caps, g.FrameCap));
-            UiKit.StepperRow(c, "Frame limit", -525f, limits, limit, i =>
+            UiKit.StepperRow(c, "Frame limit", y, limits, limit, i =>
             {
                 g.VSync = i == 0;
                 g.FrameCap = i == 0 ? 0 : caps[i - 1];
                 ApplyGraphics();
             }, ContentWidth);
+        }
+
+        private void ApplyDisplay()
+        {
+            S.Graphics.Clamp();
+            ScreenDisplay.Apply(S.Graphics);
+            Changed();
         }
 
         private void ApplyGraphics()

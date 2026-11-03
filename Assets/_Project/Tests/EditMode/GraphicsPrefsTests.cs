@@ -1,5 +1,6 @@
 using GateRush.Core;
 using NUnit.Framework;
+using UnityEngine;
 
 namespace GateRush.Tests
 {
@@ -51,6 +52,33 @@ namespace GateRush.Tests
             var s = new GameSettings { Graphics = null };
             s.Clamp();
             Assert.IsNotNull(s.Graphics);
+        }
+
+        [Test]
+        public void Display_DefaultsToFullscreenAtNative_AndSurvivesPresetChanges()
+        {
+            var p = GraphicsPrefs.ForPreset("High");
+            Assert.AreEqual(ScreenDisplay.Fullscreen, p.DisplayMode, "the build opens fullscreen");
+            var native = new Vector2Int(2560, 1440);
+            Assert.AreEqual(native, ScreenDisplay.TargetSize(p, native));
+
+            p.DisplayMode = ScreenDisplay.Windowed;
+            Assert.AreEqual(new Vector2Int(1920, 1080), ScreenDisplay.TargetSize(p, native), "a native window gets 75 %");
+            p.ResolutionWidth = 1600;
+            p.ResolutionHeight = 900;
+            Assert.AreEqual(new Vector2Int(1600, 900), ScreenDisplay.TargetSize(p, native));
+            p.DisplayMode = ScreenDisplay.Maximized;
+            Assert.AreEqual(native, ScreenDisplay.TargetSize(p, native), "maximized fills the desktop");
+
+            var low = p.WithPreset("Low");
+            Assert.AreEqual(ScreenDisplay.Maximized, low.DisplayMode);
+            Assert.AreEqual(1600, low.ResolutionWidth);
+            Assert.AreEqual(0, low.Shadows, "quality values come from the preset");
+
+            var bad = new GraphicsPrefs { DisplayMode = 7, ResolutionWidth = 100, ResolutionHeight = 50 };
+            bad.Clamp();
+            Assert.AreEqual(ScreenDisplay.Windowed, bad.DisplayMode);
+            Assert.AreEqual(0, bad.ResolutionWidth);
         }
     }
 }

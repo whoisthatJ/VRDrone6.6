@@ -25,6 +25,10 @@ namespace GateRush.Core
         public bool VSync = true;
         /// <summary>Frame-rate cap when VSync is off; 0 = uncapped.</summary>
         public int FrameCap;
+        /// <summary>Window mode, see <see cref="ScreenDisplay.Modes"/>: 0 fullscreen (borderless), 1 exclusive, 2 maximized, 3 window.</summary>
+        public int DisplayMode;
+        /// <summary>Render resolution; 0 = the monitor's native resolution.</summary>
+        public int ResolutionWidth, ResolutionHeight;
 
         /// <summary>Choices offered for <see cref="FrameCap"/>.</summary>
         public static readonly int[] FrameCaps = { 0, 60, 120, 144, 165, 240 };
@@ -45,6 +49,20 @@ namespace GateRush.Core
             Shadows = Mathf.Clamp(Shadows, 0, 3);
             Vegetation = Mathf.Clamp01(Vegetation);
             if (Array.IndexOf(FrameCaps, FrameCap) < 0) FrameCap = 0;
+            DisplayMode = Mathf.Clamp(DisplayMode, 0, ScreenDisplay.Modes.Length - 1);
+            if (ResolutionWidth < 640 || ResolutionHeight < 360) ResolutionWidth = ResolutionHeight = 0;
+        }
+
+        /// <summary>A preset's quality values, keeping this player's display mode, resolution and frame limit.</summary>
+        public GraphicsPrefs WithPreset(string preset)
+        {
+            var p = ForPreset(preset);
+            p.DisplayMode = DisplayMode;
+            p.ResolutionWidth = ResolutionWidth;
+            p.ResolutionHeight = ResolutionHeight;
+            p.VSync = VSync;
+            p.FrameCap = FrameCap;
+            return p;
         }
     }
 
@@ -90,6 +108,7 @@ namespace GateRush.Core
                 Debug.Log($"[GateRush] Graphics preset {preset} chosen for {SystemInfo.graphicsDeviceName} ({SystemInfo.graphicsMemorySize} MB)");
             }
             Apply(settings.Graphics);
+            ScreenDisplay.Apply(settings.Graphics);
             SceneManager.sceneLoaded += (_, _) => ApplyScene();
 #if UNITY_EDITOR
             UnityEditor.EditorApplication.playModeStateChanged += state =>
