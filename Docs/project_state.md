@@ -56,3 +56,36 @@ Missing for the plan: `com.unity.cinemachine` (6.6.0 available), `com.unity.spli
 | Quality presets | Present: Low / Medium / High / Ultra (`GraphicsQuality`), High is the default |
 | `FLIGHT_PHYSICS.md` | Not in the repo; the code is the reference |
 | Existing Expo work | Track `expo-astana` (commit ba564fd, `Editor/Art/ExpoArt.cs`, scene Track_Expo): real-scale layout from OSM measurements and the reference images, real names in the track text; predates this plan |
+
+
+## Phase 3 orientation (P0, 2026-11-04)
+Branch `track-expo-phase3` (from `feature/track-garage` @ 146f5c7). Unity 6000.6.0f1, URP 17.6.
+
+| Area | State now |
+|---|---|
+| Track system | Spline `RouteData` + `TrackRoute` (position, flat forward, right, up = world up). **No roll / up vectors**: obstacles turn by yaw only (`LookRotation(p.FlatForward)` + yaw); checkpoints are directional planes (`GateCrossing`) that work in any orientation, but the route never pitches a gate. `AirCourse` routes (E6) have no lanes and floating `Air` gates. |
+| Obstacle kit | Single, Double, Slalom, Cube, Ladder, Dive, Ramp, Arch, Finish (T6 cube), Air (E6); props ChevronBoard(Left), Flag, LandingPad, StartPad. LOD0/1/2, box colliders, `NextGateHighlight` LEDs. |
+| Guidance | Off / Standard / Trainer (`RouteGuidanceLevel`): racing-line ribbon, `NextGateIndicator` off-screen arrow, gate LED states, E6 vertical `NextGateBeacon` column. No up/down arrow, no 3D chevrons. |
+| Finish | T6 finish cube + `FinishSequence` (slow-mo, auto-hover, cinematic camera, results). |
+| Garage | `PartCatalog` (frames, motors, props, batteries, extras, styles, colours), `BuildComposer` (physics from parts), runtime `QuadModelBuilder` (procedural, simple shapes). Catalogue quads race5, freestyle5, whoop65. |
+| Quality | Low / Medium / High / Ultra (`GraphicsQuality`), High default, display modes. |
+| Input | Radio (HID / Input System), keyboard + gamepad, mixed sources; scripted source for the autopilot. |
+| Networking | M9 online races: Multiplayer Services sessions (Relay), Netcode for GameObjects named messages, interpolated remote quads, Unity Leaderboards (deployed by the owner). No LAN / direct-IP mode yet. |
+| Bots | Only `RaceAutopilot` (Angle mode test pilot; follows the flight line on air courses). No planner, trajectory follower or stick synthesiser. |
+| Tools | Blender **3.3.0** at `C:/Program Files/Blender Foundation/Blender 3.3/blender.exe` (not on PATH; the plan asks for 4.x LTS, 3.3 has the same headless Python + glTF export). No photos in `Docs/reference/quads/`. |
+
+### Track_expo inventory
+| Item | Value |
+|---|---|
+| Scene | `Assets/_Project/Scenes/Track_Expo.unity` (the only Expo scene), environment id `expo` |
+| Built by | `TrackSceneBuilder.Build("expo")`, then `ArtPass.ApplyOne("Expo")` → `ExpoArt.Apply` |
+| Generators | `Editor/Environment/SphereDistrict/`: `OsmImporter`, `PolyMesh`, `HeroGenerators` (sphere, pillow pavilions, pods, canopy, landmarks), `SphereDistrictHeroes`, `StreetscapeGenerator`, `CityGenerator`, `CourseClearance`, `CourseFlightTest`; `Editor/Art/ExpoArt.cs` (ground, steppe, skyline, lighting) |
+| Data | `Data/Geo/SphereDistrict/osm_extract.json` (Overpass, ODbL), `SphereDistrict_Geo.asset`, `SphereDistrict_Overrides.asset` |
+| Generated assets | Meshes `Art/Meshes/SD_*` and `Expo_*`, library materials `M_Expo_*`, `M_Sphere_*`, `M_City_*`, `M_SD_*`, `M_Beacon`, procedural textures (`KitTextures`), skies `Art/HDRI/Sky_Expo_{Day,Golden,Night}.mat`, volumes `Art/Volumes/VP_Expo*.asset` |
+| Lighting | Realtime; `StadiumLighting` venue `expo` with Night / Golden hour / Summer day (default), 8 night uplights, 2 realtime reflection probes (via scripting) |
+| Routes | `expo-astana` **Expo Sprint** (beginner): 1.40 km, 16 checkpoints, top 31 m, 2 laps. `expo-pro` **Expo Pro** (advanced): 2.33 km, 22 checkpoints, top 90 m, 2 laps. `expo-free` **Expo Free Flight**: no gates, 4 spawns. Definitions in `Data/TrackDefinitions/` + `Data/Tracks/*.json`, written by `RouteLibrary.ExpoSprint / ExpoPro / ExpoFreeFlight` |
+| Lap times measured (autopilot, 12 m/s cruise) | Sprint 225 / 217 s; Pro 332 s (clean). Estimated 5" pilot: Sprint ~64 s, Pro ~106 s |
+| Bookmarks | `SceneShots.CaptureExpo` (expo_reference, expo_top, overview, walkway, orbit, trees, lawn, spawn, fpv) and `CaptureExpoLighting` (per preset: reference, walkway, sphere) |
+| Tests | `GeoTests`, `SphereDistrictTests` (geometry, petals, corridor, courses, free flight), `ContentTests` (catalogue), `OnlineTests` (leaderboard files) |
+| Referenced by | `CatalogBuilder` (3 menu entries), `OnlineLeaderboards.Tracks` + `Online/Leaderboards/lap-expo-astana.lb`, `lap-expo-pro.lb`, `TrackSceneBuilder.Environments`, `EnvironmentBuilder`, `TrackSceneController` (`FlightArea` for `expo`), `SceneShots`, local leaderboard and ghosts (keyed by track id) |
+| Mode | Faithful (owner's E0 decision), not Inspired |
