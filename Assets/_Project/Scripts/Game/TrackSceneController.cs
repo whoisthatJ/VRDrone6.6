@@ -79,6 +79,12 @@ namespace GateRush.Game
             LoadTrack(GameFlow.TakeTrackToLoad());
             if (views != null) views.Apply((ViewMode)settings.Camera.ViewMode);
             if (GateRush.Net.NetRace.InRace && Track != null) gameObject.AddComponent<OnlineRaceDriver>().Configure(this, vehicle, race, buildMaterials);
+            // A short showdown of the track before the pilot's view (not for online races: the host starts those).
+            else if (Track != null)
+            {
+                var hudText = hud != null ? hud.GetComponentInChildren<TMPro.TMP_Text>(true) : null;
+                TrackIntro.Play(gameObject, views, vehicle, race, Track, hud, hudText != null ? hudText.font : null);
+            }
         }
 
         private void OnDestroy()

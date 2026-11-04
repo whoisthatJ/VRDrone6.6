@@ -48,6 +48,7 @@ namespace GateRush.Game
         {
             var args = Environment.GetCommandLineArgs();
             if (!Requested(args)) return;
+            TrackIntro.Disabled = true;
             var go = new GameObject("Benchmark");
             DontDestroyOnLoad(go);
             go.AddComponent<BenchmarkRunner>().Configure(args);
@@ -59,6 +60,7 @@ namespace GateRush.Game
         /// </summary>
         public static void StartInEditor(string scenes, string presets, float seconds, string outPath)
         {
+            TrackIntro.Disabled = true;
             var go = new GameObject("Benchmark");
             DontDestroyOnLoad(go);
             var args = new List<string> { Flag, "-benchSeconds", seconds.ToString(CultureInfo.InvariantCulture), "-benchOut", outPath };

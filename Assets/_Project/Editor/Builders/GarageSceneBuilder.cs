@@ -299,8 +299,9 @@ namespace GateRush.EditorTools.Builders
             var dof = Add<DepthOfField>();
             dof.mode.Override(DepthOfFieldMode.Bokeh);
             dof.focusDistance.Override(0.6f);
-            dof.focalLength.Override(60f);
-            dof.aperture.Override(2.2f);
+            // Gentle: the background softens a little, the room still reads (f/5.6 at 45 mm, ~4.5x less blur than f/2.2 at 60 mm).
+            dof.focalLength.Override(45f);
+            dof.aperture.Override(5.6f);
             var v = Add<Vignette>();
             v.intensity.Override(0.25f);
             v.smoothness.Override(0.45f);

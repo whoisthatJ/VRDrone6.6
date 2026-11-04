@@ -18,6 +18,9 @@ namespace GateRush.EditorTools.SphereDistrict
             var race = Object.FindAnyObjectByType<RaceSession>();
             var v = Object.FindAnyObjectByType<QuadVehicle>();
             if (race == null || v == null) return "no race";
+            // Skip the track showdown: the autopilot flies at once.
+            var intro = Object.FindAnyObjectByType<GateRush.Game.TrackIntro>();
+            if (intro != null) intro.enabled = false;
             var src = v.gameObject.AddComponent<ScriptedInputSource>();
             v.InputSource = src;
             var ap = v.gameObject.AddComponent<RaceAutopilot>();

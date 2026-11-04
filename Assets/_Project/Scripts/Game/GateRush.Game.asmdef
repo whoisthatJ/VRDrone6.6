@@ -11,7 +11,9 @@
         "GateRush.Track",
         "GateRush.TrackEditor",
         "GateRush.Net",
-        "Unity.InputSystem"
+        "Unity.InputSystem",
+        "Unity.TextMeshPro",
+        "UnityEngine.UI"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
