@@ -284,6 +284,11 @@ namespace GateRush.EditorTools.Art
         {
             ArtJobs.RequireCleanScenes();
             EditorSceneManager.OpenScene(ArtJobs.ScenePath(sceneName), OpenSceneMode.Single);
+            // The scene's own day preset (sky, ambient, probes): in the Editor the ambient otherwise carries over from
+            // whichever scene was open before, and two captures of the same scene differ.
+            var venue = Object.FindAnyObjectByType<GateRush.Core.StadiumLighting>();
+            if (venue != null) venue.Apply(GateRush.Core.TimeOfDay.Day);
+            else DynamicGI.UpdateEnvironment();
             var prefabs = AssetDatabase.LoadAssetAtPath<TrackPrefabs>(PrefabsPath);
             var track = TrackLoader.Load(course, prefabs);
             bool asyncShaders = ShaderUtil.allowAsyncCompilation;
@@ -295,6 +300,8 @@ namespace GateRush.EditorTools.Art
                 {
                     // The reference photo: high over the south-south-west edge, looking up the axis (bearing 14).
                     new Bookmark("expo_reference", RouteLibrary.ExpoPoint(194f, 470f, 235f), RouteLibrary.ExpoPoint(14f, 60f), 66f),
+                    // P1: framed like the photo (solved from where the sphere, the petal edge and the horizon sit in it; compare on a 4:3 centre crop).
+                    new Bookmark("expo_photo", RouteLibrary.ExpoPoint(194f, 450f, 262f), RouteLibrary.ExpoPoint(194f, 52f), 66f),
                     // Straight down, north up, like the satellite view (Docs/reference/ref_expo_astana_top.png).
                     new Bookmark("expo_top", new Vector3(0f, 900f, -0.5f), Vector3.zero, 50f),
                     new Bookmark("expo_overview", RouteLibrary.ExpoPoint(245f, 420f, 170f), new Vector3(0f, 20f, 0f), 50f),

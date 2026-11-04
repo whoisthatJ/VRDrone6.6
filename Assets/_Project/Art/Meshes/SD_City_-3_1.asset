@@ -31,26 +31,26 @@ Mesh:
       m_Extent: {x: 0, y: 0, z: 0}
   - serializedVersion: 2
     firstByte: 0
-    indexCount: 66
+    indexCount: 18
     topology: 0
     baseVertex: 0
     firstVertex: 0
-    vertexCount: 83
+    vertexCount: 12
     localAABB:
-      m_Center: {x: -1101.125, y: 6, z: 526.57104}
-      m_Extent: {x: 41.98706, y: 6, z: 115.81239}
+      m_Center: {x: -1094.8411, y: 3.2, z: 448.80426}
+      m_Extent: {x: 35.703064, y: 3.2, z: 38.04561}
   - serializedVersion: 2
-    firstByte: 264
-    indexCount: 15
+    firstByte: 72
+    indexCount: 0
     topology: 0
     baseVertex: 0
-    firstVertex: 12
-    vertexCount: 75
+    firstVertex: 0
+    vertexCount: 0
     localAABB:
-      m_Center: {x: -1101.125, y: 9.2, z: 526.57104}
-      m_Extent: {x: 41.98706, y: 2.8, z: 115.81239}
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0, y: 0, z: 0}
   - serializedVersion: 2
-    firstByte: 324
+    firstByte: 72
     indexCount: 48
     topology: 0
     baseVertex: 0
@@ -59,6 +59,56 @@ Mesh:
     localAABB:
       m_Center: {x: -1133.2501, y: 1.8, z: 586.8181}
       m_Extent: {x: 9.861938, y: 1.8, z: 55.56534}
+  - serializedVersion: 2
+    firstByte: 264
+    indexCount: 48
+    topology: 0
+    baseVertex: 0
+    firstVertex: 31
+    vertexCount: 52
+    localAABB:
+      m_Center: {x: -1133.2501, y: 7.8, z: 586.8181}
+      m_Extent: {x: 9.861938, y: 4.2, z: 55.56534}
+  - serializedVersion: 2
+    firstByte: 456
+    indexCount: 0
+    topology: 0
+    baseVertex: 0
+    firstVertex: 0
+    vertexCount: 0
+    localAABB:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0, y: 0, z: 0}
+  - serializedVersion: 2
+    firstByte: 456
+    indexCount: 0
+    topology: 0
+    baseVertex: 0
+    firstVertex: 0
+    vertexCount: 0
+    localAABB:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0, y: 0, z: 0}
+  - serializedVersion: 2
+    firstByte: 456
+    indexCount: 0
+    topology: 0
+    baseVertex: 0
+    firstVertex: 0
+    vertexCount: 0
+    localAABB:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0, y: 0, z: 0}
+  - serializedVersion: 2
+    firstByte: 456
+    indexCount: 15
+    topology: 0
+    baseVertex: 0
+    firstVertex: 12
+    vertexCount: 75
+    localAABB:
+      m_Center: {x: -1101.125, y: 9.2, z: 526.57104}
+      m_Extent: {x: 41.98706, y: 2.8, z: 115.81239}
   m_Shapes:
     vertices: []
     shapes: []
@@ -75,7 +125,7 @@ Mesh:
   m_KeepVertices: 0
   m_KeepIndices: 0
   m_IndexFormat: 1
-  m_IndexBuffer: 000000000200000001000000000000000300000002000000040000000600000005000000040000000700000006000000080000000a00000009000000080000000b0000000a0000001f00000021000000200000001f0000002200000021000000230000002500000024000000230000002600000025000000270000002900000028000000270000002a000000290000002b0000002d0000002c0000002b0000002e0000002d000000430000004500000044000000430000004600000045000000470000004900000048000000470000004a000000490000004b0000004d0000004c0000004b0000004e0000004d0000004f00000051000000500000004f00000052000000510000000c0000000e0000000d00000032000000300000002f0000003000000032000000310000005600000054000000530000005400000056000000550000000f00000011000000100000000f0000001200000011000000130000001500000014000000130000001600000015000000170000001900000018000000170000001a000000190000001b0000001d0000001c0000001b0000001e0000001d000000330000003500000034000000330000003600000035000000370000003900000038000000370000003a000000390000003b0000003d0000003c0000003b0000003e0000003d0000003f00000041000000400000003f0000004200000041000000y
+  m_IndexBuffer: 000000000200000001000000000000000300000002000000040000000600000005000000040000000700000006000000080000000a00000009000000080000000b0000000a0000000f00000011000000100000000f0000001200000011000000130000001500000014000000130000001600000015000000170000001900000018000000170000001a000000190000001b0000001d0000001c0000001b0000001e0000001d000000330000003500000034000000330000003600000035000000370000003900000038000000370000003a000000390000003b0000003d0000003c0000003b0000003e0000003d0000003f00000041000000400000003f00000042000000410000001f00000021000000200000001f0000002200000021000000230000002500000024000000230000002600000025000000270000002900000028000000270000002a000000290000002b0000002d0000002c0000002b0000002e0000002d000000430000004500000044000000430000004600000045000000470000004900000048000000470000004a000000490000004b0000004d0000004c0000004b0000004e0000004d0000004f00000051000000500000004f00000052000000510000000c0000000e0000000d00000032000000300000002f000000300000003200000031000000560000005400000053000000540000005600000055000000y
   m_VertexData:
     serializedVersion: 3
     m_VertexCount: 87
@@ -214,6 +264,31 @@ Mesh:
       m_LodBias: 0
     m_NumLevels: 1
     m_SubMeshes:
+    - serializedVersion: 2
+      m_Levels:
+      - serializedVersion: 1
+        m_IndexStart: 0
+        m_IndexCount: 0
+    - serializedVersion: 2
+      m_Levels:
+      - serializedVersion: 1
+        m_IndexStart: 0
+        m_IndexCount: 0
+    - serializedVersion: 2
+      m_Levels:
+      - serializedVersion: 1
+        m_IndexStart: 0
+        m_IndexCount: 0
+    - serializedVersion: 2
+      m_Levels:
+      - serializedVersion: 1
+        m_IndexStart: 0
+        m_IndexCount: 0
+    - serializedVersion: 2
+      m_Levels:
+      - serializedVersion: 1
+        m_IndexStart: 0
+        m_IndexCount: 0
     - serializedVersion: 2
       m_Levels:
       - serializedVersion: 1

@@ -90,11 +90,13 @@ namespace GateRush.EditorTools.Art
             },
             new StadiumArt.LookDef
             {
-                // Like the reference photo: midday summer sun from the south-south-west.
-                Name = "Day", Hdri = "hilly_terrain_01_puresky", Exposure = 0.8f, Ambient = 1.05f, Reflection = 1f,
-                SunIntensity = 3.3f, SunRotation = Quaternion.Euler(52f, 20f, 0f), SunTint = new Color(1f, 0.95f, 0.88f), Shadow = 0.85f,
-                FogDensity = 0.00024f, FogBrightness = 0.95f, Flood = 0f, Lamp = 0.6f, PropEmission = 0.15f,
-                Post = new SceneLook { PostExposure = 0.12f, Contrast = 9f, Saturation = 6f, BloomIntensity = 0.3f },
+                // Like the reference photo: midday summer sun from the south-south-west under a clear blue sky with a
+                // light grey horizon (P1: procedural sky and grade tuned against the photo's region means).
+                Name = "Day", Procedural = true, SkyTint = new Color(0.36f, 0.48f, 0.82f), Atmosphere = 0.85f, Exposure = 1.45f,
+                Ambient = 1.1f, Reflection = 1f,
+                SunIntensity = 3.3f, SunRotation = Quaternion.Euler(52f, 20f, 0f), SunTint = new Color(1f, 0.97f, 0.92f), Shadow = 0.85f,
+                Fog = new Color(0.7f, 0.76f, 0.87f), FogDensity = 0.00022f, Flood = 0f, Lamp = 0.6f, PropEmission = 0.15f,
+                Post = new SceneLook { PostExposure = 0.05f, Contrast = 12f, Saturation = 8f, Temperature = -4f, BloomIntensity = 0.3f },
             },
         };
 

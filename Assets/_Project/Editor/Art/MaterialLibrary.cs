@@ -133,14 +133,14 @@ namespace GateRush.EditorTools.Art
             new MatDef { Name = "M_Stadium_LedBanner", Shader = MatDef.Led, Texture = "proc:LedBanner", Tint = Color.white, LedIntensity = 2.2f },
             new MatDef { Name = "M_Stadium_Floodlamp", Shader = MatDef.Led, Tint = new Color(1f, 0.96f, 0.88f), LedIntensity = 12f },
             // Expo (Astana EXPO 2017 site): Nur Alem glass sphere, pavilion curtain walls and metal roofs, plaza, ring road, city
-            new MatDef { Name = "M_Expo_SphereGlass", Texture = "proc:ExpoSphereGlass", TileMeters = 4f, Smoothness = 0.97f, Metallic = 0f, Macro = 0f },
-            new MatDef { Name = "M_Expo_CurtainWall", Texture = "proc:ExpoCurtainWall", TileMeters = 6f, Smoothness = 0.92f, Metallic = 0f, Macro = 0f },
-            new MatDef { Name = "M_Expo_Roof", Texture = "proc:ExpoRoof", Tint = new Color(0.72f, 0.74f, 0.78f), TileMeters = 4f, Smoothness = 0.72f, Metallic = 0.55f, Macro = 0f },
+            new MatDef { Name = "M_Expo_SphereGlass", Texture = "proc:ExpoSphereGlass", Tint = new Color(1.25f, 1.32f, 1.4f), TileMeters = 4f, Smoothness = 0.97f, Metallic = 0f, Macro = 0f },
+            new MatDef { Name = "M_Expo_CurtainWall", Texture = "proc:ExpoCurtainWall", Tint = new Color(1.15f, 1.2f, 1.25f), TileMeters = 6f, Smoothness = 0.92f, Metallic = 0f, Macro = 0f },
+            new MatDef { Name = "M_Expo_Roof", Texture = "proc:ExpoRoof", Tint = new Color(0.68f, 0.7f, 0.74f), TileMeters = 4f, Smoothness = 0.62f, Metallic = 0.3f, Macro = 0f },
             new MatDef { Name = "M_Expo_Apartment", Texture = "proc:ExpoApartment", TileMeters = 7.2f, Smoothness = 0.25f, Metallic = 0f, Macro = 0f },
-            Plain("M_Expo_Skylight", new Color(0.18f, 0.3f, 0.4f), 0.95f),
+            Plain("M_Expo_Skylight", new Color(0.36f, 0.5f, 0.6f), 0.95f),
             Plain("M_Expo_Steel", new Color(0.8f, 0.82f, 0.84f), 0.7f, 0.9f),
-            Tint("M_Expo_Paving", "Concrete_PaintedFloor", new Color(0.92f, 1.02f, 1.22f), smooth: 0.12f, macro: 0.2f),
-            Tint("M_Expo_Lawn", "Grass_Field", new Color(0.6f, 0.78f, 0.5f), smooth: 0.3f, macro: 0.35f),
+            Tint("M_Expo_Paving", "Concrete_PaintedFloor", new Color(1.1f, 1.13f, 1.2f), smooth: 0.12f, macro: 0.2f),
+            Tint("M_Expo_Lawn", "Grass_Field", new Color(0.64f, 0.74f, 0.62f), smooth: 0.3f, macro: 0.35f),
             new MatDef { Name = "M_Expo_Leaves", Texture = "proc:ExpoLeaves", TileMeters = 1f, AlphaClip = true, Cutoff = 0.45f, DoubleSided = true, Smoothness = 0.25f, Metallic = 0f, Macro = 0f },
             Plain("M_Expo_Bark", new Color(0.24f, 0.2f, 0.16f), 0.2f),
             // Sphere District hero buildings (E2)
@@ -151,13 +151,22 @@ namespace GateRush.EditorTools.Art
             Plain("M_Expo_Floor", new Color(0.66f, 0.66f, 0.64f), 0.3f),
             Plain("M_Expo_Cladding", new Color(0.64f, 0.66f, 0.69f), 0.55f, 0.6f),
             Tint("M_Expo_Steppe", "Grass_Field", new Color(1.05f, 0.95f, 0.62f), smooth: 0.2f, macro: 0.5f),
-            Plain("M_Expo_Asphalt", new Color(0.2f, 0.21f, 0.22f), 0.08f),
+            Plain("M_Expo_Asphalt", new Color(0.47f, 0.47f, 0.47f), 0.1f),
+            // P1: pools that reflect the sky (the shared M_Water is a dark pond) and blue solar cells.
+            new MatDef { Name = "M_Expo_Water", Texture = "proc:Water", Tint = new Color(0.22f, 0.34f, 0.44f), TileMeters = 6f, Smoothness = 0.97f, Metallic = 0f, NormalScale = 0.25f, Macro = 0f },
+            Plain("M_Expo_Solar", new Color(0.1f, 0.2f, 0.42f), 0.88f, 0.2f),
             Plain("M_Expo_Tower", new Color(0.2f, 0.27f, 0.33f), 0.9f, 0.3f),
             // E6 next-gate beacon: a translucent green light column.
             new MatDef { Name = "M_Beacon", Tint = new Color(0.35f, 1f, 0.5f, 0.16f), Smoothness = 0f, Metallic = 0f, Macro = 0f, Transparent = true, DoubleSided = true, Emission = new Color(0.25f, 1f, 0.4f) * 1.6f },
             // E4 city: light grey precast panels and bitumen-grey roofs (Astana slabs read pale from the air).
             Plain("M_City_Concrete", new Color(0.7f, 0.71f, 0.73f), 0.2f),
             Plain("M_City_Roof", new Color(0.42f, 0.43f, 0.45f), 0.15f),
+            // P1: the Astana palette for the city (white, beige, cream and pastel slabs, blue glass, dark roofs).
+            new MatDef { Name = "M_City_Beige", Texture = "proc:ExpoApartment", Tint = new Color(0.93f, 0.84f, 0.7f), TileMeters = 7.2f, Smoothness = 0.25f, Metallic = 0f, Macro = 0f },
+            new MatDef { Name = "M_City_Cream", Texture = "proc:ExpoApartment", Tint = new Color(0.98f, 0.93f, 0.8f), TileMeters = 7.2f, Smoothness = 0.25f, Metallic = 0f, Macro = 0f },
+            new MatDef { Name = "M_City_Pastel", Texture = "proc:ExpoApartment", Tint = new Color(0.8f, 0.86f, 0.9f), TileMeters = 7.2f, Smoothness = 0.25f, Metallic = 0f, Macro = 0f },
+            new MatDef { Name = "M_City_GlassBlue", Texture = "proc:ExpoCurtainWall", Tint = new Color(0.62f, 0.78f, 0.95f), TileMeters = 6f, Smoothness = 0.92f, Metallic = 0f, Macro = 0f },
+            Plain("M_City_RoofDark", new Color(0.3f, 0.3f, 0.32f), 0.15f),
             // T7 garage
             new MatDef { Name = "M_Garage_CuttingMat", Texture = "proc:CuttingMat", TileMeters = 0.3f, Smoothness = 0.35f, Metallic = 0f, Macro = 0f },
             new MatDef { Name = "M_Garage_Pegboard", Texture = "proc:Pegboard", TileMeters = 0.2f, Smoothness = 0.2f, Metallic = 0f, Macro = 0f },

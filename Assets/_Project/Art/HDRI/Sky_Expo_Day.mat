@@ -8,10 +8,11 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Sky_Expo_Day
-  m_Shader: {fileID: 103, guid: 0000000000000000f000000000000000, type: 0}
+  m_Shader: {fileID: 106, guid: 0000000000000000f000000000000000, type: 0}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
-  m_ValidKeywords: []
+  m_ValidKeywords:
+  - _SUNDISK_HIGH_QUALITY
   m_InvalidKeywords: []
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -22,16 +23,16 @@ Material:
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
-    m_TexEnvs:
-    - _Tex:
-        m_Texture: {fileID: 8900000, guid: d9d2fe6a86a3f914a9a82c722909a1b4, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
+    m_TexEnvs: []
     m_Ints: []
     m_Floats:
-    - _Exposure: 0.8
-    - _Rotation: 0
+    - _AtmosphereThickness: 0.85
+    - _Exposure: 1.45
+    - _SunDisk: 2
+    - _SunSize: 0.035
+    - _SunSizeConvergence: 6
     m_Colors:
-    - _Tint: {r: 0.5, g: 0.5, b: 0.5, a: 0.5}
+    - _GroundColor: {r: 0.42, g: 0.42, b: 0.4, a: 1}
+    - _SkyTint: {r: 0.36, g: 0.48, b: 0.82, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

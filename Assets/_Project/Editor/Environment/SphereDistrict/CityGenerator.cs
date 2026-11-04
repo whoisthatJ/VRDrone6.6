@@ -18,13 +18,24 @@ namespace GateRush.EditorTools.SphereDistrict
         public const float Cell = 400f;
         public const float ShadowRadius = 700f;
         private const int SubResidential = 0, SubGlass = 1, SubConcrete = 2, SubRoof = 3, SubGround = 4;
-        private static readonly string[] Mats = { "M_Expo_Apartment", "M_Expo_CurtainWall", "M_City_Concrete", "M_City_Roof", "M_Glass_Dirty" };
+        private static readonly string[] Mats =
+        {
+            "M_Expo_Apartment", "M_Expo_CurtainWall", "M_City_Concrete", "M_City_Roof", "M_Glass_Dirty",
+            "M_City_Beige", "M_City_Cream", "M_City_Pastel", "M_City_GlassBlue", "M_City_RoofDark",
+        };
+        // P1: palette variants per kind, picked by the OSM id so a building keeps its colour between rebuilds.
+        private static readonly int[] ResidentialVariants = { SubResidential, 5, 6, 7 };
+        private static readonly int[] GlassVariants = { SubGlass, 8 };
+        private static readonly int[] ConcreteVariants = { SubConcrete, 5 };
+        private static readonly int[] RoofVariants = { SubRoof, 9 };
+
+        private static int Pick(int[] variants, long id) => variants[(int)((id * 2654435761L >> 8) & 0x7fffffff) % variants.Length];
 
         public static int FacadeFor(GeoBuilding b) => b.Kind switch
         {
-            "apartments" or "residential" or "house" or "dormitory" => SubResidential,
-            "office" or "hotel" or "commercial" or "retail" or "government" => SubGlass,
-            _ => b.Height >= 28f ? SubResidential : SubConcrete,
+            "apartments" or "residential" or "house" or "dormitory" => Pick(ResidentialVariants, b.Id),
+            "office" or "hotel" or "commercial" or "retail" or "government" => Pick(GlassVariants, b.Id),
+            _ => b.Height >= 28f ? Pick(ResidentialVariants, b.Id) : Pick(ConcreteVariants, b.Id),
         };
 
         public static string Build(ArtContext ctx, GeoData data, Transform group)
@@ -52,7 +63,7 @@ namespace GateRush.EditorTools.SphereDistrict
                     pm.Wall(outer, 3.6f, h, facade);
                 }
                 else pm.Wall(outer, 0f, h, facade);
-                pm.Cap(outer, null, h, SubRoof);
+                pm.Cap(outer, null, h, Pick(RoofVariants, b.Id + 7));
                 count++;
             }
 
@@ -97,11 +108,13 @@ namespace GateRush.EditorTools.SphereDistrict
                     bool tower = rng.NextDouble() < 0.12;
                     float h = tower ? 60f + (float)rng.NextDouble() * 70f : (9 + rng.Next(0, 17)) * 3f;
                     float w = tower ? 26f : 50f + (float)rng.NextDouble() * 40f, d = tower ? 26f : 15f + (float)rng.NextDouble() * 4f;
-                    var part = ProcMesh.Part(new Vector3(p.x, h * 0.5f, p.y), new Vector3(w, h, d), Quaternion.Euler(0f, rng.Next(0, 4) * 90f + (float)(rng.NextDouble() - 0.5) * 10f, 0f), tower ? 1 : 0);
+                    // Towers are glass; slabs take one of the four residential palettes.
+                    int sub = tower ? 1 : new[] { 0, 2, 3, 4 }[rng.Next(0, 4)];
+                    var part = ProcMesh.Part(new Vector3(p.x, h * 0.5f, p.y), new Vector3(w, h, d), Quaternion.Euler(0f, rng.Next(0, 4) * 90f + (float)(rng.NextDouble() - 0.5) * 10f, 0f), sub);
                     (r < 2800f ? near : far).Add(part);
                     n++;
                 }
-            var mats = ArtPass.Mats("M_Expo_Apartment", "M_Expo_Tower");
+            var mats = ArtPass.Mats("M_Expo_Apartment", "M_Expo_Tower", "M_City_Beige", "M_City_Cream", "M_City_Pastel");
             foreach (var (name, parts) in new[] { ("SD_FarRing_Near", near), ("SD_FarRing_Far", far) })
             {
                 var mesh = ArtPass.MeshAsset(name, () => ProcMesh.Combine(name, parts));

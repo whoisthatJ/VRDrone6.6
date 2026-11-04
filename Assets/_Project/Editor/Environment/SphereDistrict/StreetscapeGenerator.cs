@@ -21,7 +21,7 @@ namespace GateRush.EditorTools.SphereDistrict
         public const float Cell = 600f, Extent = 1500f;
         private const int SubAsphalt = 0, SubPaint = 1, SubKerb = 2, SubPaving = 3, SubLawn = 4, SubPitch = 5, SubRubber = 6, SubWater = 7, SubDirt = 8;
         private static readonly string[] SurfaceMats =
-            { "M_Expo_Asphalt", "M_Stadium_LinePaint", "M_Concrete_Wall", "M_Expo_Paving", "M_Expo_Lawn", "M_Stadium_Grass_Dark", "M_Stadium_Tartan", "M_Water", "M_Dirt_Field" };
+            { "M_Expo_Asphalt", "M_Stadium_LinePaint", "M_Concrete_Wall", "M_Expo_Paving", "M_Expo_Lawn", "M_Stadium_Grass_Dark", "M_Stadium_Tartan", "M_Expo_Water", "M_Dirt_Field" };
 
         private readonly GeoData _data;
         private readonly List<Vector2> _corridor;
@@ -447,7 +447,8 @@ namespace GateRush.EditorTools.SphereDistrict
         public const int TreeVariants = 4;
         public static readonly Color[] CarColours =
         {
-            new Color(0.9f, 0.9f, 0.9f), new Color(0.08f, 0.08f, 0.09f), new Color(0.55f, 0.57f, 0.6f), new Color(0.35f, 0.04f, 0.04f),
+            // Mostly white and silver, like the car parks in the reference photo.
+            new Color(0.92f, 0.92f, 0.92f), new Color(0.72f, 0.74f, 0.76f), new Color(0.45f, 0.47f, 0.5f), new Color(0.07f, 0.07f, 0.08f),
         };
 
         // ---------- writing to the scene ----------
@@ -509,7 +510,7 @@ namespace GateRush.EditorTools.SphereDistrict
             d["streetlight"] = (ArtPass.MeshAsset("SD_StreetLight", StreetLightMesh), new[] { Inst("M_Expo_Steel"), Inst("M_Lamp_Emitter") }, false);
             d["parklamp"] = (ArtPass.MeshAsset("SD_ParkLamp", ParkLampMesh), new[] { Inst("M_Plastic_Black"), Inst("M_Lamp_Warm") }, false);
             d["bench"] = (ArtPass.MeshAsset("SD_Bench", BenchMesh), new[] { Inst("M_Wood_Planks"), Inst("M_Plastic_Black") }, false);
-            d["solar"] = (ArtPass.MeshAsset("SD_Solar", SolarMesh), new[] { Inst("M_Glass_Night"), Inst("M_Expo_Steel") }, false);
+            d["solar"] = (ArtPass.MeshAsset("SD_Solar", SolarMesh), new[] { Inst("M_Expo_Solar"), Inst("M_Expo_Steel") }, false);
             var carMesh = ArtPass.MeshAsset("SD_Car", CarMesh);
             for (int i = 0; i < CarColours.Length; i++)
                 d["car" + i] = (carMesh, new[] { CarPaint(i), Inst("M_Glass_Night"), Inst("M_Rubber_Black") }, false);

@@ -535,6 +535,10 @@ namespace GateRush.EditorTools.Art
             public string Name, Hdri;
             public float Exposure, Ambient, Reflection, SunIntensity, Shadow, FogDensity, FogBrightness, Flood, Lamp;
             public float PropEmission = 1f;
+            /// <summary>Unity's procedural sky instead of the HDRI (tunable to a photo's sky colour); needs SunRotation and Fog.</summary>
+            public bool Procedural;
+            public Color SkyTint = new Color(0.5f, 0.5f, 0.5f);
+            public float Atmosphere = 1f;
             public bool Sun = true;
             public Quaternion? SunRotation;
             public Color SunTint = Color.white;
@@ -587,6 +591,45 @@ namespace GateRush.EditorTools.Art
             return m;
         }
 
+        private static StadiumLighting.Preset ProceduralPreset(ArtContext ctx, LookDef d, string prefix)
+        {
+            string path = $"{EnvironmentAssets.SkyDir}/Sky_{prefix}_{d.Name}.mat";
+            var m = AssetDatabase.LoadAssetAtPath<Material>(path);
+            var shader = Shader.Find("Skybox/Procedural");
+            if (m == null || m.shader != shader)
+            {
+                if (m != null) AssetDatabase.DeleteAsset(path);
+                m = new Material(shader);
+                AssetDatabase.CreateAsset(m, path);
+            }
+            m.SetFloat("_SunDisk", 2f);
+            m.SetFloat("_SunSize", 0.035f);
+            m.SetFloat("_SunSizeConvergence", 6f);
+            m.SetFloat("_AtmosphereThickness", d.Atmosphere);
+            m.SetColor("_SkyTint", d.SkyTint);
+            m.SetColor("_GroundColor", new Color(0.42f, 0.42f, 0.4f));
+            m.SetFloat("_Exposure", d.Exposure);
+            EditorUtility.SetDirty(m);
+            return new StadiumLighting.Preset
+            {
+                Name = d.Name,
+                Sky = m,
+                AmbientIntensity = d.Ambient,
+                ReflectionIntensity = d.Reflection,
+                SunEnabled = d.Sun,
+                SunRotation = d.SunRotation ?? Quaternion.Euler(50f, 0f, 0f),
+                SunColor = d.SunTint,
+                SunIntensity = d.SunIntensity,
+                ShadowStrength = d.Shadow,
+                FogColor = d.Fog ?? Color.grey,
+                FogDensity = d.FogDensity,
+                FloodlightIntensity = d.Flood,
+                LampIntensity = d.Lamp,
+                PropEmission = d.PropEmission,
+                Volume = ArtPass.SetupVolume(ctx, d.Post, "_" + d.Name),
+            };
+        }
+
         private static void BuildLighting(ArtContext ctx, Light[] spots, Renderer[] heads, float[] scales) =>
             BuildVenueLighting(ctx, Looks, spots, heads, scales, "stadium", TimeOfDay.Night, null);
 
@@ -603,6 +646,12 @@ namespace GateRush.EditorTools.Art
             for (int i = 0; i < looks.Length; i++)
             {
                 var d = looks[i];
+                if (d.Procedural)
+                {
+                    presets[i] = ProceduralPreset(ctx, d, prefix);
+                    ctx.Log.Append($" {d.Name} procedural sky;");
+                    continue;
+                }
                 var src = ArtCatalog.Find(d.Hdri);
                 var hdr = HdriSun.Analyze($"{EnvironmentAssets.SkyDir}/{src.Id}_{src.Resolution}.hdr");
                 Color fog;
