@@ -333,7 +333,7 @@ namespace GateRush.Game
             {
                 _stockProps ??= spinner.Props;
                 _stockDiscs ??= spinner.BlurDiscs;
-                spinner.Configure(model.Props, null);
+                spinner.Configure(model.Props, model.BlurDiscs);
             }
         }
     }

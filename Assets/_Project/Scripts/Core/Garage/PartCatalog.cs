@@ -12,7 +12,7 @@ namespace GateRush.Garage
 
     public enum FrameGeometry { TrueX, StretchX, Deadcat, Ducted }
 
-    public enum ExtraKind { ActionCam, LedKit, LongAntenna, HdCamera }
+    public enum ExtraKind { ActionCam, LedKit, LongAntenna, HdCamera, DigitalHd }
 
     public enum FrameFinish { Carbon, GoldEdge, Tiger, Stealth }
 
@@ -192,6 +192,8 @@ namespace GateRush.Garage
                 Slot = PartSlot.Extra, Sizes = S57, MassG = 121f, Kind = ExtraKind.ActionCam, CdAFront = 9f, CdATop = 12f },
             new ExtraDef { Id = "extra-hdcam", Name = "HD camera", Brand = "GateRush", Description = "Small HD camera for 3\" rigs.",
                 Slot = PartSlot.Extra, Sizes = S253, MassG = 28f, Kind = ExtraKind.HdCamera, CdAFront = 3f, CdATop = 3f },
+            new ExtraDef { Id = "extra-hd-system", Name = "Digital HD video", Brand = "GateRush", Description = "Digital HD camera and air unit with two antennas instead of the analog camera and VTX: a clear feed, a little heavier.",
+                Slot = PartSlot.Extra, Sizes = new[] { SizeClass.Three, SizeClass.Five, SizeClass.Seven }, MassG = 24f, Kind = ExtraKind.DigitalHd, CdAFront = 1.5f, CdATop = 2f },
             new ExtraDef { Id = "extra-leds", Name = "LED kit", Brand = "GateRush", Description = "Bright LED strips along the frame. Night racing look.",
                 Slot = PartSlot.Extra, MassG = 6f, Kind = ExtraKind.LedKit },
             new ExtraDef { Id = "extra-antenna", Name = "Long-range antenna", Brand = "GateRush", Description = "Tall stubby-free antenna: better range, a little drag.",

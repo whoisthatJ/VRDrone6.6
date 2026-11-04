@@ -1,0 +1,598 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d787b73b815553f40a5e3876ded0b16d, type: 3}
+  m_Name: QuadPartLibrary
+  m_EditorClassIdentifier: GateRush.Core::GateRush.Garage.QuadPartLibrary
+  Entries:
+  - Id: actioncam
+    Mesh: {fileID: 4300000, guid: eb6b25670083f4545b2ac447f456bd41, type: 2}
+    Slots:
+    - Plastic
+    - Lens
+    - TPU
+    Sockets: []
+  - Id: camera-hd
+    Mesh: {fileID: 4300000, guid: b87b0c084de49514c9c491f55ac35c0c, type: 2}
+    Slots:
+    - Plastic
+    - Lens
+    - TPU
+    - Metal
+    Sockets: []
+  - Id: camera-micro
+    Mesh: {fileID: 4300000, guid: f1e6e2066d8fc014ba2818b293eeb92e, type: 2}
+    Slots:
+    - Plastic
+    - Lens
+    - TPU
+    - Metal
+    Sockets: []
+  - Id: camera-nano
+    Mesh: {fileID: 4300000, guid: 0df80d13c39fcae4c88632593576e8ce, type: 2}
+    Slots:
+    - Plastic
+    - Lens
+    - TPU
+    - Metal
+    Sockets: []
+  - Id: capacitor
+    Mesh: {fileID: 4300000, guid: c6bbeba3dabb6ec4dbc8bdf77132bcd1, type: 2}
+    Slots:
+    - Cap
+    - Metal
+    Sockets: []
+  - Id: frame-atlas7
+    Mesh: {fileID: 4300000, guid: fb9f93b018a9ddb4bbcfa728dee9394a, type: 2}
+    Slots:
+    - Carbon
+    - Metal
+    - TPU
+    - Edge
+    Sockets:
+    - Name: motor0
+      Position: {x: 0.10595, y: 0.005, z: -0.11654}
+    - Name: motor1
+      Position: {x: 0.10595, y: 0.005, z: 0.11654}
+    - Name: motor2
+      Position: {x: -0.10595, y: 0.005, z: -0.11654}
+    - Name: motor3
+      Position: {x: -0.10595, y: 0.005, z: 0.11654}
+    - Name: stack
+      Position: {x: 0, y: 0.0065, z: 0}
+    - Name: camera
+      Position: {x: 0, y: 0.022, z: 0.0524}
+    - Name: top
+      Position: {x: 0, y: 0.04125, z: 0}
+    - Name: antenna
+      Position: {x: 0, y: 0.04925, z: -0.0564}
+    - Name: rx
+      Position: {x: 0, y: 0.0118, z: -0.042}
+  - Id: frame-cine35
+    Mesh: {fileID: 4300000, guid: 21fb7050dfc4e4e4fb840acbc084b12c, type: 2}
+    Slots:
+    - Carbon
+    - Plastic
+    - Edge
+    - Metal
+    - TPU
+    Sockets:
+    - Name: motor0
+      Position: {x: 0.05339, y: 0.003, z: -0.05339}
+    - Name: motor1
+      Position: {x: 0.05339, y: 0.003, z: 0.05339}
+    - Name: motor2
+      Position: {x: -0.05339, y: 0.003, z: -0.05339}
+    - Name: motor3
+      Position: {x: -0.05339, y: 0.003, z: 0.05339}
+    - Name: stack
+      Position: {x: 0, y: 0.0045, z: 0}
+    - Name: camera
+      Position: {x: 0, y: 0.014, z: 0.0234}
+    - Name: top
+      Position: {x: 0, y: 0.02635, z: 0}
+    - Name: antenna
+      Position: {x: 0, y: 0.03435, z: -0.02726}
+    - Name: rx
+      Position: {x: 0, y: 0.0074, z: -0.0203}
+  - Id: frame-grx-race
+    Mesh: {fileID: 4300000, guid: a81ba258e5b68b746b63426f8b306acf, type: 2}
+    Slots:
+    - Carbon
+    - Metal
+    - TPU
+    - Edge
+    Sockets:
+    - Name: motor0
+      Position: {x: 0.07778, y: 0.005, z: -0.07778}
+    - Name: motor1
+      Position: {x: 0.07778, y: 0.005, z: 0.07778}
+    - Name: motor2
+      Position: {x: -0.07778, y: 0.005, z: -0.07778}
+    - Name: motor3
+      Position: {x: -0.07778, y: 0.005, z: 0.07778}
+    - Name: stack
+      Position: {x: 0, y: 0.0065, z: 0}
+    - Name: camera
+      Position: {x: 0, y: 0.018, z: 0.0364}
+    - Name: top
+      Position: {x: 0, y: 0.03325, z: 0}
+    - Name: antenna
+      Position: {x: 0, y: 0.04125, z: -0.04136}
+    - Name: rx
+      Position: {x: 0, y: 0.0102, z: -0.0308}
+  - Id: frame-grx-slim
+    Mesh: {fileID: 4300000, guid: 9472cfbedcd371c46a2bfc8adf450c18, type: 2}
+    Slots:
+    - Carbon
+    - Metal
+    - TPU
+    - Edge
+    Sockets:
+    - Name: motor0
+      Position: {x: 0.07601, y: 0.004, z: -0.07601}
+    - Name: motor1
+      Position: {x: 0.07601, y: 0.004, z: 0.07601}
+    - Name: motor2
+      Position: {x: -0.07601, y: 0.004, z: -0.07601}
+    - Name: motor3
+      Position: {x: -0.07601, y: 0.004, z: 0.07601}
+    - Name: stack
+      Position: {x: 0, y: 0.0055, z: 0}
+    - Name: camera
+      Position: {x: 0, y: 0.016, z: 0.0344}
+    - Name: top
+      Position: {x: 0, y: 0.0298, z: 0}
+    - Name: antenna
+      Position: {x: 0, y: 0.0378, z: -0.03948}
+    - Name: rx
+      Position: {x: 0, y: 0.0088, z: -0.0294}
+  - Id: frame-kestrel25
+    Mesh: {fileID: 4300000, guid: 9f82b18ea905e0c459243561a96eab65, type: 2}
+    Slots:
+    - Carbon
+    - Plastic
+    - Edge
+    - Metal
+    - TPU
+    Sockets:
+    - Name: motor0
+      Position: {x: 0.0396, y: 0.002, z: -0.0396}
+    - Name: motor1
+      Position: {x: 0.0396, y: 0.002, z: 0.0396}
+    - Name: motor2
+      Position: {x: -0.0396, y: 0.002, z: -0.0396}
+    - Name: motor3
+      Position: {x: -0.0396, y: 0.002, z: 0.0396}
+    - Name: stack
+      Position: {x: 0, y: 0.0035, z: 0}
+    - Name: camera
+      Position: {x: 0, y: 0.011, z: 0.0164}
+    - Name: top
+      Position: {x: 0, y: 0.0209, z: 0}
+    - Name: antenna
+      Position: {x: 0, y: 0.0289, z: -0.02068}
+    - Name: rx
+      Position: {x: 0, y: 0.0056, z: -0.0154}
+  - Id: frame-kestrel65
+    Mesh: {fileID: 4300000, guid: 6fe0ef346748d8042a80a334299f1879, type: 2}
+    Slots:
+    - Carbon
+    - Plastic
+    - TPU
+    - Edge
+    - Metal
+    Sockets:
+    - Name: motor0
+      Position: {x: 0.02298, y: 0.001, z: -0.02298}
+    - Name: motor1
+      Position: {x: 0.02298, y: 0.001, z: 0.02298}
+    - Name: motor2
+      Position: {x: -0.02298, y: 0.001, z: -0.02298}
+    - Name: motor3
+      Position: {x: -0.02298, y: 0.001, z: 0.02298}
+    - Name: stack
+      Position: {x: 0, y: 0.0025, z: 0}
+    - Name: camera
+      Position: {x: 0, y: 0.008, z: 0.0094}
+    - Name: top
+      Position: {x: 0, y: 0.01545, z: 0}
+    - Name: antenna
+      Position: {x: 0, y: 0.02345, z: -0.0141}
+    - Name: rx
+      Position: {x: 0, y: 0.0038, z: -0.0105}
+  - Id: frame-pick3
+    Mesh: {fileID: 4300000, guid: ed1a8fb448e40af4a93c3652574f9d28, type: 2}
+    Slots:
+    - Carbon
+    - Metal
+    - TPU
+    - Edge
+    Sockets:
+    - Name: motor0
+      Position: {x: 0.04525, y: 0.002, z: -0.04525}
+    - Name: motor1
+      Position: {x: 0.04525, y: 0.002, z: 0.04525}
+    - Name: motor2
+      Position: {x: -0.04525, y: 0.002, z: -0.04525}
+    - Name: motor3
+      Position: {x: -0.04525, y: 0.002, z: 0.04525}
+    - Name: stack
+      Position: {x: 0, y: 0.0035, z: 0}
+    - Name: camera
+      Position: {x: 0, y: 0.01, z: 0.0144}
+    - Name: top
+      Position: {x: 0, y: 0.0189, z: 0}
+    - Name: antenna
+      Position: {x: 0, y: 0.0269, z: -0.0188}
+    - Name: rx
+      Position: {x: 0, y: 0.0052, z: -0.014}
+  - Id: frame-volt-deadcat
+    Mesh: {fileID: 4300000, guid: e0ccf32c5b6963942a112f4a70c2f168, type: 2}
+    Slots:
+    - Carbon
+    - Metal
+    - TPU
+    - Edge
+    Sockets:
+    - Name: motor0
+      Position: {x: 0.07813, y: 0.005, z: -0.08438}
+    - Name: motor1
+      Position: {x: 0.07813, y: 0.005, z: 0.08438}
+    - Name: motor2
+      Position: {x: -0.07813, y: 0.005, z: -0.08438}
+    - Name: motor3
+      Position: {x: -0.07813, y: 0.005, z: 0.08438}
+    - Name: stack
+      Position: {x: 0, y: 0.0065, z: 0}
+    - Name: camera
+      Position: {x: 0, y: 0.02, z: 0.0424}
+    - Name: top
+      Position: {x: 0, y: 0.03725, z: 0}
+    - Name: antenna
+      Position: {x: 0, y: 0.04525, z: -0.047}
+    - Name: rx
+      Position: {x: 0, y: 0.011, z: -0.035}
+  - Id: frame-volt-free
+    Mesh: {fileID: 4300000, guid: 09842a10577262840b9437541df23dd3, type: 2}
+    Slots:
+    - Carbon
+    - Metal
+    - TPU
+    - Edge
+    Sockets:
+    - Name: motor0
+      Position: {x: 0.07526, y: 0.006, z: -0.08429}
+    - Name: motor1
+      Position: {x: 0.07526, y: 0.006, z: 0.08429}
+    - Name: motor2
+      Position: {x: -0.07526, y: 0.006, z: -0.08429}
+    - Name: motor3
+      Position: {x: -0.07526, y: 0.006, z: 0.08429}
+    - Name: stack
+      Position: {x: 0, y: 0.0075, z: 0}
+    - Name: camera
+      Position: {x: 0, y: 0.021, z: 0.0404}
+    - Name: top
+      Position: {x: 0, y: 0.0387, z: 0}
+    - Name: antenna
+      Position: {x: 0, y: 0.0467, z: -0.04512}
+    - Name: rx
+      Position: {x: 0, y: 0.012, z: -0.0336}
+  - Id: liion-6s-3000
+    Mesh: {fileID: 4300000, guid: 9aa41a57f49c88e4fa7d217266d8e551, type: 2}
+    Slots:
+    - Lipo
+    - WireRed
+    - Wire
+    - Plug
+    - Plastic
+    - Pad
+    - Rubber
+    Sockets: []
+  - Id: lipo-1s-300
+    Mesh: {fileID: 4300000, guid: fe24ce13d0b3aa543ad21cb70bf64b0f, type: 2}
+    Slots:
+    - Lipo
+    - Plastic
+    - WireRed
+    - Wire
+    - Plug
+    - Pad
+    - Rubber
+    Sockets: []
+  - Id: lipo-2s-450
+    Mesh: {fileID: 4300000, guid: 1be55883646c2d44f8209b4e0b791c66, type: 2}
+    Slots:
+    - Lipo
+    - Plastic
+    - WireRed
+    - Wire
+    - Plug
+    - Pad
+    - Rubber
+    Sockets: []
+  - Id: lipo-4s-1300
+    Mesh: {fileID: 4300000, guid: 9359fbff9d32d4a40bb4dc8200468b46, type: 2}
+    Slots:
+    - Lipo
+    - Plastic
+    - WireRed
+    - Wire
+    - Plug
+    - Pad
+    - Rubber
+    Sockets: []
+  - Id: lipo-4s-1500
+    Mesh: {fileID: 4300000, guid: 6cde7282ba627e5409622766f2099a50, type: 2}
+    Slots:
+    - Lipo
+    - Plastic
+    - WireRed
+    - Wire
+    - Plug
+    - Pad
+    - Rubber
+    Sockets: []
+  - Id: lipo-4s-650
+    Mesh: {fileID: 4300000, guid: 4caa6a2a12452d648a0402cb6e18d5f7, type: 2}
+    Slots:
+    - Lipo
+    - Plastic
+    - WireRed
+    - Wire
+    - Plug
+    - Pad
+    - Rubber
+    Sockets: []
+  - Id: lipo-6s-1100
+    Mesh: {fileID: 4300000, guid: bcee186cf6da5b740be01b46147bb5f3, type: 2}
+    Slots:
+    - Lipo
+    - Plastic
+    - WireRed
+    - Wire
+    - Plug
+    - Pad
+    - Rubber
+    Sockets: []
+  - Id: lipo-6s-1300
+    Mesh: {fileID: 4300000, guid: dd9524111c396734e8b43cf26e80c88d, type: 2}
+    Slots:
+    - Lipo
+    - Plastic
+    - WireRed
+    - Wire
+    - Plug
+    - Pad
+    - Rubber
+    Sockets: []
+  - Id: lipo-6s-850
+    Mesh: {fileID: 4300000, guid: 92098dc2f87aaef4d880885623534fde, type: 2}
+    Slots:
+    - Lipo
+    - Plastic
+    - WireRed
+    - Wire
+    - Plug
+    - Pad
+    - Rubber
+    Sockets: []
+  - Id: motor-atlas2806
+    Mesh: {fileID: 4300000, guid: 77b157720c9255f4b8c2f4483090f7db, type: 2}
+    Slots:
+    - Metal
+    - Copper
+    - Bell
+    - Carbon
+    Sockets:
+    - Name: prop
+      Position: {x: 0, y: 0.0177, z: 0}
+  - Id: motor-gnat0702
+    Mesh: {fileID: 4300000, guid: f1ec13abe465d344c9299da70c09b899, type: 2}
+    Slots:
+    - Metal
+    - Copper
+    - Bell
+    - Carbon
+    Sockets:
+    - Name: prop
+      Position: {x: 0, y: 0.01005, z: 0}
+  - Id: motor-gnat1103
+    Mesh: {fileID: 4300000, guid: a216be92b194f5d4c86f86a0196b58ec, type: 2}
+    Slots:
+    - Metal
+    - Copper
+    - Bell
+    - Carbon
+    Sockets:
+    - Name: prop
+      Position: {x: 0, y: 0.01165, z: 0}
+  - Id: motor-hornet1404
+    Mesh: {fileID: 4300000, guid: 68d059566ca332e45ba3e09e9a51d156, type: 2}
+    Slots:
+    - Metal
+    - Copper
+    - Bell
+    - Carbon
+    Sockets:
+    - Name: prop
+      Position: {x: 0, y: 0.0131, z: 0}
+  - Id: motor-hornet1804
+    Mesh: {fileID: 4300000, guid: d6fe272c46a990d4bb8866a0ab7c88e7, type: 2}
+    Slots:
+    - Metal
+    - Copper
+    - Bell
+    - Carbon
+    Sockets:
+    - Name: prop
+      Position: {x: 0, y: 0.0137, z: 0}
+  - Id: motor-raptor2207-1950
+    Mesh: {fileID: 4300000, guid: 08fe2ff01f01b324ca2dd526362ae1e0, type: 2}
+    Slots:
+    - Metal
+    - Copper
+    - Bell
+    - Carbon
+    Sockets:
+    - Name: prop
+      Position: {x: 0, y: 0.0173, z: 0}
+  - Id: motor-raptor2207-2400
+    Mesh: {fileID: 4300000, guid: dd31327b80c9ceb44b96cd7774c0da30, type: 2}
+    Slots:
+    - Metal
+    - Copper
+    - Bell
+    - Carbon
+    Sockets:
+    - Name: prop
+      Position: {x: 0, y: 0.0173, z: 0}
+  - Id: motor-swift2306
+    Mesh: {fileID: 4300000, guid: 91048c110d4bc824a8effcbe4415505b, type: 2}
+    Slots:
+    - Metal
+    - Copper
+    - Bell
+    - Carbon
+    Sockets:
+    - Name: prop
+      Position: {x: 0, y: 0.01645, z: 0}
+  - Id: prop-2525-3
+    Mesh: {fileID: 4300000, guid: 72d5f7a176b42c446b5868056d6b5ad5, type: 2}
+    Slots:
+    - Prop
+    Sockets: []
+  - Id: prop-2525-3-blur
+    Mesh: {fileID: 4300000, guid: 0574e3d14d91b0f45b098954f77bb606, type: 2}
+    Slots:
+    - PropBlur
+    Sockets: []
+  - Id: prop-3030-3
+    Mesh: {fileID: 4300000, guid: 6dca16dc7f33d6148ae4ea4d8eff98e7, type: 2}
+    Slots:
+    - Prop
+    Sockets: []
+  - Id: prop-3030-3-blur
+    Mesh: {fileID: 4300000, guid: c3cfc91c6b5b74c45bd4f04138979e38, type: 2}
+    Slots:
+    - PropBlur
+    Sockets: []
+  - Id: prop-31mm-4
+    Mesh: {fileID: 4300000, guid: 1ef008296132caa4fab0a8b009c2a971, type: 2}
+    Slots:
+    - Prop
+    Sockets: []
+  - Id: prop-31mm-4-blur
+    Mesh: {fileID: 4300000, guid: 717ddd24c9fcaaf4a95b88b7b33de098, type: 2}
+    Slots:
+    - PropBlur
+    Sockets: []
+  - Id: prop-3525-5
+    Mesh: {fileID: 4300000, guid: 2bf04d7a42da5934cb5a044d48fd5f94, type: 2}
+    Slots:
+    - Prop
+    Sockets: []
+  - Id: prop-3525-5-blur
+    Mesh: {fileID: 4300000, guid: 20d0db9d33318b44ca354e86a23d8e23, type: 2}
+    Slots:
+    - PropBlur
+    Sockets: []
+  - Id: prop-5045-3
+    Mesh: {fileID: 4300000, guid: 3b9f13fdb0e152249b01d50ef0a9abc9, type: 2}
+    Slots:
+    - Prop
+    Sockets: []
+  - Id: prop-5045-3-blur
+    Mesh: {fileID: 4300000, guid: 227a0bbff4a7aea43a6090a11c61e1bc, type: 2}
+    Slots:
+    - PropBlur
+    Sockets: []
+  - Id: prop-5136-3
+    Mesh: {fileID: 4300000, guid: 5d8a554cf0ab40044bbf5dc057b283b5, type: 2}
+    Slots:
+    - Prop
+    Sockets: []
+  - Id: prop-5136-3-blur
+    Mesh: {fileID: 4300000, guid: ad6824b2e2a4bfc4eae8551d5cbe5e51, type: 2}
+    Slots:
+    - PropBlur
+    Sockets: []
+  - Id: prop-5143-3
+    Mesh: {fileID: 4300000, guid: 49d13ef2fb71e0140a6c046b5c1abae4, type: 2}
+    Slots:
+    - Prop
+    Sockets: []
+  - Id: prop-5143-3-blur
+    Mesh: {fileID: 4300000, guid: f511abb10c1c9de40a2cc8645583b3ad, type: 2}
+    Slots:
+    - PropBlur
+    Sockets: []
+  - Id: prop-7035-3
+    Mesh: {fileID: 4300000, guid: e8055d7779e111a41a0ee41d9667da63, type: 2}
+    Slots:
+    - Prop
+    Sockets: []
+  - Id: prop-7035-3-blur
+    Mesh: {fileID: 4300000, guid: d4036abf04ffc7749b0a61ba1a8694b0, type: 2}
+    Slots:
+    - PropBlur
+    Sockets: []
+  - Id: receiver
+    Mesh: {fileID: 4300000, guid: 3754e7e1535d7d349b7528c8e3636593, type: 2}
+    Slots:
+    - PCB
+    - Plastic
+    - Wire
+    Sockets: []
+  - Id: stack-20
+    Mesh: {fileID: 4300000, guid: 1586d4a4ee71a4646beb21917be6b689, type: 2}
+    Slots:
+    - PCB
+    - Carbon
+    - Rubber
+    - Metal
+    - Plastic
+    - Wire
+    Sockets: []
+  - Id: stack-25
+    Mesh: {fileID: 4300000, guid: b12d225e28d8fb74e860b29b5c3114a7, type: 2}
+    Slots:
+    - PCB
+    - Carbon
+    - Rubber
+    - Metal
+    - Plastic
+    - Wire
+    Sockets: []
+  - Id: stack-30
+    Mesh: {fileID: 4300000, guid: 1d7cf58b7b5029d4c9521cd7fc425e0b, type: 2}
+    Slots:
+    - PCB
+    - Carbon
+    - Rubber
+    - Metal
+    - Plastic
+    - Wire
+    Sockets: []
+  - Id: vtx-analog
+    Mesh: {fileID: 4300000, guid: b94597c657e11ab44881f15ac3096654, type: 2}
+    Slots:
+    - Wire
+    - Plastic
+    Sockets: []
+  - Id: vtx-hd
+    Mesh: {fileID: 4300000, guid: 5dbc4eb963c50234ba7d1f49ce9c25d2, type: 2}
+    Slots:
+    - Plastic
+    - Metal
+    - Wire
+    Sockets: []

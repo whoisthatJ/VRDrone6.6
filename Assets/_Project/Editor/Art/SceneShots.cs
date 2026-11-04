@@ -195,6 +195,47 @@ namespace GateRush.EditorTools.Art
             return sb.ToString();
         }
 
+        /// <summary>P2: each shipped build on the garage turntable (detailed parts), three-quarter view and top view.</summary>
+        public static string CaptureQuads(string tag)
+        {
+            ArtJobs.RequireCleanScenes();
+            const string sceneName = "Garage";
+            EditorSceneManager.OpenScene(ArtJobs.ScenePath(sceneName), OpenSceneMode.Single);
+            var garage = Object.FindAnyObjectByType<GateRush.UI.GarageController>(FindObjectsInactive.Include);
+            var so = new SerializedObject(garage);
+            var turntable = (Transform)so.FindProperty("turntable").objectReferenceValue;
+            var field = typeof(GateRush.UI.GarageController).GetField("materials", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            var mats = (GateRush.Garage.QuadModelMaterials)field.GetValue(garage);
+            var source = Object.FindAnyObjectByType<Camera>();
+            // No depth of field: it is focused for the garage's own framing and blurs these close-ups.
+            foreach (var v in Object.FindObjectsByType<Volume>(FindObjectsSortMode.None)) v.enabled = false;
+            var shots = new List<Bookmark>();
+            var models = new List<GameObject>();
+            var sb = new StringBuilder(sceneName + ":");
+            try
+            {
+                foreach (var b in GateRush.Garage.QuadPresets.All)
+                {
+                    var model = GateRush.Garage.QuadModelBuilder.Build(b, mats, turntable, turntable.gameObject.layer);
+                    var bounds = GateRush.Garage.QuadModelBuilder.Bounds(model.Root);
+                    float dist = bounds.extents.magnitude / Mathf.Tan(15f * Mathf.Deg2Rad) * 0.95f;
+                    string id = b.Id.Replace("preset-", "");
+                    // From the garage camera's side (the bench backs onto the wall), a little higher.
+                    Vector3 dir = source != null ? (source.transform.position - bounds.center).normalized : new Vector3(0.75f, 0.55f, 1f).normalized;
+                    dir = (new Vector3(dir.x, 0f, dir.z).normalized + Vector3.up * 0.55f).normalized;
+                    var three = new Bookmark($"quad_{id}_34", bounds.center + dir * dist, bounds.center, 30f);
+                    var top = new Bookmark($"quad_{id}_top", bounds.center + new Vector3(0f, 1f, -0.02f) * dist, bounds.center, 30f);
+                    sb.Append(' ').Append(CaptureSet(sceneName, new List<Bookmark> { three, top }, source, tag));
+                    Object.DestroyImmediate(model.Root);
+                }
+            }
+            finally
+            {
+                ArtJobs.ReturnToBoot();
+            }
+            return sb.ToString();
+        }
+
         /// <summary>Sphere District lighting presets (E5): the reference view, the walkway and a sphere close-up per preset.</summary>
         public static string CaptureExpoLighting(string tag)
         {

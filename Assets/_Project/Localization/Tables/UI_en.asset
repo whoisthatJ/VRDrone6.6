@@ -1902,6 +1902,14 @@ MonoBehaviour:
     m_Localized: Free flight in the original district (Track_Expo_v1).
     m_Metadata:
       m_Items: []
+  - m_Id: 397150372491264
+    m_Localized: Digital HD video
+    m_Metadata:
+      m_Items: []
+  - m_Id: 397150443794432
+    m_Localized: 'Digital HD camera and air unit with two antennas instead of the analog camera and VTX: a clear feed, a little heavier.'
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

@@ -23,7 +23,8 @@ namespace GateRush.Garage
     }
 
     /// <summary>
-    /// Builds the quad for a <see cref="QuadBuild"/> at runtime, in metres, so it always matches the parts: frame
+    /// Builds the quad for a <see cref="QuadBuild"/> at runtime, in metres, so it always matches the parts. With the
+    /// P2 part library (Blender-generated meshes) it assembles the detailed parts; otherwise it builds the frame
     /// plates and arms (true-X, stretch-X, deadcat) or ducts, motors sized from the stator code, props by diameter and
     /// blade count, the LiPo with its strap, FPV camera, antenna and extras, in the build's style and accent colour.
     /// Origin at the centre of the bottom plate; +Z forward. Props are separate children ("Prop 0..3" in mixer order
@@ -38,6 +39,8 @@ namespace GateRush.Garage
             public GameObject Root;
             public Transform[] Props = new Transform[4];
             public Renderer[] Leds = new Renderer[0];
+            /// <summary>Prop blur discs (detailed models), one per prop, for <c>PropVisuals</c>.</summary>
+            public Renderer[] BlurDiscs = new Renderer[0];
             /// <summary>Child objects by part slot, for the exploded view.</summary>
             public readonly Dictionary<string, Transform> Parts = new Dictionary<string, Transform>();
         }
@@ -98,6 +101,13 @@ namespace GateRush.Garage
             root.transform.SetParent(parent, false);
             res.Root = root;
             if (f == null || b.Motor == null || b.Prop == null || b.Battery == null) return res;
+            // P2: the detailed Blender-generated parts when they exist for this build.
+            var lib = QuadPartLibrary.Instance;
+            if (lib != null && lib.Find(f.Id) != null && lib.Find(b.Motor.Id) != null && lib.Find(b.Prop.Id) != null && lib.Find(b.Battery.Id) != null)
+            {
+                UnityEngine.Object.DestroyImmediate(root);
+                return BuildDetailed(b, mats, parent, layer, lib);
+            }
 
             var accent = b.Color.Accent;
             var finish = b.Style.Finish;
@@ -265,6 +275,168 @@ namespace GateRush.Garage
                 ledGo.GetComponent<MeshRenderer>().shadowCastingMode = ShadowCastingMode.Off;
                 res.Leds = new Renderer[] { ledGo.GetComponent<Renderer>() };
                 res.Parts["LEDs"] = ledGo.transform;
+            }
+            return res;
+        }
+
+        /// <summary>The pack's natural size (m) from its mass (~2.1 g/cm³): width, length, height.</summary>
+        public static (float w, float l, float h) BatterySize(BatteryDef b)
+        {
+            float vol = b.MassG / 2.1f * 1e-6f;
+            float l = Mathf.Pow(vol * 3.2f, 1f / 3f) * 1.25f;
+            float w = Mathf.Sqrt(vol / l) * 1.3f;
+            return (w, l, vol / (l * w));
+        }
+
+        /// <summary>The stack (mounting pattern) a frame carries.</summary>
+        public static string StackFor(FrameDef f) =>
+            f.Size >= SizeClass.Five ? "stack-30" : f.Size == SizeClass.Three && f.Geometry == FrameGeometry.Ducted ? "stack-25" : "stack-20";
+
+        /// <summary>
+        /// P2: the build from the Blender-generated parts (<see cref="QuadPartLibrary"/>): frame, motors, props with blur
+        /// discs, battery with leads, plug, strap and pad, the FC/ESC stack, FPV camera, analog VTX or HD air unit,
+        /// receiver, capacitor and extras, placed on the frame's sockets. Same origin and conventions as the procedural
+        /// model.
+        /// </summary>
+        private static Result BuildDetailed(QuadBuild b, QuadModelMaterials mats, Transform parent, int layer, QuadPartLibrary lib)
+        {
+            var res = new Result();
+            var f = b.Frame;
+            var root = new GameObject("Quad: " + b.Name) { layer = layer };
+            root.transform.SetParent(parent, false);
+            res.Root = root;
+
+            var accent = b.Color.Accent;
+            var finish = b.Style.Finish;
+            Material carbon = Tint(mats.Carbon, finish == FrameFinish.Stealth ? new Color(0.25f, 0.25f, 0.27f) : finish == FrameFinish.Tiger ? new Color(1.0f, 0.82f, 0.35f) : Color.white,
+                finish == FrameFinish.Tiger ? TigerTexture() : null);
+            Material edge = finish == FrameFinish.GoldEdge ? mats.Gold : finish == FrameFinish.Stealth ? mats.Plastic : mats.Metal;
+            Material Slot(string slot) => slot switch
+            {
+                "Carbon" => carbon,
+                "Edge" => edge,
+                "Metal" => mats.Metal,
+                "Bell" => Tint(mats.Bell, accent),
+                "Copper" => mats.Copper,
+                "Prop" or "PropBlur" => Tint(mats.Prop, new Color(accent.r, accent.g, accent.b, mats.Prop != null ? mats.Prop.color.a : 0.7f)),
+                "Lipo" => mats.Lipo,
+                "Led" => TintLed(mats.Led, accent),
+                "Lens" => mats.Lens,
+                "Pad" => mats.Pad,
+                "TPU" => Tint(mats.Plastic, Color.Lerp(accent, Color.black, 0.2f)),
+                "PCB" => Tint(mats.Plastic, new Color(0.05f, 0.2f, 0.11f)),
+                "Wire" => Tint(mats.Plastic, new Color(0.05f, 0.05f, 0.05f)),
+                "WireRed" => Tint(mats.Plastic, new Color(0.7f, 0.05f, 0.04f)),
+                "Rubber" => Tint(mats.Plastic, new Color(0.09f, 0.09f, 0.09f)),
+                "Plug" => Tint(mats.Plastic, new Color(0.95f, 0.72f, 0.08f)),
+                "Cap" => Tint(mats.Plastic, new Color(0.1f, 0.1f, 0.12f)),
+                _ => mats.Plastic,
+            };
+            GameObject Part(string id, string name, Transform par, Vector3 pos, Quaternion rot, Vector3 scale)
+            {
+                var e = lib.Find(id);
+                if (e == null) return null;
+                var go = new GameObject(name) { layer = layer };
+                go.transform.SetParent(par, false);
+                go.transform.SetLocalPositionAndRotation(pos, rot);
+                go.transform.localScale = scale;
+                go.AddComponent<MeshFilter>().sharedMesh = e.Mesh;
+                var mr = go.AddComponent<MeshRenderer>();
+                var list = new Material[e.Slots.Length];
+                for (int i = 0; i < list.Length; i++) list[i] = Slot(e.Slots[i]);
+                mr.sharedMaterials = list;
+                return go;
+            }
+            Transform Group(string name)
+            {
+                var t = new GameObject(name) { layer = layer }.transform;
+                t.SetParent(root.transform, false);
+                return t;
+            }
+
+            var frameEntry = lib.Find(f.Id);
+            float plate = f.PlateMm * 0.001f, stack = f.StackMm * 0.001f, bodyL = f.BodyLengthMm * 0.001f, bodyW = f.BodyWidthMm * 0.001f;
+            float topY = plate + stack + plate * 0.45f;
+            Vector3 Socket(string name, Vector3 fallback) => frameEntry.TryGetSocket(name, out var p) ? p : fallback;
+
+            // Frame and the electronics between the plates.
+            var frameGo = Part(f.Id, "Frame", root.transform, Vector3.zero, Quaternion.identity, Vector3.one);
+            res.Parts["Frame"] = frameGo.transform;
+            Part(StackFor(f), "Stack", frameGo.transform, Socket("stack", new Vector3(0f, plate, 0f)), Quaternion.identity, Vector3.one);
+            Part("receiver", "Receiver", frameGo.transform, Socket("rx", new Vector3(0f, plate, -bodyL * 0.35f)), Quaternion.identity, Vector3.one * (f.Size <= SizeClass.TwoFive ? 0.7f : 1f));
+
+            // Motors on the mounts, props on the motor shafts (mirrored blades on the counter-clockwise pair).
+            BuildComposer.Arms(f, out float ax, out float az);
+            var mounts = new[] { new Vector3(ax, plate, -az), new Vector3(ax, plate, az), new Vector3(-ax, plate, -az), new Vector3(-ax, plate, az) };
+            for (int i = 0; i < 4; i++) mounts[i] = Socket("motor" + i, mounts[i]);
+            var motorEntry = lib.Find(b.Motor.Id);
+            float propLift = motorEntry != null && motorEntry.TryGetSocket("prop", out var ps) ? ps.y : 0.012f;
+            var motorRoot = Group("Motors");
+            for (int i = 0; i < 4; i++) Part(b.Motor.Id, $"Motor {i}", motorRoot, mounts[i], Quaternion.Euler(0f, i * 90f + 45f, 0f), Vector3.one);
+            res.Parts["Motors"] = motorRoot;
+            var propRoot = Group("Props");
+            var discs = new List<Renderer>();
+            for (int i = 0; i < 4; i++)
+            {
+                Vector3 at = mounts[i] + Vector3.up * propLift;
+                var mirror = i == 1 || i == 2 ? new Vector3(-1f, 1f, 1f) : Vector3.one;
+                var prop = Part(b.Prop.Id, $"Prop {i}", propRoot, at, Quaternion.Euler(0f, i * 37f, 0f), mirror);
+                res.Props[i] = prop != null ? prop.transform : null;
+                var disc = Part(b.Prop.Id + "-blur", $"Blur {i}", propRoot, at, Quaternion.identity, Vector3.one);
+                if (disc == null) continue;
+                var dr = disc.GetComponent<MeshRenderer>();
+                dr.shadowCastingMode = ShadowCastingMode.Off;
+                dr.enabled = false;
+                discs.Add(dr);
+            }
+            res.BlurDiscs = discs.ToArray();
+            res.Parts["Props"] = propRoot;
+
+            // Battery on the top plate (scaled down if the pack is longer or wider than the frame allows).
+            var (bw, bl, bh) = BatterySize(b.Battery);
+            float s = Mathf.Min(1f, bodyL * 1.05f / bl, bodyW * 0.95f / bw);
+            Vector3 batC = new Vector3(0f, topY + bh * s * 0.5f + 0.001f, -bodyL * 0.06f);
+            var bat = Part(b.Battery.Id, "Battery", root.transform, batC, Quaternion.identity, Vector3.one * s);
+            res.Parts["Battery"] = bat != null ? bat.transform : root.transform;
+
+            // Camera, video and extras.
+            var extras = Group("Camera and extras");
+            bool hd = false, actionCam = false, longAntenna = false, leds = false;
+            foreach (var e in b.Extras)
+            {
+                hd |= e.Kind == ExtraKind.HdCamera || e.Kind == ExtraKind.DigitalHd;
+                actionCam |= e.Kind == ExtraKind.ActionCam;
+                longAntenna |= e.Kind == ExtraKind.LongAntenna;
+                leds |= e.Kind == ExtraKind.LedKit;
+            }
+            string cam = hd ? "camera-hd" : f.Size >= SizeClass.Five ? "camera-micro" : "camera-nano";
+            Part(cam, "FPV camera", extras, Socket("camera", new Vector3(0f, plate + stack * 0.5f, bodyL * 0.4f)), Quaternion.Euler(-25f, 0f, 0f), Vector3.one * (f.Size == SizeClass.Whoop ? 0.85f : 1f));
+            bool digital = false;
+            foreach (var e in b.Extras) digital |= e.Kind == ExtraKind.DigitalHd;
+            Vector3 antenna = Socket("antenna", new Vector3(0f, topY, -bodyL * 0.47f));
+            Part(digital ? "vtx-hd" : "vtx-analog", digital ? "HD air unit" : "VTX antenna", extras, antenna, Quaternion.identity, longAntenna ? new Vector3(1f, 2.2f, 1f) : Vector3.one);
+            if (f.Size > SizeClass.Whoop)
+                Part("capacitor", "Capacitor", extras, new Vector3(bodyW * 0.3f, topY + 0.004f, -bodyL * 0.42f), Quaternion.Euler(0f, 20f, 0f), Vector3.one);
+            if (actionCam)
+                Part("actioncam", "Action camera", extras, new Vector3(0f, batC.y + bh * s * 0.5f + 0.026f, bodyL * 0.28f), Quaternion.Euler(-15f, 0f, 0f), Vector3.one);
+            res.Parts["Extras"] = extras;
+
+            if (leds)
+            {
+                var ledBatch = new Batch();
+                Material led = TintLed(mats.Led, accent);
+                float chip = Mathf.Max(0.003f, stack * 0.2f);
+                foreach (float sx in new[] { -1f, 1f })
+                    foreach (float y in new[] { plate + stack * 0.3f, plate + stack * 0.68f })
+                        for (int k = 0; k < 8; k++)
+                            ledBatch.Box(led, new Vector3(sx * (bodyW * 0.5f + 0.0015f), y, -bodyL * 0.42f + k * bodyL * 0.84f / 7f), new Vector3(0.002f, chip, bodyL * 0.075f));
+                if (ledBatch.Items.Count > 0)
+                {
+                    var ledGo = ledBatch.Build("LEDs", root.transform, layer);
+                    ledGo.GetComponent<MeshRenderer>().shadowCastingMode = ShadowCastingMode.Off;
+                    res.Leds = new Renderer[] { ledGo.GetComponent<Renderer>() };
+                    res.Parts["LEDs"] = ledGo.transform;
+                }
             }
             return res;
         }
