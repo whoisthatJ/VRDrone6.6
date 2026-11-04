@@ -66,10 +66,22 @@ namespace GateRush.Core
                     receiveShadows = true,
                     lightProbeUsage = LightProbeUsage.Off,
                 };
+                if (g.Material.IsKeywordEnabled("_EMISSION"))
+                {
+                    _mpb ??= new MaterialPropertyBlock();
+                    _mpb.SetColor(EmissionId, g.Material.GetColor(EmissionId) * EmissionScale);
+                    rp.matProps = _mpb;
+                }
                 for (int start = 0; start < g.Matrices.Length; start += Batch)
                     Graphics.RenderMeshInstanced(rp, g.Mesh, g.Submesh, g.Matrices, Mathf.Min(Batch, g.Matrices.Length - start), start);
             }
         }
+
+        private static readonly int EmissionId = Shader.PropertyToID("_EmissionColor");
+        private MaterialPropertyBlock _mpb;
+
+        /// <summary>Multiplier on the emission of emissive groups (lamps): low by day, full at night. Set by the venue lighting.</summary>
+        public static float EmissionScale { get; set; } = 1f;
 
         public static void DrawAll(Camera camera)
         {

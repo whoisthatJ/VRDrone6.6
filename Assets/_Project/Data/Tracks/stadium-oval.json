@@ -11,7 +11,8 @@
             "y": 0.15000000596046448,
             "z": -45.97999954223633
         },
-        "Yaw": 89.99989318847656
+        "Yaw": 89.99989318847656,
+        "Name": ""
     },
     "Gates": [],
     "Props": [
@@ -988,6 +989,9 @@
                 "Color": "red",
                 "IsCheckpoint": true
             }
-        ]
-    }
+        ],
+        "AirCourse": false
+    },
+    "FreeFlight": false,
+    "ExtraSpawns": []
 }

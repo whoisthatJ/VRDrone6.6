@@ -35,11 +35,12 @@ namespace GateRush.EditorTools.SphereDistrict
         private readonly Dictionary<Vector2Int, List<(Mesh, Matrix4x4, int)>> _colliders = new Dictionary<Vector2Int, List<(Mesh, Matrix4x4, int)>>();
         public readonly Dictionary<string, int> Counts = new Dictionary<string, int>();
 
-        /// <param name="corridor">Race corridor centreline (props keep 7 m clear of it).</param>
-        public StreetscapeGenerator(GeoData data, IList<Vector3> corridor)
+        /// <param name="corridors">Race flight lines, each a closed loop (props keep 7 m clear of them).</param>
+        public StreetscapeGenerator(GeoData data, IEnumerable<IList<Vector3>> corridors)
         {
             _data = data;
             _corridor = new List<Vector2>();
+            foreach (var corridor in corridors)
             for (int i = 0; i < corridor.Count; i++)
             {
                 Vector3 a = corridor[i], b = corridor[(i + 1) % corridor.Count];

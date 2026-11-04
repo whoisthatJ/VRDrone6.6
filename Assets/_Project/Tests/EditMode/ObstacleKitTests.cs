@@ -10,7 +10,7 @@ namespace GateRush.Tests
     /// <summary>The T2 obstacle kit: every prefab is registered, LOD'd, collides with primitives only and has its checkpoints.</summary>
     public class ObstacleKitTests
     {
-        private static readonly string[] GateTypes = { "Single", "Double", "Slalom", "Cube", "Ladder", "Dive", "Ramp", "Arch", "Finish" };
+        private static readonly string[] GateTypes = { "Single", "Double", "Slalom", "Cube", "Ladder", "Dive", "Ramp", "Arch", "Finish", "Air" };
         private static readonly string[] PropTypes = { "ChevronBoard", "ChevronBoardLeft", "Flag", "LandingPad", "StartPad" };
 
         private static TrackPrefabs Prefabs => AssetDatabase.LoadAssetAtPath<TrackPrefabs>("Assets/_Project/Data/TrackPrefabs.asset");

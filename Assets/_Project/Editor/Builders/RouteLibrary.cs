@@ -20,7 +20,9 @@ namespace GateRush.EditorTools.Builders
             yield return SplineTest();
             yield return StadiumOval();
             yield return SerpentArena();
-            yield return ExpoAstana();
+            yield return ExpoSprint();
+            yield return ExpoPro();
+            yield return ExpoFreeFlight();
         }
 
         /// <summary>Writes every built-in spline track's JSON and definition asset.</summary>
@@ -242,51 +244,224 @@ namespace GateRush.EditorTools.Builders
             return t;
         }
 
-        /// <summary>
-        /// Expo Astana: one ~1.2 km lap of the EXPO 2017 site (ExpoArt; sphere at the origin, bearings clockwise from
-        /// north). Start on the south-south-west walkway (bearing 194) heading for the sphere, then
-        /// anticlockwise round Nur Alem at 61 m between its podium and the pods (east, the park side, north-west), out across the open north-west lawn
-        /// over a 4 m bridge, then anticlockwise along the lawn inside the ring road at 305 m past the south-west crescent
-        /// and back into the walkway. Gates stay on level ground or mid-bridge (not on ramps). 14 obstacles, 2 laps.
-        /// </summary>
-        public static TrackData ExpoAstana()
+        // ===================== Sphere District courses (E6) =====================
+        // Knots are written as (bearing clockwise from north, distance from the sphere, height). Air courses: no lanes,
+        // gates on the ground where the line is low, floating "Air" gates where it climbs, a beacon on the next gate.
+        // Clearances (CourseClearance, 2 m sphere): the south walkway gap is 190-198 (between the 160 and 226 pavilions),
+        // pod gaps 118-138 and 184-203 (r 70-118), the canopy covers 71-249 at r 52-93 and 6.5 m (fly at 3 m under it or
+        // 12+ m over it), pavilions are 24 m high (hops cross the end wings at 31 m), courtyards 165-211 m out.
+
+        /// <summary>Lanes on the south walkway: northbound into the finish cube, southbound on the way back.</summary>
+        public const float WalkNorth = 196.4f, WalkSouth = 192.6f;
+
+        private static Vector3 B(float bearing, float distance, float y) => ExpoPoint(bearing, distance, y);
+
+        private static void Arc(List<Vector3> k, float from, float to, float step, float r0, float r1, float y0, float y1)
         {
-            var t = new TrackData { Id = "expo-astana", Name = "Expo Astana", Author = "GateRush", Environment = "expo", Laps = 2 };
+            int n = Mathf.Max(1, Mathf.RoundToInt(Mathf.Abs(to - from) / step));
+            for (int i = 1; i <= n; i++)
+            {
+                float t = i / (float)n;
+                k.Add(B(Mathf.Lerp(from, to, t), Mathf.Lerp(r0, r1, t), Mathf.Lerp(y0, y1, t)));
+            }
+        }
+
+        /// <summary>Start: north up the walkway through the finish cube, hop over the west wing of the 160 pavilion,
+        /// fly the length of its courtyard, climb out over the inner wing and drop under the canopy through the
+        /// 118-138 pod gap onto the orbit (61 m, 3 m high).</summary>
+        private static List<Vector3> ExpoOpening()
+        {
+            return new List<Vector3>
+            {
+                B(WalkNorth, 300f, 1.8f),   // 0
+                B(WalkNorth, 262f, 1.8f),   // 1 finish cube
+                B(WalkNorth, 232f, 2.2f),   // 2
+                B(195.5f, 212f, 6f),        // 3
+                B(193f, 199f, 18f),         // 4 climbing at the courtyard's west end
+                B(188f, 192f, 31f),         // 5 over the west wing
+                B(181f, 188f, 22f),         // 6 dropping in
+                B(172f, 187f, 10f),         // 7 courtyard
+                B(160f, 187f, 7f),          // 8
+                B(149f, 186f, 9f),          // 9
+                B(141f, 182f, 21f),         // 10 climbing out
+                B(135f, 158f, 31f),         // 11 over the inner wing
+                B(129f, 125f, 15f),         // 12 dropping between the pods
+                B(127f, 100f, 4f),          // 13 under the canopy edge
+                B(122f, 76f, 3f),           // 14
+                B(110f, OrbitRadius, 3f),   // 15 orbit, under the canopy
+            };
+        }
+
+        /// <summary>
+        /// Expo Sprint (~1.2 km, beginner): up the walkway, the courtyard hop, anticlockwise round the sphere at 3 m, out
+        /// to the park for a slalom and back (U-turn at 230 m), on round the west side, south through the pod gap and
+        /// down the walkway, a U-turn on the south plaza and into the finish cube. Keeps the expo-astana id (and its
+        /// online leaderboard).
+        /// </summary>
+        public static TrackData ExpoSprint()
+        {
+            var k = ExpoOpening();
+            Arc(k, 110f, 10f, 20f, OrbitRadius, OrbitRadius, 3f, 3f);       // 16-20 orbit to the north
+            k.Add(B(6f, 95f, 4f));                                           // 21
+            k.Add(B(9f, 135f, 4.5f));                                        // 22
+            k.Add(B(11f, 172f, 4.5f));                                       // 23 park slalom
+            k.Add(B(12f, 205f, 5f));                                         // 24
+            k.Add(B(9f, 232f, 6f));                                          // 25 U-turn (to the left, clear of the 41 pavilion)
+            k.Add(B(1f, 238f, 6f));                                          // 26
+            k.Add(B(354f, 222f, 5f));                                        // 27
+            k.Add(B(357f, 180f, 4.5f));                                      // 28 back down the axis
+            k.Add(B(356f, 120f, 4f));                                        // 29
+            k.Add(B(352f, 80f, 3f));                                         // 30
+            Arc(k, 340f, 220f, 20f, OrbitRadius, OrbitRadius, 3f, 3f);       // 31-36 west side of the orbit
+            k.Add(B(205f, 70f, 3f));                                         // 37
+            k.Add(B(WalkSouth + 1f, 100f, 3f));                              // 38 south pod gap
+            k.Add(B(WalkSouth, 150f, 3f));                                   // 39
+            k.Add(B(WalkSouth, 210f, 3f));                                   // 40
+            k.Add(B(WalkSouth, 265f, 2.5f));                                 // 41
+            k.Add(B(WalkSouth, 305f, 2.5f));                                 // 42
+            k.Add(B(193.5f, 322f, 3f));                                      // 43 U-turn on the south plaza
+            k.Add(B(196.5f, 318f, 2.5f));                                    // 44
+
+            var t = ExpoTrack("expo-astana", "Expo Sprint", 2, k);
             var r = t.Route;
+            var route = new TrackRoute(r);
+            float At(int knot) => route.ClosestDistance(k[knot]);
+            void Add(string type, int knot, string color) => r.Obstacles.Add(new RouteObstacle { Type = type, Distance = At(knot), Color = color, IsCheckpoint = true });
+            Add("Finish", 1, "");
+            Add("Single", 2, "red");
+            Add("Air", 8, "blue");        // courtyard (room to drop in after the wing)
+            Add("Air", 9, "blue");
+            Add("Air", 11, "white");      // over the inner wing
+            Add("Single", 16, "red");     // under the canopy, east
+            Add("Single", 19, "red");     // north-east
+            Add("Slalom", 23, "white");   // park
+            Add("Air", 26, "blue");       // U-turn
+            Add("Single", 29, "red");     // back down the axis
+            Add("Single", 32, "red");     // north-west orbit
+            Add("Single", 35, "red");     // south-west, under the canopy
+            Add("Double", 40, "red");     // walkway, southbound
+            Add("Single", 0, "white");    // the straight into the finish, after the plaza U-turn
+            return Finish(t, route, k);
+        }
+
+        /// <summary>
+        /// Expo Pro (~2.2 km, advanced): the Sprint opening, then a 1.25-turn helix round the sphere from 3 m to 90 m
+        /// (clear of the canopy sector until 14 m), the dive down the north-west side into the park (slalom), a fast
+        /// sweeper along the ring road, the second courtyard (226 pavilion, west wing in, east wing out), and down the
+        /// walkway to the south plaza U-turn and the finish cube.
+        /// </summary>
+        public static TrackData ExpoPro()
+        {
+            var k = ExpoOpening();
+            Arc(k, 110f, 60f, 25f, OrbitRadius, OrbitRadius, 3f, 3f);          // 16-17 to the canopy's north edge
+            Arc(k, 60f, -110f, 17f, OrbitRadius, 70f, 3f, 14f);                // 18-27 climbing, canopy-free side
+            Arc(k, -110f, -390f, 20f, 70f, 74f, 14f, 90f);                     // 28-41 helix to 90 m
+            int helixTop = k.Count - 1;
+            k.Add(B(329f, 105f, 70f));                                         // dive
+            k.Add(B(331f, 140f, 42f));
+            k.Add(B(330f, 180f, 18f));
+            int diveBottom = k.Count;
+            k.Add(B(324f, 215f, 6f));                                          // park
+            k.Add(B(311f, 245f, 4f));
+            int slalom = k.Count;
+            k.Add(B(298f, 270f, 4f));                                          // park slalom
+            k.Add(B(290f, 300f, 4f));
+            int sweepStart = k.Count;
+            Arc(k, 284f, 236f, 8f, 330f, 330f, 4f, 4f);                       // ring-road sweeper
+            int sweepEnd = k.Count - 1;
+            k.Add(B(259f, 300f, 4f));                                          // turning in to the 226 pavilion
+            k.Add(B(259f, 245f, 12f));
+            k.Add(B(256f, 205f, 26f));
+            k.Add(B(252f, 193f, 31f));                                         // over its west wing
+            k.Add(B(246f, 191f, 25f));
+            k.Add(B(240f, 191f, 13f));
+            int court2 = k.Count;
+            k.Add(B(232f, 191f, 7f));                                          // courtyard
+            k.Add(B(221f, 191f, 7f));
+            k.Add(B(210f, 192f, 13f));
+            k.Add(B(202f, 196f, 31f));                                         // over its east wing
+            k.Add(B(WalkSouth, 222f, 16f));                                    // down into the walkway
+            k.Add(B(WalkSouth, 255f, 4f));
+            k.Add(B(WalkSouth, 295f, 2.5f));
+            k.Add(B(193.5f, 322f, 3f));                                        // south plaza U-turn
+            k.Add(B(196.5f, 318f, 2.5f));
+
+            var t = ExpoTrack("expo-pro", "Expo Pro", 2, k);
+            var r = t.Route;
+            var route = new TrackRoute(r);
+            float At(int knot) => route.ClosestDistance(k[knot]);
+            void Add(string type, int knot, string color) => r.Obstacles.Add(new RouteObstacle { Type = type, Distance = At(knot), Color = color, IsCheckpoint = true });
+            Add("Finish", 1, "");
+            Add("Air", 8, "blue");        // first courtyard
+            Add("Air", 9, "blue");
+            Add("Air", 11, "white");
+            Add("Single", 16, "red");     // under the canopy
+            for (int h = 20; h < helixTop - 1; h += 4) Add("Air", h, h > 30 ? "white" : "blue");   // up the helix
+            Add("Air", helixTop, "red");  // top of the helix: the dive starts here
+            Add("Air", helixTop + 2, "blue");
+            Add("Single", diveBottom + 1, "red");
+            Add("Slalom", slalom, "white");
+            for (int s = sweepStart + 1; s < sweepEnd; s += 2) Add("Single", s, "red");   // gates along the ring road
+            Add("Air", court2, "blue");   // second courtyard
+            Add("Air", court2 + 1, "blue");
+            Add("Double", court2 + 5, "red");
+            Add("Single", 0, "white");    // the straight into the finish
+            return Finish(t, route, k);
+        }
+
+        /// <summary>
+        /// Expo free flight (E7): no gates, the whole 1.2 km area. Spawns: the south plaza (default), hovering above the
+        /// sphere, the park and the east ring road; F / D-pad up switches, T resets.
+        /// </summary>
+        public static TrackData ExpoFreeFlight()
+        {
+            var t = new TrackData { Id = "expo-free", Name = "Expo Free Flight", Author = "GateRush", Environment = "expo", Laps = 1, FreeFlight = true };
+            t.Spawn = Spawn("South plaza", B(WalkNorth, 285f, 0.15f), 16f);
+            t.ExtraSpawns.Add(Spawn("Above the sphere", B(194f, 30f, 112f), 14f));
+            t.ExtraSpawns.Add(Spawn("Park", B(12f, 330f, 0.15f), 192f));
+            t.ExtraSpawns.Add(Spawn("Ring road", B(90f, 330f, 0.15f), 0f));
+            return t;
+        }
+
+        private static SpawnData Spawn(string name, Vector3 p, float yaw) => new SpawnData { Name = name, Position = p, Yaw = yaw };
+
+        private static TrackData ExpoTrack(string id, string name, int laps, List<Vector3> knots)
+        {
+            var t = new TrackData { Id = id, Name = name, Author = "GateRush", Environment = "expo", Laps = laps };
+            var r = t.Route;
+            r.AirCourse = true;
             r.CorridorWidth = 5f;
             r.FlightHeight = 1.8f;
-            var knots = ExpoKnots();
-            foreach (var k in knots) r.Knots.Add(new RouteKnot { Position = k });
-            var route = new TrackRoute(r);
-            float At(int knot) => route.ClosestDistance(knots[knot]);
-            void Add(string type, int knot, string color) =>
-                r.Obstacles.Add(new RouteObstacle { Type = type, Distance = At(knot), Color = color, IsCheckpoint = true });
-
-            Add("Arch", 1, "white");      // finish, on the walkway
-            Add("Single", 3, "red");
-            Add("Double", 4, "red");      // between the southern petals
-            Add("Single", 8, "blue");     // under the canopy, south of the sphere
-            Add("Ladder", 11, "green");   // east, between the sphere and a pod
-            Add("Single", 14, "red");     // north-east
-            Add("Single", 16, "red");     // north, facing the park
-            Add("Ladder", 18, "green");   // north-west
-            r.Obstacles.Add(new RouteObstacle { Type = "Single", Distance = (At(22) + At(23)) * 0.5f, Color = "blue", IsCheckpoint = true }); // mid-bridge
-            Add("Single", 26, "red");     // turning onto the lawn loop
-            Add("Ladder", 28, "green");
-            Add("Cube", 30, "green");     // past the south-west petal
-            Add("Ladder", 32, "green");   // back towards the walkway
-            r.Obstacles.Sort((a, b) => a.Distance.CompareTo(b.Distance));
-            r.FinishObstacle = r.Obstacles.FindIndex(o => o.Type == "Arch");
-
-            // Start grid on the walkway 30 m before the finish arch, facing the sphere (bearing 14).
-            var fwd = ExpoPoint(14f, 1f);
-            var right = new Vector3(fwd.z, 0f, -fwd.x);
-            var padPos = knots[1] - fwd * 30f + right * 4.5f;
-            t.Spawn.Position = new Vector3(padPos.x, r.GroundHeight + 0.15f, padPos.z);
-            t.Spawn.Yaw = 14f;
-            foreach (float side in new[] { -4.2f, 4.2f })
-                t.Props.Add(new PropData { Type = "Flag", Position = padPos + right * 1.4f + fwd * side, Euler = new Vector3(0f, 14f, 0f) });
+            foreach (var p in knots) r.Knots.Add(new RouteKnot { Position = p });
             return t;
+        }
+
+        /// <summary>Sorts the obstacles, makes the cube the finish and puts the start pad 26 m before it on the walkway.</summary>
+        private static TrackData Finish(TrackData t, TrackRoute route, List<Vector3> knots)
+        {
+            var r = t.Route;
+            r.Obstacles.Sort((a, b) => a.Distance.CompareTo(b.Distance));
+            r.FinishObstacle = r.Obstacles.FindIndex(o => o.Type == "Finish");
+            var pad = route.Sample(route.ClosestDistance(knots[1]) - 26f);
+            t.Spawn.Position = new Vector3(pad.Position.x, r.GroundHeight + 0.15f, pad.Position.z);
+            t.Spawn.Yaw = Mathf.Atan2(pad.FlatForward.x, pad.FlatForward.z) * Mathf.Rad2Deg;
+            foreach (float side in new[] { -4.2f, 4.2f })
+                t.Props.Add(new PropData { Type = "Flag", Position = new Vector3(pad.Position.x, 0f, pad.Position.z) + pad.Right * 3f + pad.FlatForward * side, Euler = new Vector3(0f, t.Spawn.Yaw, 0f) });
+            return t;
+        }
+
+        /// <summary>The flight lines of both Sphere District courses, sampled every 2 m (props keep clear of them).</summary>
+        public static List<List<Vector3>> ExpoCorridors()
+        {
+            var all = new List<List<Vector3>>();
+            foreach (var t in new[] { ExpoSprint(), ExpoPro() })
+            {
+                var route = new TrackRoute(t.Route);
+                var pts = new List<Vector3>();
+                for (float d = 0f; d < route.Length; d += 2f) pts.Add(route.Sample(d).Position);
+                all.Add(pts);
+            }
+            return all;
         }
 
         /// <summary>Radius of the Expo course's orbit round the sphere (generators keep it clear).</summary>
@@ -300,32 +475,6 @@ namespace GateRush.EditorTools.Builders
         }
 
         /// <summary>The Expo route's knots (x east, y deck height, z north), in flying order.</summary>
-        public static List<Vector3> ExpoKnots()
-        {
-            var k = new List<Vector3>
-            {
-                ExpoPoint(194f, 296f),     // 0 entering the walkway from the lawn loop
-                ExpoPoint(194f, 252f),     // 1 finish arch
-                ExpoPoint(194f, 215f),
-                ExpoPoint(194f, 182f),     // 3
-                ExpoPoint(194f, 152f),     // 4 between the southern petals
-                ExpoPoint(192f, 112f),
-                ExpoPoint(189f, 82f),      // 6 between the southern pods, under the canopy edge
-            };
-            // Anticlockwise round the sphere at 61 m, between its podium (to 55 m) and the pods (from 67 m), under the
-            // canopy on the south side: bearing 180 down to -80.
-            for (float b = 180f; b >= -80f; b -= 20f) k.Add(ExpoPoint(b, OrbitRadius));   // knots 7..20
-            // Out across the north-west lawn over a bridge (40 m level deck, 40-45 m ramps).
-            k.Add(ExpoPoint(274f, 150f));         // 21 ramp foot
-            k.Add(ExpoPoint(273f, 195f, 4f));     // 22 deck
-            k.Add(ExpoPoint(272f, 235f, 4f));     // 23 deck
-            k.Add(ExpoPoint(268f, 275f));         // 24 ramp foot
-            // Anticlockwise along the lawn inside the ring road at 305 m, bearing 258 down to 202.
-            for (float b = 258f; b >= 202f; b -= 8f) k.Add(ExpoPoint(b, 305f));      // knots 25..32
-            k.Add(ExpoPoint(197f, 304f));         // 33
-            return k;
-        }
-
         /// <summary>Points on a stadium-shaped oval (two straights of ±<paramref name="half"/> and semicircles of <paramref name="radius"/>), anticlockwise from (−half, −radius).</summary>
         public static List<Vector2> OvalPoints(float half, float radius, int perArc)
         {

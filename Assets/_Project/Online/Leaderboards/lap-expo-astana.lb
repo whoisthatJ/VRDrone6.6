@@ -2,6 +2,6 @@
   "$schema": "https://ugs-config-schemas.unity3d.com/v1/leaderboards.schema.json",
   "SortOrder": "asc",
   "UpdateType": "keepBest",
-  "Name": "Expo Astana best lap",
+  "Name": "Expo Sprint best lap",
   "Id": "lap-expo-astana"
 }

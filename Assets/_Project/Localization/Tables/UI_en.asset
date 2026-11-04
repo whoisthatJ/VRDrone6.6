@@ -1734,10 +1734,6 @@ MonoBehaviour:
     m_Localized: Expo Astana
     m_Metadata:
       m_Items: []
-  - m_Id: 77934666706944
-    m_Localized: 'The EXPO 2017 site in Astana: up the south walkway, round the Nur Alem sphere, out between the pavilions and back along the ring road.'
-    m_Metadata:
-      m_Items: []
   - m_Id: 91357320310784
     m_Localized: Credits
     m_Metadata:
@@ -1812,6 +1808,74 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 246772767125515
     m_Localized: Next (N)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 258319883169792
+    m_Localized: Expo lighting
+    m_Metadata:
+      m_Items: []
+  - m_Id: 258319929307136
+    m_Localized: Night
+    m_Metadata:
+      m_Items: []
+  - m_Id: 258319929307137
+    m_Localized: Golden hour
+    m_Metadata:
+      m_Items: []
+  - m_Id: 258319929307138
+    m_Localized: Summer day
+    m_Metadata:
+      m_Items: []
+  - m_Id: 266269578227712
+    m_Localized: Expo Sprint
+    m_Metadata:
+      m_Items: []
+  - m_Id: 266269620170752
+    m_Localized: Expo Pro
+    m_Metadata:
+      m_Items: []
+  - m_Id: 266269620170753
+    m_Localized: 'Beginner, 1.2 km: up the south walkway, over a pavilion into its courtyard, round the sphere at 3 m, a park slalom and back down the walkway. Trainer guidance recommended.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 266269620170754
+    m_Localized: 'Advanced, 2.2 km: the courtyard hop, a helix round the sphere to 90 m, the dive into the park, the ring-road sweeper and a second courtyard.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 274119067168768
+    m_Localized: <color=#ff4a3d>LEAVING THE FLYING AREA - TURN BACK</color>
+    m_Metadata:
+      m_Items: []
+  - m_Id: 274119125889024
+    m_Localized: FREE FLIGHT   {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 274119125889025
+    m_Localized: 'F / D-pad up: next spawn   T: reset'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 274119125889026
+    m_Localized: South plaza
+    m_Metadata:
+      m_Items: []
+  - m_Id: 274119125889027
+    m_Localized: Above the sphere
+    m_Metadata:
+      m_Items: []
+  - m_Id: 274119125889028
+    m_Localized: Park
+    m_Metadata:
+      m_Items: []
+  - m_Id: 274119125889029
+    m_Localized: Ring road
+    m_Metadata:
+      m_Items: []
+  - m_Id: 274119134277632
+    m_Localized: Expo Free Flight
+    m_Metadata:
+      m_Items: []
+  - m_Id: 274119134277633
+    m_Localized: 'No gates: fly anywhere within 1.2 km of the sphere and up to 150 m. F / D-pad up switches between the south plaza, above the sphere, the park and the ring road; T resets.'
     m_Metadata:
       m_Items: []
   references:

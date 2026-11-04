@@ -196,6 +196,13 @@ namespace GateRush.Game
                 losStand.SetPositionAndRotation(new Vector3(pos.x, 0f, pos.z), Quaternion.LookRotation(s.rotation * new Vector3(4f, 0f, 14f)));
             }
             race.SetCourse(Track.Gates, Track.Spawn, data.Id, data.Laps, data.Name);
+            var beacon = race.GetComponent<NextGateBeacon>();
+            if (beacon != null) beacon.Show = data.Route.AirCourse;
+            // E7: open venues have a flyable area with a soft boundary; free-flight tracks have no race at all.
+            var area = GetComponent<FlightArea>();
+            if (area == null) area = gameObject.AddComponent<FlightArea>();
+            area.Configure(vehicle, data, Track.Spawn, environment == "expo");
+            race.enabled = !data.FreeFlight;
             ApplyGuidance(SaveSystem.Settings);
             Debug.Log($"[GateRush] Track '{data.Name}' loaded: {Track.Gates.Length} gates, {data.Props.Count} props, {data.Laps} laps");
         }
@@ -229,8 +236,12 @@ namespace GateRush.Game
             if (quadAudio != null) quadAudio.Volume = s.Feed.MotorVolume;
             if (vtx != null) vtx.Level = (VtxNoiseLevel)s.Feed.VtxNoise;
             if (debugOverlay != null) debugOverlay.SetActive(s.Feed.ShowDebugOverlay);
-            var stadium = FindAnyObjectByType<StadiumLighting>();
-            if (stadium != null && stadium.Current != (TimeOfDay)s.Feed.StadiumLighting) stadium.Apply((TimeOfDay)s.Feed.StadiumLighting);
+            var venue = FindAnyObjectByType<StadiumLighting>();
+            if (venue != null)
+            {
+                var time = (TimeOfDay)(venue.Venue == "expo" ? s.Feed.ExpoLighting : s.Feed.StadiumLighting);
+                if (venue.Current != time) venue.Apply(time);
+            }
             if (vehicle != null) vehicle.SetBatterySag(s.Physics.BatterySag);
             if (views != null) OnViewChanged(views.Mode);
 

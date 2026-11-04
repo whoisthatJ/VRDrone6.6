@@ -153,6 +153,8 @@ namespace GateRush.EditorTools.Art
             Tint("M_Expo_Steppe", "Grass_Field", new Color(1.05f, 0.95f, 0.62f), smooth: 0.2f, macro: 0.5f),
             Plain("M_Expo_Asphalt", new Color(0.2f, 0.21f, 0.22f), 0.08f),
             Plain("M_Expo_Tower", new Color(0.2f, 0.27f, 0.33f), 0.9f, 0.3f),
+            // E6 next-gate beacon: a translucent green light column.
+            new MatDef { Name = "M_Beacon", Tint = new Color(0.35f, 1f, 0.5f, 0.16f), Smoothness = 0f, Metallic = 0f, Macro = 0f, Transparent = true, DoubleSided = true, Emission = new Color(0.25f, 1f, 0.4f) * 1.6f },
             // E4 city: light grey precast panels and bitumen-grey roofs (Astana slabs read pale from the air).
             Plain("M_City_Concrete", new Color(0.7f, 0.71f, 0.73f), 0.2f),
             Plain("M_City_Roof", new Color(0.42f, 0.43f, 0.45f), 0.15f),

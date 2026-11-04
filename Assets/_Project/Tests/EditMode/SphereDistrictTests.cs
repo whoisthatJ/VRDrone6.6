@@ -67,12 +67,43 @@ namespace GateRush.Tests
         [Test]
         public void Streetscape_KeepsPropsOffTheRaceCorridor_AndOffsetsLines()
         {
-            var st = new StreetscapeGenerator(new GeoData(), new List<Vector3> { new Vector3(0, 0, 0), new Vector3(100, 0, 0), new Vector3(100, 0, 100) });
+            var st = new StreetscapeGenerator(new GeoData(), new[] { new List<Vector3> { new Vector3(0, 0, 0), new Vector3(100, 0, 0), new Vector3(100, 0, 100) } });
             Assert.IsTrue(st.NearCorridor(new Vector2(50f, 3f)), "3 m from the corridor");
             Assert.IsFalse(st.NearCorridor(new Vector2(50f, 20f)), "20 m away");
             var line = StreetscapeGenerator.OffsetLine(new List<Vector2> { new Vector2(0, 0), new Vector2(10, 0) }, 2f);
             Assert.AreEqual(2f, line[0].y, 1e-4f, "left of an eastbound line is north");
             Assert.AreEqual(2f, line[1].y, 1e-4f);
+        }
+    
+        [Test]
+        public void ExpoCourses_AreAirCourses_EndInTheFinishCube_AndHaveTheirLengths()
+        {
+            foreach (var (t, min, max, top) in new[]
+            {
+                (GateRush.EditorTools.Builders.RouteLibrary.ExpoSprint(), 1000f, 1500f, 40f),
+                (GateRush.EditorTools.Builders.RouteLibrary.ExpoPro(), 2000f, 2600f, 95f),
+            })
+            {
+                Assert.IsTrue(t.Route.AirCourse, t.Id);
+                Assert.AreEqual("Finish", t.Route.Obstacles[t.Route.FinishObstacle].Type, t.Id);
+                var route = new GateRush.Track.TrackRoute(t.Route);
+                Assert.That(route.Length, Is.InRange(min, max), t.Id);
+                float high = 0f;
+                foreach (var k in t.Route.Knots) high = Mathf.Max(high, k.Position.y);
+                Assert.That(high, Is.LessThanOrEqualTo(top), t.Id);
+                Assert.IsEmpty(t.Validate(), t.Id);
+            }
+        }
+
+        [Test]
+        public void ExpoFreeFlight_HasNoGates_FourSpawns_AndValidates()
+        {
+            var t = GateRush.EditorTools.Builders.RouteLibrary.ExpoFreeFlight();
+            Assert.IsTrue(t.FreeFlight);
+            Assert.IsFalse(t.IsSplineTrack);
+            Assert.AreEqual(3, t.ExtraSpawns.Count);
+            Assert.IsEmpty(t.Validate());
+            Assert.IsTrue(t.ExtraSpawns.Exists(s => s.Position.y > 100f), "a spawn above the sphere");
         }
     }
 }

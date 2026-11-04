@@ -20,14 +20,15 @@ namespace GateRush.EditorTools.Art
     /// Obstacles (local +Z = flying direction, base on y = 0): Single, Double (stacked), Slalom (3 offset gates, 3
     /// checkpoints), Cube, Ladder (H hurdle, fly under or between the rungs), Dive (frame tilted 45° down), Ramp
     /// (gate on a raised platform at the top of a ramp), Arch, Finish (T6: the 4 m truss cube entered through a glowing
-    /// hexagon, with the <see cref="FinishCube"/> camera and hover anchors). Every obstacle has LOD0/1/2 + cull, box colliders only,
+    /// hexagon, with the <see cref="FinishCube"/> camera and hover anchors), Air (E6: a 3.2 m padded frame with no bases,
+    /// floating on the flight line of city courses). Every obstacle has LOD0/1/2 + cull, box colliders only,
     /// and one or more directional <see cref="Gate"/> checkpoints. Prefabs go to Prefabs/Obstacles and are registered
     /// in <see cref="TrackPrefabs"/> by type name.
     /// </summary>
     public static class ObstacleKit
     {
         public const string PrefabDir = "Assets/_Project/Prefabs/Obstacles";
-        public static readonly string[] GateTypes = { "Single", "Double", "Slalom", "Cube", "Ladder", "Dive", "Ramp", "Arch", "Finish" };
+        public static readonly string[] GateTypes = { "Single", "Double", "Slalom", "Cube", "Ladder", "Dive", "Ramp", "Arch", "Finish", "Air" };
         public static readonly string[] PropTypes = { "ChevronBoard", "ChevronBoardLeft", "Flag", "LandingPad", "StartPad" };
 
         public const float TrussSize = 0.29f;
@@ -447,6 +448,14 @@ namespace GateRush.EditorTools.Art
                     gates.Add((new Vector3(0f, (legs + R * 0.8f) / 2 + 0.2f, 0f), new Vector2(2f * R - PadSize, legs + R * 0.8f - 0.2f), Quaternion.identity));
                     break;
                 }
+
+                case "Air":
+                    // E6 air gate: a padded frame with no feet, its opening centred 1.8 m above its origin (the flight
+                    // line of air courses), so it floats where the course climbs.
+                    W = 3.2f; H = 3.2f; b = 0.2f;
+                    PaddedGate(g, W, H, b, bases: false);
+                    gates.Add((new Vector3(0f, b + H / 2, 0f), new Vector2(W, H), Quaternion.identity));
+                    break;
 
                 case "Finish":
                 {

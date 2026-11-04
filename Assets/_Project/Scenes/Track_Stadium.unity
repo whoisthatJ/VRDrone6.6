@@ -172752,6 +172752,7 @@ MonoBehaviour:
     FogDensity: 0.0016
     FloodlightIntensity: 11000
     LampIntensity: 14
+    PropEmission: 1
     Volume: {fileID: 1199605866}
   - Name: Dusk
     Sky: {fileID: 2100000, guid: 4f7f32e2033a6eb4cbb6047e5230b492, type: 2}
@@ -172766,6 +172767,7 @@ MonoBehaviour:
     FogDensity: 0.0012
     FloodlightIntensity: 4500
     LampIntensity: 9
+    PropEmission: 1
     Volume: {fileID: 2080478185}
   - Name: Day
     Sky: {fileID: 2100000, guid: 106f6d4a2bfb9b145be179de41f4f512, type: 2}
@@ -172780,6 +172782,7 @@ MonoBehaviour:
     FogDensity: 0.0008
     FloodlightIntensity: 0
     LampIntensity: 0.5
+    PropEmission: 1
     Volume: {fileID: 1464859126}
   sun: {fileID: 1893194599}
   floodlights:
@@ -172806,6 +172809,8 @@ MonoBehaviour:
   - {fileID: 1608628481}
   - {fileID: 1590482607}
   initial: 0
+  venue: stadium
+  probes: []
 --- !u!21 &1472278615
 Material:
   serializedVersion: 8
@@ -175025,6 +175030,7 @@ GameObject:
   - component: {fileID: 1681649350}
   - component: {fileID: 1681649349}
   - component: {fileID: 1681649348}
+  - component: {fileID: 1681649351}
   m_Layer: 0
   m_Name: Race
   m_TagString: Untagged
@@ -175084,6 +175090,22 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1681649351
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1681649347}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8a276201e6bcbf449fccab102d33423, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GateRush.Race::GateRush.Race.NextGateBeacon
+  session: {fileID: 1681649348}
+  material: {fileID: 2100000, guid: f6a4e52493688fc4eab78cc333aa6ce4, type: 2}
+  radius: 0.9
+  height: 150
 --- !u!1 &1693523705
 GameObject:
   m_ObjectHideFlags: 0

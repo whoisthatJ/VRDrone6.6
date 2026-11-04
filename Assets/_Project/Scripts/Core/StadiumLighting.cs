@@ -12,9 +12,10 @@ namespace GateRush.Core
     }
 
     /// <summary>
-    /// Runtime time-of-day for the stadium: each preset sets the sky, ambient, sun (or moon), fog, the floodlights
-    /// (realtime spots + emissive heads) and its own post-processing volume. Nothing is baked, so presets switch live
-    /// (settings: Stadium lighting). Built by the stadium art pass.
+    /// Runtime time-of-day for a venue (the stadium, and the Sphere District since E5): each preset sets the sky,
+    /// ambient, sun (or moon), fog, the floodlights (realtime lights + emissive heads), the glow of instanced lamps and
+    /// its own post-processing volume, then re-renders the venue's reflection probes. Nothing is baked, so presets switch
+    /// live (settings: Stadium lighting / Expo lighting). Built by the venue's art pass.
     /// </summary>
     public sealed class StadiumLighting : MonoBehaviour
     {
@@ -38,6 +39,8 @@ namespace GateRush.Core
             public float FloodlightIntensity;
             [Tooltip("HDR intensity of the floodlight lamp heads.")]
             public float LampIntensity = 1f;
+            [Tooltip("Emission multiplier for GPU-instanced lamps (street and park lights).")]
+            public float PropEmission = 1f;
             public Volume Volume;
         }
 
@@ -48,15 +51,24 @@ namespace GateRush.Core
         [SerializeField] private float[] floodlightScale = new float[0];
         [SerializeField] private Renderer[] lampHeads = new Renderer[0];
         [SerializeField] private TimeOfDay initial = TimeOfDay.Night;
+        [Tooltip("Which setting picks the preset: \"stadium\" or \"expo\".")]
+        [SerializeField] private string venue = "stadium";
+        [Tooltip("Realtime probes re-rendered after each preset change (glass and metal need the new sky).")]
+        [SerializeField] private ReflectionProbe[] probes = new ReflectionProbe[0];
 
         private MaterialPropertyBlock _mpb;
         private bool _applied;
 
         public TimeOfDay Current { get; private set; }
         public Preset[] Presets => presets;
+        public string Venue => venue;
 
-        public void Configure(Preset[] all, Light sunLight, Light[] spots, Renderer[] heads, float[] spotScale = null)
+        public void Configure(Preset[] all, Light sunLight, Light[] spots, Renderer[] heads, float[] spotScale = null,
+            string venueName = "stadium", TimeOfDay start = TimeOfDay.Night, ReflectionProbe[] reflectionProbes = null)
         {
+            venue = venueName;
+            initial = start;
+            probes = reflectionProbes ?? new ReflectionProbe[0];
             presets = all;
             sun = sunLight;
             floodlights = spots;
@@ -110,7 +122,10 @@ namespace GateRush.Core
             for (int k = 0; k < presets.Length; k++)
                 if (presets[k]?.Volume != null) presets[k].Volume.weight = k == i ? 1f : 0f;
 
+            InstancedProps.EmissionScale = p.PropEmission;
             DynamicGI.UpdateEnvironment();
+            foreach (var probe in probes)
+                if (probe != null && probe.mode == UnityEngine.Rendering.ReflectionProbeMode.Realtime) probe.RenderProbe();
         }
     }
 }

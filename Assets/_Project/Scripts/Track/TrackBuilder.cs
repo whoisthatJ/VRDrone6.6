@@ -55,7 +55,7 @@ namespace GateRush.Track
             var supportColliders = NewChild(generated, "Support Colliders", layer);
             float startDistance = route.ClosestDistance(data.Spawn.Position);
 
-            for (float s = 0f; s < route.Length - 0.01f; s += SegmentLength)
+            for (float s = 0f; !r.AirCourse && s < route.Length - 0.01f; s += SegmentLength)
             {
                 float e = Mathf.Min(s + SegmentLength, route.Length);
                 var mesh = new TrackMesh(SubCount);
@@ -71,7 +71,7 @@ namespace GateRush.Track
             }
 
             var gates = BuildObstacles(data, route, prefabs, root, startDistance, out var wear);
-            if (!wear.IsEmpty)
+            if (!wear.IsEmpty && !r.AirCourse)
             {
                 var decals = NewChild(generated, "Wear Marks", layer);
                 decals.AddComponent<MeshFilter>().sharedMesh = wear.ToMesh("Wear Marks");

@@ -66,7 +66,89 @@ namespace GateRush.EditorTools.Art
             BuildStreetscape(ctx);
             BuildCity(ctx);
             BuildSkyline(ctx);
-            ArtPass.AddProbe(ctx, "Hub Probe", new Vector3(0f, 20f, 0f), new Vector3(700f, 120f, 700f), false, 256);
+            BuildLighting(ctx);
+        }
+
+        // ---------- E5 lighting: summer day (default), golden hour, night ----------
+
+        private static readonly StadiumArt.LookDef[] Looks =
+        {
+            new StadiumArt.LookDef
+            {
+                Name = "Night", Hdri = "qwantani_night_puresky", Exposure = 0.16f, Ambient = 1.4f, Reflection = 0.5f,
+                // Moonlight, and the sphere lit from below; the street and park lamps glow.
+                SunIntensity = 0.08f, SunRotation = Quaternion.Euler(50f, 150f, 0f), SunTint = new Color(0.6f, 0.7f, 1f), Shadow = 0.5f,
+                Fog = new Color(0.03f, 0.04f, 0.065f), FogDensity = 0.0003f, Flood = 40000f, Lamp = 5f, PropEmission = 1.6f,
+                Post = new SceneLook { PostExposure = 0.6f, Contrast = 12f, Saturation = 4f, Temperature = -4f, BloomIntensity = 0.8f, BloomThreshold = 1f, Vignette = 0.22f },
+            },
+            new StadiumArt.LookDef
+            {
+                Name = "Golden", Hdri = "qwantani_dusk_2_puresky", Exposure = 0.75f, Ambient = 0.85f, Reflection = 0.85f,
+                SunIntensity = 2f, SunTint = new Color(1f, 0.82f, 0.62f), Shadow = 0.85f, FogDensity = 0.00035f, FogBrightness = 0.8f,
+                Flood = 0f, Lamp = 2f, PropEmission = 0.8f,
+                Post = new SceneLook { PostExposure = 0.1f, Contrast = 10f, Saturation = 8f, Temperature = 8f, BloomIntensity = 0.45f, Vignette = 0.15f },
+            },
+            new StadiumArt.LookDef
+            {
+                // Like the reference photo: midday summer sun from the south-south-west.
+                Name = "Day", Hdri = "hilly_terrain_01_puresky", Exposure = 0.8f, Ambient = 1.05f, Reflection = 1f,
+                SunIntensity = 3.3f, SunRotation = Quaternion.Euler(52f, 20f, 0f), SunTint = new Color(1f, 0.95f, 0.88f), Shadow = 0.85f,
+                FogDensity = 0.00024f, FogBrightness = 0.95f, Flood = 0f, Lamp = 0.6f, PropEmission = 0.15f,
+                Post = new SceneLook { PostExposure = 0.12f, Contrast = 9f, Saturation = 6f, BloomIntensity = 0.3f },
+            },
+        };
+
+        private static void BuildLighting(ArtContext ctx)
+        {
+            // Realtime probes (re-rendered on each preset change): the whole hub, and a tighter one for the sphere's glass.
+            var probes = new List<ReflectionProbe>
+            {
+                ArtPass.AddProbe(ctx, "Hub Probe", new Vector3(0f, 20f, 0f), new Vector3(700f, 120f, 700f), false, 256),
+                ArtPass.AddProbe(ctx, "Sphere Probe", new Vector3(0f, 60f, 0f), new Vector3(220f, 150f, 220f), false, 256),
+            };
+            probes[1].importance = 2;
+            foreach (var p in probes)
+            {
+                p.mode = UnityEngine.Rendering.ReflectionProbeMode.Realtime;
+                p.refreshMode = UnityEngine.Rendering.ReflectionProbeRefreshMode.ViaScripting;
+                p.timeSlicingMode = UnityEngine.Rendering.ReflectionProbeTimeSlicingMode.NoTimeSlicing;
+            }
+
+            // Night: eight wide uplights 75 m out wash the whole sphere (shadowless, realtime).
+            var lights = new List<Light>();
+            var group = G(ctx, "Night Lights");
+            for (int i = 0; i < 8; i++)
+            {
+                var pos = Polar(Vector2.zero, i * 45f + 22.5f, 75f);
+                var go = new GameObject($"Sphere Uplight {i}");
+                go.transform.SetParent(group, false);
+                go.transform.position = new Vector3(pos.x, 1f, pos.z);
+                go.transform.rotation = Quaternion.LookRotation(new Vector3(0f, 72f, 0f) - go.transform.position);
+                var l = go.AddComponent<Light>();
+                l.type = LightType.Spot;
+                l.range = 200f;
+                l.spotAngle = 75f;
+                l.innerSpotAngle = 45f;
+                l.color = new Color(0.75f, 0.88f, 1f);
+                l.shadows = LightShadows.None;
+                l.lightmapBakeType = LightmapBakeType.Realtime;
+                l.enabled = false;
+                lights.Add(l);
+            }
+            var scales = new float[lights.Count];
+            for (int i = 0; i < scales.Length; i++) scales[i] = 1f;
+
+            // The sphere's LED bands are the "lamp heads" (their LED intensity follows the preset).
+            var led = MaterialLibrary.Get("M_Sphere_LED");
+            var heads = new List<Renderer>();
+            foreach (var r in ctx.Dressing.GetComponentsInChildren<MeshRenderer>(true))
+                if (System.Array.IndexOf(r.sharedMaterials, led) >= 0) heads.Add(r);
+
+            // The presets bring their own post volumes: drop the single-look one ApplyLook made.
+            var basePost = ctx.Dressing.Find("Post Volume");
+            if (basePost != null) Object.DestroyImmediate(basePost.gameObject);
+            StadiumArt.BuildVenueLighting(ctx, Looks, lights.ToArray(), heads.ToArray(), scales, "expo", TimeOfDay.Day, probes.ToArray());
+            ctx.Log.Append($" night uplights {lights.Count}, LED renderers {heads.Count}, probes {probes.Count};");
         }
 
         // ---------- helpers ----------
@@ -174,7 +256,7 @@ namespace GateRush.EditorTools.Art
                 ctx.Log.Append(" no geo data;");
                 return;
             }
-            var st = new GateRush.EditorTools.SphereDistrict.StreetscapeGenerator(geo.Data, GateRush.EditorTools.Builders.RouteLibrary.ExpoKnots());
+            var st = new GateRush.EditorTools.SphereDistrict.StreetscapeGenerator(geo.Data, GateRush.EditorTools.Builders.RouteLibrary.ExpoCorridors());
             st.BuildRoads();
             st.BuildAreas();
             st.BuildFootwayProps();

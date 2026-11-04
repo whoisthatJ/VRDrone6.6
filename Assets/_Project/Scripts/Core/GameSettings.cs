@@ -40,6 +40,8 @@ namespace GateRush.Core
         public bool ShowDebugOverlay;
         /// <summary>Stadium time of day: 0 night (floodlights), 1 dusk, 2 day (GateRush.Core.TimeOfDay).</summary>
         public int StadiumLighting;
+        /// <summary>Sphere District (Expo) time of day: 0 night, 1 golden hour, 2 summer day (default, like the reference photo).</summary>
+        public int ExpoLighting = 2;
     }
 
     /// <summary>How much the game helps you find the route (T5).</summary>
@@ -128,6 +130,7 @@ namespace GateRush.Core
             Feed.VtxNoise = Mathf.Clamp(Feed.VtxNoise, 0, 2);
             Feed.MotorVolume = Mathf.Clamp01(Feed.MotorVolume);
             Feed.StadiumLighting = Mathf.Clamp(Feed.StadiumLighting, 0, 2);
+            Feed.ExpoLighting = Mathf.Clamp(Feed.ExpoLighting, 0, 2);
 
             Rates.Roll = ClampAxis(Rates.Type, Rates.Roll);
             Rates.Pitch = ClampAxis(Rates.Type, Rates.Pitch);

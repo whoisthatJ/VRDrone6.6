@@ -195,6 +195,41 @@ namespace GateRush.EditorTools.Art
             return sb.ToString();
         }
 
+        /// <summary>Sphere District lighting presets (E5): the reference view, the walkway and a sphere close-up per preset.</summary>
+        public static string CaptureExpoLighting(string tag)
+        {
+            ArtJobs.RequireCleanScenes();
+            const string sceneName = "Track_Expo";
+            EditorSceneManager.OpenScene(ArtJobs.ScenePath(sceneName), OpenSceneMode.Single);
+            var lighting = Object.FindAnyObjectByType<GateRush.Core.StadiumLighting>();
+            bool asyncShaders = ShaderUtil.allowAsyncCompilation;
+            ShaderUtil.allowAsyncCompilation = false;
+            var sb = new StringBuilder(sceneName + ":");
+            try
+            {
+                var source = GameObject.Find("Main Camera")?.GetComponent<Camera>();
+                foreach (var time in new[] { GateRush.Core.TimeOfDay.Day, GateRush.Core.TimeOfDay.Dusk, GateRush.Core.TimeOfDay.Night })
+                {
+                    lighting.Apply(time);
+                    string name = time == GateRush.Core.TimeOfDay.Dusk ? "golden" : time.ToString().ToLowerInvariant();
+                    var shots = new List<Bookmark>
+                    {
+                        new Bookmark($"{name}_reference", RouteLibrary.ExpoPoint(194f, 470f, 235f), RouteLibrary.ExpoPoint(14f, 60f), 66f),
+                        new Bookmark($"{name}_walkway", RouteLibrary.ExpoPoint(194f, 236f, 4f), RouteLibrary.ExpoPoint(14f, 30f, 30f), 62f),
+                        new Bookmark($"{name}_sphere", RouteLibrary.ExpoPoint(160f, 150f, 20f), new Vector3(0f, 55f, 0f), 55f),
+                    };
+                    sb.Append(' ').Append(CaptureSet(sceneName, shots, source, tag + "_" + name));
+                }
+                lighting.Apply(GateRush.Core.TimeOfDay.Day);
+            }
+            finally
+            {
+                ShaderUtil.allowAsyncCompilation = asyncShaders;
+                ArtJobs.ReturnToBoot();
+            }
+            return sb.ToString();
+        }
+
         /// <summary>
         /// The finish cube (T6) on the Serpent Arena at night: from the approach, from the side, and the finish-moment
         /// cinematic view (inside the cube through the hexagon, the quad moved to the hover spot).
@@ -245,7 +280,7 @@ namespace GateRush.EditorTools.Art
             const string sceneName = "Track_Expo";
             EditorSceneManager.OpenScene(ArtJobs.ScenePath(sceneName), OpenSceneMode.Single);
             var prefabs = AssetDatabase.LoadAssetAtPath<TrackPrefabs>(PrefabsPath);
-            var track = TrackLoader.Load(RouteLibrary.ExpoAstana(), prefabs);
+            var track = TrackLoader.Load(RouteLibrary.ExpoSprint(), prefabs);
             bool asyncShaders = ShaderUtil.allowAsyncCompilation;
             ShaderUtil.allowAsyncCompilation = false;
             try

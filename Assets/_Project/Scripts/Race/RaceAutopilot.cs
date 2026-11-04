@@ -31,6 +31,9 @@ namespace GateRush.Race
         private float _stuckTimer;
         private int _rescueGate = -1, _rescuesAtGate;
         private Transform _rescueSpawn;
+        private System.Func<float, Vector3> _line;
+        private float _lineLength, _lineDistance = -1f;
+        private const float LineLookahead = 12f;
 
         /// <summary>How often the watchdog had to put the quad back in front of a gate.</summary>
         public int Rescues { get; private set; }
@@ -38,6 +41,25 @@ namespace GateRush.Race
         public bool GaveUp { get; private set; }
         /// <summary>Last watchdog message (gate, position, what the quad was touching).</summary>
         public string LastReport { get; private set; } = "";
+
+        /// <summary>Cruise speed in m/s (the default is a gentle 8).</summary>
+        public float CruiseSpeed
+        {
+            get => cruiseSpeed;
+            set => cruiseSpeed = Mathf.Max(2f, value);
+        }
+
+        /// <summary>
+        /// City courses (E6): follow the course's flight line between gates (<paramref name="pointAt"/> = the line at a
+        /// distance, looping at <paramref name="length"/>) instead of flying straight at the next gate, which would go
+        /// through buildings. The gate approach takes over in the last metres before each gate.
+        /// </summary>
+        public void FollowLine(System.Func<float, Vector3> pointAt, float length)
+        {
+            _line = pointAt;
+            _lineLength = length;
+            _lineDistance = -1f;
+        }
 
         public void Configure(RaceSession raceSession, QuadVehicle quad, ScriptedInputSource source, Gate[] course)
         {
@@ -64,8 +86,12 @@ namespace GateRush.Race
             {
                 pilot.Throttle = 0f;
                 pilot.Pitch = pilot.Roll = pilot.Yaw = 0f;
-                if (!_armRequested && !vehicle.IsCrashed) pilot.PressArm();
-                _armRequested = true;
+                // Only count a press that was made: one skipped while crashed must happen after the respawn.
+                if (!_armRequested && !vehicle.IsCrashed)
+                {
+                    pilot.PressArm();
+                    _armRequested = true;
+                }
                 return;
             }
             _armRequested = false;
@@ -93,7 +119,9 @@ namespace GateRush.Race
             float offAxis = Mathf.Abs(Vector3.Dot(pos - centre, Vector3.Cross(Vector3.up, gateFwd).normalized));
             bool lined = offAxis < 0.8f || along > -1.5f;
             Vector3 target;
-            if (along >= 0f) target = centre - gateFwd * (approachDistance * 2f);
+            bool onLine = _line != null && (centre - pos).magnitude > approachDistance + 6f;
+            if (onLine) target = _line(Mathf.Repeat(LineDistance(pos) + LineLookahead, _lineLength));
+            else if (along >= 0f) target = centre - gateFwd * (approachDistance * 2f);
             else if (along < -approachDistance || !lined) target = centre - gateFwd * approachDistance;
             else target = centre + gateFwd * 4f;
 
@@ -108,6 +136,8 @@ namespace GateRush.Race
             float vLateral = Vector3.Dot(vel, right);
             float turnFactor = Mathf.Clamp01(1f - Mathf.Abs(headingError) / 60f);
             float targetSpeed = cruiseSpeed * Mathf.Lerp(0.3f, 1f, turnFactor);
+            // Big height changes (hops over buildings, the helix, the dive): slow down so the climb keeps up.
+            targetSpeed *= Mathf.Lerp(1f, 0.35f, Mathf.Clamp01(Mathf.Abs(target.y - pos.y) / 12f));
 
             // Default rates give ~670 °/s at full stick; keep turns gentle (≤ ~150 °/s).
             pilot.Yaw = Mathf.Clamp(headingError / 90f, -0.5f, 0.5f);
@@ -118,7 +148,7 @@ namespace GateRush.Race
 
             float tilt = Mathf.Max(Mathf.Abs(pilot.Pitch), Mathf.Abs(pilot.Roll)) * vehicle.Profile.AngleMode.MaxAngleDeg * Mathf.Deg2Rad;
             // Cascade: altitude error → desired climb rate → throttle.
-            float climbTarget = Mathf.Clamp(1.2f * (target.y - pos.y), -2.5f, 2.5f);
+            float climbTarget = _line != null ? Mathf.Clamp(1.2f * (target.y - pos.y), -5f, 6f) : Mathf.Clamp(1.2f * (target.y - pos.y), -2.5f, 2.5f);
             float throttle = vehicle.HoverThrottle / Mathf.Max(0.4f, Mathf.Cos(tilt)) + 0.06f * (climbTarget - vel.y);
             pilot.Throttle = Mathf.Clamp(throttle, 0.06f, 0.9f);
         }
@@ -176,8 +206,30 @@ namespace GateRush.Race
             vehicle.SpawnPoint = _rescueSpawn;
             vehicle.Respawn();
             vehicle.SpawnPoint = previous;
+            _lineDistance = -1f;
             _stuckAnchor = rp;
             return true;
+        }
+
+        /// <summary>Where the quad is along the flight line: a local search ahead of the last value (a global one after a jump).</summary>
+        private float LineDistance(Vector3 pos)
+        {
+            float best = float.MaxValue, bestD = 0f;
+            bool global = _lineDistance < 0f;
+            float from = global ? 0f : _lineDistance - 10f, to = global ? _lineLength : _lineDistance + 40f;
+            for (float d = from; d <= to; d += 1f)
+            {
+                float dd = Mathf.Repeat(d, _lineLength);
+                float e = (_line(dd) - pos).sqrMagnitude;
+                if (e < best)
+                {
+                    best = e;
+                    bestD = dd;
+                }
+            }
+            // Far off the line (a respawn at a gate): search the whole line next frame.
+            _lineDistance = best > 30f * 30f && !global ? -1f : bestD;
+            return bestD;
         }
 
         private void OnDestroy()

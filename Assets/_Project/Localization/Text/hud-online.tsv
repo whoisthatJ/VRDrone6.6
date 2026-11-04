@@ -86,3 +86,10 @@ Lap {0}	{0}-айналым	Круг {0}
 Restart (T)	Қайта бастау (T)	Заново (T)
 Exit (Esc)	Шығу (Esc)	Выход (Esc)
 Next (N)	Келесі (N)	Далее (N)
+<color=#ff4a3d>LEAVING THE FLYING AREA - TURN BACK</color>	<color=#ff4a3d>ҰШУ АЙМАҒЫНАН ШЫҒЫП БАРАСЫЗ - КЕРІ БҰРЫЛЫҢЫЗ</color>	<color=#ff4a3d>ВЫ ПОКИДАЕТЕ ЗОНУ ПОЛЁТОВ - РАЗВЕРНИТЕСЬ</color>
+FREE FLIGHT   {0}	ЕРКІН ҰШУ   {0}	СВОБОДНЫЙ ПОЛЁТ   {0}
+F / D-pad up: next spawn   T: reset	F / D-pad жоғары: келесі орын   T: қайта бастау	F / D-pad вверх: следующая точка   T: сброс
+South plaza	Оңтүстік алаң	Южная площадь
+Above the sphere	Сфера үстінде	Над сферой
+Park	Саябақ	Парк
+Ring road	Айналма жол	Кольцевая дорога

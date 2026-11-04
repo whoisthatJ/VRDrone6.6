@@ -15,125 +15,159 @@ MonoBehaviour:
   Track:
     Version: 1
     Id: expo-astana
-    Name: Expo Astana
+    Name: Expo Sprint
     Author: GateRush
     Environment: expo
     Laps: 2
     Spawn:
-      Position: {x: -63.855625, y: 0.15, z: -274.71207}
-      Yaw: 14
+      Position: {x: -81.24672, y: 0.15, z: -276.3033}
+      Yaw: 16.392883
+      Name: 
     Gates: []
     Props:
     - Type: Flag
-      Position: {x: -63.513283, y: 0, z: -279.126}
-      Euler: {x: 0, y: 14, z: 0}
+      Position: {x: -79.55401, y: 0, z: -281.17926}
+      Euler: {x: 0, y: 16.392883, z: 0}
       Scale: {x: 1, y: 1, z: 1}
     - Type: Flag
-      Position: {x: -61.48114, y: 0, z: -270.9755}
-      Euler: {x: 0, y: 14, z: 0}
+      Position: {x: -77.18334, y: 0, z: -273.12073}
+      Euler: {x: 0, y: 16.392883, z: 0}
       Scale: {x: 1, y: 1, z: 1}
     Route:
       Knots:
-      - Position: {x: -71.60885, y: 0, z: -287.20755}
+      - Position: {x: -84.70236, y: 1.8, z: -287.79422}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: -60.964294, y: 0, z: -244.51453}
+      - Position: {x: -73.9734, y: 1.8, z: -251.34029}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: -52.013187, y: 0, z: -208.61359}
+      - Position: {x: -65.50316, y: 2.2, z: -222.56085}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: -44.029766, y: 0, z: -176.59383}
+      - Position: {x: -56.65453, y: 6, z: -204.28966}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: -36.772114, y: 0, z: -147.48495}
+      - Position: {x: -44.76526, y: 18, z: -193.89964}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: -23.286121, y: 0, z: -109.55253}
+      - Position: {x: -26.721237, y: 31, z: -190.13147}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: -12.827619, y: 0, z: -80.99045}
+      - Position: {x: -3.2810502, y: 22, z: -187.97137}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: -0.0000053327894, y: 0, z: -61}
+      - Position: {x: 26.025385, y: 10, z: -185.18013}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: 20.863234, y: 0, z: -57.32125}
+      - Position: {x: 63.95778, y: 7, z: -175.72252}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: 39.210045, y: 0, z: -46.72871}
+      - Position: {x: 95.79707, y: 9, z: -159.43312}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: 52.82755, y: 0, z: -30.500004}
+      - Position: {x: 114.53633, y: 21, z: -141.44055}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: 60.073273, y: 0, z: -10.59254}
+      - Position: {x: 111.72287, y: 31, z: -111.72287}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: 60.073273, y: 0, z: 10.592542}
+      - Position: {x: 97.14326, y: 15, z: -78.66504}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: 52.827553, y: 0, z: 30.499998}
+      - Position: {x: 79.86355, y: 4, z: -60.18151}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: 39.21004, y: 0, z: 46.72871}
+      - Position: {x: 64.45165, y: 3, z: -40.27387}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: 20.863228, y: 0, z: 57.32125}
+      - Position: {x: 57.32125, y: 3, z: -20.863228}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: 0, y: 0, z: 61}
+      - Position: {x: 61, y: 3, z: -0.0000026663947}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: -20.863228, y: 0, z: 57.32125}
+      - Position: {x: 57.32125, y: 3, z: 20.86323}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: -39.21004, y: 0, z: 46.72871}
+      - Position: {x: 46.728706, y: 3, z: 39.210045}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: -52.827553, y: 0, z: 30.499998}
+      - Position: {x: 30.499998, y: 3, z: 52.827553}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: -60.073273, y: 0, z: 10.592542}
+      - Position: {x: 10.592539, y: 3, z: 60.073273}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: -149.6346, y: 0, z: 10.463485}
+      - Position: {x: 9.930204, y: 4, z: 94.47958}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: -194.73276, y: 4, z: 10.205549}
+      - Position: {x: 21.118654, y: 4.5, z: 133.33794}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: -234.85684, y: 4, z: 8.201338}
+      - Position: {x: 32.81915, y: 4.5, z: 168.83987}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: -274.8325, y: 0, z: -9.597435}
+      - Position: {x: 42.6219, y: 5, z: 200.52026}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: -298.33502, y: 0, z: -63.413136}
+      - Position: {x: 36.292797, y: 6, z: 229.1437}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: -286.60626, y: 0, z: -104.31612}
+      - Position: {x: 4.1536727, y: 6, z: 237.96376}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: -269.299, y: 0, z: -143.18884}
+      - Position: {x: -23.20536, y: 5, z: 220.78386}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: -246.75014, y: 0, z: -179.27455}
+      - Position: {x: -9.420473, y: 4.5, z: 179.75331}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: -219.39865, y: 0, z: -211.87079}
+      - Position: {x: -8.370766, y: 4, z: 119.70769}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: -187.77672, y: 0, z: -240.3433}
+      - Position: {x: -11.133847, y: 3, z: 79.22144}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: -152.49998, y: 0, z: -264.13776}
+      - Position: {x: -39.210052, y: 3, z: 46.728703}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: -114.25503, y: 0, z: -282.79105}
+      - Position: {x: -52.827553, y: 3, z: 30.499994}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: -88.88102, y: 0, z: -290.71664}
+      - Position: {x: -60.073273, y: 3, z: 10.592537}
+        TangentIn: {x: 0, y: 0, z: 0}
+        TangentOut: {x: 0, y: 0, z: 0}
+      - Position: {x: -60.073277, y: 3, z: -10.592536}
+        TangentIn: {x: 0, y: 0, z: 0}
+        TangentOut: {x: 0, y: 0, z: 0}
+      - Position: {x: -52.827553, y: 3, z: -30.499994}
+        TangentIn: {x: 0, y: 0, z: 0}
+        TangentOut: {x: 0, y: 0, z: 0}
+      - Position: {x: -39.21004, y: 3, z: -46.728714}
+        TangentIn: {x: 0, y: 0, z: 0}
+        TangentOut: {x: 0, y: 0, z: 0}
+      - Position: {x: -29.583279, y: 3, z: -63.441547}
+        TangentIn: {x: 0, y: 0, z: 0}
+        TangentOut: {x: 0, y: 0, z: 0}
+      - Position: {x: -23.51422, y: 3, z: -97.1961}
+        TangentIn: {x: 0, y: 0, z: 0}
+        TangentOut: {x: 0, y: 0, z: 0}
+      - Position: {x: -32.72151, y: 3, z: -146.38751}
+        TangentIn: {x: 0, y: 0, z: 0}
+        TangentOut: {x: 0, y: 0, z: 0}
+      - Position: {x: -45.81012, y: 3, z: -204.94252}
+        TangentIn: {x: 0, y: 0, z: 0}
+        TangentOut: {x: 0, y: 0, z: 0}
+      - Position: {x: -57.808006, y: 2.5, z: -258.61795}
+        TangentIn: {x: 0, y: 0, z: 0}
+        TangentOut: {x: 0, y: 0, z: 0}
+      - Position: {x: -66.533745, y: 2.5, z: -297.6546}
+        TangentIn: {x: 0, y: 0, z: 0}
+        TangentOut: {x: 0, y: 0, z: 0}
+      - Position: {x: -75.169395, y: 3, z: -313.10312}
+        TangentIn: {x: 0, y: 0, z: 0}
+        TangentOut: {x: 0, y: 0, z: 0}
+      - Position: {x: -90.31685, y: 2.5, z: -304.9047}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
       Closed: 1
@@ -141,10 +175,50 @@ MonoBehaviour:
       OuterLineGap: 0.35
       FlightHeight: 1.8
       GroundHeight: 0
-      FinishObstacle: 0
+      FinishObstacle: 1
       Obstacles:
-      - Type: Arch
-        Distance: 44.5
+      - Type: Single
+        Distance: 0
+        Lateral: 0
+        Height: 0
+        Yaw: 0
+        Scale: 1
+        Color: white
+        IsCheckpoint: 1
+      - Type: Finish
+        Distance: 38
+        Lateral: 0
+        Height: 0
+        Yaw: 0
+        Scale: 1
+        Color: 
+        IsCheckpoint: 1
+      - Type: Single
+        Distance: 68
+        Lateral: 0
+        Height: 0
+        Yaw: 0
+        Scale: 1
+        Color: red
+        IsCheckpoint: 1
+      - Type: Air
+        Distance: 228.5
+        Lateral: 0
+        Height: 0
+        Yaw: 0
+        Scale: 1
+        Color: blue
+        IsCheckpoint: 1
+      - Type: Air
+        Distance: 264.5
+        Lateral: 0
+        Height: 0
+        Yaw: 0
+        Scale: 1
+        Color: blue
+        IsCheckpoint: 1
+      - Type: Air
+        Distance: 325.75
         Lateral: 0
         Height: 0
         Yaw: 0
@@ -152,7 +226,55 @@ MonoBehaviour:
         Color: white
         IsCheckpoint: 1
       - Type: Single
-        Distance: 114.5
+        Distance: 460.75
+        Lateral: 0
+        Height: 0
+        Yaw: 0
+        Scale: 1
+        Color: red
+        IsCheckpoint: 1
+      - Type: Single
+        Distance: 524.75
+        Lateral: 0
+        Height: 0
+        Yaw: 0
+        Scale: 1
+        Color: red
+        IsCheckpoint: 1
+      - Type: Slalom
+        Distance: 659.25
+        Lateral: 0
+        Height: 0
+        Yaw: 0
+        Scale: 1
+        Color: white
+        IsCheckpoint: 1
+      - Type: Air
+        Distance: 756.75
+        Lateral: 0
+        Height: 0
+        Yaw: 0
+        Scale: 1
+        Color: blue
+        IsCheckpoint: 1
+      - Type: Single
+        Distance: 894.5
+        Lateral: 0
+        Height: 0
+        Yaw: 0
+        Scale: 1
+        Color: red
+        IsCheckpoint: 1
+      - Type: Single
+        Distance: 999.75
+        Lateral: 0
+        Height: 0
+        Yaw: 0
+        Scale: 1
+        Color: red
+        IsCheckpoint: 1
+      - Type: Single
+        Distance: 1063.5
         Lateral: 0
         Height: 0
         Yaw: 0
@@ -160,91 +282,14 @@ MonoBehaviour:
         Color: red
         IsCheckpoint: 1
       - Type: Double
-        Distance: 144.5
+        Distance: 1248.75
         Lateral: 0
         Height: 0
         Yaw: 0
         Scale: 1
         Color: red
         IsCheckpoint: 1
-      - Type: Single
-        Distance: 260.5
-        Lateral: 0
-        Height: 0
-        Yaw: 0
-        Scale: 1
-        Color: blue
-        IsCheckpoint: 1
-      - Type: Ladder
-        Distance: 324.5
-        Lateral: 0
-        Height: 0
-        Yaw: 0
-        Scale: 1
-        Color: green
-        IsCheckpoint: 1
-      - Type: Single
-        Distance: 388.25
-        Lateral: 0
-        Height: 0
-        Yaw: 0
-        Scale: 1
-        Color: red
-        IsCheckpoint: 1
-      - Type: Single
-        Distance: 431
-        Lateral: 0
-        Height: 0
-        Yaw: 0
-        Scale: 1
-        Color: red
-        IsCheckpoint: 1
-      - Type: Ladder
-        Distance: 473.5
-        Lateral: 0
-        Height: 0
-        Yaw: 0
-        Scale: 1
-        Color: green
-        IsCheckpoint: 1
-      - Type: Single
-        Distance: 672.25
-        Lateral: 0
-        Height: 0
-        Yaw: 0
-        Scale: 1
-        Color: blue
-        IsCheckpoint: 1
-      - Type: Single
-        Distance: 839.5
-        Lateral: 0
-        Height: 0
-        Yaw: 0
-        Scale: 1
-        Color: red
-        IsCheckpoint: 1
-      - Type: Ladder
-        Distance: 924.75
-        Lateral: 0
-        Height: 0
-        Yaw: 0
-        Scale: 1
-        Color: green
-        IsCheckpoint: 1
-      - Type: Cube
-        Distance: 1010
-        Lateral: 0
-        Height: 0
-        Yaw: 0
-        Scale: 1
-        Color: green
-        IsCheckpoint: 1
-      - Type: Ladder
-        Distance: 1095
-        Lateral: 0
-        Height: 0
-        Yaw: 0
-        Scale: 1
-        Color: green
-        IsCheckpoint: 1
+      AirCourse: 1
+    FreeFlight: 0
+    ExtraSpawns: []
   Json: {fileID: 4900000, guid: 5a0cc74c110b27d45ab2f6313f733b84, type: 3}

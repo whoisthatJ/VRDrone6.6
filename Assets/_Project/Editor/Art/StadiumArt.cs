@@ -530,10 +530,11 @@ namespace GateRush.EditorTools.Art
 
         // ---------- time of day ----------
 
-        private sealed class LookDef
+        internal sealed class LookDef
         {
             public string Name, Hdri;
             public float Exposure, Ambient, Reflection, SunIntensity, Shadow, FogDensity, FogBrightness, Flood, Lamp;
+            public float PropEmission = 1f;
             public bool Sun = true;
             public Quaternion? SunRotation;
             public Color SunTint = Color.white;
@@ -568,9 +569,9 @@ namespace GateRush.EditorTools.Art
         };
 
         /// <summary>Stadium-only copy of a shared sky material (the shared one's exposure belongs to its own scene).</summary>
-        private static Material Sky(string name, string hdri, float exposure)
+        private static Material Sky(string name, string hdri, float exposure, string venue = "Stadium")
         {
-            string path = $"{EnvironmentAssets.SkyDir}/Sky_Stadium_{name}.mat";
+            string path = $"{EnvironmentAssets.SkyDir}/Sky_{venue}_{name}.mat";
             var shared = EnvironmentAssets.Sky(hdri);
             var m = AssetDatabase.LoadAssetAtPath<Material>(path);
             if (m == null)
@@ -586,12 +587,22 @@ namespace GateRush.EditorTools.Art
             return m;
         }
 
-        private static void BuildLighting(ArtContext ctx, Light[] spots, Renderer[] heads, float[] scales)
+        private static void BuildLighting(ArtContext ctx, Light[] spots, Renderer[] heads, float[] scales) =>
+            BuildVenueLighting(ctx, Looks, spots, heads, scales, "stadium", TimeOfDay.Night, null);
+
+        /// <summary>
+        /// Time-of-day presets (Night, Dusk/Golden hour, Day) for a venue as a runtime <see cref="StadiumLighting"/>:
+        /// per-preset sky copies, sun from the HDRI (or fixed), fog from the horizon colour, volumes, floodlight and lamp
+        /// levels. The saved scene starts at <paramref name="start"/>; the track scene re-applies the player's choice.
+        /// </summary>
+        internal static void BuildVenueLighting(ArtContext ctx, LookDef[] looks, Light[] spots, Renderer[] heads, float[] scales,
+            string venue, TimeOfDay start, ReflectionProbe[] probes)
         {
-            var presets = new StadiumLighting.Preset[Looks.Length];
-            for (int i = 0; i < Looks.Length; i++)
+            string prefix = char.ToUpperInvariant(venue[0]) + venue.Substring(1);
+            var presets = new StadiumLighting.Preset[looks.Length];
+            for (int i = 0; i < looks.Length; i++)
             {
-                var d = Looks[i];
+                var d = looks[i];
                 var src = ArtCatalog.Find(d.Hdri);
                 var hdr = HdriSun.Analyze($"{EnvironmentAssets.SkyDir}/{src.Id}_{src.Resolution}.hdr");
                 Color fog;
@@ -608,7 +619,7 @@ namespace GateRush.EditorTools.Art
                 presets[i] = new StadiumLighting.Preset
                 {
                     Name = d.Name,
-                    Sky = Sky(d.Name, d.Hdri, d.Exposure),
+                    Sky = Sky(d.Name, d.Hdri, d.Exposure, prefix),
                     AmbientIntensity = d.Ambient,
                     ReflectionIntensity = d.Reflection,
                     SunEnabled = d.Sun,
@@ -620,6 +631,7 @@ namespace GateRush.EditorTools.Art
                     FogDensity = d.FogDensity,
                     FloodlightIntensity = d.Flood,
                     LampIntensity = d.Lamp,
+                    PropEmission = d.PropEmission,
                     Volume = vol,
                 };
                 ctx.Log.Append($" {d.Name} sun elev {hdr.SunElevation:F1}°;");
@@ -635,13 +647,12 @@ namespace GateRush.EditorTools.Art
                 ctx.Sun.shadowNormalBias = 0.4f;
                 ctx.Sun.lightmapBakeType = LightmapBakeType.Realtime;
             }
-            var go = new GameObject("Stadium Lighting");
+            var go = new GameObject(prefix + " Lighting");
             go.transform.SetParent(ctx.Dressing, false);
             var sl = go.AddComponent<StadiumLighting>();
-            sl.Configure(presets, ctx.Sun, spots, heads, scales);
-            // The saved scene starts at night (the default setting); the track scene re-applies the player's choice.
-            sl.Apply(TimeOfDay.Night);
-            ctx.Log.Append(" lighting presets 3;");
+            sl.Configure(presets, ctx.Sun, spots, heads, scales, venue, start, probes);
+            sl.Apply(start);
+            ctx.Log.Append($" lighting presets {presets.Length};");
         }
     }
 }

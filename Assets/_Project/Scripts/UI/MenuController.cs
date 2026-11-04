@@ -432,11 +432,12 @@ namespace GateRush.UI
             UiKit.SliderRow(c, L.T("Motor volume"), 0f, 0f, 1f, feed.MotorVolume, v => F(v * 100f, "0") + " %", v => { feed.MotorVolume = v; Changed(); }, ContentWidth);
             UiKit.StepperRow(c, L.T("Debug readout"), -90f, OffOn, feed.ShowDebugOverlay ? 1 : 0, i => { feed.ShowDebugOverlay = i == 1; Changed(); }, ContentWidth);
             UiKit.StepperRow(c, L.T("Stadium lighting"), -180f, new[] { L.T("Night (floodlights)"), L.T("Dusk"), L.T("Day") }, feed.StadiumLighting, i => { feed.StadiumLighting = i; Changed(); }, ContentWidth);
+            UiKit.StepperRow(c, L.T("Expo lighting"), -270f, new[] { L.T("Night"), L.T("Golden hour"), L.T("Summer day") }, feed.ExpoLighting, i => { feed.ExpoLighting = i; Changed(); }, ContentWidth);
             var guide = S.Guidance;
-            UiKit.StepperRow(c, L.T("Route guidance"), -270f, new[] { L.T("Off"), L.T("Standard"), L.T("Trainer") }, guide.RouteGuidance, i => { guide.RouteGuidance = i; Changed(); }, ContentWidth);
-            UiKit.StepperRow(c, L.T("Ghost lanes"), -360f, OffOn, guide.GhostLanes ? 1 : 0, i => { guide.GhostLanes = i == 1; Changed(); }, ContentWidth);
+            UiKit.StepperRow(c, L.T("Route guidance"), -360f, new[] { L.T("Off"), L.T("Standard"), L.T("Trainer") }, guide.RouteGuidance, i => { guide.RouteGuidance = i; Changed(); }, ContentWidth);
+            UiKit.StepperRow(c, L.T("Ghost lanes"), -450f, OffOn, guide.GhostLanes ? 1 : 0, i => { guide.GhostLanes = i == 1; Changed(); }, ContentWidth);
             UiKit.Label(c, L.T("Trainer adds a racing line (green: fast, yellow: brake, red: slow) and an arrow to the next gate. Ghost lanes: fly through the lane posts."),
-                new Vector2(0f, -450f), new Vector2(ContentWidth, 60f), 26f, TextAlignmentOptions.TopLeft, UiKit.DimTextColor);
+                new Vector2(0f, -540f), new Vector2(ContentWidth, 60f), 26f, TextAlignmentOptions.TopLeft, UiKit.DimTextColor);
         }
 
         private void BuildPhysics(RectTransform c)

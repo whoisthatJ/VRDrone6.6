@@ -23,7 +23,7 @@ namespace GateRush.UI
         [SerializeField] private float lapFlashSeconds = 2f;
         [SerializeField] private float goSeconds = 1f;
 
-        private enum CentreMode { None, ArmToStart, Countdown, Go, Hold, MissedGate, Lap, Finish }
+        private enum CentreMode { None, ArmToStart, Countdown, Go, Hold, MissedGate, Lap, Finish, Boundary, FreeFlight }
 
         private CentreMode _centreMode = (CentreMode)(-1);
         private int _shownCount = -1;
@@ -69,6 +69,12 @@ namespace GateRush.UI
         {
             // The race object can be inactive (track editor) before RaceSession.Awake has run.
             if (session == null || session.Timer == null) return;
+            var area = GateRush.Game.FlightArea.Current;
+            if (!session.isActiveAndEnabled)
+            {
+                FreeFlightHud(area);
+                return;
+            }
             var timer = session.Timer;
             double now = session.Now;
 
@@ -94,6 +100,11 @@ namespace GateRush.UI
             }
 
             if (centre == null) return;
+            if (area != null && area.Warning)
+            {
+                SetCentre(CentreMode.Boundary, L.T("<color=#ff4a3d>LEAVING THE FLYING AREA - TURN BACK</color>"));
+                return;
+            }
             switch (session.Phase)
             {
                 case RacePhase.Idle:
@@ -121,6 +132,26 @@ namespace GateRush.UI
                     break;
             }
         }
+
+        // E7 free flight: no timing, the spawn point and the keys instead of the lap counter.
+        private void FreeFlightHud(GateRush.Game.FlightArea area)
+        {
+            if (lapInfo != null)
+            {
+                string spawn = area != null ? L.T(area.SpawnName) : "";
+                if (spawn != _shownSpawn)
+                {
+                    _shownSpawn = spawn;
+                    lapInfo.SetText(L.F("FREE FLIGHT   {0}", spawn) + "\n" + L.T("F / D-pad up: next spawn   T: reset"));
+                }
+            }
+            if (centre == null) return;
+            if (area != null && area.Warning) SetCentre(CentreMode.Boundary, L.T("<color=#ff4a3d>LEAVING THE FLYING AREA - TURN BACK</color>"));
+            else if (area != null && area.Holding) SetCentre(CentreMode.Hold, L.T("ARM + THROTTLE UP"));
+            else SetCentre(CentreMode.FreeFlight, "");
+        }
+
+        private string _shownSpawn;
 
         private void ShowLapFlash()
         {

@@ -11,7 +11,8 @@
             "y": 0.15000000596046448,
             "z": 0.0
         },
-        "Yaw": 0.0
+        "Yaw": 0.0,
+        "Name": ""
     },
     "Gates": [
         {
@@ -103,5 +104,18 @@
             "Scale": 1.0
         }
     ],
-    "Props": []
+    "Props": [],
+    "Route": {
+        "Knots": [],
+        "Closed": true,
+        "CorridorWidth": 4.0,
+        "OuterLineGap": 0.3499999940395355,
+        "FlightHeight": 1.5,
+        "GroundHeight": 0.0,
+        "FinishObstacle": -1,
+        "Obstacles": [],
+        "AirCourse": false
+    },
+    "FreeFlight": false,
+    "ExtraSpawns": []
 }

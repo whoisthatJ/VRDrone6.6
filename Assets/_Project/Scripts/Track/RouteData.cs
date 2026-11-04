@@ -60,6 +60,12 @@ namespace GateRush.Track
         /// <summary>Index into <see cref="Obstacles"/> of the finish (start/finish line, race gate 0); -1 = the first checkpoint after the start pad.</summary>
         public int FinishObstacle = -1;
         public List<RouteObstacle> Obstacles = new List<RouteObstacle>();
+        /// <summary>
+        /// A city course (Sphere District): no lane lights, chevrons, raised decks or wear marks; obstacles stand on the
+        /// ground where the line is low and float on the flight line where it climbs (air gates), and the next gate gets
+        /// a beacon because buildings hide it.
+        /// </summary>
+        public bool AirCourse;
 
         public bool HasRoute => Knots != null && Knots.Count >= 3;
     }

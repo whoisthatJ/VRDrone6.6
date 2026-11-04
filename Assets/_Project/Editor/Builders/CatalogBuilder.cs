@@ -63,7 +63,9 @@ namespace GateRush.EditorTools.Builders
             catalog.Tracks.Add(Entry("spline-test", "Spline Test Loop", "Figure-eight lane track with an overpass (spline track system test)."));
             catalog.Tracks.Add(Entry("stadium-oval", "Stadium Oval", "Floodlit football stadium: an easy oval around the pitch. Learn the lanes and gates."));
             catalog.Tracks.Add(Entry("serpent-arena", "Serpent Arena", "The stadium race track: loops round the landing pads, a figure-eight at the centre spot and four overpasses."));
-            catalog.Tracks.Add(Entry("expo-astana", "Expo Astana", "The EXPO 2017 site in Astana: up the south walkway, round the Nur Alem sphere, out between the pavilions and back along the ring road."));
+            catalog.Tracks.Add(Entry("expo-astana", "Expo Sprint", "Beginner, 1.2 km: up the south walkway, over a pavilion into its courtyard, round the sphere at 3 m, a park slalom and back down the walkway. Trainer guidance recommended."));
+            catalog.Tracks.Add(Entry("expo-pro", "Expo Pro", "Advanced, 2.2 km: the courtyard hop, a helix round the sphere to 90 m, the dive into the park, the ring-road sweeper and a second courtyard."));
+            catalog.Tracks.Add(Entry("expo-free", "Expo Free Flight", "No gates: fly anywhere within 1.2 km of the sphere and up to 150 m. F / D-pad up switches between the south plaza, above the sphere, the park and the ring road; T resets."));
             catalog.Environments.Clear();
             catalog.Environments.Add(new TrackCatalog.EnvironmentScene { Environment = "field", SceneName = "Track_Field" });
             catalog.Environments.Add(new TrackCatalog.EnvironmentScene { Environment = "hangar", SceneName = "Track_Hangar" });

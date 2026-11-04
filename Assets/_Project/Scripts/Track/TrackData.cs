@@ -33,6 +33,8 @@ namespace GateRush.Track
     {
         public Vector3 Position = new Vector3(0f, 0.15f, 0f);
         public float Yaw;
+        /// <summary>Shown when free flight switches spawn points ("Plaza", "Sphere top", ...).</summary>
+        public string Name = "";
     }
 
     /// <summary>
@@ -58,6 +60,10 @@ namespace GateRush.Track
         public List<PropData> Props = new List<PropData>();
         /// <summary>Spline route (empty for gate-list tracks).</summary>
         public RouteData Route = new RouteData();
+        /// <summary>No race (E7): fly anywhere in the area; the spawn and <see cref="ExtraSpawns"/> can be switched in flight.</summary>
+        public bool FreeFlight;
+        /// <summary>More free-flight spawn points; one above the ground is held in a hover until the pilot throttles up.</summary>
+        public List<SpawnData> ExtraSpawns = new List<SpawnData>();
 
         public bool IsSplineTrack => Route != null && Route.HasRoute;
 
@@ -84,7 +90,7 @@ namespace GateRush.Track
             if (Version > CurrentVersion) errors.Add($"Track version {Version} is newer than this game ({CurrentVersion})");
             if (string.IsNullOrWhiteSpace(Id)) errors.Add("Missing id");
             if (IsSplineTrack) ValidateRoute(errors, knownGateTypes, knownPropTypes);
-            else if (Gates.Count == 0) errors.Add("A track needs at least one gate");
+            else if (Gates.Count == 0 && !FreeFlight) errors.Add("A track needs at least one gate");
             if (Laps < 1 || Laps > 10) errors.Add($"Laps must be 1-10 (is {Laps})");
             for (int i = 0; i < Gates.Count; i++)
             {

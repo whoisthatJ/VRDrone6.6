@@ -25,7 +25,7 @@ namespace GateRush.Net
         public const string Prefix = "lap-";
 
         /// <summary>Tracks that have an online board (the built-in ones).</summary>
-        public static readonly string[] Tracks = { "field", "hangar", "industrial", "spline-test", "stadium-oval", "serpent-arena", "expo-astana" };
+        public static readonly string[] Tracks = { "field", "hangar", "industrial", "spline-test", "stadium-oval", "serpent-arena", "expo-astana", "expo-pro" };
 
         public static string IdFor(string trackId) => Prefix + trackId;
         public static bool Has(string trackId) => Array.IndexOf(Tracks, trackId) >= 0;

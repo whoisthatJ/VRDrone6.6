@@ -22,6 +22,7 @@ MonoBehaviour:
     Spawn:
       Position: {x: -11.946267, y: 0.15, z: -45.98}
       Yaw: 89.99989
+      Name: 
     Gates: []
     Props:
     - Type: Flag
@@ -273,4 +274,7 @@ MonoBehaviour:
         Scale: 1
         Color: red
         IsCheckpoint: 1
+      AirCourse: 0
+    FreeFlight: 0
+    ExtraSpawns: []
   Json: {fileID: 4900000, guid: 481cab861150c8a458796624b8d6e691, type: 3}

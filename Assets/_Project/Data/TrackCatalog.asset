@@ -38,9 +38,17 @@ MonoBehaviour:
     Description: 'The stadium race track: loops round the landing pads, a figure-eight at the centre spot and four overpasses.'
     Json: {fileID: 4900000, guid: ce521c4b474270e46a5b63650c7880bf, type: 3}
   - Id: expo-astana
-    DisplayName: Expo Astana
-    Description: 'The EXPO 2017 site in Astana: up the south walkway, round the Nur Alem sphere, out between the pavilions and back along the ring road.'
+    DisplayName: Expo Sprint
+    Description: 'Beginner, 1.2 km: up the south walkway, over a pavilion into its courtyard, round the sphere at 3 m, a park slalom and back down the walkway. Trainer guidance recommended.'
     Json: {fileID: 4900000, guid: 5a0cc74c110b27d45ab2f6313f733b84, type: 3}
+  - Id: expo-pro
+    DisplayName: Expo Pro
+    Description: 'Advanced, 2.2 km: the courtyard hop, a helix round the sphere to 90 m, the dive into the park, the ring-road sweeper and a second courtyard.'
+    Json: {fileID: 4900000, guid: 0c16fb5fabfe6ee40853ab59562e5d9f, type: 3}
+  - Id: expo-free
+    DisplayName: Expo Free Flight
+    Description: 'No gates: fly anywhere within 1.2 km of the sphere and up to 150 m. F / D-pad up switches between the south plaza, above the sphere, the park and the ring road; T resets.'
+    Json: {fileID: 4900000, guid: 23caaf317267f224599c9cd8a47b86dc, type: 3}
   Environments:
   - Environment: field
     SceneName: Track_Field
