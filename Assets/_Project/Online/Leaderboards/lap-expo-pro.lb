@@ -2,6 +2,6 @@
   "$schema": "https://ugs-config-schemas.unity3d.com/v1/leaderboards.schema.json",
   "SortOrder": "asc",
   "UpdateType": "keepBest",
-  "Name": "Expo Pro best lap",
+  "Name": "Expo Classic Pro best lap",
   "Id": "lap-expo-pro"
 }

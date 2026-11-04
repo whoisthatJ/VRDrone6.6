@@ -295,8 +295,8 @@ namespace GateRush.EditorTools.Builders
         /// <summary>
         /// Expo Sprint (~1.2 km, beginner): up the walkway, the courtyard hop, anticlockwise round the sphere at 3 m, out
         /// to the park for a slalom and back (U-turn at 230 m), on round the west side, south through the pod gap and
-        /// down the walkway, a U-turn on the south plaza and into the finish cube. Keeps the expo-astana id (and its
-        /// online leaderboard).
+        /// down the walkway, a U-turn on the south plaza and into the finish cube. The first version of this route lives
+        /// on, frozen, as expo-astana in Track_Expo_v1 (P1a).
         /// </summary>
         public static TrackData ExpoSprint()
         {
@@ -322,7 +322,7 @@ namespace GateRush.EditorTools.Builders
             k.Add(B(193.5f, 322f, 3f));                                      // 43 U-turn on the south plaza
             k.Add(B(196.5f, 318f, 2.5f));                                    // 44
 
-            var t = ExpoTrack("expo-astana", "Expo Sprint", 2, k);
+            var t = ExpoTrack("expo-v2-sprint", "Expo Sprint", 2, k);
             var r = t.Route;
             var route = new TrackRoute(r);
             float At(int knot) => route.ClosestDistance(k[knot]);
@@ -386,7 +386,7 @@ namespace GateRush.EditorTools.Builders
             k.Add(B(193.5f, 322f, 3f));                                        // south plaza U-turn
             k.Add(B(196.5f, 318f, 2.5f));
 
-            var t = ExpoTrack("expo-pro", "Expo Pro", 2, k);
+            var t = ExpoTrack("expo-v2-pro", "Expo Pro", 2, k);
             var r = t.Route;
             var route = new TrackRoute(r);
             float At(int knot) => route.ClosestDistance(k[knot]);
@@ -415,7 +415,7 @@ namespace GateRush.EditorTools.Builders
         /// </summary>
         public static TrackData ExpoFreeFlight()
         {
-            var t = new TrackData { Id = "expo-free", Name = "Expo Free Flight", Author = "GateRush", Environment = "expo", Laps = 1, FreeFlight = true };
+            var t = new TrackData { Id = "expo-v2-free", Name = "Expo Free Flight", Author = "GateRush", Environment = "expo", Laps = 1, FreeFlight = true };
             t.Spawn = Spawn("South plaza", B(WalkNorth, 285f, 0.15f), 16f);
             t.ExtraSpawns.Add(Spawn("Above the sphere", B(194f, 30f, 112f), 14f));
             t.ExtraSpawns.Add(Spawn("Park", B(12f, 330f, 0.15f), 192f));

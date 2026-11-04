@@ -37,18 +37,30 @@ MonoBehaviour:
     DisplayName: Serpent Arena
     Description: 'The stadium race track: loops round the landing pads, a figure-eight at the centre spot and four overpasses.'
     Json: {fileID: 4900000, guid: ce521c4b474270e46a5b63650c7880bf, type: 3}
-  - Id: expo-astana
+  - Id: expo-v2-sprint
     DisplayName: Expo Sprint
     Description: 'Beginner, 1.2 km: up the south walkway, over a pavilion into its courtyard, round the sphere at 3 m, a park slalom and back down the walkway. Trainer guidance recommended.'
-    Json: {fileID: 4900000, guid: 5a0cc74c110b27d45ab2f6313f733b84, type: 3}
-  - Id: expo-pro
+    Json: {fileID: 4900000, guid: 920dde672eb45d04a8d5f4dd14ef57c4, type: 3}
+  - Id: expo-v2-pro
     DisplayName: Expo Pro
     Description: 'Advanced, 2.2 km: the courtyard hop, a helix round the sphere to 90 m, the dive into the park, the ring-road sweeper and a second courtyard.'
-    Json: {fileID: 4900000, guid: 0c16fb5fabfe6ee40853ab59562e5d9f, type: 3}
-  - Id: expo-free
+    Json: {fileID: 4900000, guid: ad8e9fd3e09cb5249995716d7866676b, type: 3}
+  - Id: expo-v2-free
     DisplayName: Expo Free Flight
     Description: 'No gates: fly anywhere within 1.2 km of the sphere and up to 150 m. F / D-pad up switches between the south plaza, above the sphere, the park and the ring road; T resets.'
-    Json: {fileID: 4900000, guid: 23caaf317267f224599c9cd8a47b86dc, type: 3}
+    Json: {fileID: 4900000, guid: c52a1f8a5e1761d4581cda615da13d67, type: 3}
+  - Id: expo-astana
+    DisplayName: Expo Classic Sprint
+    Description: 'The original Expo Sprint (Track_Expo_v1): the courtyard hop, the low sphere orbit and the park slalom, in the first look of the district.'
+    Json: {fileID: 4900000, guid: addb4e50095f6bb438e51f185e08324a, type: 3}
+  - Id: expo-pro
+    DisplayName: Expo Classic Pro
+    Description: 'The original Expo Pro (Track_Expo_v1): helix to 90 m, the park dive, the ring-road sweeper and the second courtyard.'
+    Json: {fileID: 4900000, guid: 6948040d84bb9c747b437a728c118a82, type: 3}
+  - Id: expo-free
+    DisplayName: Expo Classic Free Flight
+    Description: Free flight in the original district (Track_Expo_v1).
+    Json: {fileID: 4900000, guid: ee843bf88a3b87e488b9470c7a4a9bcf, type: 3}
   Environments:
   - Environment: field
     SceneName: Track_Field
@@ -60,3 +72,5 @@ MonoBehaviour:
     SceneName: Track_Stadium
   - Environment: expo
     SceneName: Track_Expo
+  - Environment: expo_v1
+    SceneName: Track_Expo_v1

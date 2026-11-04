@@ -1875,6 +1875,30 @@ MonoBehaviour:
     m_Key: 'No gates: fly anywhere within 1.2 km of the sphere and up to 150 m. F / D-pad up switches between the south plaza, above the sphere, the park and the ring road; T resets.'
     m_Metadata:
       m_Items: []
+  - m_Id: 332879047421952
+    m_Key: Expo Classic Sprint
+    m_Metadata:
+      m_Items: []
+  - m_Id: 332879093559296
+    m_Key: Expo Classic Pro
+    m_Metadata:
+      m_Items: []
+  - m_Id: 332879093559297
+    m_Key: Expo Classic Free Flight
+    m_Metadata:
+      m_Items: []
+  - m_Id: 332879093559298
+    m_Key: 'The original Expo Sprint (Track_Expo_v1): the courtyard hop, the low sphere orbit and the park slalom, in the first look of the district.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 332879093559299
+    m_Key: 'The original Expo Pro (Track_Expo_v1): helix to 90 m, the park dive, the ring-road sweeper and the second courtyard.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 332879093559300
+    m_Key: Free flight in the original district (Track_Expo_v1).
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

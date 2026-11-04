@@ -201,7 +201,7 @@ namespace GateRush.Game
             // E7: open venues have a flyable area with a soft boundary; free-flight tracks have no race at all.
             var area = GetComponent<FlightArea>();
             if (area == null) area = gameObject.AddComponent<FlightArea>();
-            area.Configure(vehicle, data, Track.Spawn, environment == "expo");
+            area.Configure(vehicle, data, Track.Spawn, environment.StartsWith("expo"));
             race.enabled = !data.FreeFlight;
             ApplyGuidance(SaveSystem.Settings);
             Debug.Log($"[GateRush] Track '{data.Name}' loaded: {Track.Gates.Length} gates, {data.Props.Count} props, {data.Laps} laps");

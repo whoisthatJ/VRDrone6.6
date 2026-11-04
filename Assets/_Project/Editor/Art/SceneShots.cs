@@ -274,13 +274,18 @@ namespace GateRush.EditorTools.Art
         /// Expo Astana: the reference view (aerial from the south like Docs/reference/ref_expo_astana.webp), an overview,
         /// the walkway, the sphere orbit and the spawn / FPV.
         /// </summary>
-        public static string CaptureExpo(string tag)
+        public static string CaptureExpo(string tag) => CaptureExpo(tag, "Track_Expo", RouteLibrary.ExpoSprint());
+
+        /// <summary>The same bookmarks in another Expo scene (Track_Expo_v1 with its frozen Classic Sprint).</summary>
+        public static string CaptureExpoV1(string tag) => CaptureExpo(tag, "Track_Expo_v1",
+            TrackData.FromJson(File.ReadAllText(GateRush.EditorTools.SphereDistrict.TrackFreezer.TrackJson("expo-astana"))));
+
+        public static string CaptureExpo(string tag, string sceneName, TrackData course)
         {
             ArtJobs.RequireCleanScenes();
-            const string sceneName = "Track_Expo";
             EditorSceneManager.OpenScene(ArtJobs.ScenePath(sceneName), OpenSceneMode.Single);
             var prefabs = AssetDatabase.LoadAssetAtPath<TrackPrefabs>(PrefabsPath);
-            var track = TrackLoader.Load(RouteLibrary.ExpoSprint(), prefabs);
+            var track = TrackLoader.Load(course, prefabs);
             bool asyncShaders = ShaderUtil.allowAsyncCompilation;
             ShaderUtil.allowAsyncCompilation = false;
             try

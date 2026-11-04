@@ -63,18 +63,34 @@ namespace GateRush.EditorTools.Builders
             catalog.Tracks.Add(Entry("spline-test", "Spline Test Loop", "Figure-eight lane track with an overpass (spline track system test)."));
             catalog.Tracks.Add(Entry("stadium-oval", "Stadium Oval", "Floodlit football stadium: an easy oval around the pitch. Learn the lanes and gates."));
             catalog.Tracks.Add(Entry("serpent-arena", "Serpent Arena", "The stadium race track: loops round the landing pads, a figure-eight at the centre spot and four overpasses."));
-            catalog.Tracks.Add(Entry("expo-astana", "Expo Sprint", "Beginner, 1.2 km: up the south walkway, over a pavilion into its courtyard, round the sphere at 3 m, a park slalom and back down the walkway. Trainer guidance recommended."));
-            catalog.Tracks.Add(Entry("expo-pro", "Expo Pro", "Advanced, 2.2 km: the courtyard hop, a helix round the sphere to 90 m, the dive into the park, the ring-road sweeper and a second courtyard."));
-            catalog.Tracks.Add(Entry("expo-free", "Expo Free Flight", "No gates: fly anywhere within 1.2 km of the sphere and up to 150 m. F / D-pad up switches between the south plaza, above the sphere, the park and the ring road; T resets."));
+            catalog.Tracks.Add(Entry("expo-v2-sprint", "Expo Sprint", "Beginner, 1.2 km: up the south walkway, over a pavilion into its courtyard, round the sphere at 3 m, a park slalom and back down the walkway. Trainer guidance recommended."));
+            catalog.Tracks.Add(Entry("expo-v2-pro", "Expo Pro", "Advanced, 2.2 km: the courtyard hop, a helix round the sphere to 90 m, the dive into the park, the ring-road sweeper and a second courtyard."));
+            catalog.Tracks.Add(Entry("expo-v2-free", "Expo Free Flight", "No gates: fly anywhere within 1.2 km of the sphere and up to 150 m. F / D-pad up switches between the south plaza, above the sphere, the park and the ring road; T resets."));
             catalog.Environments.Clear();
             catalog.Environments.Add(new TrackCatalog.EnvironmentScene { Environment = "field", SceneName = "Track_Field" });
             catalog.Environments.Add(new TrackCatalog.EnvironmentScene { Environment = "hangar", SceneName = "Track_Hangar" });
             catalog.Environments.Add(new TrackCatalog.EnvironmentScene { Environment = "industrial", SceneName = "Track_Industrial" });
             catalog.Environments.Add(new TrackCatalog.EnvironmentScene { Environment = "stadium", SceneName = "Track_Stadium" });
             catalog.Environments.Add(new TrackCatalog.EnvironmentScene { Environment = "expo", SceneName = "Track_Expo" });
+            // Phase 3 P1a: the first Sphere District, frozen with its original routes and records.
+            if (System.IO.File.Exists(GateRush.EditorTools.SphereDistrict.TrackFreezer.FrozenScene))
+            {
+                catalog.Tracks.Add(Frozen("expo-astana", "Expo Classic Sprint", "The original Expo Sprint (Track_Expo_v1): the courtyard hop, the low sphere orbit and the park slalom, in the first look of the district."));
+                catalog.Tracks.Add(Frozen("expo-pro", "Expo Classic Pro", "The original Expo Pro (Track_Expo_v1): helix to 90 m, the park dive, the ring-road sweeper and the second courtyard."));
+                catalog.Tracks.Add(Frozen("expo-free", "Expo Classic Free Flight", "Free flight in the original district (Track_Expo_v1)."));
+                catalog.Environments.Add(new TrackCatalog.EnvironmentScene { Environment = GateRush.EditorTools.SphereDistrict.TrackFreezer.Environment, SceneName = "Track_Expo_v1" });
+            }
             EditorUtility.SetDirty(catalog);
             return catalog;
         }
+
+        private static TrackCatalog.Entry Frozen(string id, string name, string description) => new TrackCatalog.Entry
+        {
+            Id = id,
+            DisplayName = name,
+            Description = description,
+            Json = AssetDatabase.LoadAssetAtPath<TextAsset>(GateRush.EditorTools.SphereDistrict.TrackFreezer.TrackJson(id)),
+        };
 
         private static TrackCatalog.Entry Entry(string id, string name, string description) => new TrackCatalog.Entry
         {
