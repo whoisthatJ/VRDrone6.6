@@ -12,7 +12,7 @@ using UnityEngine.UI;
 namespace GateRush.Game
 {
     /// <summary>
-    /// Track showdown before a race: a ~4 s cutscene from three angles, then the pilot's own view.
+    /// Track showdown before a race: a ~8 s cutscene from three angles, then the pilot's own view.
     /// <list type="number">
     /// <item>a high, slow orbit over the whole course;</item>
     /// <item>a low run along the flight line through a gate in the middle of the lap;</item>
@@ -23,7 +23,7 @@ namespace GateRush.Game
     /// </summary>
     public sealed class TrackIntro : MonoBehaviour
     {
-        public const float ShotSeconds = 1.4f;
+        public const float ShotSeconds = 2.8f;
         public const int Shots = 3;
         public const float FadeSeconds = 0.18f;
 
