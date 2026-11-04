@@ -1,9 +1,9 @@
 using System.Collections.Generic;
-using GateRush.Race;
+using Ushqyr.Race;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-namespace GateRush.Track
+namespace Ushqyr.Track
 {
     /// <summary>
     /// Generates a spline track from its <see cref="RouteData"/> (editor and runtime, deterministic):
@@ -87,7 +87,7 @@ namespace GateRush.Track
             spawn.SetParent(root, false);
             spawn.SetPositionAndRotation(data.Spawn.Position, Quaternion.Euler(0f, data.Spawn.Yaw, 0f));
 
-            var racingLine = GateRush.Track.RacingLine.Build(route, data.Route, kit?.RacingLine, root);
+            var racingLine = Ushqyr.Track.RacingLine.Build(route, data.Route, kit?.RacingLine, root);
             racingLine.SetActive(false);
 
             return new LoadedTrack
@@ -256,7 +256,7 @@ namespace GateRush.Track
                 GameObject prefab = prefabs != null ? prefabs.Gate(o.Type) ?? prefabs.Prop(o.Type) : null;
                 if (prefab == null && prefabs != null)
                 {
-                    Debug.LogWarning($"[GateRush] Track '{data.Id}': unknown obstacle type '{o.Type}', using Square");
+                    Debug.LogWarning($"[Ushqyr] Track '{data.Id}': unknown obstacle type '{o.Type}', using Square");
                     prefab = prefabs.Gate("Square");
                 }
                 var go = prefab != null ? Object.Instantiate(prefab, pos, rot, root) : new GameObject();

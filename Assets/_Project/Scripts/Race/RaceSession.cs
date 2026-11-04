@@ -1,10 +1,10 @@
 using System;
-using GateRush.Vehicle;
+using Ushqyr.Vehicle;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
 
-namespace GateRush.Race
+namespace Ushqyr.Race
 {
     public enum RacePhase
     {
@@ -71,10 +71,10 @@ namespace GateRush.Race
         /// <summary>Flying past (not through) the next gate within this distance counts as missing it.</summary>
         public const float MissRadius = 5f;
 
-        private GateRush.Core.RouteGuidanceLevel _guidance = GateRush.Core.RouteGuidanceLevel.Standard;
+        private Ushqyr.Core.RouteGuidanceLevel _guidance = Ushqyr.Core.RouteGuidanceLevel.Standard;
 
         /// <summary>Route guidance (T5): Off shows every gate plain; Standard/Trainer highlight next, upcoming and passed.</summary>
-        public GateRush.Core.RouteGuidanceLevel Guidance
+        public Ushqyr.Core.RouteGuidanceLevel Guidance
         {
             get => _guidance;
             set
@@ -401,7 +401,7 @@ namespace GateRush.Race
             LastRaceSetTrackBestLap = trackBest;
             _board.Save(LocalLeaderboard.DefaultPath);
             SetPhase(RacePhase.Finished);
-            Debug.Log($"[GateRush] Race finished on {trackId}: total {entry.TotalTime:F2}s, best lap {entry.BestLap:F2}s, rank {LastRank}");
+            Debug.Log($"[Ushqyr] Race finished on {trackId}: total {entry.TotalTime:F2}s, best lap {entry.BestLap:F2}s, rank {LastRank}");
         }
 
         private void OnRespawned()
@@ -429,7 +429,7 @@ namespace GateRush.Race
             bool showStart = _phase == RacePhase.Idle || _phase == RacePhase.Countdown;
             int next = racing ? _timer.NextCheckpoint : 0;
             int upcoming = gates.Length > 1 ? (next + 1) % gates.Length : -1;
-            bool guided = _guidance != GateRush.Core.RouteGuidanceLevel.Off;
+            bool guided = _guidance != Ushqyr.Core.RouteGuidanceLevel.Off;
             for (int i = 0; i < gates.Length; i++)
             {
                 GateVisualState s = GateVisualState.Idle;

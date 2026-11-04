@@ -1,9 +1,9 @@
 using System;
-using GateRush.Flight;
-using GateRush.Input;
+using Ushqyr.Flight;
+using Ushqyr.Input;
 using UnityEngine;
 
-namespace GateRush.Vehicle
+namespace Ushqyr.Vehicle
 {
     /// <summary>
     /// MonoBehaviour bridge: feeds pilot input into <see cref="QuadSimulator"/> with fixed sub-steps,

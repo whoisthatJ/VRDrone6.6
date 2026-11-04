@@ -1,8 +1,8 @@
-using GateRush.Input;
+using Ushqyr.Input;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace GateRush.Cameras
+namespace Ushqyr.Cameras
 {
     /// <summary>Cycles the camera view: keyboard V, gamepad left shoulder, or the radio's view switch (if calibrated).</summary>
     public sealed class ViewModeInput : MonoBehaviour

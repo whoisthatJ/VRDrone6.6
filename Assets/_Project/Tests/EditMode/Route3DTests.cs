@@ -1,11 +1,11 @@
 using System.Linq;
-using GateRush.Race;
-using GateRush.Track;
+using Ushqyr.Race;
+using Ushqyr.Track;
 using NUnit.Framework;
 using UnityEditor;
 using UnityEngine;
 
-namespace GateRush.Tests
+namespace Ushqyr.Tests
 {
     /// <summary>P3: routes with a full 3D frame (vertical and inverted sections) and gates aligned to it.</summary>
     public class Route3DTests

@@ -1,14 +1,14 @@
 using System.Linq;
-using GateRush.Core;
-using GateRush.Game;
-using GateRush.Track;
+using Ushqyr.Core;
+using Ushqyr.Game;
+using Ushqyr.Track;
 using NUnit.Framework;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace GateRush.Tests
+namespace Ushqyr.Tests
 {
     /// <summary>T3 stadium: the scene's dressing, the runtime time-of-day presets and the Stadium Oval track.</summary>
     public class StadiumTests

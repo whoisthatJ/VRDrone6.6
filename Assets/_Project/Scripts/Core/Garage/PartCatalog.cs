@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace GateRush.Garage
+namespace Ushqyr.Garage
 {
     public enum PartSlot { Frame = 0, Motor = 1, Prop = 2, Battery = 3, Extra = 4, Style = 5, Color = 6 }
 
@@ -188,24 +188,24 @@ namespace GateRush.Garage
 
         public static readonly List<ExtraDef> Extras = new List<ExtraDef>
         {
-            new ExtraDef { Id = "extra-actioncam", Name = "Action camera", Brand = "GateRush", Description = "Full-size action camera on the top plate: cinematic footage, more weight and drag.",
+            new ExtraDef { Id = "extra-actioncam", Name = "Action camera", Brand = "Ushqyr", Description = "Full-size action camera on the top plate: cinematic footage, more weight and drag.",
                 Slot = PartSlot.Extra, Sizes = S57, MassG = 121f, Kind = ExtraKind.ActionCam, CdAFront = 9f, CdATop = 12f },
-            new ExtraDef { Id = "extra-hdcam", Name = "HD camera", Brand = "GateRush", Description = "Small HD camera for 3\" rigs.",
+            new ExtraDef { Id = "extra-hdcam", Name = "HD camera", Brand = "Ushqyr", Description = "Small HD camera for 3\" rigs.",
                 Slot = PartSlot.Extra, Sizes = S253, MassG = 28f, Kind = ExtraKind.HdCamera, CdAFront = 3f, CdATop = 3f },
-            new ExtraDef { Id = "extra-hd-system", Name = "Digital HD video", Brand = "GateRush", Description = "Digital HD camera and air unit with two antennas instead of the analog camera and VTX: a clear feed, a little heavier.",
+            new ExtraDef { Id = "extra-hd-system", Name = "Digital HD video", Brand = "Ushqyr", Description = "Digital HD camera and air unit with two antennas instead of the analog camera and VTX: a clear feed, a little heavier.",
                 Slot = PartSlot.Extra, Sizes = new[] { SizeClass.Three, SizeClass.Five, SizeClass.Seven }, MassG = 24f, Kind = ExtraKind.DigitalHd, CdAFront = 1.5f, CdATop = 2f },
-            new ExtraDef { Id = "extra-leds", Name = "LED kit", Brand = "GateRush", Description = "Bright LED strips along the frame. Night racing look.",
+            new ExtraDef { Id = "extra-leds", Name = "LED kit", Brand = "Ushqyr", Description = "Bright LED strips along the frame. Night racing look.",
                 Slot = PartSlot.Extra, MassG = 6f, Kind = ExtraKind.LedKit },
-            new ExtraDef { Id = "extra-antenna", Name = "Long-range antenna", Brand = "GateRush", Description = "Tall stubby-free antenna: better range, a little drag.",
+            new ExtraDef { Id = "extra-antenna", Name = "Long-range antenna", Brand = "Ushqyr", Description = "Tall stubby-free antenna: better range, a little drag.",
                 Slot = PartSlot.Extra, Sizes = S57, MassG = 8f, Kind = ExtraKind.LongAntenna, CdAFront = 0.6f },
         };
 
         public static readonly List<StyleDef> Styles = new List<StyleDef>
         {
-            new StyleDef { Id = "style-carbon", Name = "Raw carbon", Brand = "GateRush", Description = "Plain 3K carbon weave.", Slot = PartSlot.Style, Finish = FrameFinish.Carbon },
-            new StyleDef { Id = "style-gold", Name = "Gold edge", Brand = "GateRush", Description = "Carbon with gold-anodised plate edges and standoffs.", Slot = PartSlot.Style, Finish = FrameFinish.GoldEdge },
-            new StyleDef { Id = "style-tiger", Name = "Tiger wrap", Brand = "GateRush", Description = "Printed tiger-stripe skin on the plates.", Slot = PartSlot.Style, Finish = FrameFinish.Tiger },
-            new StyleDef { Id = "style-stealth", Name = "Stealth", Brand = "GateRush", Description = "Matte black everything.", Slot = PartSlot.Style, Finish = FrameFinish.Stealth },
+            new StyleDef { Id = "style-carbon", Name = "Raw carbon", Brand = "Ushqyr", Description = "Plain 3K carbon weave.", Slot = PartSlot.Style, Finish = FrameFinish.Carbon },
+            new StyleDef { Id = "style-gold", Name = "Gold edge", Brand = "Ushqyr", Description = "Carbon with gold-anodised plate edges and standoffs.", Slot = PartSlot.Style, Finish = FrameFinish.GoldEdge },
+            new StyleDef { Id = "style-tiger", Name = "Tiger wrap", Brand = "Ushqyr", Description = "Printed tiger-stripe skin on the plates.", Slot = PartSlot.Style, Finish = FrameFinish.Tiger },
+            new StyleDef { Id = "style-stealth", Name = "Stealth", Brand = "Ushqyr", Description = "Matte black everything.", Slot = PartSlot.Style, Finish = FrameFinish.Stealth },
         };
 
         public static readonly List<ColorDef> Colors = new List<ColorDef>
@@ -262,6 +262,6 @@ namespace GateRush.Garage
             };
 
         private static ColorDef Col(string id, string name, Color c) =>
-            new ColorDef { Id = id, Name = name, Brand = "GateRush", Description = "Accent colour for motors, props and LEDs.", Slot = PartSlot.Color, Accent = c };
+            new ColorDef { Id = id, Name = name, Brand = "Ushqyr", Description = "Accent colour for motors, props and LEDs.", Slot = PartSlot.Color, Accent = c };
     }
 }

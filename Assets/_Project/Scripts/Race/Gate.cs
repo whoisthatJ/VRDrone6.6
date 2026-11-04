@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace GateRush.Race
+namespace Ushqyr.Race
 {
     public enum GateVisualState
     {

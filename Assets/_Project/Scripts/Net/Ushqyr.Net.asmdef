@@ -1,11 +1,11 @@
 {
-    "name": "GateRush.Net",
-    "rootNamespace": "GateRush.Net",
+    "name": "Ushqyr.Net",
+    "rootNamespace": "Ushqyr.Net",
     "references": [
-        "GateRush.Flight",
-        "GateRush.Core",
-        "GateRush.Vehicle",
-        "GateRush.Race",
+        "Ushqyr.Flight",
+        "Ushqyr.Core",
+        "Ushqyr.Vehicle",
+        "Ushqyr.Race",
         "Unity.Netcode.Runtime",
         "Unity.Networking.Transport",
         "Unity.Collections",

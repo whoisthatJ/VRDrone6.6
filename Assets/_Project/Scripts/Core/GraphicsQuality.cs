@@ -5,7 +5,7 @@ using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
 
-namespace GateRush.Core
+namespace Ushqyr.Core
 {
     /// <summary>Graphics options (Windows monitor build). Saved with the rest of <see cref="GameSettings"/>.</summary>
     [Serializable]
@@ -104,7 +104,7 @@ namespace GateRush.Core
             if (string.IsNullOrEmpty(settings.Graphics.Preset))
             {
                 settings.Graphics = settings.Graphics.WithPreset(DefaultPreset);
-                Debug.Log($"[GateRush] Graphics preset {DefaultPreset} (default) on {SystemInfo.graphicsDeviceName} ({SystemInfo.graphicsMemorySize} MB)");
+                Debug.Log($"[Ushqyr] Graphics preset {DefaultPreset} (default) on {SystemInfo.graphicsDeviceName} ({SystemInfo.graphicsMemorySize} MB)");
             }
             Apply(settings.Graphics);
             ScreenDisplay.Apply(settings.Graphics);

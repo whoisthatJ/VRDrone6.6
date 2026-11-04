@@ -3,7 +3,7 @@ using System.IO;
 using System.Text;
 using UnityEngine;
 
-namespace GateRush.EditorTools.Art
+namespace Ushqyr.EditorTools.Art
 {
     /// <summary>
     /// Reads a Radiance .hdr (RGBE, RLE) equirectangular image and finds the sun (centroid of the brightest

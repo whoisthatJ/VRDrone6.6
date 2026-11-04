@@ -4,12 +4,12 @@ using System.IO;
 using System.Text;
 using UnityEngine;
 
-namespace GateRush.Track
+namespace Ushqyr.Track
 {
     /// <summary>
     /// User tracks on disk: one JSON file per track in persistentDataPath/tracks. Sharing = copying files:
     /// any valid track JSON dropped into that folder shows up in the game (ids are made unique on load).
-    /// On Quest: /sdcard/Android/data/com.gaterush.vr/files/tracks (adb push/pull or SideQuest).
+    /// On Quest: /sdcard/Android/data/com.ushqyr.vr/files/tracks (adb push/pull or SideQuest).
     /// </summary>
     public sealed class TrackLibrary
     {
@@ -46,7 +46,7 @@ namespace GateRush.Track
                 }
                 catch (Exception e) when (e is IOException || e is ArgumentException || e is UnauthorizedAccessException)
                 {
-                    Debug.LogWarning($"[GateRush] Skipping track file {f.Name}: {e.Message}");
+                    Debug.LogWarning($"[Ushqyr] Skipping track file {f.Name}: {e.Message}");
                 }
             }
             return result;

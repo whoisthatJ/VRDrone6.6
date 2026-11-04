@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-namespace GateRush.Race
+namespace Ushqyr.Race
 {
     /// <summary>
     /// Guidance in the open city (E6, P3) for air courses, with route guidance on:
@@ -78,7 +78,7 @@ namespace GateRush.Race
         private void LateUpdate()
         {
             Gate gate = null;
-            bool guided = Show && session != null && session.Guidance != GateRush.Core.RouteGuidanceLevel.Off;
+            bool guided = Show && session != null && session.Guidance != Ushqyr.Core.RouteGuidanceLevel.Off;
             if (guided)
             {
                 if (session.Phase == RacePhase.Racing) gate = session.NextGate;

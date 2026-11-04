@@ -1,7 +1,7 @@
 using Unity.Cinemachine;
 using UnityEngine;
 
-namespace GateRush.Cameras
+namespace Ushqyr.Cameras
 {
     /// <summary>
     /// FPV camera mount on the quad: uptilt and horizontal FOV, like a real FPV cam. Drives a

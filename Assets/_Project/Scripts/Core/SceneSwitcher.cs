@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
-namespace GateRush.Core
+namespace Ushqyr.Core
 {
     /// <summary>
     /// Back to the main menu from any scene: Esc, F1 or gamepad right-stick click.

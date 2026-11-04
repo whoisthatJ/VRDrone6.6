@@ -1,7 +1,7 @@
-using GateRush.Garage;
+using Ushqyr.Garage;
 using UnityEngine;
 
-namespace GateRush.Net
+namespace Ushqyr.Net
 {
     /// <summary>
     /// Another pilot's quad: their own build's model, posed from their snapshots (interpolated slightly in the past)

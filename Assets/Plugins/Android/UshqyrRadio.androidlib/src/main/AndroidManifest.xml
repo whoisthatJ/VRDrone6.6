@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- GateRush VR: RC radio support. Merged into the app manifest by Gradle. -->
+<!-- Ushqyr VR: RC radio support. Merged into the app manifest by Gradle. -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- USB-C OTG radios (LiteRadio 2 SIM / 3 / 4 over cable). Not required, so the app still installs everywhere. -->
     <uses-feature android:name="android.hardware.usb.host" android:required="false" />

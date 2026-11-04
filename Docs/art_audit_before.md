@@ -56,7 +56,7 @@ Track scenes include their built-in course (gates and props spawned from the pre
 
 - `Universal Render Pipeline/Lit`: 7 (FieldPillar, Frame, GateFrame, GroundField, PropFront, PropRear, TreeLine)
 - `Universal Render Pipeline/Unlit`: 2 (Ghost, PropBlur)
-- `GateRush/AnalogFeed`: 1 (GogglesFeed)
+- `Ushqyr/AnalogFeed`: 1 (GogglesFeed)
 - `Skybox/Procedural`: 1 (Default-Skybox)
 
 **Textures**
@@ -79,7 +79,7 @@ Track scenes include their built-in course (gates and props spawned from the pre
 
 - `Universal Render Pipeline/Lit`: 14 (Barrel, Crate, Frame, GateFrame, GroundHangar, HangarDoor, HangarLamp, HangarRoof, HangarSteel, HangarStripe, HangarWall, PropFront, PropRear, Wall)
 - `Universal Render Pipeline/Unlit`: 2 (Ghost, PropBlur)
-- `GateRush/AnalogFeed`: 1 (GogglesFeed)
+- `Ushqyr/AnalogFeed`: 1 (GogglesFeed)
 - `Skybox/Procedural`: 1 (Default-Skybox)
 
 **Textures**
@@ -103,7 +103,7 @@ Track scenes include their built-in course (gates and props spawned from the pre
 
 - `Universal Render Pipeline/Lit`: 20 (Barrel, ContainerBlue, ContainerGreen, ContainerRed, Crane, Frame, GateFrame, GroundAsphalt, Pole, PoleLamp, PropFront, PropRear, Quay, Warehouse, …)
 - `Universal Render Pipeline/Unlit`: 2 (Ghost, PropBlur)
-- `GateRush/AnalogFeed`: 1 (GogglesFeed)
+- `Ushqyr/AnalogFeed`: 1 (GogglesFeed)
 - `Skybox/Procedural`: 1 (Default-Skybox)
 
 **Textures**
@@ -152,7 +152,7 @@ Track scenes include their built-in course (gates and props spawned from the pre
 | Art/Materials/Frame.mat | `Universal Render Pipeline/Lit` |  |
 | Art/Materials/GateFrame.mat | `Universal Render Pipeline/Lit` |  |
 | Art/Materials/Ghost.mat | `Universal Render Pipeline/Unlit` |  |
-| Art/Materials/GogglesFeed.mat | `GateRush/AnalogFeed` |  |
+| Art/Materials/GogglesFeed.mat | `Ushqyr/AnalogFeed` |  |
 | Art/Materials/GogglesScreen.mat | `Universal Render Pipeline/Unlit` |  |
 | Art/Materials/Ground.mat | `Universal Render Pipeline/Lit` | _MainTex=Grid, _BaseMap=Grid |
 | Art/Materials/GroundAsphalt.mat | `Universal Render Pipeline/Lit` | _MainTex=Grid, _BaseMap=Grid |

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace GateRush.EditorTools.Art
+namespace Ushqyr.EditorTools.Art
 {
     public enum ArtProvider { PolyHaven, AmbientCG }
     public enum ArtKind { Texture, Hdri, Model }

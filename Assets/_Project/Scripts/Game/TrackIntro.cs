@@ -1,15 +1,15 @@
 using System;
-using GateRush.Cameras;
-using GateRush.Core;
-using GateRush.Race;
-using GateRush.Track;
-using GateRush.Vehicle;
+using Ushqyr.Cameras;
+using Ushqyr.Core;
+using Ushqyr.Race;
+using Ushqyr.Track;
+using Ushqyr.Vehicle;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
-namespace GateRush.Game
+namespace Ushqyr.Game
 {
     /// <summary>
     /// Track showdown before a race: a ~8 s cutscene from three angles, then the pilot's own view.

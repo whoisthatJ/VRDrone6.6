@@ -1,6 +1,6 @@
 using System;
 
-namespace GateRush.Flight
+namespace Ushqyr.Flight
 {
     /// <summary>Four motor values. Order: 0 = rear-right, 1 = front-right, 2 = rear-left, 3 = front-left (Betaflight Quad-X).</summary>
     [Serializable]

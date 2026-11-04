@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.Rendering;
 
-namespace GateRush.Race
+namespace Ushqyr.Race
 {
     /// <summary>
     /// P3 holographic ring (HoloRing gate, Holo Halo): light, not a solid, so it has no collider. The race checks the

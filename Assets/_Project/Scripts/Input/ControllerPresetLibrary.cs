@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace GateRush.Input
+namespace Ushqyr.Input
 {
     /// <summary>All shipped presets (referenced from scenes so they ship in the build).</summary>
-    [CreateAssetMenu(menuName = "GateRush/Controller Preset Library", fileName = "ControllerPresets")]
+    [CreateAssetMenu(menuName = "Ushqyr/Controller Preset Library", fileName = "ControllerPresets")]
     public sealed class ControllerPresetLibrary : ScriptableObject
     {
         public List<ControllerPreset> Presets = new List<ControllerPreset>();

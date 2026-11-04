@@ -1,8 +1,8 @@
 using System.Collections;
-using GateRush.Core;
-using GateRush.Game;
-using GateRush.Race;
-using GateRush.Vehicle;
+using Ushqyr.Core;
+using Ushqyr.Game;
+using Ushqyr.Race;
+using Ushqyr.Vehicle;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -12,7 +12,7 @@ using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.UI;
 
-namespace GateRush.UI
+namespace Ushqyr.UI
 {
     /// <summary>
     /// The finish moment (T6): crossing the finish → 0.5 s of slow motion → the quad auto-hovers in front of the finish

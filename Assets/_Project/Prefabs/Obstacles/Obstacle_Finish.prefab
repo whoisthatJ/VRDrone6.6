@@ -1242,7 +1242,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3e430935fc1db8a44a530aa37b5994e5, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: GateRush.Race::GateRush.Race.Gate
+  m_EditorClassIdentifier: Ushqyr.Race::Ushqyr.Race.Gate
   order: 0
   openingSize: {x: 2.2, y: 1.9052559}
   openingCenter: {x: 0, y: 1.75, z: -1.855}
@@ -1266,7 +1266,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f7ab76d55b1eb6f41ab9b86f65533ebf, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: GateRush.Race::GateRush.Race.NextGateHighlight
+  m_EditorClassIdentifier: Ushqyr.Race::Ushqyr.Race.NextGateHighlight
   leds:
   - {fileID: 1902203060778068373}
   idleIntensity: 2.5
@@ -1286,7 +1286,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 696bce3a239e0cd4696b8b96f7d0e3b6, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: GateRush.Race::GateRush.Race.FinishCube
+  m_EditorClassIdentifier: Ushqyr.Race::Ushqyr.Race.FinishCube
   CameraAnchor: {fileID: 6053504428651459055}
   HoverAnchor: {fileID: 3679342484955820217}
 --- !u!1 &8931297348888588797

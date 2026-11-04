@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bf2426122a92b6a479c7c4056bec270e, type: 3}
   m_Name: TrackCatalog
-  m_EditorClassIdentifier: GateRush.Game::GateRush.Game.TrackCatalog
+  m_EditorClassIdentifier: Ushqyr.Game::Ushqyr.Game.TrackCatalog
   Tracks:
   - Id: field
     DisplayName: Open Field

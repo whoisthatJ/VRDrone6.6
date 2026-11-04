@@ -376,7 +376,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3e430935fc1db8a44a530aa37b5994e5, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: GateRush.Race::GateRush.Race.Gate
+  m_EditorClassIdentifier: Ushqyr.Race::Ushqyr.Race.Gate
   order: 0
   openingSize: {x: 1.52, y: 1.52}
   openingCenter: {x: 0, y: 1.76, z: 0}

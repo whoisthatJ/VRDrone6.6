@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using System.Text;
-using GateRush.Track;
+using Ushqyr.Track;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 
-namespace GateRush.EditorTools.SphereDistrict
+namespace Ushqyr.EditorTools.SphereDistrict
 {
     /// <summary>
     /// E6 course check: samples a route's flight line every metre in its environment scene and reports every stretch

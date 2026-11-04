@@ -2,10 +2,10 @@
 
 ## Install
 ```
-adb install -r Builds/GateRush.apk
+adb install -r Builds/Ushqyr.apk
 adb logcat -s Unity
 ```
-Start **GateRush VR** from *Library → Unknown Sources*.
+Start **Ushqyr VR** from *Library → Unknown Sources*.
 
 ## Controls (Touch, Mode 2)
 | | |
@@ -19,7 +19,7 @@ Start **GateRush VR** from *Library → Unknown Sources*.
 | Left menu (≡) | Switch to / from Input Diagnostics |
 
 ## What to check
-1. **Frame rate:** logcat shows `[GateRush] FPS avg ...` every 5 s. It should read ~72 in all three views. In Diagnostics press **B** to request 90 Hz, then check the log reads ~90 back in the flight scene.
+1. **Frame rate:** logcat shows `[Ushqyr] FPS avg ...` every 5 s. It should read ~72 in all three views. In Diagnostics press **B** to request 90 Hz, then check the log reads ~90 back in the flight scene.
 2. **Goggles:** a curved screen in a dark room. Same image in both eyes; OSD text in the top-left of the feed. The screen should drift back in front of you when you turn your head. Hold Y to snap it.
 3. **Immersive:** you sit on the quad with uptilt; turning your head looks around. Fast rolls/flips should darken the edges (vignette). Comfort rating: intense.
 4. **LOS:** you stand left-behind the pad and see the quad; fly it in Angle mode (B).
@@ -31,6 +31,6 @@ Start **GateRush VR** from *Library → Unknown Sources*.
 3. Move each stick to all corners and flip every switch. Note which rows move, and their min/max.
 4. Press **A** to save the report, then send me:
    ```
-   adb pull /sdcard/Android/data/com.gaterush.vr/files/input-devices.txt
-   adb logcat -d -s Unity | findstr "GateRush][Input"
+   adb pull /sdcard/Android/data/com.ushqyr.vr/files/input-devices.txt
+   adb logcat -d -s Unity | findstr "Ushqyr][Input"
    ```

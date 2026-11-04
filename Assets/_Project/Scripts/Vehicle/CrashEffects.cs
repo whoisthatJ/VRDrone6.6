@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace GateRush.Vehicle
+namespace Ushqyr.Vehicle
 {
     /// <summary>
     /// Sparks and debris for crashes and hard bounces. One particle system, created once and reused with

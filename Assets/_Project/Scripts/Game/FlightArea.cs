@@ -1,10 +1,10 @@
 using System.Collections.Generic;
-using GateRush.Track;
-using GateRush.Vehicle;
+using Ushqyr.Track;
+using Ushqyr.Vehicle;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace GateRush.Game
+namespace Ushqyr.Game
 {
     /// <summary>
     /// E7: the flyable area of an open venue and free flight.

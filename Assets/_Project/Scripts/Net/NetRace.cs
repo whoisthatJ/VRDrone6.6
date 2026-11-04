@@ -5,7 +5,7 @@ using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using UnityEngine;
 
-namespace GateRush.Net
+namespace Ushqyr.Net
 {
     public enum OnlinePhase { Lobby, Loading, Racing }
 
@@ -249,7 +249,7 @@ namespace GateRush.Net
             r.ReadValueSafe(out int raceId);
             if (raceId != RaceId || !Pilots.TryGetValue(sender, out var p)) return;
             p.Ready = true;
-            Debug.Log($"[GateRush] Online: {p.Name} is on the grid");
+            Debug.Log($"[Ushqyr] Online: {p.Name} is on the grid");
             TryStartRace();
         }
 
@@ -263,7 +263,7 @@ namespace GateRush.Net
 
         private void SendGo()
         {
-            Debug.Log("[GateRush] Online: everyone is on the grid, GO in " + OnlineRules.StartLead + " s");
+            Debug.Log("[Ushqyr] Online: everyone is on the grid, GO in " + OnlineRules.StartLead + " s");
             using var w = Writer();
             w.WriteValueSafe(RaceId);
             w.WriteValueSafe(ServerTime + OnlineRules.StartLead);
@@ -347,7 +347,7 @@ namespace GateRush.Net
             Phase = OnlinePhase.Loading;
             _loadStarted = Time.unscaledTime;
             foreach (var p in Pilots.Values) p.ResetRace();
-            Debug.Log($"[GateRush] Online: loading '{trackId}' for race {raceId}");
+            Debug.Log($"[Ushqyr] Online: loading '{trackId}' for race {raceId}");
             LoadRequested?.Invoke(trackId);
         }
 
@@ -357,10 +357,10 @@ namespace GateRush.Net
             r.ReadValueSafe(out double go);
             if (raceId != RaceId || Phase != OnlinePhase.Loading)
             {
-                Debug.LogWarning($"[GateRush] Online: GO for race {raceId} ignored (race {RaceId}, {Phase})");
+                Debug.LogWarning($"[Ushqyr] Online: GO for race {raceId} ignored (race {RaceId}, {Phase})");
                 return;
             }
-            Debug.Log($"[GateRush] Online: GO at server time {go:F2} (now {ServerTime:F2})");
+            Debug.Log($"[Ushqyr] Online: GO at server time {go:F2} (now {ServerTime:F2})");
             GoServerTime = go;
             Phase = OnlinePhase.Racing;
             GoReceived?.Invoke(go);

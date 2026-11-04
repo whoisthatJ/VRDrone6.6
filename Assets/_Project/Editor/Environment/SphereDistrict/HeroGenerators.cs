@@ -1,8 +1,8 @@
 using System.Collections.Generic;
-using GateRush.Track.Geo;
+using Ushqyr.Track.Geo;
 using UnityEngine;
 
-namespace GateRush.EditorTools.SphereDistrict
+namespace Ushqyr.EditorTools.SphereDistrict
 {
     /// <summary>
     /// Pillow pavilions (Sphere District E2): the four petal pavilions from their OSM outlines and courtyard holes. A
@@ -181,7 +181,7 @@ namespace GateRush.EditorTools.SphereDistrict
                 {
                     var p = new Vector2(x, z);
                     // Keep the course's orbit round the sphere clear (5 m either side).
-                    if (Mathf.Abs(p.magnitude - GateRush.EditorTools.Builders.RouteLibrary.OrbitRadius) < 5f) continue;
+                    if (Mathf.Abs(p.magnitude - Ushqyr.EditorTools.Builders.RouteLibrary.OrbitRadius) < 5f) continue;
                     if (PolyMesh.Inside(inner, p)) columns.Add(p);
                 }
             return pm.Build(name);
@@ -334,14 +334,14 @@ namespace GateRush.EditorTools.SphereDistrict
         {
             var body = new List<(Mesh, Matrix4x4, int)>
             {
-                GateRush.EditorTools.Art.ProcMesh.Part(new Vector3(0f, 2f, 0f), new Vector3(0.6f, 4f, 0.6f), Quaternion.identity),
-                GateRush.EditorTools.Art.ProcMesh.Part(new Vector3(0f, 4.2f, -0.5f), new Vector3(1.1f, 1.1f, 2.6f), Quaternion.identity),
+                Ushqyr.EditorTools.Art.ProcMesh.Part(new Vector3(0f, 2f, 0f), new Vector3(0.6f, 4f, 0.6f), Quaternion.identity),
+                Ushqyr.EditorTools.Art.ProcMesh.Part(new Vector3(0f, 4.2f, -0.5f), new Vector3(1.1f, 1.1f, 2.6f), Quaternion.identity),
             };
             var blades = new List<(Mesh, Matrix4x4, int)>();
             for (int k = 0; k < 3; k++)
-                blades.Add(GateRush.EditorTools.Art.ProcMesh.Part(Quaternion.Euler(0f, 0f, k * 120f) * new Vector3(0f, 3.4f, 0f), new Vector3(0.7f, 6.6f, 0.12f), Quaternion.Euler(0f, 0f, k * 120f)));
-            blades.Add(GateRush.EditorTools.Art.ProcMesh.Part(Vector3.zero, new Vector3(0.9f, 0.9f, 0.9f), Quaternion.identity));
-            return (GateRush.EditorTools.Art.ProcMesh.Combine("SD_TurbineBody", body), GateRush.EditorTools.Art.ProcMesh.Combine("SD_TurbineRotor", blades));
+                blades.Add(Ushqyr.EditorTools.Art.ProcMesh.Part(Quaternion.Euler(0f, 0f, k * 120f) * new Vector3(0f, 3.4f, 0f), new Vector3(0.7f, 6.6f, 0.12f), Quaternion.Euler(0f, 0f, k * 120f)));
+            blades.Add(Ushqyr.EditorTools.Art.ProcMesh.Part(Vector3.zero, new Vector3(0.9f, 0.9f, 0.9f), Quaternion.identity));
+            return (Ushqyr.EditorTools.Art.ProcMesh.Combine("SD_TurbineBody", body), Ushqyr.EditorTools.Art.ProcMesh.Combine("SD_TurbineRotor", blades));
         }
     }
 
@@ -403,11 +403,11 @@ namespace GateRush.EditorTools.SphereDistrict
         {
             var parts = new List<(Mesh, Matrix4x4, int)>
             {
-                (GateRush.EditorTools.Art.ProcMesh.Cone(height - 3f, 1.5f, 0.12f, 16), Matrix4x4.Translate(new Vector3(at.x, 1.2f, at.y)), 0),
-                (GateRush.EditorTools.Art.ProcMesh.Cone(3.2f, 0.32f, 0.02f, 12), Matrix4x4.Translate(new Vector3(at.x, height - 1.9f, at.y)), 1),
-                GateRush.EditorTools.Art.ProcMesh.Part(new Vector3(at.x, 0.6f, at.y), new Vector3(12f, 1.2f, 12f), Quaternion.Euler(0f, 12f, 0f), 0),
+                (Ushqyr.EditorTools.Art.ProcMesh.Cone(height - 3f, 1.5f, 0.12f, 16), Matrix4x4.Translate(new Vector3(at.x, 1.2f, at.y)), 0),
+                (Ushqyr.EditorTools.Art.ProcMesh.Cone(3.2f, 0.32f, 0.02f, 12), Matrix4x4.Translate(new Vector3(at.x, height - 1.9f, at.y)), 1),
+                Ushqyr.EditorTools.Art.ProcMesh.Part(new Vector3(at.x, 0.6f, at.y), new Vector3(12f, 1.2f, 12f), Quaternion.Euler(0f, 12f, 0f), 0),
             };
-            return GateRush.EditorTools.Art.ProcMesh.Combine(name, parts);
+            return Ushqyr.EditorTools.Art.ProcMesh.Combine(name, parts);
         }
     }
 }

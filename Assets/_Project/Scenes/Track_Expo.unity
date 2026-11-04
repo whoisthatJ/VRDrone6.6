@@ -1192,7 +1192,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 04a04e499d04c9445bc38d85e7650667, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: GateRush.UI::GateRush.UI.NextGateIndicator
+  m_EditorClassIdentifier: Ushqyr.UI::Ushqyr.UI.NextGateIndicator
   race: {fileID: 960160684}
   vehicle: {fileID: 2109282428}
   marker: {fileID: 512181267}
@@ -1727,7 +1727,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5ce70b79c7a9a9b439b8dbe11b7e599e, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: GateRush.Core::GateRush.Core.Spinner
+  m_EditorClassIdentifier: Ushqyr.Core::Ushqyr.Core.Spinner
   axis: {x: 0, y: 0, z: 1}
   rpm: 14
 --- !u!23 &148041733
@@ -2354,7 +2354,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c48c888a48f34d74491675868f581bdf, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: GateRush.Input::GateRush.Input.RadioDeviceProvider
+  m_EditorClassIdentifier: Ushqyr.Input::Ushqyr.Input.RadioDeviceProvider
   presets: {fileID: 11400000, guid: 3ef0a739f5bc0794cb707319d7f11a15, type: 2}
   backend: 0
 --- !u!114 &199652403
@@ -2368,7 +2368,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 727ab8d9fe1352146aaccad8d55cd965, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: GateRush.Input::GateRush.Input.RcRadioSource
+  m_EditorClassIdentifier: Ushqyr.Input::Ushqyr.Input.RcRadioSource
   shaping:
     Deadband: 0.02
     Expo: 0
@@ -2388,7 +2388,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4fdaa9916eb049945beabb8ffd1ec4df, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: GateRush.Input::GateRush.Input.KeyboardGamepadSource
+  m_EditorClassIdentifier: Ushqyr.Input::Ushqyr.Input.KeyboardGamepadSource
   shaping:
     Deadband: 0.02
     Expo: 0
@@ -2410,7 +2410,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2c25ccf5e322cff4b9ce73b8e9a88d07, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: GateRush.Game::GateRush.Game.ControllerHotplugGuard
+  m_EditorClassIdentifier: Ushqyr.Game::Ushqyr.Game.ControllerHotplugGuard
   router: {fileID: 199652406}
   race: {fileID: 960160684}
   centreTolerance: 0.15
@@ -2426,7 +2426,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 294c68e4511d45541a131d759a00da94, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: GateRush.Vehicle::GateRush.Vehicle.VehicleInputRouter
+  m_EditorClassIdentifier: Ushqyr.Vehicle::Ushqyr.Vehicle.VehicleInputRouter
   vehicle: {fileID: 2109282428}
   sources:
   - {fileID: 199652404}
@@ -6229,7 +6229,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2b4681399b1ba4742891d5170453025d, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: GateRush.UI::GateRush.UI.HotplugOverlay
+  m_EditorClassIdentifier: Ushqyr.UI::Ushqyr.UI.HotplugOverlay
   guard: {fileID: 199652405}
   panel: {fileID: 4498044}
   text: {fileID: 445114179}
@@ -6244,7 +6244,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bd363f8d93c554b41aede3eb6c9173e4, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: GateRush.UI::GateRush.UI.RaceHud
+  m_EditorClassIdentifier: Ushqyr.UI::Ushqyr.UI.RaceHud
   session: {fileID: 960160684}
   lapInfo: {fileID: 1689486054}
   centre: {fileID: 61823217}
@@ -6265,7 +6265,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b3df43bba21fba04d85cc3b6d36d0d63, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: GateRush.UI::GateRush.UI.FinishSequence
+  m_EditorClassIdentifier: Ushqyr.UI::Ushqyr.UI.FinishSequence
   session: {fileID: 960160684}
   vehicle: {fileID: 2109282428}
   slowMotionScale: 0.3
@@ -6282,7 +6282,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 99c46223b1c4a5448a4b2f1d0121da5e, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: GateRush.UI::GateRush.UI.OsdHud
+  m_EditorClassIdentifier: Ushqyr.UI::Ushqyr.UI.OsdHud
   vehicle: {fileID: 2109282428}
   vtx: {fileID: 1550903409}
   battery: {fileID: 574478458}
@@ -6835,7 +6835,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 44be31e750741024599379f520049ede, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: GateRush.Core::GateRush.Core.InstancedProps
+  m_EditorClassIdentifier: Ushqyr.Core::Ushqyr.Core.InstancedProps
   groups:
   - Mesh: {fileID: 4300000, guid: 26885213389c7814c900f36e3dc988a7, type: 2}
     Submesh: 0
@@ -827728,7 +827728,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fb0c4ba660dc6884eb8e999b2dfcfaaa, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: GateRush.UI::GateRush.UI.FlightDebugOverlay
+  m_EditorClassIdentifier: Ushqyr.UI::Ushqyr.UI.FlightDebugOverlay
   vehicle: {fileID: 2109282428}
   status: {fileID: 1589972865}
   sticks: {fileID: 551595891}
@@ -827963,7 +827963,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6b605e19db02be0499b3547d22b3ab4c, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: GateRush.TrackEditor::GateRush.TrackEditor.TrackEditorController
+  m_EditorClassIdentifier: Ushqyr.TrackEditor::Ushqyr.TrackEditor.TrackEditorController
   prefabs: {fileID: 11400000, guid: 9aac9d2a203b446409b3c7ea79aca162, type: 2}
   markerMaterial: {fileID: 2100000, guid: ed56572681189074eb9383cb65b1a51e, type: 2}
   panelMaterial: {fileID: 2100000, guid: 1c2207352f4aef34ea844739aafb3353, type: 2}
@@ -833230,7 +833230,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 497eb1f5d476d2546a0cdca69c79148d, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: GateRush.Race::GateRush.Race.RaceSession
+  m_EditorClassIdentifier: Ushqyr.Race::Ushqyr.Race.RaceSession
   vehicle: {fileID: 2109282428}
   gates: []
   ghosts: {fileID: 960160685}
@@ -833252,7 +833252,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 05294df91189faf4f8161953cc756ff9, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: GateRush.Race::GateRush.Race.GhostSystem
+  m_EditorClassIdentifier: Ushqyr.Race::Ushqyr.Race.GhostSystem
   ghostVisual: {fileID: 642860972}
   sampleRate: 30
   maxLapSeconds: 600
@@ -833267,7 +833267,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e8a276201e6bcbf449fccab102d33423, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: GateRush.Race::GateRush.Race.NextGateBeacon
+  m_EditorClassIdentifier: Ushqyr.Race::Ushqyr.Race.NextGateBeacon
   session: {fileID: 960160684}
   material: {fileID: 2100000, guid: f6a4e52493688fc4eab78cc333aa6ce4, type: 2}
   guide: {fileID: 2100000, guid: 1c4a109364b50334f8ac45bf725a16f9, type: 2}
@@ -840589,7 +840589,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6a35060a10df16c468cab92ec1944282, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: GateRush.Cameras::GateRush.Cameras.FpvCamera
+  m_EditorClassIdentifier: Ushqyr.Cameras::Ushqyr.Cameras.FpvCamera
   tiltDegrees: 25
   horizontalFov: 120
 --- !u!1 &1510974869
@@ -841081,7 +841081,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 44eaf361db4f09547826feeb3ed6d201, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: GateRush.Cameras::GateRush.Cameras.VtxSignal
+  m_EditorClassIdentifier: Ushqyr.Cameras::Ushqyr.Cameras.VtxSignal
   vehicle: {fileID: 2109282428}
   receiver: {fileID: 1708083041}
   screen: {fileID: 0}
@@ -841103,7 +841103,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3fd801cd7a15cfe4b81b720869780cb6, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: GateRush.Cameras::GateRush.Cameras.ViewModeManager
+  m_EditorClassIdentifier: Ushqyr.Cameras::Ushqyr.Cameras.ViewModeManager
   mode: 0
   vehicle: {fileID: 2109282428}
   outputCamera: {fileID: 1477351125}
@@ -841145,7 +841145,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bc34cf9ec4b1f4943a175911b16aadde, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: GateRush.Cameras::GateRush.Cameras.ViewModeInput
+  m_EditorClassIdentifier: Ushqyr.Cameras::Ushqyr.Cameras.ViewModeInput
   views: {fileID: 1550903410}
   radio: {fileID: 199652403}
 --- !u!1 &1555288661
@@ -848902,7 +848902,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2760d557e56f04943a629a37c8b72842, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: GateRush.Core::GateRush.Core.StadiumLighting
+  m_EditorClassIdentifier: Ushqyr.Core::Ushqyr.Core.StadiumLighting
   presets:
   - Name: Night
     Sky: {fileID: 2100000, guid: 92475d2af08387846b251dd6787d5c59, type: 2}
@@ -849024,7 +849024,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 06f8d69ac104c954f96da005b156fdca, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: GateRush.Vehicle::GateRush.Vehicle.QuadAudio
+  m_EditorClassIdentifier: Ushqyr.Vehicle::Ushqyr.Vehicle.QuadAudio
   vehicle: {fileID: 2109282428}
   maxRpm: 28000
   blades: 3
@@ -849040,7 +849040,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5b13e233b2b99e64b8dcdf6b44002558, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: GateRush.Vehicle::GateRush.Vehicle.QuadVehicle
+  m_EditorClassIdentifier: Ushqyr.Vehicle::Ushqyr.Vehicle.QuadVehicle
   profile: {fileID: 11400000, guid: 065bd4b96d202af49a80dfe9ef60c302, type: 2}
   rates: {fileID: 0}
   physics: {fileID: 11400000, guid: 4ee50f88c9df7cd45aa2de27a688b5c0, type: 2}
@@ -849057,7 +849057,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d503bf23fa1e5ad45be15f3336d8e0e9, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: GateRush.Vehicle::GateRush.Vehicle.CrashEffects
+  m_EditorClassIdentifier: Ushqyr.Vehicle::Ushqyr.Vehicle.CrashEffects
   vehicle: {fileID: 2109282428}
   particleMaterial: {fileID: 2100000, guid: 2f26bd7b9044cfa4fb844592228fdb9c, type: 2}
   crashParticles: 60
@@ -849170,7 +849170,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a1a32651964a57641918bd4537a2b887, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: GateRush.Vehicle::GateRush.Vehicle.PropVisuals
+  m_EditorClassIdentifier: Ushqyr.Vehicle::Ushqyr.Vehicle.PropVisuals
   vehicle: {fileID: 2109282428}
   props:
   - {fileID: 279344950}
@@ -849319,7 +849319,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5ce70b79c7a9a9b439b8dbe11b7e599e, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: GateRush.Core::GateRush.Core.Spinner
+  m_EditorClassIdentifier: Ushqyr.Core::Ushqyr.Core.Spinner
   axis: {x: 0, y: 0, z: 1}
   rpm: 18
 --- !u!23 &2131156160
@@ -849550,7 +849550,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: edd4909cecc5b114aacbfb1b74314262, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: GateRush.Game::GateRush.Game.TrackSceneController
+  m_EditorClassIdentifier: Ushqyr.Game::Ushqyr.Game.TrackSceneController
   environment: expo
   quads: {fileID: 11400000, guid: f513e8f612496c344ad0f57783580c0e, type: 2}
   tracks: {fileID: 11400000, guid: 64e9395e0713f0d448c713bade700a80, type: 2}

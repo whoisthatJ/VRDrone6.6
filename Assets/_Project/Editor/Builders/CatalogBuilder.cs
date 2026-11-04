@@ -1,10 +1,10 @@
-using GateRush.Flight;
-using GateRush.Game;
-using GateRush.Vehicle;
+using Ushqyr.Flight;
+using Ushqyr.Game;
+using Ushqyr.Vehicle;
 using UnityEditor;
 using UnityEngine;
 
-namespace GateRush.EditorTools.Builders
+namespace Ushqyr.EditorTools.Builders
 {
     /// <summary>Creates/updates the quad profile assets, the quad catalog and the track catalog.</summary>
     public static class CatalogBuilder
@@ -13,7 +13,7 @@ namespace GateRush.EditorTools.Builders
         public const string TrackCatalogPath = "Assets/_Project/Data/TrackCatalog.asset";
         private const string ProfileDir = "Assets/_Project/Data/QuadProfiles";
 
-        [MenuItem("GateRush/Builders/Build Catalogs")]
+        [MenuItem("Ushqyr/Builders/Build Catalogs")]
         public static void BuildAll()
         {
             CourseLibrary.WriteAll();
@@ -73,12 +73,12 @@ namespace GateRush.EditorTools.Builders
             catalog.Environments.Add(new TrackCatalog.EnvironmentScene { Environment = "stadium", SceneName = "Track_Stadium", DisplayName = "Stadium", Description = "Floodlit football stadium with lane tracks round the pitch." });
             catalog.Environments.Add(new TrackCatalog.EnvironmentScene { Environment = "expo", SceneName = "Track_Expo", DisplayName = "Expo Astana", Description = "The Expo district in Astana: the sphere, the pavilions, holo rings and vertical routes." });
             // Phase 3 P1a: the first Sphere District, frozen with its original routes and records.
-            if (System.IO.File.Exists(GateRush.EditorTools.SphereDistrict.TrackFreezer.FrozenScene))
+            if (System.IO.File.Exists(Ushqyr.EditorTools.SphereDistrict.TrackFreezer.FrozenScene))
             {
                 catalog.Tracks.Add(Frozen("expo-astana", "Classic Sprint", "Expo Classic Sprint", "The original Expo Sprint (Track_Expo_v1): the courtyard hop, the low sphere orbit and the park slalom, in the first look of the district."));
                 catalog.Tracks.Add(Frozen("expo-pro", "Classic Pro", "Expo Classic Pro", "The original Expo Pro (Track_Expo_v1): helix to 90 m, the park dive, the ring-road sweeper and the second courtyard."));
                 catalog.Tracks.Add(Frozen("expo-free", "Classic Free Flight", "Expo Classic Free Flight", "Free flight in the original district (Track_Expo_v1)."));
-                catalog.Environments.Add(new TrackCatalog.EnvironmentScene { Environment = GateRush.EditorTools.SphereDistrict.TrackFreezer.Environment, SceneName = "Track_Expo_v1", DisplayName = "Expo Astana Classic", Description = "The first version of the Expo district, with its original routes and records." });
+                catalog.Environments.Add(new TrackCatalog.EnvironmentScene { Environment = Ushqyr.EditorTools.SphereDistrict.TrackFreezer.Environment, SceneName = "Track_Expo_v1", DisplayName = "Expo Astana Classic", Description = "The first version of the Expo district, with its original routes and records." });
             }
             EditorUtility.SetDirty(catalog);
             return catalog;
@@ -87,12 +87,12 @@ namespace GateRush.EditorTools.Builders
         private static TrackCatalog.Entry Frozen(string id, string variation, string name, string description) => new TrackCatalog.Entry
         {
             Id = id,
-            Environment = GateRush.EditorTools.SphereDistrict.TrackFreezer.Environment,
+            Environment = Ushqyr.EditorTools.SphereDistrict.TrackFreezer.Environment,
             Variation = variation,
             Preview = PreviewFor(id),
             DisplayName = name,
             Description = description,
-            Json = AssetDatabase.LoadAssetAtPath<TextAsset>(GateRush.EditorTools.SphereDistrict.TrackFreezer.TrackJson(id)),
+            Json = AssetDatabase.LoadAssetAtPath<TextAsset>(Ushqyr.EditorTools.SphereDistrict.TrackFreezer.TrackJson(id)),
         };
 
         private static TrackCatalog.Entry Entry(string id, string environment, string variation, string name, string description) => new TrackCatalog.Entry

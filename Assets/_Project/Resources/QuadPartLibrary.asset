@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d787b73b815553f40a5e3876ded0b16d, type: 3}
   m_Name: QuadPartLibrary
-  m_EditorClassIdentifier: GateRush.Core::GateRush.Garage.QuadPartLibrary
+  m_EditorClassIdentifier: Ushqyr.Core::Ushqyr.Garage.QuadPartLibrary
   Entries:
   - Id: actioncam
     Mesh: {fileID: 4300000, guid: eb6b25670083f4545b2ac447f456bd41, type: 2}

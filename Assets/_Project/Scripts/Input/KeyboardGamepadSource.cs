@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace GateRush.Input
+namespace Ushqyr.Input
 {
     /// <summary>
     /// Gamepad (Mode 2) with keyboard fallback, read directly from devices (no allocations).

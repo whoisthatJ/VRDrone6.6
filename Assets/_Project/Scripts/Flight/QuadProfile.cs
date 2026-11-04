@@ -1,6 +1,6 @@
 using System;
 
-namespace GateRush.Flight
+namespace Ushqyr.Flight
 {
     /// <summary>Rate-PID gains for one axis. Output is in normalised mixer units per rad/s of error.</summary>
     [Serializable]

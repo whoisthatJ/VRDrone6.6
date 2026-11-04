@@ -1,4 +1,4 @@
-namespace GateRush.Flight
+namespace Ushqyr.Flight
 {
     /// <summary>Called after each fixed sub-step. Return false to stop sub-stepping for this frame (e.g. after a crash).</summary>
     public interface IStepHook

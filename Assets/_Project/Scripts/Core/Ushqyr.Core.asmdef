@@ -1,12 +1,13 @@
 {
-    "name": "GateRush.TrackEditor",
-    "rootNamespace": "GateRush.TrackEditor",
+    "name": "Ushqyr.Core",
+    "rootNamespace": "Ushqyr.Core",
     "references": [
-        "GateRush.Core",
-        "GateRush.Track",
-        "GateRush.Race",
+        "Ushqyr.Flight",
         "Unity.InputSystem",
-        "Unity.TextMeshPro"
+        "Unity.RenderPipelines.Core.Runtime",
+        "Unity.RenderPipelines.Universal.Runtime",
+        "Unity.Localization",
+        "Unity.ResourceManager"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

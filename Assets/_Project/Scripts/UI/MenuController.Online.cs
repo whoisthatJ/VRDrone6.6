@@ -1,13 +1,13 @@
 using System.Collections.Generic;
 using System.Globalization;
-using GateRush.Core;
-using GateRush.Game;
-using GateRush.Net;
+using Ushqyr.Core;
+using Ushqyr.Game;
+using Ushqyr.Net;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace GateRush.UI
+namespace Ushqyr.UI
 {
     /// <summary>
     /// Online pages: find or host a race (quick race, open races, join with a code), the race lobby, and the online

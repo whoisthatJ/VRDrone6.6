@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
 
-namespace GateRush.Input
+namespace Ushqyr.Input
 {
     /// <summary>A radio as a flat list of raw channels (axes first, then buttons), whatever the backend.</summary>
     public interface IChannelReader

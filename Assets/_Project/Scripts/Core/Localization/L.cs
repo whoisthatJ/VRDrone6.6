@@ -5,12 +5,12 @@ using UnityEngine.Localization;
 using UnityEngine.Localization.Settings;
 using UnityEngine.Localization.Tables;
 
-namespace GateRush.Core
+namespace Ushqyr.Core
 {
     /// <summary>
     /// Text in the player's language through the Unity Localization package. Keys are the English text, so code
     /// reads <c>L.T("Quick race")</c>; the "UI" string table (built from <c>Assets/_Project/Localization/Text/*.tsv</c>
-    /// by <i>GateRush > Localization > Import Strings</i>) holds Kazakh, Russian and English. Kazakh is the default.
+    /// by <i>Ushqyr > Localization > Import Strings</i>) holds Kazakh, Russian and English. Kazakh is the default.
     /// The language lives in <see cref="GameSettings.Language"/> and is applied with
     /// <see cref="LocalizationSettings.SelectedLocale"/>; UI built in code rebuilds on <see cref="Changed"/>.
     /// </summary>

@@ -1,6 +1,6 @@
 using System;
 
-namespace GateRush.Flight
+namespace Ushqyr.Flight
 {
     /// <summary>First-order motor spool plus thrust ∝ ω² and reaction torque ∝ thrust.</summary>
     public static class MotorModel

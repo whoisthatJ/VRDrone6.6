@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 using System.IO;
-using GateRush.EditorTools.Builders;
+using Ushqyr.EditorTools.Builders;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 
-namespace GateRush.EditorTools
+namespace Ushqyr.EditorTools
 {
     /// <summary>
     /// Bakes the track scenes' lighting one after another without blocking the Editor
@@ -20,7 +20,7 @@ namespace GateRush.EditorTools
         private static string _current;
         private static System.Diagnostics.Stopwatch _clock;
 
-        [MenuItem("GateRush/Lighting/Bake All Track Lighting")]
+        [MenuItem("Ushqyr/Lighting/Bake All Track Lighting")]
         public static string BakeAll()
         {
             Pending.Clear();
@@ -56,7 +56,7 @@ namespace GateRush.EditorTools
         {
             var scene = EditorSceneManager.GetActiveScene();
             EditorSceneManager.SaveScene(scene);
-            Debug.Log($"[GateRush] Baked lighting for {scene.name} ({LightmapSettings.lightmaps.Length} lightmaps)");
+            Debug.Log($"[Ushqyr] Baked lighting for {scene.name} ({LightmapSettings.lightmaps.Length} lightmaps)");
             Next();
         }
 

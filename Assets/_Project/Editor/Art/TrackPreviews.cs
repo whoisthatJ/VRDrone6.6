@@ -1,16 +1,16 @@
 using System.IO;
 using System.Text;
-using GateRush.EditorTools.Builders;
-using GateRush.Game;
-using GateRush.Track;
+using Ushqyr.EditorTools.Builders;
+using Ushqyr.Game;
+using Ushqyr.Track;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 
-namespace GateRush.EditorTools.Art
+namespace Ushqyr.EditorTools.Art
 {
     /// <summary>
-    /// GateRush > Tracks > Capture Track Previews: a 640x360 aerial of every built-in track (the intro's high-orbit
+    /// Ushqyr > Tracks > Capture Track Previews: a 640x360 aerial of every built-in track (the intro's high-orbit
     /// framing, the venue's menu lighting) into <c>Art/Previews/&lt;id&gt;.png</c>, then the catalogue is rebuilt so
     /// the menu shows them.
     /// </summary>
@@ -18,7 +18,7 @@ namespace GateRush.EditorTools.Art
     {
         public const int Width = 640, Height = 360;
 
-        [MenuItem("GateRush/Tracks/Capture Track Previews")]
+        [MenuItem("Ushqyr/Tracks/Capture Track Previews")]
         public static void Menu() => Debug.Log(CaptureAll());
 
         public static string CaptureAll()
@@ -35,9 +35,9 @@ namespace GateRush.EditorTools.Art
                     var tracks = cat.TracksFor(venue.Environment);
                     if (tracks.Count == 0) continue;
                     EditorSceneManager.OpenScene(ArtJobs.ScenePath(venue.SceneName), OpenSceneMode.Single);
-                    var lighting = Object.FindAnyObjectByType<GateRush.Core.StadiumLighting>();
+                    var lighting = Object.FindAnyObjectByType<Ushqyr.Core.StadiumLighting>();
                     // The menu look: day at the Expo, floodlit night in the stadium (the game's defaults).
-                    if (lighting != null) lighting.Apply(lighting.Venue == "stadium" ? GateRush.Core.TimeOfDay.Night : GateRush.Core.TimeOfDay.Day);
+                    if (lighting != null) lighting.Apply(lighting.Venue == "stadium" ? Ushqyr.Core.TimeOfDay.Night : Ushqyr.Core.TimeOfDay.Day);
                     else DynamicGI.UpdateEnvironment();
                     var source = GameObject.Find("Main Camera")?.GetComponent<Camera>();
                     foreach (var entry in tracks)

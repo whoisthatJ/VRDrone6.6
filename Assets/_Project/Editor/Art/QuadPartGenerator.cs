@@ -5,13 +5,13 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
-using GateRush.Garage;
+using Ushqyr.Garage;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
 using Debug = UnityEngine.Debug;
 
-namespace GateRush.EditorTools.Art
+namespace Ushqyr.EditorTools.Art
 {
     /// <summary>
     /// P2 quad pipeline: garage part data → <c>Tools/Blender/quadgen.py</c> (Blender, headless) → one JSON mesh per part
@@ -33,7 +33,7 @@ namespace GateRush.EditorTools.Art
             "stack-30", "stack-25", "stack-20", "camera-micro", "camera-nano", "camera-hd", "vtx-analog", "vtx-hd", "receiver", "capacitor", "actioncam",
         };
 
-        [MenuItem("GateRush/Quads/Generate Quad Parts")]
+        [MenuItem("Ushqyr/Quads/Generate Quad Parts")]
         private static void Menu() => Debug.Log(GenerateAll());
 
         public static string GenerateAll(string only = null)

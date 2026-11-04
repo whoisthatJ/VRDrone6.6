@@ -1,4 +1,4 @@
-namespace GateRush.Input
+namespace Ushqyr.Input
 {
     /// <summary>
     /// Betaflight-style arm switch: the quad arms when the switch is flipped on with throttle low. Flipping it on

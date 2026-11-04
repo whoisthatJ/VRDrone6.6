@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-namespace GateRush.Core
+namespace Ushqyr.Core
 {
     /// <summary>
     /// GPU-instanced street props (trees, cars, lamps, benches, solar panels): each group is one mesh submesh with one

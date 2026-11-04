@@ -3,7 +3,7 @@ using UnityEditor.Build;
 using UnityEditor.Rendering;
 using UnityEngine;
 
-namespace GateRush.EditorTools.Art
+namespace Ushqyr.EditorTools.Art
 {
     /// <summary>
     /// Build-time shader stripping for the Windows player. URP's terrain only uses its add pass for terrains with more

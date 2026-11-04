@@ -1,7 +1,7 @@
-using GateRush.Vehicle;
+using Ushqyr.Vehicle;
 using UnityEngine;
 
-namespace GateRush.Cameras
+namespace Ushqyr.Cameras
 {
     public enum VtxNoiseLevel
     {

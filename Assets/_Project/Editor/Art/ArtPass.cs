@@ -11,7 +11,7 @@ using UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
 using Object = UnityEngine.Object;
 
-namespace GateRush.EditorTools.Art
+namespace Ushqyr.EditorTools.Art
 {
     /// <summary>State shared by one scene's art pass.</summary>
     public sealed class ArtContext

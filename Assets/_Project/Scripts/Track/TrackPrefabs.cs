@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace GateRush.Track
+namespace Ushqyr.Track
 {
     /// <summary>Maps the type names used in track JSON to gate and prop prefabs.</summary>
-    [CreateAssetMenu(menuName = "GateRush/Track Prefabs", fileName = "TrackPrefabs")]
+    [CreateAssetMenu(menuName = "Ushqyr/Track Prefabs", fileName = "TrackPrefabs")]
     public sealed class TrackPrefabs : ScriptableObject
     {
         [Serializable]
@@ -33,7 +33,7 @@ namespace GateRush.Track
             public Material Wear;
             [Tooltip("Start pad mat.")]
             public Material StartPad;
-            [Tooltip("Trainer racing line (GateRush/LED; its colour strip is generated per track).")]
+            [Tooltip("Trainer racing line (Ushqyr/LED; its colour strip is generated per track).")]
             public Material RacingLine;
         }
 

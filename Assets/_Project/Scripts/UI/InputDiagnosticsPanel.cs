@@ -1,13 +1,13 @@
 using System.Collections.Generic;
-using GateRush.Core;
-using GateRush.Input;
+using Ushqyr.Core;
+using Ushqyr.Input;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
 using UnityEngine.UI;
 
-namespace GateRush.UI
+namespace Ushqyr.UI
 {
     /// <summary>
     /// World-space input diagnostics: every Input System device with layout, interface, VID/PID and capabilities,

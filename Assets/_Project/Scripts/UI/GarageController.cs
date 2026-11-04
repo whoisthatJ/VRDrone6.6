@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
-using GateRush.Core;
-using GateRush.Game;
-using GateRush.Garage;
+using Ushqyr.Core;
+using Ushqyr.Game;
+using Ushqyr.Garage;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -14,7 +14,7 @@ using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.UI;
 
-namespace GateRush.UI
+namespace Ushqyr.UI
 {
     /// <summary>
     /// The garage (T7/T8): the quad on the workbench and the build screen around it. Top bar: Back, part tabs
@@ -429,7 +429,7 @@ namespace GateRush.UI
                 return;
             }
             _infoName.text = PartName(part).ToUpperInvariant();
-            _infoBrand.text = (part.Brand ?? "GateRush").ToUpperInvariant();
+            _infoBrand.text = (part.Brand ?? "Ushqyr").ToUpperInvariant();
             var sb = new StringBuilder();
             switch (part)
             {

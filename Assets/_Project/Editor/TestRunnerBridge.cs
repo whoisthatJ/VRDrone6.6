@@ -4,7 +4,7 @@ using UnityEditor;
 using UnityEditor.TestTools.TestRunner.Api;
 using UnityEngine;
 
-namespace GateRush.EditorTools
+namespace Ushqyr.EditorTools
 {
     /// <summary>
     /// Runs EditMode tests inside the open Editor (the CLI's batchmode runner can't open a project that's already open)
@@ -15,8 +15,8 @@ namespace GateRush.EditorTools
         public const string SummaryPath = "TestResults/editmode-summary.txt";
         public const string JUnitPath = "TestResults/editmode.xml";
 
-        [MenuItem("GateRush/Tests/Run EditMode Tests")]
-        public static string RunEditMode() => RunEditMode("GateRush.Tests.EditMode");
+        [MenuItem("Ushqyr/Tests/Run EditMode Tests")]
+        public static string RunEditMode() => RunEditMode("Ushqyr.Tests.EditMode");
 
         public static string RunEditMode(string assemblyName)
         {

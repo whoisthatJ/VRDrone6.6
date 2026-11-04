@@ -1,6 +1,6 @@
 using System;
 
-namespace GateRush.Flight
+namespace Ushqyr.Flight
 {
     /// <summary>
     /// Three-axis rate PID. P on error, I with a limit, D on measurement through a

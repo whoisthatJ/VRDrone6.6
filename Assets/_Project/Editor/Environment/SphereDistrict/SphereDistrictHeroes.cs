@@ -1,12 +1,12 @@
 using System.Collections.Generic;
-using GateRush.Core;
-using GateRush.EditorTools.Art;
-using GateRush.Track.Geo;
+using Ushqyr.Core;
+using Ushqyr.EditorTools.Art;
+using Ushqyr.Track.Geo;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-namespace GateRush.EditorTools.SphereDistrict
+namespace Ushqyr.EditorTools.SphereDistrict
 {
     /// <summary>
     /// Builds the hero buildings of the Sphere District (E2) into a scene's art dressing from the imported OSM data:

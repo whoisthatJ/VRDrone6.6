@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-namespace GateRush.Core
+namespace Ushqyr.Core
 {
     /// <summary>
     /// Draws thousands of identical stadium seats with GPU instancing (Graphics.RenderMeshInstanced, 1023 per call):

@@ -1,11 +1,11 @@
-using GateRush.Cameras;
-using GateRush.Core;
-using GateRush.Flight;
-using GateRush.Vehicle;
+using Ushqyr.Cameras;
+using Ushqyr.Core;
+using Ushqyr.Flight;
+using Ushqyr.Vehicle;
 using TMPro;
 using UnityEngine;
 
-namespace GateRush.UI
+namespace Ushqyr.UI
 {
     /// <summary>
     /// Betaflight-style OSD drawn into the FPV feed: pack voltage and per-cell voltage, mAh used, flight mode and
@@ -68,8 +68,8 @@ namespace GateRush.UI
             bool blink = (Time.time * 2f) % 1f < 0.6f;
             string w = cell < lowCellVoltage && s.Armed && blink ? L.T("LOW BATTERY") : lq < 0.3f && blink ? L.T("LINK") : "";
             // Why an arm attempt did nothing (Betaflight shows "THROTTLE" in the same place).
-            if (w.Length == 0 && !s.Armed && Time.unscaledTime < GateRush.Input.PilotInputSource.RefusalShownUntil)
-                w = GateRush.Input.PilotInputSource.LastRefusal == GateRush.Input.PilotInputSource.ArmRefusal.SwitchBlocked ? L.T("ARM SWITCH OFF, THEN ON") : L.T("THROTTLE LOW TO ARM");
+            if (w.Length == 0 && !s.Armed && Time.unscaledTime < Ushqyr.Input.PilotInputSource.RefusalShownUntil)
+                w = Ushqyr.Input.PilotInputSource.LastRefusal == Ushqyr.Input.PilotInputSource.ArmRefusal.SwitchBlocked ? L.T("ARM SWITCH OFF, THEN ON") : L.T("THROTTLE LOW TO ARM");
             SetIfChanged(warning, w, ref _warningShown);
 
             bool fpv = views == null || views.Mode == ViewMode.Fpv;

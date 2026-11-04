@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using GateRush.Core;
-using GateRush.Track;
+using Ushqyr.Core;
+using Ushqyr.Track;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -10,7 +10,7 @@ using UnityEngine.InputSystem.Controls;
 using UnityEngine.InputSystem.XR;
 using UnityEngine.XR;
 
-namespace GateRush.TrackEditor
+namespace Ushqyr.TrackEditor
 {
     /// <summary>
     /// In-VR track editor. Right controller: point + trigger to select/drag (thumbstick X rotates, Y pushes/pulls,
@@ -338,7 +338,7 @@ namespace GateRush.TrackEditor
                 string path = TrackLibrary.Default.Save(_model.Data);
                 _model.MarkSaved();
                 _message = errors.Count == 0 ? L.F("Saved {0}.", Path.GetFileName(path)) : L.F("Saved with warnings: {0}", errors[0]);
-                Debug.Log($"[GateRush] Track saved: {path}");
+                Debug.Log($"[Ushqyr] Track saved: {path}");
                 RefreshPanel();
                 return path;
             }

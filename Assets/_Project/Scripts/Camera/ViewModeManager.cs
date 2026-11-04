@@ -1,10 +1,10 @@
 using System;
-using GateRush.Vehicle;
+using Ushqyr.Vehicle;
 using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-namespace GateRush.Cameras
+namespace Ushqyr.Cameras
 {
     public enum ViewMode
     {
@@ -81,7 +81,7 @@ namespace GateRush.Cameras
             if (lineOfSight != null) lineOfSight.enabled = !_free && mode == ViewMode.LineOfSight;
             if (outputCamera != null) outputCamera.cullingMask = fpvOn ? _fullMask & ~localQuadLayer : _fullMask;
             UpdateLens();
-            if (!_free) Debug.Log($"[GateRush] View mode: {mode}");
+            if (!_free) Debug.Log($"[Ushqyr] View mode: {mode}");
             Changed?.Invoke(mode);
         }
 

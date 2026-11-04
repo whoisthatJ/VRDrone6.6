@@ -1,11 +1,11 @@
 using System.Linq;
-using GateRush.Race;
-using GateRush.Track;
+using Ushqyr.Race;
+using Ushqyr.Track;
 using NUnit.Framework;
 using UnityEditor;
 using UnityEngine;
 
-namespace GateRush.Tests
+namespace Ushqyr.Tests
 {
     /// <summary>The T2 obstacle kit: every prefab is registered, LOD'd, collides with primitives only and has its checkpoints.</summary>
     public class ObstacleKitTests

@@ -1,12 +1,12 @@
 using System.Collections.Generic;
 using System.IO;
-using GateRush.Race;
+using Ushqyr.Race;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-namespace GateRush.EditorTools.Art
+namespace Ushqyr.EditorTools.Art
 {
     /// <summary>
     /// Tools > Art > Obstacle Showroom: a scene with every kit obstacle in a row and every prop behind them,

@@ -1,8 +1,8 @@
-using GateRush.Input;
+using Ushqyr.Input;
 using UnityEditor;
 using UnityEngine;
 
-namespace GateRush.EditorTools.Builders
+namespace Ushqyr.EditorTools.Builders
 {
     /// <summary>
     /// Creates the shipped radio presets and their library in Assets/_Project/Data/Radios.
@@ -14,7 +14,7 @@ namespace GateRush.EditorTools.Builders
         public const string Dir = "Assets/_Project/Data/Radios";
         public const string LibraryPath = Dir + "/ControllerPresets.asset";
 
-        [MenuItem("GateRush/Builders/Build Radio Presets")]
+        [MenuItem("Ushqyr/Builders/Build Radio Presets")]
         public static ControllerPresetLibrary BuildAll()
         {
             System.IO.Directory.CreateDirectory(Dir);

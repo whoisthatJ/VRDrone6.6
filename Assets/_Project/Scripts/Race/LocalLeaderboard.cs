@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
-namespace GateRush.Race
+namespace Ushqyr.Race
 {
     [Serializable]
     public sealed class LeaderboardEntry
@@ -118,7 +118,7 @@ namespace GateRush.Race
             }
             catch (Exception e) when (e is IOException || e is ArgumentException)
             {
-                Debug.LogWarning($"[GateRush] Leaderboard unreadable, starting fresh: {e.Message}");
+                Debug.LogWarning($"[Ushqyr] Leaderboard unreadable, starting fresh: {e.Message}");
                 Data = new LeaderboardData();
             }
         }
@@ -131,7 +131,7 @@ namespace GateRush.Race
             }
             catch (IOException e)
             {
-                Debug.LogWarning($"[GateRush] Could not save leaderboard: {e.Message}");
+                Debug.LogWarning($"[Ushqyr] Could not save leaderboard: {e.Message}");
             }
         }
     }

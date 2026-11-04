@@ -1,9 +1,9 @@
-using GateRush.Core;
+using Ushqyr.Core;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 
-namespace GateRush.EditorTools.Builders
+namespace Ushqyr.EditorTools.Builders
 {
     /// <summary>
     /// Builds Assets/_Project/Scenes/Boot.unity: app-wide services (display config, perf log, scene switcher)
@@ -17,7 +17,7 @@ namespace GateRush.EditorTools.Builders
         /// Builds all content and every scene, then sets the build order:
         /// Boot, Menu, Track_Field, Track_Hangar, Track_Industrial, InputDiagnostics.
         /// </summary>
-        [MenuItem("GateRush/Builders/Build All Scenes")]
+        [MenuItem("Ushqyr/Builders/Build All Scenes")]
         public static string BuildAll()
         {
             PropBuilder.BuildAll();      // gate + prop prefabs, TrackPrefabs
@@ -38,7 +38,7 @@ namespace GateRush.EditorTools.Builders
         }
 
         /// <summary>
-        /// Opens each built scene and fails if any GateRush component has an unassigned object reference
+        /// Opens each built scene and fails if any Ushqyr component has an unassigned object reference
         /// (e.g. an asset loaded before EditorSceneManager.NewScene, which unloads unused assets).
         /// </summary>
         /// <summary>References that are optional by design.</summary>
@@ -58,7 +58,7 @@ namespace GateRush.EditorTools.Builders
                 EditorSceneManager.OpenScene(path);
                 foreach (var mb in Object.FindObjectsByType<MonoBehaviour>(FindObjectsInactive.Include))
                 {
-                    if (mb == null || mb.GetType().Namespace == null || !mb.GetType().Namespace.StartsWith("GateRush")) continue;
+                    if (mb == null || mb.GetType().Namespace == null || !mb.GetType().Namespace.StartsWith("Ushqyr")) continue;
                     var so = new SerializedObject(mb);
                     var it = so.GetIterator();
                     bool enter = true;
@@ -77,7 +77,7 @@ namespace GateRush.EditorTools.Builders
                 throw new System.InvalidOperationException("Unassigned scene references (re-run Build All Scenes):\n" + string.Join("\n", problems));
         }
 
-        [MenuItem("GateRush/Builders/Build Boot Scene")]
+        [MenuItem("Ushqyr/Builders/Build Boot Scene")]
         public static string Build()
         {
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);

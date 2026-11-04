@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
-namespace GateRush.EditorTools.Art
+namespace Ushqyr.EditorTools.Art
 {
     /// <summary>
     /// Track_Industrial (V6): an abandoned factory yard, overcast. Brick warehouses with rusty corrugated roofs,

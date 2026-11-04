@@ -1,11 +1,11 @@
-using GateRush.Game;
-using GateRush.Input;
-using GateRush.Race;
-using GateRush.Track;
-using GateRush.Vehicle;
+using Ushqyr.Game;
+using Ushqyr.Input;
+using Ushqyr.Race;
+using Ushqyr.Track;
+using Ushqyr.Vehicle;
 using UnityEngine;
 
-namespace GateRush.EditorTools.SphereDistrict
+namespace Ushqyr.EditorTools.SphereDistrict
 {
     /// <summary>
     /// E6 Play-mode flight test (driven from <c>unity command eval</c>): the autopilot flies the loaded track, following
@@ -19,7 +19,7 @@ namespace GateRush.EditorTools.SphereDistrict
             var v = Object.FindAnyObjectByType<QuadVehicle>();
             if (race == null || v == null) return "no race";
             // Skip the track showdown: the autopilot flies at once.
-            var intro = Object.FindAnyObjectByType<GateRush.Game.TrackIntro>();
+            var intro = Object.FindAnyObjectByType<Ushqyr.Game.TrackIntro>();
             if (intro != null) intro.enabled = false;
             var src = v.gameObject.AddComponent<ScriptedInputSource>();
             v.InputSource = src;

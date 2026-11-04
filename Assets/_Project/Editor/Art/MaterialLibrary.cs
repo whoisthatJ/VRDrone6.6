@@ -5,7 +5,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-namespace GateRush.EditorTools.Art
+namespace Ushqyr.EditorTools.Art
 {
     /// <summary>One master material. Textured ones use a catalog texture set; tiling assumes metric UVs (BoxUvMesh).</summary>
     public sealed class MatDef
@@ -33,13 +33,13 @@ namespace GateRush.EditorTools.Art
         public string Shader = EnvLit;
         public float LedIntensity = 6f;
 
-        public const string EnvLit = "GateRush/Env Lit";
-        public const string Led = "GateRush/LED";
-        public const string Hologram = "GateRush/Hologram";
+        public const string EnvLit = "Ushqyr/Env Lit";
+        public const string Led = "Ushqyr/LED";
+        public const string Hologram = "Ushqyr/Hologram";
     }
 
     /// <summary>
-    /// Tools > Art > Build Material Library: the master materials (GateRush/Env Lit) for every scene, built from the
+    /// Tools > Art > Build Material Library: the master materials (Ushqyr/Env Lit) for every scene, built from the
     /// downloaded CC0 sets and the procedural textures. Rebuilding overwrites settings from these definitions, so tweak
     /// values here, not in the inspector. Masters live next to their textures; plain and procedural ones in Library/.
     /// </summary>
@@ -227,7 +227,7 @@ namespace GateRush.EditorTools.Art
         {
             var d = Def(name);
             var m = d != null ? AssetDatabase.LoadAssetAtPath<Material>(PathOf(d)) : null;
-            if (m == null) Debug.LogWarning($"[GateRush][Art] material {name} missing: run Tools > Art > Build Material Library");
+            if (m == null) Debug.LogWarning($"[Ushqyr][Art] material {name} missing: run Tools > Art > Build Material Library");
             return m;
         }
 

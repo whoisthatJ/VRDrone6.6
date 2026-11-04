@@ -1,7 +1,7 @@
 # Headset test: M4 (racing)
 
 ```
-adb install -r Builds/GateRush.apk
+adb install -r Builds/Ushqyr.apk
 adb logcat -s Unity
 ```
 
@@ -23,4 +23,4 @@ adb logcat -s Unity
 - Do gate timings feel right (no missed passes when you clearly flew through)?
 - Is the course fun/too tight for Touch controllers? (Gates can be resized later.)
 - Ghost visible and smooth?
-- FPS in logcat during a race (`[GateRush] FPS avg`).
+- FPS in logcat during a race (`[Ushqyr] FPS avg`).

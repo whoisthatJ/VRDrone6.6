@@ -1,16 +1,16 @@
 using System.Collections.Generic;
 using System.Linq;
-using GateRush.Core;
-using GateRush.Game;
-using GateRush.Garage;
-using GateRush.Net;
-using GateRush.Race;
+using Ushqyr.Core;
+using Ushqyr.Game;
+using Ushqyr.Garage;
+using Ushqyr.Net;
+using Ushqyr.Race;
 using NUnit.Framework;
 using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 
-namespace GateRush.Tests
+namespace Ushqyr.Tests
 {
     /// <summary>M9 online race: snapshot interpolation and wire format, grid, standings, progress, names, opt-in.</summary>
     public class OnlineTests

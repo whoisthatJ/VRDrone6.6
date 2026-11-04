@@ -1,8 +1,8 @@
 {
-    "name": "GateRush.Input",
-    "rootNamespace": "GateRush.Input",
+    "name": "Ushqyr.Input",
+    "rootNamespace": "Ushqyr.Input",
     "references": [
-        "GateRush.Flight",
+        "Ushqyr.Flight",
         "Unity.InputSystem"
     ],
     "includePlatforms": [],

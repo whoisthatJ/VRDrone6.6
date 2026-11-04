@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace GateRush.Core
+namespace Ushqyr.Core
 {
     /// <summary>Lives in the Boot scene: keeps app-wide services alive and loads the first gameplay scene.</summary>
     public sealed class AppBootstrap : MonoBehaviour

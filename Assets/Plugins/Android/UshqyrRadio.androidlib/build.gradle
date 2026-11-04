@@ -1,8 +1,8 @@
-// GateRush VR radio plugin: Android library module included by Unity's Gradle build.
+// Ushqyr VR radio plugin: Android library module included by Unity's Gradle build.
 apply plugin: 'com.android.library'
 
 android {
-    namespace 'com.gaterush.input'
+    namespace 'com.ushqyr.input'
     compileSdk 34
 
     defaultConfig {

@@ -11,12 +11,12 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 822e4063ef2a56140a80566d62a63e91, type: 3}
   m_Name: serpent-arena
-  m_EditorClassIdentifier: GateRush.Track::GateRush.Track.TrackDefinition
+  m_EditorClassIdentifier: Ushqyr.Track::Ushqyr.Track.TrackDefinition
   Track:
     Version: 1
     Id: serpent-arena
     Name: Serpent Arena
-    Author: GateRush
+    Author: Ushqyr
     Environment: stadium
     Laps: 3
     Spawn:

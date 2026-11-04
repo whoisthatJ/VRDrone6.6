@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b4c9bdfcdd678134998a205e30d160c1, type: 3}
   m_Name: LR2SIM_Xbox
-  m_EditorClassIdentifier: GateRush.Input::GateRush.Input.ControllerPreset
+  m_EditorClassIdentifier: Ushqyr.Input::Ushqyr.Input.ControllerPreset
   DisplayName: BetaFPV LiteRadio 2 SIM (Xbox mode)
   NamePattern: BETAFPV.*(Xbox|XInput|Gamepad)|(Xbox|XInput).*BETAFPV
   Priority: 30

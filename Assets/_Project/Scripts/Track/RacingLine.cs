@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-namespace GateRush.Track
+namespace Ushqyr.Track
 {
     /// <summary>
     /// Trainer racing line (T5): a thin glowing ribbon just under the flight line, coloured by recommended speed: green

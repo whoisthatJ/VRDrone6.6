@@ -1,6 +1,6 @@
 using System;
 
-namespace GateRush.Track.Geo
+namespace Ushqyr.Track.Geo
 {
     /// <summary>
     /// WGS84 latitude/longitude → local metres on the tangent plane at an origin (east-north-up, the Sphere District

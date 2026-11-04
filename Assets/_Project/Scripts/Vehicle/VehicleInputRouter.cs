@@ -1,8 +1,8 @@
-using GateRush.Flight;
-using GateRush.Input;
+using Ushqyr.Flight;
+using Ushqyr.Input;
 using UnityEngine;
 
-namespace GateRush.Vehicle
+namespace Ushqyr.Vehicle
 {
     /// <summary>
     /// Connects the highest-priority connected input source to the vehicle, and mixes every other connected source on
@@ -98,7 +98,7 @@ namespace GateRush.Vehicle
             var previous = vehicle.InputSource;
             if (previous != null) previous.Disarm();
             vehicle.InputSource = best;
-            Debug.Log(best != null ? $"[GateRush] Input source: {best.GetType().Name}" : "[GateRush] Input source: none");
+            Debug.Log(best != null ? $"[Ushqyr] Input source: {best.GetType().Name}" : "[Ushqyr] Input source: none");
             SourceChanged?.Invoke(previous, best);
         }
     }

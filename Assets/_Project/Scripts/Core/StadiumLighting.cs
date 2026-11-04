@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-namespace GateRush.Core
+namespace Ushqyr.Core
 {
     public enum TimeOfDay
     {

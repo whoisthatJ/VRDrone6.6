@@ -1,10 +1,10 @@
 using System.Text;
-using GateRush.Core;
-using GateRush.Race;
+using Ushqyr.Core;
+using Ushqyr.Race;
 using TMPro;
 using UnityEngine;
 
-namespace GateRush.UI
+namespace Ushqyr.UI
 {
     /// <summary>
     /// Race OSD: lap counter and times, big centre messages (countdown, GO, missed gate, lap times),
@@ -69,7 +69,7 @@ namespace GateRush.UI
         {
             // The race object can be inactive (track editor) before RaceSession.Awake has run.
             if (session == null || session.Timer == null) return;
-            var area = GateRush.Game.FlightArea.Current;
+            var area = Ushqyr.Game.FlightArea.Current;
             if (!session.isActiveAndEnabled)
             {
                 FreeFlightHud(area);
@@ -135,7 +135,7 @@ namespace GateRush.UI
         }
 
         // E7 free flight: no timing, the spawn point and the keys instead of the lap counter.
-        private void FreeFlightHud(GateRush.Game.FlightArea area)
+        private void FreeFlightHud(Ushqyr.Game.FlightArea area)
         {
             if (lapInfo != null)
             {

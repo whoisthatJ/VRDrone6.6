@@ -3981,7 +3981,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5fbf0e7d8bb96444b978a1102cf19328, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: GateRush.UI::GateRush.UI.GarageController
+  m_EditorClassIdentifier: Ushqyr.UI::Ushqyr.UI.GarageController
   canvas: {fileID: 490523519}
   turntable: {fileID: 712009587}
   orbit: {fileID: 1374425391}
@@ -9847,7 +9847,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ffa5f362afac8ad44a463a6153c22b55, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: GateRush.UI::GateRush.UI.GarageCamera
+  m_EditorClassIdentifier: Ushqyr.UI::Ushqyr.UI.GarageCamera
   target: {fileID: 712009587}
   yaw: -35
   pitch: 24

@@ -1,7 +1,7 @@
-using GateRush.Flight;
+using Ushqyr.Flight;
 using UnityEngine;
 
-namespace GateRush.Vehicle
+namespace Ushqyr.Vehicle
 {
     /// <summary>
     /// Sweeps the quad's collision sphere along each sub-step's motion against the track geometry layer

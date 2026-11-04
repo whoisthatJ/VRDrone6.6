@@ -1,7 +1,7 @@
-using GateRush.Flight;
+using Ushqyr.Flight;
 using UnityEngine;
 
-namespace GateRush.Input
+namespace Ushqyr.Input
 {
     /// <summary>
     /// Base for anything that produces <see cref="PilotInput"/>. Owns arming and flight-mode state so

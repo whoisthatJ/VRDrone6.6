@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace GateRush.Vehicle
+namespace Ushqyr.Vehicle
 {
     /// <summary>
     /// Procedural motor sound (no audio assets): per motor a band-limited saw at the prop blade-pass frequency

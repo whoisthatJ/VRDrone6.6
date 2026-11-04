@@ -1,10 +1,10 @@
 using System;
 using System.Globalization;
-using GateRush.Net;
-using GateRush.Race;
+using Ushqyr.Net;
+using Ushqyr.Race;
 using UnityEngine;
 
-namespace GateRush.Game
+namespace Ushqyr.Game
 {
     /// <summary>
     /// Command-line driven online race for smoke tests with two copies of the build on one PC:
@@ -40,7 +40,7 @@ namespace GateRush.Game
             auto._quit = Array.Exists(args, a => string.Equals(a, "-online-quit", StringComparison.OrdinalIgnoreCase));
             // The autopilot is tuned for the stock racer: fly that (in memory only, the saved choice is untouched).
             string quad = BenchmarkRunner.Arg(args, "-online-quad", "race5");
-            if (!string.IsNullOrEmpty(quad)) GateRush.Core.SaveSystem.Settings.QuadId = quad;
+            if (!string.IsNullOrEmpty(quad)) Ushqyr.Core.SaveSystem.Settings.QuadId = quad;
         }
 
         private async void Start()

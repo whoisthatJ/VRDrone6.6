@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace GateRush.Core
+namespace Ushqyr.Core
 {
     /// <summary>
     /// Perimeter LED advertising boards: scrolls the banner texture along the boards (one property block for all of

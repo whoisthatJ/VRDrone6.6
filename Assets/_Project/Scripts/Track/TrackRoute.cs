@@ -3,7 +3,7 @@ using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Splines;
 
-namespace GateRush.Track
+namespace Ushqyr.Track
 {
     /// <summary>A point on the route with a level frame (right is horizontal, up is never upside down).</summary>
     public struct RoutePoint

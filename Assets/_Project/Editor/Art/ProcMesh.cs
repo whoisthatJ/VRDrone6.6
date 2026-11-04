@@ -3,7 +3,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-namespace GateRush.EditorTools.Art
+namespace Ushqyr.EditorTools.Art
 {
     /// <summary>
     /// Procedural meshes for the art pass. "Unit-space" meshes (Box, PaddedBar) live in the ±0.5 cube so they can

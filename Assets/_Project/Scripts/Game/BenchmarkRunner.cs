@@ -4,16 +4,16 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Text;
-using GateRush.Core;
-using GateRush.Race;
+using Ushqyr.Core;
+using Ushqyr.Race;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace GateRush.Game
+namespace Ushqyr.Game
 {
     /// <summary>
     /// Command-line benchmark for the Windows player (inactive without <c>-benchmark</c>):
-    /// <c>GateRush.exe -benchmark [-benchScenes Track_Field,Menu] [-benchPresets Medium,High] [-benchSeconds 20] [-benchOut file.csv]</c>.
+    /// <c>Ushqyr.exe -benchmark [-benchScenes Track_Field,Menu] [-benchPresets Medium,High] [-benchSeconds 20] [-benchOut file.csv]</c>.
     /// For every preset and scene it loads the scene, flies the drone camera along the gate line at a fixed speed
     /// (so every run sees the same frames), and logs average fps, 1 % low, worst frame and CPU/GPU frame times
     /// (FrameTimingManager), then quits.
@@ -91,11 +91,11 @@ namespace GateRush.Game
             {
                 int level = Array.FindIndex(QualitySettings.names, n => string.Equals(n, preset, StringComparison.OrdinalIgnoreCase));
                 if (level >= 0) GraphicsQuality.Apply(GraphicsPrefs.ForPreset(QualitySettings.names[level]));
-                else Debug.LogWarning($"[GateRush][Bench] unknown quality level '{preset}', using current");
+                else Debug.LogWarning($"[Ushqyr][Bench] unknown quality level '{preset}', using current");
                 QualitySettings.vSyncCount = 0;
                 foreach (var scene in _scenes) yield return Measure(scene.Trim(), preset);
             }
-            Debug.Log("[GateRush][Bench] finished, results in " + _out);
+            Debug.Log("[Ushqyr][Bench] finished, results in " + _out);
 #if UNITY_EDITOR
             UnityEditor.EditorApplication.ExitPlaymode();
 #else
@@ -108,7 +108,7 @@ namespace GateRush.Game
             var load = SceneManager.LoadSceneAsync(scene, LoadSceneMode.Single);
             if (load == null)
             {
-                Debug.LogError($"[GateRush][Bench] scene '{scene}' is not in the build");
+                Debug.LogError($"[Ushqyr][Bench] scene '{scene}' is not in the build");
                 yield break;
             }
             while (!load.isDone) yield return null;
@@ -204,7 +204,7 @@ namespace GateRush.Game
             string line = string.Format(inv, "{0:yyyy-MM-dd HH:mm},{1},{2}x{3},{4},{5},{6:F1},{7:F1},{8:F2},{9:F2},{10:F2},{11:F2}",
                 DateTime.Now, SystemInfo.graphicsDeviceName.Replace(',', ' '), Screen.width, Screen.height, preset, scene,
                 avgFps, 1f / p99, total / frames.Count * 1000f, worst * 1000f, cpuMs, gpuMs);
-            Debug.Log($"[GateRush][Bench] {scene} @ {preset}: {avgFps:F1} fps avg, {1f / p99:F1} fps 1% low, worst {worst * 1000f:F1} ms, cpu {cpuMs:F2} ms, gpu {gpuMs:F2} ms");
+            Debug.Log($"[Ushqyr][Bench] {scene} @ {preset}: {avgFps:F1} fps avg, {1f / p99:F1} fps 1% low, worst {worst * 1000f:F1} ms, cpu {cpuMs:F2} ms, gpu {gpuMs:F2} ms");
             try
             {
                 bool header = !File.Exists(_out);
@@ -216,7 +216,7 @@ namespace GateRush.Game
             }
             catch (Exception e)
             {
-                Debug.LogWarning("[GateRush][Bench] could not write " + _out + ": " + e.Message);
+                Debug.LogWarning("[Ushqyr][Bench] could not write " + _out + ": " + e.Message);
             }
         }
     }

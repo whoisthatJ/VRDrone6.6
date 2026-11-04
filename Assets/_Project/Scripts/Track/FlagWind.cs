@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace GateRush.Track
+namespace Ushqyr.Track
 {
     /// <summary>
     /// Feather-flag wind: the cloth swings around the pole with two layered sines and a small lean, phase-offset per

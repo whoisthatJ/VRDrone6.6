@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 02fce85ed50f61d4ba51d090bcba7b59, type: 3}
   m_Name: PhysicsSettings
-  m_EditorClassIdentifier: GateRush.Vehicle::GateRush.Vehicle.PhysicsSettingsAsset
+  m_EditorClassIdentifier: Ushqyr.Vehicle::Ushqyr.Vehicle.PhysicsSettingsAsset
   Simulation:
     Gravity: 9.81
     FixedStep: 0.001

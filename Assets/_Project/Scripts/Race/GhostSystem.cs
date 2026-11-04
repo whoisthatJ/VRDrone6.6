@@ -1,7 +1,7 @@
 using System.IO;
 using UnityEngine;
 
-namespace GateRush.Race
+namespace Ushqyr.Race
 {
     /// <summary>
     /// Records the current lap and replays the best lap as a ghost quad. The best ghost per track + quad
@@ -44,7 +44,7 @@ namespace GateRush.Race
             }
             catch (IOException e)
             {
-                Debug.LogWarning($"[GateRush] Ghost unreadable: {e.Message}");
+                Debug.LogWarning($"[Ushqyr] Ghost unreadable: {e.Message}");
                 _best.Clear();
             }
         }
@@ -118,7 +118,7 @@ namespace GateRush.Race
             }
             catch (IOException e)
             {
-                Debug.LogWarning($"[GateRush] Could not save ghost: {e.Message}");
+                Debug.LogWarning($"[Ushqyr] Could not save ghost: {e.Message}");
             }
         }
 

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace GateRush.Input
+namespace Ushqyr.Input
 {
     public enum RadioBackend
     {
@@ -188,10 +188,10 @@ namespace GateRush.Input
             if (Reader?.DeviceKey != previous || Reader?.Backend != old?.Backend)
             {
                 Debug.Log(Reader != null
-                    ? $"[GateRush][Input] Radio: {Reader.DisplayName} via {Reader.Backend}, {Reader.ChannelCount} channels, " +
+                    ? $"[Ushqyr][Input] Radio: {Reader.DisplayName} via {Reader.Backend}, {Reader.ChannelCount} channels, " +
                       $"preset {(Preset != null ? Preset.DisplayName + (Preset.Verified ? "" : " (unverified)") : "none")}, " +
                       $"{(IsCalibrated ? "calibrated" : "not calibrated")}"
-                    : "[GateRush][Input] Radio: none");
+                    : "[Ushqyr][Input] Radio: none");
             }
             Changed?.Invoke();
         }

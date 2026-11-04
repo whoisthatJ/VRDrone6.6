@@ -4,7 +4,7 @@ using System.Globalization;
 using System.Text;
 using UnityEngine;
 
-namespace GateRush.Track.Geo
+namespace Ushqyr.Track.Geo
 {
     /// <summary>
     /// Turns an Overpass JSON extract ("out body" with the referenced nodes) into <see cref="GeoData"/> in local metres:

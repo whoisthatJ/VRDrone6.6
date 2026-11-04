@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace GateRush.Race
+namespace Ushqyr.Race
 {
     /// <summary>Segment-vs-gate-opening test: did the motion from a to b fly through the opening in its forward direction?</summary>
     public static class GateCrossing

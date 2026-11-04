@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace GateRush.Input
+namespace Ushqyr.Input
 {
     /// <summary>
     /// RC radio (BetaFPV LiteRadio and any other joystick-mode radio) as a pilot input. Sticks and switches come

@@ -1,9 +1,9 @@
-using GateRush.Core;
-using GateRush.Track;
+using Ushqyr.Core;
+using Ushqyr.Track;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace GateRush.Game
+namespace Ushqyr.Game
 {
     /// <summary>Scene navigation shared by the menu and gameplay scenes.</summary>
     public static class GameFlow
@@ -33,7 +33,7 @@ namespace GateRush.Game
                 }
                 catch (System.Exception e) when (e is System.IO.IOException || e is System.ArgumentException)
                 {
-                    Debug.LogWarning($"[GateRush] User track '{trackId}' unreadable: {e.Message}");
+                    Debug.LogWarning($"[Ushqyr] User track '{trackId}' unreadable: {e.Message}");
                     return null;
                 }
             }
@@ -69,13 +69,13 @@ namespace GateRush.Game
             var data = Resolve(catalog, trackId);
             if (data == null)
             {
-                Debug.LogWarning($"[GateRush] Unknown track '{trackId}'");
+                Debug.LogWarning($"[Ushqyr] Unknown track '{trackId}'");
                 return false;
             }
             string scene = catalog.SceneFor(data.Environment);
             if (string.IsNullOrEmpty(scene))
             {
-                Debug.LogWarning($"[GateRush] No scene for environment '{data.Environment}'");
+                Debug.LogWarning($"[Ushqyr] No scene for environment '{data.Environment}'");
                 return false;
             }
 
@@ -95,13 +95,13 @@ namespace GateRush.Game
             if (track.IsSplineTrack)
             {
                 // The in-game editor places gates; spline tracks are edited in Unity (TrackDefinition + Tools > Track).
-                Debug.LogWarning($"[GateRush] '{track.Name}' is a spline track: edit it in Unity (Tools > Track)");
+                Debug.LogWarning($"[Ushqyr] '{track.Name}' is a spline track: edit it in Unity (Tools > Track)");
                 return false;
             }
             string scene = catalog.SceneFor(track.Environment);
             if (string.IsNullOrEmpty(scene))
             {
-                Debug.LogWarning($"[GateRush] No scene for environment '{track.Environment}'");
+                Debug.LogWarning($"[Ushqyr] No scene for environment '{track.Environment}'");
                 return false;
             }
             PendingEdit = track;

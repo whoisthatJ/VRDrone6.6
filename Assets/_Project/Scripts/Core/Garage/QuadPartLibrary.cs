@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace GateRush.Garage
+namespace Ushqyr.Garage
 {
     /// <summary>
     /// P2: the detailed quad part meshes generated in Blender from the garage part data (Tools/Blender/quadgen.py via
-    /// GateRush > Quads > Generate Quad Parts): one mesh per frame, motor, prop (and its blur disc), battery, plus the
+    /// Ushqyr > Quads > Generate Quad Parts): one mesh per frame, motor, prop (and its blur disc), battery, plus the
     /// shared electronics. Each sub-mesh is tagged with a material slot name; frames carry named sockets (motor
     /// mounts, stack, camera, top plate, antenna, receiver). <see cref="QuadModelBuilder"/> uses a part's mesh when it
     /// is here and falls back to the procedural shape otherwise. Loaded from Resources.

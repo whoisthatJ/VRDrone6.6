@@ -1,4 +1,4 @@
-package com.gaterush.input;
+package com.ushqyr.input;
 
 import android.app.Activity;
 import android.content.Context;
@@ -20,7 +20,7 @@ import java.nio.ByteOrder;
 import java.util.List;
 
 /**
- * Raw joystick reader for RC radios (GateRush VR).
+ * Raw joystick reader for RC radios (Ushqyr VR).
  *
  * Wraps the activity window's Window.Callback, so it sees every joystick MotionEvent and gamepad KeyEvent
  * before Unity does (works with GameActivity and UnityPlayerActivity, no manifest entry-point change),
@@ -34,7 +34,7 @@ import java.util.List;
  *   [4] axis mask bits 0-31  [5] axis mask bits 32-63  [6] button mask  [7] reserved
  *   [8 .. 8+MAX_AXES) axis values indexed by MotionEvent.AXIS_* constant
  */
-public final class GateRushJoystick {
+public final class UshqyrJoystick {
     public static final int MAX_DEVICES = 4;
     public static final int MAX_AXES = 48; // AXIS_GENERIC_16 == 47
     public static final int HEADER_INTS = 8;
@@ -56,7 +56,7 @@ public final class GateRushJoystick {
     private static final String[] slotNames = new String[MAX_DEVICES];
     private static boolean installed;
 
-    private GateRushJoystick() { }
+    private UshqyrJoystick() { }
 
     /** Installs the window hook (once) and returns the shared buffer. Call from Unity's main thread. */
     public static synchronized ByteBuffer install(final Activity activity) {
@@ -140,7 +140,7 @@ public final class GateRushJoystick {
 
     static void onMotion(MotionEvent ev) {
         if ((ev.getSource() & InputDevice.SOURCE_JOYSTICK) != InputDevice.SOURCE_JOYSTICK || ev.getAction() != MotionEvent.ACTION_MOVE) return;
-        synchronized (GateRushJoystick.class) {
+        synchronized (UshqyrJoystick.class) {
             int slot = slotFor(ev.getDeviceId());
             if (slot < 0) return;
             int b = base(slot);
@@ -159,7 +159,7 @@ public final class GateRushJoystick {
         if (bit < 0) return;
         int src = ev.getSource();
         if ((src & InputDevice.SOURCE_JOYSTICK) != InputDevice.SOURCE_JOYSTICK && (src & InputDevice.SOURCE_GAMEPAD) != InputDevice.SOURCE_GAMEPAD) return;
-        synchronized (GateRushJoystick.class) {
+        synchronized (UshqyrJoystick.class) {
             int slot = slotFor(ev.getDeviceId());
             if (slot < 0) return;
             int b = base(slot);

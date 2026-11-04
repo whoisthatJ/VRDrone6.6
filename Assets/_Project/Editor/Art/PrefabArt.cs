@@ -4,7 +4,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-namespace GateRush.EditorTools.Art
+namespace Ushqyr.EditorTools.Art
 {
     /// <summary>
     /// V7 gates, props and the quad. Gates: padded fabric covers in race colours (per type) over the unchanged
@@ -112,7 +112,7 @@ namespace GateRush.EditorTools.Art
                     }
                 }
 
-                var gate = root.GetComponent<GateRush.Race.Gate>();
+                var gate = root.GetComponent<Ushqyr.Race.Gate>();
                 var so = new SerializedObject(gate);
                 var fr = so.FindProperty("frameRenderers");
                 fr.arraySize = leds.Count;

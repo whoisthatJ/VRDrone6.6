@@ -1,10 +1,10 @@
 using System.Collections.Generic;
-using GateRush.Race;
-using GateRush.Track;
+using Ushqyr.Race;
+using Ushqyr.Track;
 using NUnit.Framework;
 using UnityEngine;
 
-namespace GateRush.Tests
+namespace Ushqyr.Tests
 {
     public class RouteTrackTests
     {

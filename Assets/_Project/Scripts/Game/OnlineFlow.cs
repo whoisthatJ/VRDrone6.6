@@ -1,10 +1,10 @@
-using GateRush.Core;
-using GateRush.Garage;
-using GateRush.Net;
+using Ushqyr.Core;
+using Ushqyr.Garage;
+using Ushqyr.Net;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace GateRush.Game
+namespace Ushqyr.Game
 {
     /// <summary>
     /// Connects the online race (<see cref="NetRace"/>, <see cref="OnlineLobby"/>) to the game's scenes: the host's

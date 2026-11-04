@@ -1,7 +1,7 @@
-// GateRush VR: the drone camera feed on the goggles screen, with analog-video artefacts.
+// Ushqyr VR: the drone camera feed on the goggles screen, with analog-video artefacts.
 // _Noise (0..1): snow, desaturation, scanlines. _Breakup (0..1): line jitter and static bands (weak signal).
 // Unlit, opaque, single-pass-instanced stereo; cheap enough for the Quest eye buffer (one texture sample + hashes).
-Shader "GateRush/AnalogFeed"
+Shader "Ushqyr/AnalogFeed"
 {
     Properties
     {

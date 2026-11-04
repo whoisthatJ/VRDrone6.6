@@ -1,6 +1,6 @@
 using System;
 
-namespace GateRush.Flight
+namespace Ushqyr.Flight
 {
     /// <summary>
     /// Engine-free 3D vector. Uses Unity's axis convention (X right, Y up, Z forward,

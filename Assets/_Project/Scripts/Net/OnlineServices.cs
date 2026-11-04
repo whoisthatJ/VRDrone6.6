@@ -1,12 +1,12 @@
 using System;
 using System.Text;
 using System.Threading.Tasks;
-using GateRush.Core;
+using Ushqyr.Core;
 using Unity.Services.Authentication;
 using Unity.Services.Core;
 using UnityEngine;
 
-namespace GateRush.Net
+namespace Ushqyr.Net
 {
     /// <summary>
     /// Unity Gaming Services start-up and anonymous sign-in. Only runs when the player opens an online feature (the
@@ -47,7 +47,7 @@ namespace GateRush.Net
             catch (Exception e)
             {
                 LastError = Describe(e);
-                Debug.LogWarning("[GateRush] Online sign-in failed: " + e.Message);
+                Debug.LogWarning("[Ushqyr] Online sign-in failed: " + e.Message);
                 return false;
             }
         }
@@ -65,7 +65,7 @@ namespace GateRush.Net
             catch (Exception e)
             {
                 // A name problem never blocks playing online.
-                Debug.LogWarning("[GateRush] Could not set the online name: " + e.Message);
+                Debug.LogWarning("[Ushqyr] Could not set the online name: " + e.Message);
             }
             return true;
         }

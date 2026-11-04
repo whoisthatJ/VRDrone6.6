@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace GateRush.Track.Geo
+namespace Ushqyr.Track.Geo
 {
     /// <summary>
     /// Manual fixes on top of the OSM extract: drop wrong footprints, set missing heights, and mark the footprints the

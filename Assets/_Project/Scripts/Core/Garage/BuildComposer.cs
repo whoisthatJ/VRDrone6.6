@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using GateRush.Core;
-using GateRush.Flight;
+using Ushqyr.Core;
+using Ushqyr.Flight;
 using UnityEngine;
 
-namespace GateRush.Garage
+namespace Ushqyr.Garage
 {
     /// <summary>What the garage shows for a build; every number comes from the same physics the flight model uses.</summary>
     public struct BuildStats

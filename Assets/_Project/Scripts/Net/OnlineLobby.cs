@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Unity.Services.Multiplayer;
 using UnityEngine;
 
-namespace GateRush.Net
+namespace Ushqyr.Net
 {
     /// <summary>An open race in the list.</summary>
     public struct OpenRace
@@ -24,7 +24,7 @@ namespace GateRush.Net
     public static class OnlineLobby
     {
         /// <summary>Game tag on every race; bump when the protocol changes so old builds don't meet new ones.</summary>
-        public const string GameTag = "gaterush-1";
+        public const string GameTag = "ushqyr-1";
         private const string KeyGame = "game", KeyState = "state", KeyTrack = "track", KeyTrackName = "trackName";
         private const string StateLobby = "lobby", StateRacing = "racing";
 
@@ -158,7 +158,7 @@ namespace GateRush.Net
             }
             catch (Exception e)
             {
-                Debug.LogWarning("[GateRush] Leaving the race: " + e.Message);
+                Debug.LogWarning("[Ushqyr] Leaving the race: " + e.Message);
             }
             if (NetRace.Instance != null) NetRace.Instance.ResetState();
         }
@@ -197,7 +197,7 @@ namespace GateRush.Net
             catch (Exception e)
             {
                 LastError = e is SessionException se ? Friendly(se) : OnlineServices.Describe(e);
-                Debug.LogWarning("[GateRush] Online race: " + e);
+                Debug.LogWarning("[Ushqyr] Online race: " + e);
                 return false;
             }
         }
@@ -248,7 +248,7 @@ namespace GateRush.Net
             }
             catch (Exception e)
             {
-                Debug.LogWarning("[GateRush] Saving the race settings: " + e.Message);
+                Debug.LogWarning("[Ushqyr] Saving the race settings: " + e.Message);
             }
         }
 

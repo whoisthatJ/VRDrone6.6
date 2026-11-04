@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
-using GateRush.Track;
+using Ushqyr.Track;
 using UnityEngine;
 
-namespace GateRush.Game
+namespace Ushqyr.Game
 {
     /// <summary>Built-in tracks (JSON) and the environment scene each one is raced in.</summary>
-    [CreateAssetMenu(menuName = "GateRush/Track Catalog", fileName = "TrackCatalog")]
+    [CreateAssetMenu(menuName = "Ushqyr/Track Catalog", fileName = "TrackCatalog")]
     public sealed class TrackCatalog : ScriptableObject
     {
         [Serializable]

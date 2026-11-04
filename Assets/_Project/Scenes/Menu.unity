@@ -3233,7 +3233,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 09c0a14173c5b364ab5d8fc976738fa3, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: GateRush.UI::GateRush.UI.MenuController
+  m_EditorClassIdentifier: Ushqyr.UI::Ushqyr.UI.MenuController
   radio: {fileID: 1562082401}
   root: {fileID: 1188653998}
   quads: {fileID: 11400000, guid: f513e8f612496c344ad0f57783580c0e, type: 2}
@@ -3879,7 +3879,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c48c888a48f34d74491675868f581bdf, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: GateRush.Input::GateRush.Input.RadioDeviceProvider
+  m_EditorClassIdentifier: Ushqyr.Input::Ushqyr.Input.RadioDeviceProvider
   presets: {fileID: 11400000, guid: 3ef0a739f5bc0794cb707319d7f11a15, type: 2}
   backend: 0
 --- !u!4 &1562082402

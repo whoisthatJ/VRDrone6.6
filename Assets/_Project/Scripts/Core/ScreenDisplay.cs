@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using UnityEngine;
 
-namespace GateRush.Core
+namespace Ushqyr.Core
 {
     /// <summary>
     /// Window mode and resolution of the Windows build (<see cref="GraphicsPrefs.DisplayMode"/>, Resolution*). Applied

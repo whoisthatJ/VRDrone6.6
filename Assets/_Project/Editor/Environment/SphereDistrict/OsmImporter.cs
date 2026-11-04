@@ -1,17 +1,17 @@
 using System.IO;
 using System.Linq;
-using GateRush.Track.Geo;
+using Ushqyr.Track.Geo;
 using UnityEditor;
 using UnityEngine;
 
-namespace GateRush.EditorTools.SphereDistrict
+namespace Ushqyr.EditorTools.SphereDistrict
 {
     /// <summary>
     /// Sphere District E1: converts the cached Overpass extract (Data/Geo/SphereDistrict/osm_extract.json, fetched once,
     /// © OpenStreetMap contributors, ODbL) into <see cref="GeoDataAsset"/> in local metres around the sphere centre, and
     /// applies <see cref="GeoOverrides"/>. On the first import it marks the hero footprints (the sphere, the petal
     /// pavilions and the pods inside the ring road) so the generic extruder leaves them to the hero generators.
-    /// Menu: GateRush > Sphere District > Import OSM; batch: -executeMethod GateRush.EditorTools.SphereDistrict.OsmImporter.ImportCli
+    /// Menu: Ushqyr > Sphere District > Import OSM; batch: -executeMethod Ushqyr.EditorTools.SphereDistrict.OsmImporter.ImportCli
     /// </summary>
     public static class OsmImporter
     {
@@ -26,7 +26,7 @@ namespace GateRush.EditorTools.SphereDistrict
 
         public static GeoProjection Projection => new GeoProjection(OriginLat, OriginLon);
 
-        [MenuItem("GateRush/Sphere District/Import OSM")]
+        [MenuItem("Ushqyr/Sphere District/Import OSM")]
         public static string Import()
         {
             var data = OsmParser.Parse(File.ReadAllText(ExtractPath), Projection);
@@ -53,7 +53,7 @@ namespace GateRush.EditorTools.SphereDistrict
             int heroes = data.Buildings.Count(b => b.Hero), estimated = data.Buildings.Count(b => b.HeightEstimated);
             string report = $"OSM {data.Timestamp}: {data.Buildings.Count} buildings ({heroes} hero, {estimated} with default heights), " +
                             $"{data.Roads.Count} roads, {data.Areas.Count} areas, {data.Trees.Count} trees; {added} hero overrides added";
-            Debug.Log("[GateRush] Sphere District " + report);
+            Debug.Log("[Ushqyr] Sphere District " + report);
             return report;
         }
 
@@ -119,7 +119,7 @@ namespace GateRush.EditorTools.SphereDistrict
             return p.Count > 0 ? c / p.Count : c;
         }
 
-        [MenuItem("GateRush/Sphere District/Show OSM Preview")]
+        [MenuItem("Ushqyr/Sphere District/Show OSM Preview")]
         public static void ShowPreview()
         {
             var existing = Object.FindAnyObjectByType<GeoPreview>();

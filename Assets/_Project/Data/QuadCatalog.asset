@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ff1a46d481523d84998ada76e58b881d, type: 3}
   m_Name: QuadCatalog
-  m_EditorClassIdentifier: GateRush.Game::GateRush.Game.QuadCatalog
+  m_EditorClassIdentifier: Ushqyr.Game::Ushqyr.Game.QuadCatalog
   Quads:
   - Id: race5
     DisplayName: 5" Race

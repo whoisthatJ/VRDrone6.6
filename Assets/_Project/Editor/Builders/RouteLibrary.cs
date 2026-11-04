@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using System.IO;
-using GateRush.Track;
+using Ushqyr.Track;
 using UnityEditor;
 using UnityEngine;
 
-namespace GateRush.EditorTools.Builders
+namespace Ushqyr.EditorTools.Builders
 {
     /// <summary>
     /// Built-in spline tracks, defined in code like <see cref="CourseLibrary"/>: each becomes a JSON file in Data/Tracks
@@ -62,7 +62,7 @@ namespace GateRush.EditorTools.Builders
         {
             var t = new TrackData
             {
-                Id = "spline-test", Name = "Spline Test Loop", Author = "GateRush", Environment = "field", Laps = 2,
+                Id = "spline-test", Name = "Spline Test Loop", Author = "Ushqyr", Environment = "field", Laps = 2,
             };
             var r = t.Route;
             r.CorridorWidth = 4f;
@@ -122,7 +122,7 @@ namespace GateRush.EditorTools.Builders
         /// </summary>
         public static TrackData StadiumOval()
         {
-            var t = new TrackData { Id = "stadium-oval", Name = "Stadium Oval", Author = "GateRush", Environment = "stadium", Laps = 3 };
+            var t = new TrackData { Id = "stadium-oval", Name = "Stadium Oval", Author = "Ushqyr", Environment = "stadium", Laps = 3 };
             var r = t.Route;
             r.CorridorWidth = 4f;
             r.FlightHeight = 1.5f;
@@ -194,7 +194,7 @@ namespace GateRush.EditorTools.Builders
         /// </summary>
         public static TrackData SerpentArena()
         {
-            var t = new TrackData { Id = "serpent-arena", Name = "Serpent Arena", Author = "GateRush", Environment = "stadium", Laps = 3 };
+            var t = new TrackData { Id = "serpent-arena", Name = "Serpent Arena", Author = "Ushqyr", Environment = "stadium", Laps = 3 };
             var r = t.Route;
             r.CorridorWidth = 4f;
             r.FlightHeight = 1.5f;
@@ -477,7 +477,7 @@ namespace GateRush.EditorTools.Builders
         /// </summary>
         public static TrackData ExpoFreeFlight()
         {
-            var t = new TrackData { Id = "expo-v2-free", Name = "Expo Free Flight", Author = "GateRush", Environment = "expo", Laps = 1, FreeFlight = true };
+            var t = new TrackData { Id = "expo-v2-free", Name = "Expo Free Flight", Author = "Ushqyr", Environment = "expo", Laps = 1, FreeFlight = true };
             t.Spawn = Spawn("South plaza", B(WalkNorth, 285f, 0.15f), 16f);
             t.ExtraSpawns.Add(Spawn("Above the sphere", B(194f, 30f, 112f), 14f));
             t.ExtraSpawns.Add(Spawn("Park", B(12f, 330f, 0.15f), 192f));
@@ -489,7 +489,7 @@ namespace GateRush.EditorTools.Builders
 
         private static TrackData ExpoTrack(string id, string name, int laps, List<Vector3> knots)
         {
-            var t = new TrackData { Id = id, Name = name, Author = "GateRush", Environment = "expo", Laps = laps };
+            var t = new TrackData { Id = id, Name = name, Author = "Ushqyr", Environment = "expo", Laps = laps };
             var r = t.Route;
             r.AirCourse = true;
             r.CorridorWidth = 5f;

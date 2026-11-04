@@ -1,11 +1,11 @@
 using System;
 using System.Linq;
-using GateRush.Flight;
-using GateRush.Garage;
+using Ushqyr.Flight;
+using Ushqyr.Garage;
 using NUnit.Framework;
 using UnityEngine;
 
-namespace GateRush.Tests
+namespace Ushqyr.Tests
 {
     /// <summary>T7/T8: parts catalog, build composer (physics → profile + stats), presets fly, model and saving.</summary>
     public class GarageTests
@@ -130,7 +130,7 @@ namespace GateRush.Tests
         [Test]
         public void Builds_SaveLoadAndResolve()
         {
-            string dir = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "gaterush-builds-" + Guid.NewGuid().ToString("N"));
+            string dir = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "ushqyr-builds-" + Guid.NewGuid().ToString("N"));
             try
             {
                 var lib = new BuildLibrary(dir);

@@ -1,9 +1,9 @@
 {
-    "name": "GateRush.Vehicle",
-    "rootNamespace": "GateRush.Vehicle",
+    "name": "Ushqyr.Vehicle",
+    "rootNamespace": "Ushqyr.Vehicle",
     "references": [
-        "GateRush.Flight",
-        "GateRush.Input"
+        "Ushqyr.Flight",
+        "Ushqyr.Input"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

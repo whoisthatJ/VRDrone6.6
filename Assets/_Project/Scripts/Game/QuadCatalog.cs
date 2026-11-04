@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
-using GateRush.Vehicle;
+using Ushqyr.Vehicle;
 using UnityEngine;
 
-namespace GateRush.Game
+namespace Ushqyr.Game
 {
     /// <summary>The selectable quad classes and how each one looks and collides.</summary>
-    [CreateAssetMenu(menuName = "GateRush/Quad Catalog", fileName = "QuadCatalog")]
+    [CreateAssetMenu(menuName = "Ushqyr/Quad Catalog", fileName = "QuadCatalog")]
     public sealed class QuadCatalog : ScriptableObject
     {
         [Serializable]

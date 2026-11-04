@@ -1,8 +1,8 @@
-using GateRush.Track;
+using Ushqyr.Track;
 using UnityEditor;
 using UnityEngine;
 
-namespace GateRush.EditorTools.Builders
+namespace Ushqyr.EditorTools.Builders
 {
     /// <summary>
     /// Builds track prop prefabs (pivot at the base centre, colliders on TrackGeometry) and the
@@ -13,7 +13,7 @@ namespace GateRush.EditorTools.Builders
         public const string PrefabDir = "Assets/_Project/Prefabs/Props";
         public const string TrackPrefabsPath = "Assets/_Project/Data/TrackPrefabs.asset";
 
-        [MenuItem("GateRush/Builders/Build Props + Track Prefabs")]
+        [MenuItem("Ushqyr/Builders/Build Props + Track Prefabs")]
         public static TrackPrefabs BuildAll()
         {
             GateBuilder.BuildAll();
@@ -41,7 +41,7 @@ namespace GateRush.EditorTools.Builders
             Add(prefabs, "ContainerRed", PrimitiveType.Cube, containerSize, Materials.Lit("ContainerRed", new Color(0.62f, 0.16f, 0.12f)), layer);
             Add(prefabs, "ContainerGreen", PrimitiveType.Cube, containerSize, Materials.Lit("ContainerGreen", new Color(0.2f, 0.45f, 0.25f)), layer);
             RouteKitBuilder.Build(prefabs);
-            Debug.Log("[GateRush] " + GateRush.EditorTools.Art.ObstacleKit.BuildAll(prefabs));
+            Debug.Log("[Ushqyr] " + Ushqyr.EditorTools.Art.ObstacleKit.BuildAll(prefabs));
 
             EditorUtility.SetDirty(prefabs);
             AssetDatabase.SaveAssets();

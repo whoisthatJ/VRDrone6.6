@@ -1,8 +1,8 @@
-using GateRush.Game;
+using Ushqyr.Game;
 using TMPro;
 using UnityEngine;
 
-namespace GateRush.UI
+namespace Ushqyr.UI
 {
     /// <summary>OSD message while the race is paused for a controller change.</summary>
     public sealed class HotplugOverlay : MonoBehaviour

@@ -1,10 +1,10 @@
-using GateRush.Core;
-using GateRush.Game;
-using GateRush.Track;
+using Ushqyr.Core;
+using Ushqyr.Game;
+using Ushqyr.Track;
 using TMPro;
 using UnityEngine;
 
-namespace GateRush.UI
+namespace Ushqyr.UI
 {
     /// <summary>Track editor home: new track per environment, copy a built-in, and your saved tracks.</summary>
     public sealed partial class MenuController

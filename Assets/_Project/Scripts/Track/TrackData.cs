@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace GateRush.Track
+namespace Ushqyr.Track
 {
     [Serializable]
     public sealed class GateData

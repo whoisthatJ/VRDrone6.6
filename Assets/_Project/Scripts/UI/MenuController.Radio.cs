@@ -1,10 +1,10 @@
-using GateRush.Core;
-using GateRush.Input;
+using Ushqyr.Core;
+using Ushqyr.Input;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace GateRush.UI
+namespace Ushqyr.UI
 {
     /// <summary>Radio setup: status, live channels, calibration wizard and the BetaFPV connection guide.</summary>
     public sealed partial class MenuController

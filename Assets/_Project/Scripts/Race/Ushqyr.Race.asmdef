@@ -1,0 +1,20 @@
+{
+    "name": "Ushqyr.Race",
+    "rootNamespace": "Ushqyr.Race",
+    "references": [
+        "Ushqyr.Flight",
+        "Ushqyr.Input",
+        "Ushqyr.Vehicle",
+        "Ushqyr.Core",
+        "Unity.InputSystem"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

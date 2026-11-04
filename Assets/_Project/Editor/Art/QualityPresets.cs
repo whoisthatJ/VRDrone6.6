@@ -6,13 +6,13 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
-namespace GateRush.EditorTools.Art
+namespace Ushqyr.EditorTools.Art
 {
     /// <summary>
     /// Tools > Art > Build Quality Presets: the Windows (monitor) presets. One Forward+ renderer and one URP asset
     /// per preset in Assets/_Project/Settings/PC (decals everywhere, SSAO on High/Ultra), and the quality levels
     /// Low / Medium / High / Ultra replacing the old single "Quest" level. Runtime overrides (render scale, AA, shadows,
-    /// SSAO, vegetation, post-processing, VSync) are applied by GateRush.Core.GraphicsQuality.
+    /// SSAO, vegetation, post-processing, VSync) are applied by Ushqyr.Core.GraphicsQuality.
     /// </summary>
     public static class QualityPresets
     {

@@ -1,6 +1,6 @@
 using System;
 
-namespace GateRush.Race
+namespace Ushqyr.Race
 {
     public enum PassResult
     {

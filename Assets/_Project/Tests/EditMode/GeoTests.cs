@@ -1,8 +1,8 @@
 using System.Linq;
-using GateRush.Track.Geo;
+using Ushqyr.Track.Geo;
 using NUnit.Framework;
 
-namespace GateRush.Tests
+namespace Ushqyr.Tests
 {
     /// <summary>
     /// Sphere District E1: WGS84 → local metres (east-north tangent plane at the sphere centre) and the OSM extract

@@ -1,6 +1,6 @@
 using System;
 
-namespace GateRush.Flight
+namespace Ushqyr.Flight
 {
     /// <summary>
     /// Engine-free unit quaternion with the same component layout and rotation sense as

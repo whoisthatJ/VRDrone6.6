@@ -1,7 +1,7 @@
 # Quad reference (Phase 3, P2)
 
 Dimensions the generated quads use, per class. They are generic real-world construction (no brand copies); the
-names on the parts are GateRush's fictional brands. The physics still comes from the garage part data
+names on the parts are Ushqyr's fictional brands. The physics still comes from the garage part data
 (`Scripts/Core/Garage/PartCatalog.cs` → `BuildComposer`); the meshes are generated from the same numbers, so what
 you see is what flies.
 

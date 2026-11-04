@@ -1,6 +1,6 @@
-// GateRush Env Lit: generated from URP 17.6 Lit.shader by the art pipeline (only the input include, name and inspector differ).
+// Ushqyr Env Lit: generated from URP 17.6 Lit.shader by the art pipeline (only the input include, name and inspector differ).
 // _MetallicGlossMap holds an ORM mask, see EnvLitInput.hlsl.
-Shader "GateRush/Env Lit"
+Shader "Ushqyr/Env Lit"
 {
     Properties
     {

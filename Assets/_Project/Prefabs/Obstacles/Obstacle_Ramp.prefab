@@ -598,7 +598,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3e430935fc1db8a44a530aa37b5994e5, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: GateRush.Race::GateRush.Race.Gate
+  m_EditorClassIdentifier: Ushqyr.Race::Ushqyr.Race.Gate
   order: 0
   openingSize: {x: 1.8, y: 1.6}
   openingCenter: {x: 0, y: 3.1, z: 0}
@@ -622,7 +622,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f7ab76d55b1eb6f41ab9b86f65533ebf, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: GateRush.Race::GateRush.Race.NextGateHighlight
+  m_EditorClassIdentifier: Ushqyr.Race::Ushqyr.Race.NextGateHighlight
   leds:
   - {fileID: 7243625979197231874}
   idleIntensity: 2.5

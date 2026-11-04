@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace GateRush.Race
+namespace Ushqyr.Race
 {
     /// <summary>
     /// The finish cube (T6): a truss cube entered through the glowing hexagon on its front face. Marks the obstacle so

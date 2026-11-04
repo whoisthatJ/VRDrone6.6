@@ -1,10 +1,10 @@
 using System.Collections.Generic;
-using GateRush.Flight;
-using GateRush.Input;
+using Ushqyr.Flight;
+using Ushqyr.Input;
 using NUnit.Framework;
 using UnityEngine;
 
-namespace GateRush.Tests
+namespace Ushqyr.Tests
 {
     public class RadioMappingTests
     {

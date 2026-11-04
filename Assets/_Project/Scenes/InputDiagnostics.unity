@@ -318,7 +318,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f68d3de6563806b41b62860d5b68cd33, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: GateRush.UI::GateRush.UI.InputDiagnosticsPanel
+  m_EditorClassIdentifier: Ushqyr.UI::Ushqyr.UI.InputDiagnosticsPanel
   deviceList: {fileID: 2068051353}
   details: {fileID: 233190132}
   footer: {fileID: 767431902}

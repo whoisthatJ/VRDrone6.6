@@ -1,5 +1,5 @@
-using GateRush.Game;
-using GateRush.UI;
+using Ushqyr.Game;
+using Ushqyr.UI;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -7,7 +7,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.InputSystem.UI;
 using UnityEngine.UI;
 
-namespace GateRush.EditorTools.Builders
+namespace Ushqyr.EditorTools.Builders
 {
     /// <summary>
     /// Builds Assets/_Project/Scenes/Menu.unity: a desktop camera looking at the world-space menu panel, with the
@@ -17,7 +17,7 @@ namespace GateRush.EditorTools.Builders
     {
         public const string ScenePath = "Assets/_Project/Scenes/Menu.unity";
 
-        [MenuItem("GateRush/Builders/Build Menu Scene")]
+        [MenuItem("Ushqyr/Builders/Build Menu Scene")]
         public static string Build()
         {
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
@@ -61,9 +61,9 @@ namespace GateRush.EditorTools.Builders
             // On a root world-space canvas the anchored position drives x/y; set all three through it.
             rt.anchoredPosition3D = new Vector3(0f, 1.45f, 1.6f);
 
-            var radio = new GameObject("Radio").AddComponent<GateRush.Input.RadioDeviceProvider>();
+            var radio = new GameObject("Radio").AddComponent<Ushqyr.Input.RadioDeviceProvider>();
             var rso = new SerializedObject(radio);
-            rso.FindProperty("presets").objectReferenceValue = AssetDatabase.LoadAssetAtPath<GateRush.Input.ControllerPresetLibrary>(PresetBuilder.LibraryPath);
+            rso.FindProperty("presets").objectReferenceValue = AssetDatabase.LoadAssetAtPath<Ushqyr.Input.ControllerPresetLibrary>(PresetBuilder.LibraryPath);
             rso.ApplyModifiedPropertiesWithoutUndo();
 
             var menu = canvasGo.AddComponent<MenuController>();

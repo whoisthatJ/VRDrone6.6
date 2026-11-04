@@ -6,12 +6,12 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
 
-namespace GateRush.Input
+namespace Ushqyr.Input
 {
     /// <summary>
     /// Text descriptions of Input System devices for diagnostics: name, layout, interface, VID/PID,
     /// capabilities JSON and every leaf axis/button. Also logs device changes and keeps a report file
-    /// up to date (adb pull /sdcard/Android/data/com.gaterush.vr/files/input-devices.txt).
+    /// up to date (adb pull /sdcard/Android/data/com.ushqyr.vr/files/input-devices.txt).
     /// </summary>
     public static class InputDeviceReport
     {
@@ -65,7 +65,7 @@ namespace GateRush.Input
         public static string DescribeAll()
         {
             var sb = new StringBuilder();
-            sb.AppendLine($"GateRush input report  {System.DateTime.Now:yyyy-MM-dd HH:mm:ss}  {SystemInfo.deviceModel}  {SystemInfo.operatingSystem}");
+            sb.AppendLine($"Ushqyr input report  {System.DateTime.Now:yyyy-MM-dd HH:mm:ss}  {SystemInfo.deviceModel}  {SystemInfo.operatingSystem}");
             sb.AppendLine($"{InputSystem.devices.Count} devices");
             foreach (var d in InputSystem.devices) sb.AppendLine(Describe(d));
             return sb.ToString();
@@ -80,7 +80,7 @@ namespace GateRush.Input
             }
             catch (IOException e)
             {
-                Debug.LogWarning($"[GateRush][Input] Could not write {path}: {e.Message}");
+                Debug.LogWarning($"[Ushqyr][Input] Could not write {path}: {e.Message}");
             }
             return path;
         }
@@ -90,14 +90,14 @@ namespace GateRush.Input
         {
             InputSystem.onDeviceChange -= OnDeviceChange;
             InputSystem.onDeviceChange += OnDeviceChange;
-            foreach (var d in InputSystem.devices) Debug.Log("[GateRush][Input] Present: " + Summary(d));
+            foreach (var d in InputSystem.devices) Debug.Log("[Ushqyr][Input] Present: " + Summary(d));
             WriteReport();
         }
 
         private static void OnDeviceChange(InputDevice device, InputDeviceChange change)
         {
             if (change == InputDeviceChange.UsageChanged || change == InputDeviceChange.ConfigurationChanged) return;
-            Debug.Log($"[GateRush][Input] {change}: {Summary(device)}\n{Describe(device, false)}");
+            Debug.Log($"[Ushqyr][Input] {change}: {Summary(device)}\n{Describe(device, false)}");
             if (change == InputDeviceChange.Added || change == InputDeviceChange.Removed || change == InputDeviceChange.Reconnected)
                 WriteReport();
         }

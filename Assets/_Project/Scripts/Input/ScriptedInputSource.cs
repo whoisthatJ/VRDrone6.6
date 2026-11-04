@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace GateRush.Input
+namespace Ushqyr.Input
 {
     /// <summary>
     /// Input source driven from code: smoke tests, demos and automated play-mode checks.

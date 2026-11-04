@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-namespace GateRush.UI
+namespace Ushqyr.UI
 {
     /// <summary>
     /// Builds simple uGUI controls from code (no sprites needed): panels, labels, buttons, sliders and steppers.

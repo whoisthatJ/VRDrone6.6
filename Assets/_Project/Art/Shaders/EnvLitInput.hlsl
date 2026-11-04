@@ -1,4 +1,4 @@
-// GateRush "Env Lit" input: URP 17.6 LitInput.hlsl with one change. When _METALLICSPECGLOSSMAP is on,
+// Ushqyr "Env Lit" input: URP 17.6 LitInput.hlsl with one change. When _METALLICSPECGLOSSMAP is on,
 // _MetallicGlossMap is an ORM mask (R = ambient occlusion, G = roughness, B = metallic: Poly Haven's "arm"/glTF
 // layout) instead of URP's metallic + smoothness-in-alpha. _Metallic and _Smoothness scale the mask values and
 // _OcclusionStrength fades the AO, so one JPG drives all three. Everything else (SRP Batcher layout, DOTS instancing,

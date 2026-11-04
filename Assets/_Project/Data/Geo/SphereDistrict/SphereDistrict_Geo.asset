@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 773eb3bc36b2f0045a7f71f167e4c688, type: 3}
   m_Name: SphereDistrict_Geo
-  m_EditorClassIdentifier: GateRush.Track::GateRush.Track.Geo.GeoDataAsset
+  m_EditorClassIdentifier: Ushqyr.Track::Ushqyr.Track.Geo.GeoDataAsset
   Data:
     OriginLat: 51.08931
     OriginLon: 71.41615

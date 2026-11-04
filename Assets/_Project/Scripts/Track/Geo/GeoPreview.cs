@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace GateRush.Track.Geo
+namespace Ushqyr.Track.Geo
 {
     /// <summary>
     /// Scene-view gizmos of the imported OSM data: roads (grey, by width), building footprints and heights (hero

@@ -1,13 +1,13 @@
 using System;
 using System.Collections.Generic;
-using GateRush.Garage;
-using GateRush.Input;
-using GateRush.Net;
-using GateRush.Race;
-using GateRush.Vehicle;
+using Ushqyr.Garage;
+using Ushqyr.Input;
+using Ushqyr.Net;
+using Ushqyr.Race;
+using Ushqyr.Vehicle;
 using UnityEngine;
 
-namespace GateRush.Game
+namespace Ushqyr.Game
 {
     /// <summary>
     /// Runs the local side of an online race in a track scene: puts the quad on its grid slot, reports "loaded" to
@@ -74,7 +74,7 @@ namespace GateRush.Game
             // GO already given (we loaded after the host's timeout): join in straight away.
             if (_net.Phase == OnlinePhase.Racing) OnGo(_net.GoServerTime);
             else _net.SendReady();
-            Debug.Log($"[GateRush] Online race on '{track.Data.Name}': grid slot {slot + 1}, {_net.Pilots.Count} pilots");
+            Debug.Log($"[Ushqyr] Online race on '{track.Data.Name}': grid slot {slot + 1}, {_net.Pilots.Count} pilots");
         }
 
         private void OnDestroy()

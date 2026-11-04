@@ -1,9 +1,9 @@
-using GateRush.Flight;
-using GateRush.Input;
-using GateRush.Vehicle;
+using Ushqyr.Flight;
+using Ushqyr.Input;
+using Ushqyr.Vehicle;
 using UnityEngine;
 
-namespace GateRush.Race
+namespace Ushqyr.Race
 {
     /// <summary>
     /// Simple Angle-mode autopilot that flies the course through a <see cref="ScriptedInputSource"/>.
@@ -218,12 +218,12 @@ namespace GateRush.Race
             {
                 GaveUp = true;
                 pilot.Throttle = 0f;
-                Debug.LogError($"[GateRush][Autopilot] gave up: {LastReport} (after {maxRescuesPerGate} rescues)");
+                Debug.LogError($"[Ushqyr][Autopilot] gave up: {LastReport} (after {maxRescuesPerGate} rescues)");
                 return true;
             }
 
             Rescues++;
-            Debug.LogWarning($"[GateRush][Autopilot] rescue {_rescuesAtGate}/{maxRescuesPerGate}: {LastReport}");
+            Debug.LogWarning($"[Ushqyr][Autopilot] rescue {_rescuesAtGate}/{maxRescuesPerGate}: {LastReport}");
             if (_rescueSpawn == null) _rescueSpawn = new GameObject("Autopilot Rescue Spawn").transform;
             gate.GetRespawnPose(out Vector3 rp, out Quaternion rr);
             _rescueSpawn.SetPositionAndRotation(rp, rr);

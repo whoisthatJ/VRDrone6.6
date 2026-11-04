@@ -1,10 +1,10 @@
 using UnityEngine;
 
-namespace GateRush.Race
+namespace Ushqyr.Race
 {
     /// <summary>
     /// The LED strips of an obstacle: colour from the gate state (see <see cref="Gate.SetVisualState"/>) and an HDR
-    /// intensity per state; the next gate pulses. Works with the GateRush/LED shader (_BaseColor × _Intensity) through
+    /// intensity per state; the next gate pulses. Works with the Ushqyr/LED shader (_BaseColor × _Intensity) through
     /// a property block, so all obstacles share one material.
     /// </summary>
     public sealed class NextGateHighlight : MonoBehaviour

@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Unity.Services.Leaderboards;
 using UnityEngine;
 
-namespace GateRush.Net
+namespace Ushqyr.Net
 {
     /// <summary>One row of an online leaderboard.</summary>
     public struct OnlineScore
@@ -46,13 +46,13 @@ namespace GateRush.Net
                 var options = new AddPlayerScoreOptions { Metadata = new Dictionary<string, string> { ["quad"] = quadName ?? "" } };
                 await LeaderboardsService.Instance.AddPlayerScoreAsync(IdFor(trackId), Math.Round(lapSeconds, 3), options);
                 LastError = "";
-                Debug.Log($"[GateRush] Posted {lapSeconds:F3}s to the online leaderboard {IdFor(trackId)}");
+                Debug.Log($"[Ushqyr] Posted {lapSeconds:F3}s to the online leaderboard {IdFor(trackId)}");
                 return true;
             }
             catch (Exception e)
             {
                 LastError = OnlineServices.Describe(e);
-                Debug.LogWarning("[GateRush] Posting the lap time failed: " + e.Message);
+                Debug.LogWarning("[Ushqyr] Posting the lap time failed: " + e.Message);
                 return false;
             }
         }

@@ -1,10 +1,10 @@
-using GateRush.Cameras;
-using GateRush.Game;
-using GateRush.Input;
-using GateRush.Race;
-using GateRush.Track;
-using GateRush.UI;
-using GateRush.Vehicle;
+using Ushqyr.Cameras;
+using Ushqyr.Game;
+using Ushqyr.Input;
+using Ushqyr.Race;
+using Ushqyr.Track;
+using Ushqyr.UI;
+using Ushqyr.Vehicle;
 using TMPro;
 using Unity.Cinemachine;
 using UnityEditor;
@@ -12,7 +12,7 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace GateRush.EditorTools.Builders
+namespace Ushqyr.EditorTools.Builders
 {
     /// <summary>
     /// Builds the track scenes (Track_Field, Track_Hangar, Track_Industrial): environment geometry, the pilot's quad
@@ -35,7 +35,7 @@ namespace GateRush.EditorTools.Builders
         public static string ScenePath(string environment) =>
             $"Assets/_Project/Scenes/Track_{char.ToUpperInvariant(environment[0])}{environment.Substring(1)}.unity";
 
-        [MenuItem("GateRush/Builders/Build Track Scenes")]
+        [MenuItem("Ushqyr/Builders/Build Track Scenes")]
         public static string BuildAllEnvironments()
         {
             var paths = new System.Collections.Generic.List<string>();
@@ -84,7 +84,7 @@ namespace GateRush.EditorTools.Builders
 
             var ghostVisual = BuildGhostVisual(mats);
             var race = BuildRace(quad, spawn, ghostVisual);
-            race.gameObject.AddComponent<NextGateBeacon>().Configure(race, GateRush.EditorTools.Art.MaterialLibrary.Get("M_Beacon"), GateRush.EditorTools.Art.MaterialLibrary.Get("M_Holo_Guide"));
+            race.gameObject.AddComponent<NextGateBeacon>().Configure(race, Ushqyr.EditorTools.Art.MaterialLibrary.Get("M_Beacon"), Ushqyr.EditorTools.Art.MaterialLibrary.Get("M_Holo_Guide"));
 
             var guard = pilotGo.AddComponent<ControllerHotplugGuard>();
             var gso = new SerializedObject(guard);
@@ -133,21 +133,21 @@ namespace GateRush.EditorTools.Builders
         /// Inactive track editor (enabled by TrackSceneController when a track is opened for editing). It moves the
         /// camera rig and turns the output camera itself (mouse + keyboard).
         /// </summary>
-        private static GateRush.TrackEditor.TrackEditorController BuildEditor(Transform rig, Camera head, TrackPrefabs prefabs, int trackLayer)
+        private static Ushqyr.TrackEditor.TrackEditorController BuildEditor(Transform rig, Camera head, TrackPrefabs prefabs, int trackLayer)
         {
             int uiLayer = EnsureLayer(EditorUiLayerName, 11);
 
             var go = new GameObject("Track Editor");
             var line = go.AddComponent<LineRenderer>();
-            line.sharedMaterial = GateRush.EditorTools.Builders.Materials.Unlit("EditorPointer", new Color(0.4f, 0.9f, 1f), false);
+            line.sharedMaterial = Ushqyr.EditorTools.Builders.Materials.Unlit("EditorPointer", new Color(0.4f, 0.9f, 1f), false);
             line.widthMultiplier = 0.006f;
             line.enabled = false;
 
-            var editor = go.AddComponent<GateRush.TrackEditor.TrackEditorController>();
+            var editor = go.AddComponent<Ushqyr.TrackEditor.TrackEditorController>();
             var so = new SerializedObject(editor);
             so.FindProperty("prefabs").objectReferenceValue = prefabs;
-            so.FindProperty("markerMaterial").objectReferenceValue = GateRush.EditorTools.Builders.Materials.Unlit("EditorMarker", Color.white, false);
-            so.FindProperty("panelMaterial").objectReferenceValue = GateRush.EditorTools.Builders.Materials.Unlit("EditorPanel", Color.white, false);
+            so.FindProperty("markerMaterial").objectReferenceValue = Ushqyr.EditorTools.Builders.Materials.Unlit("EditorMarker", Color.white, false);
+            so.FindProperty("panelMaterial").objectReferenceValue = Ushqyr.EditorTools.Builders.Materials.Unlit("EditorPanel", Color.white, false);
             so.FindProperty("xrOrigin").objectReferenceValue = rig;
             so.FindProperty("head").objectReferenceValue = head;
             so.FindProperty("pointerLine").objectReferenceValue = line;
@@ -184,7 +184,7 @@ namespace GateRush.EditorTools.Builders
             Part(root, PrimitiveType.Cube, "Arm B", Vector3.zero, new Vector3(0.03f, 0.01f, 0.26f), Quaternion.Euler(0f, -45f, 0f), mats.Ghost);
             for (int i = 0; i < 4; i++)
             {
-                var p = GateRush.Flight.Mixer.MotorPosition(i, 0.078f, 0.078f);
+                var p = Ushqyr.Flight.Mixer.MotorPosition(i, 0.078f, 0.078f);
                 Part(root, PrimitiveType.Cylinder, $"Prop {i}", new Vector3(p.x, 0.02f, p.z), new Vector3(0.13f, 0.002f, 0.13f), Quaternion.identity, mats.Ghost);
             }
             return root;
@@ -205,7 +205,7 @@ namespace GateRush.EditorTools.Builders
             var props = new Transform[4];
             for (int i = 0; i < 4; i++)
             {
-                var p = GateRush.Flight.Mixer.MotorPosition(i, 0.078f, 0.078f);
+                var p = Ushqyr.Flight.Mixer.MotorPosition(i, 0.078f, 0.078f);
                 var pos = new Vector3(p.x, 0.012f, p.z);
                 Part(visual, PrimitiveType.Cylinder, $"Motor {i}", pos, new Vector3(0.026f, 0.01f, 0.026f), Quaternion.identity, mats.Frame);
                 var prop = Part(visual, PrimitiveType.Cylinder, $"Prop {i}", pos + new Vector3(0f, 0.012f, 0f),

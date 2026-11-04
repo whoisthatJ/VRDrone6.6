@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace GateRush.Track.Geo
+namespace Ushqyr.Track.Geo
 {
     /// <summary>A building footprint (local metres, x east, y north) with its height.</summary>
     [Serializable]

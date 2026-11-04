@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace GateRush.Track
+namespace Ushqyr.Track
 {
     /// <summary>
     /// Race order of a spline track's checkpoints. Race gate 0 is the start/finish (the finish obstacle, or the first

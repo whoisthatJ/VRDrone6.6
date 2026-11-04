@@ -162,7 +162,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3e430935fc1db8a44a530aa37b5994e5, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: GateRush.Race::GateRush.Race.Gate
+  m_EditorClassIdentifier: Ushqyr.Race::Ushqyr.Race.Gate
   order: 0
   openingSize: {x: 4.14, y: 4.14}
   openingCenter: {x: 0, y: 0, z: 0}
@@ -186,7 +186,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f7ab76d55b1eb6f41ab9b86f65533ebf, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: GateRush.Race::GateRush.Race.NextGateHighlight
+  m_EditorClassIdentifier: Ushqyr.Race::Ushqyr.Race.NextGateHighlight
   leds:
   - {fileID: 2611775772408660401}
   idleIntensity: 2.5
@@ -206,7 +206,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f96c8640e702b77469279290502430ec, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: GateRush.Race::GateRush.Race.HoloRing
+  m_EditorClassIdentifier: Ushqyr.Race::Ushqyr.Race.HoloRing
   Radius: 3
   Tube: 0.18
   Centre: {x: 0, y: 0, z: 0}

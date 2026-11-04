@@ -1,12 +1,12 @@
 using System.Collections.Generic;
-using GateRush.Core;
-using GateRush.EditorTools.Art;
-using GateRush.Track.Geo;
+using Ushqyr.Core;
+using Ushqyr.EditorTools.Art;
+using Ushqyr.Track.Geo;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-namespace GateRush.EditorTools.SphereDistrict
+namespace Ushqyr.EditorTools.SphereDistrict
 {
     /// <summary>
     /// Sphere District E3: the ground and streetscape from the OSM data. Roads as asphalt ribbons with edge, centre
@@ -505,7 +505,7 @@ namespace GateRush.EditorTools.SphereDistrict
             for (int i = 0; i < TreeVariants; i++)
             {
                 int seed = 100 + i;
-                d["tree" + i] = (ArtPass.MeshAsset("ExpoTree_" + i, () => GateRush.EditorTools.Art.ExpoArt.TreeMesh(seed, 8f)), new[] { Inst("M_Expo_Bark"), Inst("M_Expo_Leaves") }, true);
+                d["tree" + i] = (ArtPass.MeshAsset("ExpoTree_" + i, () => Ushqyr.EditorTools.Art.ExpoArt.TreeMesh(seed, 8f)), new[] { Inst("M_Expo_Bark"), Inst("M_Expo_Leaves") }, true);
             }
             d["streetlight"] = (ArtPass.MeshAsset("SD_StreetLight", StreetLightMesh), new[] { Inst("M_Expo_Steel"), Inst("M_Lamp_Emitter") }, false);
             d["parklamp"] = (ArtPass.MeshAsset("SD_ParkLamp", ParkLampMesh), new[] { Inst("M_Plastic_Black"), Inst("M_Lamp_Warm") }, false);

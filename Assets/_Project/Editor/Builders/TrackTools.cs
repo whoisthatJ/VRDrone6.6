@@ -1,12 +1,12 @@
 using System.IO;
 using System.Linq;
-using GateRush.Game;
-using GateRush.Track;
+using Ushqyr.Game;
+using Ushqyr.Track;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace GateRush.EditorTools.Builders
+namespace Ushqyr.EditorTools.Builders
 {
     /// <summary>
     /// Tools > Track: rebuilds a spline track's generated geometry as a preview in the open scene (not saved with it)
@@ -17,7 +17,7 @@ namespace GateRush.EditorTools.Builders
         public const string PreviewPrefix = "Track Preview: ";
 
         [MenuItem("Tools/Track/Rebuild")]
-        private static void RebuildMenu() => Debug.Log("[GateRush] " + Rebuild());
+        private static void RebuildMenu() => Debug.Log("[Ushqyr] " + Rebuild());
 
         [MenuItem("Tools/Track/Clear Preview")]
         public static void ClearPreview()

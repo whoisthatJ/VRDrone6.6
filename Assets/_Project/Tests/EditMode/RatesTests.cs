@@ -1,7 +1,7 @@
-using GateRush.Flight;
+using Ushqyr.Flight;
 using NUnit.Framework;
 
-namespace GateRush.Tests
+namespace Ushqyr.Tests
 {
     public class RatesTests
     {

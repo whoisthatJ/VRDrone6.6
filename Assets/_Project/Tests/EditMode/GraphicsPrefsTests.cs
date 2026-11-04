@@ -1,8 +1,8 @@
-using GateRush.Core;
+using Ushqyr.Core;
 using NUnit.Framework;
 using UnityEngine;
 
-namespace GateRush.Tests
+namespace Ushqyr.Tests
 {
     public class GraphicsPrefsTests
     {

@@ -1,13 +1,13 @@
 using System.Reflection;
-using GateRush.Flight;
-using GateRush.Input;
+using Ushqyr.Flight;
+using Ushqyr.Input;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
 using UnityEngine.InputSystem.Layouts;
 
-namespace GateRush.Tests
+namespace Ushqyr.Tests
 {
     /// <summary>Simulated USB radios through the real Input System (InputTestFixture isolates the device list).</summary>
     public class RadioDeviceTests : InputTestFixture

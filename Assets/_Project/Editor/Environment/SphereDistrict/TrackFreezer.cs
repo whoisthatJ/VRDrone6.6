@@ -2,12 +2,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using GateRush.Track;
+using Ushqyr.Track;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 
-namespace GateRush.EditorTools.SphereDistrict
+namespace Ushqyr.EditorTools.SphereDistrict
 {
     /// <summary>
     /// Phase 3 P1a: freezes the first Sphere District as its own scene, <c>Track_Expo_v1</c>, before the environment and
@@ -73,7 +73,7 @@ namespace GateRush.EditorTools.SphereDistrict
                 RenderSettings.skybox = AssetDatabase.LoadAssetAtPath<Material>(sky);
                 remapped++;
             }
-            var controller = Object.FindAnyObjectByType<GateRush.Game.TrackSceneController>(FindObjectsInactive.Include);
+            var controller = Object.FindAnyObjectByType<Ushqyr.Game.TrackSceneController>(FindObjectsInactive.Include);
             var so = new SerializedObject(controller);
             so.FindProperty("environment").stringValue = Environment;
             so.ApplyModifiedPropertiesWithoutUndo();

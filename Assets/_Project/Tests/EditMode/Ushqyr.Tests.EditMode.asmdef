@@ -1,24 +1,24 @@
 {
-    "name": "GateRush.Tests.EditMode",
-    "rootNamespace": "GateRush.Tests",
+    "name": "Ushqyr.Tests.EditMode",
+    "rootNamespace": "Ushqyr.Tests",
     "references": [
-        "GateRush.Flight",
-        "GateRush.Input",
-        "GateRush.Race",
-        "GateRush.Core",
-        "GateRush.Track",
-        "GateRush.Game",
-        "GateRush.Vehicle",
+        "Ushqyr.Flight",
+        "Ushqyr.Input",
+        "Ushqyr.Race",
+        "Ushqyr.Core",
+        "Ushqyr.Track",
+        "Ushqyr.Game",
+        "Ushqyr.Vehicle",
         "Unity.RenderPipelines.Core.Runtime",
         "Unity.InputSystem",
         "Unity.InputSystem.TestFramework",
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
-        "GateRush.Net",
+        "Ushqyr.Net",
         "Unity.Netcode.Runtime",
         "Unity.Collections",
         "Unity.Localization",
-        "GateRush.EditorTools"
+        "Ushqyr.EditorTools"
     ],
     "includePlatforms": [
         "Editor"

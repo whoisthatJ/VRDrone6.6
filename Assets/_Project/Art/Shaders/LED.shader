@@ -1,7 +1,7 @@
-// GateRush LED: unlit HDR emitter for gate LED strips, lamp lenses and indicator lights.
+// Ushqyr LED: unlit HDR emitter for gate LED strips, lamp lenses and indicator lights.
 // Colour = _BaseMap × _BaseColor × _Intensity, so Gate.SetVisualState (MaterialPropertyBlock on _BaseColor) drives the
 // glow colour and bloom picks it up. Depth and depth-normal passes keep SSAO and depth priming correct.
-Shader "GateRush/LED"
+Shader "Ushqyr/LED"
 {
     Properties
     {

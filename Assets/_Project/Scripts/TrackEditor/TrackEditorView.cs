@@ -1,11 +1,11 @@
 using System.Collections.Generic;
-using GateRush.Core;
-using GateRush.Race;
-using GateRush.Track;
+using Ushqyr.Core;
+using Ushqyr.Race;
+using Ushqyr.Track;
 using TMPro;
 using UnityEngine;
 
-namespace GateRush.TrackEditor
+namespace Ushqyr.TrackEditor
 {
     /// <summary>
     /// Mirrors a <see cref="TrackEditModel"/> with GameObjects: gates and props from <see cref="TrackPrefabs"/>,

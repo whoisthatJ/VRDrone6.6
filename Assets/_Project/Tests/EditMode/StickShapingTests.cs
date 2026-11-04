@@ -1,7 +1,7 @@
-using GateRush.Input;
+using Ushqyr.Input;
 using NUnit.Framework;
 
-namespace GateRush.Tests
+namespace Ushqyr.Tests
 {
     public class StickShapingTests
     {

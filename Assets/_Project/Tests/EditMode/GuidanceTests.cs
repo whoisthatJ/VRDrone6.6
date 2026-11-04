@@ -1,13 +1,13 @@
 using System.Linq;
-using GateRush.Core;
-using GateRush.Game;
-using GateRush.Race;
-using GateRush.Track;
+using Ushqyr.Core;
+using Ushqyr.Game;
+using Ushqyr.Race;
+using Ushqyr.Track;
 using NUnit.Framework;
 using UnityEditor;
 using UnityEngine;
 
-namespace GateRush.Tests
+namespace Ushqyr.Tests
 {
     /// <summary>T5 route guidance: racing-line colours, missing a gate, and what a built track exposes for the setting.</summary>
     public class GuidanceTests

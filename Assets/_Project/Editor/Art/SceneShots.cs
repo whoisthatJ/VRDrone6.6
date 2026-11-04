@@ -1,15 +1,15 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using GateRush.EditorTools.Builders;
-using GateRush.Track;
+using Ushqyr.EditorTools.Builders;
+using Ushqyr.Track;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
-namespace GateRush.EditorTools.Art
+namespace Ushqyr.EditorTools.Art
 {
     /// <summary>
     /// Camera bookmarks per scene and before/after screenshots at 1920×1080:
@@ -109,13 +109,13 @@ namespace GateRush.EditorTools.Art
             EditorSceneManager.OpenScene(ArtJobs.ScenePath(sceneName), OpenSceneMode.Single);
             var prefabs = AssetDatabase.LoadAssetAtPath<TrackPrefabs>(PrefabsPath);
             var track = TrackLoader.Load(RouteLibrary.StadiumOval(), prefabs);
-            var lighting = Object.FindAnyObjectByType<GateRush.Core.StadiumLighting>();
+            var lighting = Object.FindAnyObjectByType<Ushqyr.Core.StadiumLighting>();
             var sb = new StringBuilder(sceneName + ":");
             try
             {
                 var source = GameObject.Find("Main Camera")?.GetComponent<Camera>();
                 var generic = TrackBookmarks(track);
-                foreach (var time in new[] { GateRush.Core.TimeOfDay.Night, GateRush.Core.TimeOfDay.Dusk, GateRush.Core.TimeOfDay.Day })
+                foreach (var time in new[] { Ushqyr.Core.TimeOfDay.Night, Ushqyr.Core.TimeOfDay.Dusk, Ushqyr.Core.TimeOfDay.Day })
                 {
                     lighting.Apply(time);
                     var shots = new List<Bookmark>
@@ -133,7 +133,7 @@ namespace GateRush.EditorTools.Art
                     }
                     sb.Append(' ').Append(CaptureSet(sceneName, shots, source, $"{tag}"));
                 }
-                lighting.Apply(GateRush.Core.TimeOfDay.Night);
+                lighting.Apply(Ushqyr.Core.TimeOfDay.Night);
             }
             finally
             {
@@ -156,13 +156,13 @@ namespace GateRush.EditorTools.Art
             EditorSceneManager.OpenScene(ArtJobs.ScenePath(sceneName), OpenSceneMode.Single);
             var prefabs = AssetDatabase.LoadAssetAtPath<TrackPrefabs>(PrefabsPath);
             var track = TrackLoader.Load(RouteLibrary.SerpentArena(), prefabs);
-            var lighting = Object.FindAnyObjectByType<GateRush.Core.StadiumLighting>();
+            var lighting = Object.FindAnyObjectByType<Ushqyr.Core.StadiumLighting>();
             var sb = new StringBuilder(sceneName + ":");
             try
             {
                 var source = GameObject.Find("Main Camera")?.GetComponent<Camera>();
                 var generic = TrackBookmarks(track);
-                foreach (var time in new[] { GateRush.Core.TimeOfDay.Night, GateRush.Core.TimeOfDay.Dusk })
+                foreach (var time in new[] { Ushqyr.Core.TimeOfDay.Night, Ushqyr.Core.TimeOfDay.Dusk })
                 {
                     lighting.Apply(time);
                     var shots = new List<Bookmark>
@@ -185,7 +185,7 @@ namespace GateRush.EditorTools.Art
                     }
                     sb.Append(' ').Append(CaptureSet(sceneName, shots, source, tag));
                 }
-                lighting.Apply(GateRush.Core.TimeOfDay.Night);
+                lighting.Apply(Ushqyr.Core.TimeOfDay.Night);
             }
             finally
             {
@@ -201,8 +201,8 @@ namespace GateRush.EditorTools.Art
             ArtJobs.RequireCleanScenes();
             const string sceneName = "Track_Expo";
             EditorSceneManager.OpenScene(ArtJobs.ScenePath(sceneName), OpenSceneMode.Single);
-            var venue = Object.FindAnyObjectByType<GateRush.Core.StadiumLighting>();
-            if (venue != null) venue.Apply(GateRush.Core.TimeOfDay.Day);
+            var venue = Object.FindAnyObjectByType<Ushqyr.Core.StadiumLighting>();
+            if (venue != null) venue.Apply(Ushqyr.Core.TimeOfDay.Day);
             var prefabs = AssetDatabase.LoadAssetAtPath<TrackPrefabs>(PrefabsPath);
             var course = RouteLibrary.ExpoPro();
             var track = TrackLoader.Load(course, prefabs);
@@ -240,11 +240,11 @@ namespace GateRush.EditorTools.Art
             ArtJobs.RequireCleanScenes();
             const string sceneName = "Garage";
             EditorSceneManager.OpenScene(ArtJobs.ScenePath(sceneName), OpenSceneMode.Single);
-            var garage = Object.FindAnyObjectByType<GateRush.UI.GarageController>(FindObjectsInactive.Include);
+            var garage = Object.FindAnyObjectByType<Ushqyr.UI.GarageController>(FindObjectsInactive.Include);
             var so = new SerializedObject(garage);
             var turntable = (Transform)so.FindProperty("turntable").objectReferenceValue;
-            var field = typeof(GateRush.UI.GarageController).GetField("materials", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            var mats = (GateRush.Garage.QuadModelMaterials)field.GetValue(garage);
+            var field = typeof(Ushqyr.UI.GarageController).GetField("materials", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            var mats = (Ushqyr.Garage.QuadModelMaterials)field.GetValue(garage);
             var source = Object.FindAnyObjectByType<Camera>();
             // No depth of field: it is focused for the garage's own framing and blurs these close-ups.
             foreach (var v in Object.FindObjectsByType<Volume>(FindObjectsSortMode.None)) v.enabled = false;
@@ -253,10 +253,10 @@ namespace GateRush.EditorTools.Art
             var sb = new StringBuilder(sceneName + ":");
             try
             {
-                foreach (var b in GateRush.Garage.QuadPresets.All)
+                foreach (var b in Ushqyr.Garage.QuadPresets.All)
                 {
-                    var model = GateRush.Garage.QuadModelBuilder.Build(b, mats, turntable, turntable.gameObject.layer);
-                    var bounds = GateRush.Garage.QuadModelBuilder.Bounds(model.Root);
+                    var model = Ushqyr.Garage.QuadModelBuilder.Build(b, mats, turntable, turntable.gameObject.layer);
+                    var bounds = Ushqyr.Garage.QuadModelBuilder.Bounds(model.Root);
                     float dist = bounds.extents.magnitude / Mathf.Tan(15f * Mathf.Deg2Rad) * 0.95f;
                     string id = b.Id.Replace("preset-", "");
                     // From the garage camera's side (the bench backs onto the wall), a little higher.
@@ -281,17 +281,17 @@ namespace GateRush.EditorTools.Art
             ArtJobs.RequireCleanScenes();
             const string sceneName = "Track_Expo";
             EditorSceneManager.OpenScene(ArtJobs.ScenePath(sceneName), OpenSceneMode.Single);
-            var lighting = Object.FindAnyObjectByType<GateRush.Core.StadiumLighting>();
+            var lighting = Object.FindAnyObjectByType<Ushqyr.Core.StadiumLighting>();
             bool asyncShaders = ShaderUtil.allowAsyncCompilation;
             ShaderUtil.allowAsyncCompilation = false;
             var sb = new StringBuilder(sceneName + ":");
             try
             {
                 var source = GameObject.Find("Main Camera")?.GetComponent<Camera>();
-                foreach (var time in new[] { GateRush.Core.TimeOfDay.Day, GateRush.Core.TimeOfDay.Dusk, GateRush.Core.TimeOfDay.Night })
+                foreach (var time in new[] { Ushqyr.Core.TimeOfDay.Day, Ushqyr.Core.TimeOfDay.Dusk, Ushqyr.Core.TimeOfDay.Night })
                 {
                     lighting.Apply(time);
-                    string name = time == GateRush.Core.TimeOfDay.Dusk ? "golden" : time.ToString().ToLowerInvariant();
+                    string name = time == Ushqyr.Core.TimeOfDay.Dusk ? "golden" : time.ToString().ToLowerInvariant();
                     var shots = new List<Bookmark>
                     {
                         new Bookmark($"{name}_reference", RouteLibrary.ExpoPoint(194f, 470f, 235f), RouteLibrary.ExpoPoint(14f, 60f), 66f),
@@ -300,7 +300,7 @@ namespace GateRush.EditorTools.Art
                     };
                     sb.Append(' ').Append(CaptureSet(sceneName, shots, source, tag + "_" + name));
                 }
-                lighting.Apply(GateRush.Core.TimeOfDay.Day);
+                lighting.Apply(Ushqyr.Core.TimeOfDay.Day);
             }
             finally
             {
@@ -324,10 +324,10 @@ namespace GateRush.EditorTools.Art
             try
             {
                 var source = GameObject.Find("Main Camera")?.GetComponent<Camera>();
-                var cube = track.Root.GetComponentInChildren<GateRush.Race.FinishCube>();
+                var cube = track.Root.GetComponentInChildren<Ushqyr.Race.FinishCube>();
                 if (cube == null) return "no finish cube";
                 var t = cube.transform;
-                var quad = Object.FindAnyObjectByType<GateRush.Vehicle.QuadVehicle>();
+                var quad = Object.FindAnyObjectByType<Ushqyr.Vehicle.QuadVehicle>();
                 if (quad != null)
                 {
                     quad.enabled = false;
@@ -358,7 +358,7 @@ namespace GateRush.EditorTools.Art
 
         /// <summary>The same bookmarks in another Expo scene (Track_Expo_v1 with its frozen Classic Sprint).</summary>
         public static string CaptureExpoV1(string tag) => CaptureExpo(tag, "Track_Expo_v1",
-            TrackData.FromJson(File.ReadAllText(GateRush.EditorTools.SphereDistrict.TrackFreezer.TrackJson("expo-astana"))));
+            TrackData.FromJson(File.ReadAllText(Ushqyr.EditorTools.SphereDistrict.TrackFreezer.TrackJson("expo-astana"))));
 
         public static string CaptureExpo(string tag, string sceneName, TrackData course)
         {
@@ -366,8 +366,8 @@ namespace GateRush.EditorTools.Art
             EditorSceneManager.OpenScene(ArtJobs.ScenePath(sceneName), OpenSceneMode.Single);
             // The scene's own day preset (sky, ambient, probes): in the Editor the ambient otherwise carries over from
             // whichever scene was open before, and two captures of the same scene differ.
-            var venue = Object.FindAnyObjectByType<GateRush.Core.StadiumLighting>();
-            if (venue != null) venue.Apply(GateRush.Core.TimeOfDay.Day);
+            var venue = Object.FindAnyObjectByType<Ushqyr.Core.StadiumLighting>();
+            if (venue != null) venue.Apply(Ushqyr.Core.TimeOfDay.Day);
             else DynamicGI.UpdateEnvironment();
             var prefabs = AssetDatabase.LoadAssetAtPath<TrackPrefabs>(PrefabsPath);
             var track = TrackLoader.Load(course, prefabs);
@@ -511,8 +511,8 @@ namespace GateRush.EditorTools.Art
                 if (bm.HideLocalQuad) mask &= ~(1 << LocalQuadLayer);
                 cam.cullingMask = mask;
                 // GPU-instanced crowds of seats are queued per camera.
-                GateRush.Core.InstancedSeats.DrawAll(cam);
-                GateRush.Core.InstancedProps.DrawAll(cam);
+                Ushqyr.Core.InstancedSeats.DrawAll(cam);
+                Ushqyr.Core.InstancedProps.DrawAll(cam);
 
                 // Camera.CopyFrom does not copy URP's per-camera data: mirror post-processing and AA from the game camera.
                 var data = cam.GetUniversalAdditionalCameraData();

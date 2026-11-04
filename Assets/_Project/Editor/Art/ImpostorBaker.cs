@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
-namespace GateRush.EditorTools.Art
+namespace Ushqyr.EditorTools.Art
 {
     /// <summary>
     /// Bakes a heavy CC0 tree (git-ignored cache) into a 3-view billboard atlas (alpha-cut albedo, rendered under flat

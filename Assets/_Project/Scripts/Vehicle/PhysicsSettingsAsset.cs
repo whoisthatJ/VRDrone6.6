@@ -1,7 +1,7 @@
-using GateRush.Flight;
+using Ushqyr.Flight;
 using UnityEngine;
 
-namespace GateRush.Vehicle
+namespace Ushqyr.Vehicle
 {
     [System.Serializable]
     public struct CollisionSettings
@@ -38,7 +38,7 @@ namespace GateRush.Vehicle
         };
     }
 
-    [CreateAssetMenu(menuName = "GateRush/Physics Settings", fileName = "PhysicsSettings")]
+    [CreateAssetMenu(menuName = "Ushqyr/Physics Settings", fileName = "PhysicsSettings")]
     public sealed class PhysicsSettingsAsset : ScriptableObject
     {
         public PhysicsSettings Simulation = PhysicsSettings.Default;

@@ -1,6 +1,6 @@
 using System;
 
-namespace GateRush.Input
+namespace Ushqyr.Input
 {
     public enum CalibrationStep
     {

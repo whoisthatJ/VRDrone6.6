@@ -1,11 +1,11 @@
 using System.Collections.Generic;
-using GateRush.EditorTools.Art;
-using GateRush.Track.Geo;
+using Ushqyr.EditorTools.Art;
+using Ushqyr.Track.Geo;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-namespace GateRush.EditorTools.SphereDistrict
+namespace Ushqyr.EditorTools.SphereDistrict
 {
     /// <summary>
     /// Sphere District E4: the city round the complex. Every OSM building that no hero generator owns is extruded to

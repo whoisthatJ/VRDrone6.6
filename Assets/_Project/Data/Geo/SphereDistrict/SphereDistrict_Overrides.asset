@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 462b4a6e1e1647447872eb4d5ac241b6, type: 3}
   m_Name: SphereDistrict_Overrides
-  m_EditorClassIdentifier: GateRush.Track::GateRush.Track.Geo.GeoOverrides
+  m_EditorClassIdentifier: Ushqyr.Track::Ushqyr.Track.Geo.GeoOverrides
   Entries:
   - Id: 454853233
     Note: 'landmark: EXPO'

@@ -1,9 +1,9 @@
 using System.Linq;
-using GateRush.Garage;
+using Ushqyr.Garage;
 using NUnit.Framework;
 using UnityEngine;
 
-namespace GateRush.Tests
+namespace Ushqyr.Tests
 {
     /// <summary>P2: the Blender-generated quad parts match the garage part data the physics uses.</summary>
     public class QuadPartTests
@@ -13,7 +13,7 @@ namespace GateRush.Tests
             get
             {
                 var lib = QuadPartLibrary.Instance;
-                Assert.IsNotNull(lib, "no QuadPartLibrary in Resources (GateRush > Quads > Generate Quad Parts)");
+                Assert.IsNotNull(lib, "no QuadPartLibrary in Resources (Ushqyr > Quads > Generate Quad Parts)");
                 return lib;
             }
         }

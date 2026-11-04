@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using GateRush.Core;
+using Ushqyr.Core;
 using UnityEditor;
 using UnityEditor.Localization;
 using UnityEngine;
@@ -9,12 +9,12 @@ using UnityEngine.Localization;
 using UnityEngine.Localization.Settings;
 using UnityEngine.Localization.Tables;
 
-namespace GateRush.EditorTools
+namespace Ushqyr.EditorTools
 {
     /// <summary>
     /// Builds the Unity Localization setup from the translation sheets: settings asset, the kk / ru / en locales
     /// (Kazakh first and the startup default) and the "UI" string table collection, one entry per English key.
-    /// The .tsv sheets are the source; re-run after editing them (<i>GateRush > Localization > Import Strings</i>).
+    /// The .tsv sheets are the source; re-run after editing them (<i>Ushqyr > Localization > Import Strings</i>).
     /// </summary>
     public static class StringImporter
     {
@@ -32,7 +32,7 @@ namespace GateRush.EditorTools
             return all;
         }
 
-        [MenuItem("GateRush/Localization/Import Strings")]
+        [MenuItem("Ushqyr/Localization/Import Strings")]
         public static string Import()
         {
             var settings = EnsureSettings();
@@ -64,7 +64,7 @@ namespace GateRush.EditorTools
             EditorUtility.SetDirty(settings);
             AssetDatabase.SaveAssets();
             string report = $"Imported {keys.Count} strings ({stale.Count} removed) into '{L.TableName}' for {string.Join(", ", locales.Keys)}";
-            Debug.Log("[GateRush] " + report);
+            Debug.Log("[Ushqyr] " + report);
             return report;
         }
 
@@ -92,7 +92,7 @@ namespace GateRush.EditorTools
                 LocalizationEditorSettings.ActiveLocalizationSettings = settings;
             }
 
-            // Start in Kazakh unless the game's own setting says otherwise (GateRush.Core.L applies that at startup).
+            // Start in Kazakh unless the game's own setting says otherwise (Ushqyr.Core.L applies that at startup).
             var selectors = settings.GetStartupLocaleSelectors();
             selectors.Clear();
             selectors.Add(new CommandLineLocaleSelector());

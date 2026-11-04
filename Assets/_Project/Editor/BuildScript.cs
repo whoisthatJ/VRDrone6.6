@@ -4,12 +4,12 @@ using UnityEditor;
 using UnityEditor.Build.Reporting;
 using UnityEngine;
 
-namespace GateRush.EditorTools
+namespace Ushqyr.EditorTools
 {
     public static class BuildScript
     {
-        public const string ApkPath = "Builds/GateRush.apk";
-        public const string WindowsPath = "Builds/Windows/GateRush.exe";
+        public const string ApkPath = "Builds/Ushqyr.apk";
+        public const string WindowsPath = "Builds/Windows/Ushqyr.exe";
         public const string ResultPath = "Builds/build-result.txt";
 
         /// <summary>Starts the build on the next editor tick so a remote caller (MCP eval) returns immediately; poll <see cref="ResultPath"/>.</summary>
@@ -21,12 +21,12 @@ namespace GateRush.EditorTools
             return ResultPath;
         }
 
-        /// <summary>Entry point for -executeMethod GateRush.EditorTools.BuildScript.BuildQuest.</summary>
-        [MenuItem("GateRush/Build/Build Quest APK")]
+        /// <summary>Entry point for -executeMethod Ushqyr.EditorTools.BuildScript.BuildQuest.</summary>
+        [MenuItem("Ushqyr/Build/Build Quest APK")]
         public static void BuildQuest() => Build(ApkPath, BuildTarget.Android, BuildTargetGroup.Android);
 
-        /// <summary>Entry point for -executeMethod GateRush.EditorTools.BuildScript.BuildWindows. Flat-screen: Standalone has no XR loader, the drone camera renders to the monitor.</summary>
-        [MenuItem("GateRush/Build/Build Windows (PC)")]
+        /// <summary>Entry point for -executeMethod Ushqyr.EditorTools.BuildScript.BuildWindows. Flat-screen: Standalone has no XR loader, the drone camera renders to the monitor.</summary>
+        [MenuItem("Ushqyr/Build/Build Windows (PC)")]
         public static void BuildWindows() => Build(WindowsPath, BuildTarget.StandaloneWindows64, BuildTargetGroup.Standalone);
 
         /// <summary>Like <see cref="BuildQuestDeferred"/>, for the Windows player.</summary>
@@ -55,7 +55,7 @@ namespace GateRush.EditorTools
             var summary = report.summary;
             string line = $"Build {summary.result}: {summary.outputPath} " +
                           $"({summary.totalSize / (1024 * 1024)} MB, {summary.totalErrors} errors, {summary.totalWarnings} warnings, {summary.totalTime:mm\\:ss})";
-            Debug.Log("[GateRush] " + line);
+            Debug.Log("[Ushqyr] " + line);
 
             var sb = new System.Text.StringBuilder(line).AppendLine();
             foreach (var step in report.steps)

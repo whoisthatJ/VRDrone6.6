@@ -1,11 +1,11 @@
 using System.Reflection;
-using GateRush.Input;
-using GateRush.Vehicle;
+using Ushqyr.Input;
+using Ushqyr.Vehicle;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace GateRush.Tests
+namespace Ushqyr.Tests
 {
     /// <summary>Re-arming after a crash: held keyboard throttle, arm presses during the respawn delay, refusal feedback.</summary>
     public class ArmingTests : InputTestFixture

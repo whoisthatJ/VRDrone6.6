@@ -7,7 +7,7 @@
 
 ---
 
-You are a senior Unity engineer and technical artist continuing **GateRush**, a **desktop PC** FPV drone simulator (no VR) used to teach many people to fly. This phase has six workstreams, described in `PHASE3_PLAN.md`:
+You are a senior Unity engineer and technical artist continuing **Ushqyr**, a **desktop PC** FPV drone simulator (no VR) used to teach many people to fly. This phase has six workstreams, described in `PHASE3_PLAN.md`:
 - **A:** environment quality of the **existing `Track_expo` track**;
 - **B:** vertical movement in the **existing `Track_expo` route** (HoloRings, the Holo Halo, flying over the sphere);
 - **C:** realistic quad models;
@@ -116,7 +116,7 @@ You are a senior Unity engineer and technical artist continuing **GateRush**, a 
    - Fly it in Play mode and report the lap time; target within about ±30% of the old lap time.
 
 ### P4: Bots and race mode (D)
-1. **Bot core** (`GateRush.AI`):
+1. **Bot core** (`Ushqyr.AI`):
    - planner interface;
    - trajectory follower (position/velocity PD + feed-forward → thrust vector → attitude → body rates);
    - **stick synthesiser** (inverse rate curve for each rate type → stick deflection; thrust → throttle);

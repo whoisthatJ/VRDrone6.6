@@ -1,12 +1,12 @@
 using System.Collections.Generic;
 using System.IO;
-using GateRush.Race;
-using GateRush.Track;
+using Ushqyr.Race;
+using Ushqyr.Track;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-namespace GateRush.EditorTools.Art
+namespace Ushqyr.EditorTools.Art
 {
     /// <summary>
     /// T2 obstacle kit: procedural, LOD'd race obstacles built from a shared set of parts —
@@ -15,7 +15,7 @@ namespace GateRush.EditorTools.Art
     /// <item>padded foam covers (stitched-seam fabric) with black Velcro straps;</item>
     /// <item>aluminium LED channels with diffusers (one LED renderer per obstacle, driven by <see cref="NextGateHighlight"/>);</item>
     /// <item>steel base plates with sandbags or water barrels and striped cable ramps;</item>
-    /// <item>alpha-tested safety nets, printed chevron boards, GATERUSH feather flags, landing pads, the start grid.</item>
+    /// <item>alpha-tested safety nets, printed chevron boards, USHQYR feather flags, landing pads, the start grid.</item>
     /// </list>
     /// Obstacles (local +Z = flying direction, base on y = 0): Single, Double (stacked), Slalom (3 offset gates, 3
     /// checkpoints), Cube, Ladder (H hurdle, fly under or between the rungs), Dive (frame tilted 45° down), Ramp

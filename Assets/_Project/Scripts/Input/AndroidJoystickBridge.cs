@@ -1,10 +1,10 @@
 using System.Threading;
 using UnityEngine;
 
-namespace GateRush.Input
+namespace Ushqyr.Input
 {
     /// <summary>
-    /// C# side of the Android raw-joystick fallback (Plugins/Android/GateRushRadio.androidlib, GateRushJoystick.java).
+    /// C# side of the Android raw-joystick fallback (Plugins/Android/UshqyrRadio.androidlib, UshqyrJoystick.java).
     /// Java writes MotionEvent axes (including AXIS_GENERIC_1..16) and button bits into a direct ByteBuffer;
     /// <see cref="Poll"/> copies each slot once per frame through a pointer, using the slot's sequence counter
     /// to skip torn writes. No locks, no JNI calls and no allocations per frame.
@@ -58,14 +58,14 @@ namespace GateRush.Input
             {
                 using var unity = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
                 using var activity = unity.GetStatic<AndroidJavaObject>("currentActivity");
-                using var cls = new AndroidJavaClass("com.gaterush.input.GateRushJoystick");
+                using var cls = new AndroidJavaClass("com.ushqyr.input.UshqyrJoystick");
                 var buffer = cls.CallStatic<AndroidJavaObject>("install", activity);
                 _buffer = (byte*)(void*)AndroidJNI.GetDirectBufferAddress(buffer.GetRawObject());
-                Debug.Log($"[GateRush][Input] Android raw joystick bridge {(Available ? "installed" : "unavailable")}");
+                Debug.Log($"[Ushqyr][Input] Android raw joystick bridge {(Available ? "installed" : "unavailable")}");
             }
             catch (System.Exception e)
             {
-                Debug.LogWarning("[GateRush][Input] Android raw joystick bridge failed: " + e.Message);
+                Debug.LogWarning("[Ushqyr][Input] Android raw joystick bridge failed: " + e.Message);
                 _buffer = null;
             }
 #endif
@@ -117,7 +117,7 @@ namespace GateRush.Input
 #if UNITY_ANDROID
             if (Application.platform == RuntimePlatform.Android)
             {
-                using var cls = new AndroidJavaClass("com.gaterush.input.GateRushJoystick");
+                using var cls = new AndroidJavaClass("com.ushqyr.input.UshqyrJoystick");
                 Names[slot] = cls.CallStatic<string>("getDeviceName", slot);
                 NamedDevice[slot] = id;
                 return Names[slot];

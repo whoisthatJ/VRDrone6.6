@@ -1,7 +1,7 @@
-using GateRush.Track;
+using Ushqyr.Track;
 using UnityEngine;
 
-namespace GateRush.EditorTools.Builders
+namespace Ushqyr.EditorTools.Builders
 {
     /// <summary>
     /// Static world geometry for each environment (everything except the course, which comes from track JSON).
@@ -27,7 +27,7 @@ namespace GateRush.EditorTools.Builders
         /// <summary>
         /// Baked indirect GI for the static world (sun stays realtime for direct light, no shadows), emissive lamps
         /// baked in, and a light-probe grid so runtime-loaded gates, props and the quad pick up the bounce light.
-        /// Bake with GateRush/Lighting/Bake All Track Lighting (after building the scenes).
+        /// Bake with Ushqyr/Lighting/Bake All Track Lighting (after building the scenes).
         /// </summary>
         private static void ConfigureLighting(string environment, Transform parent)
         {

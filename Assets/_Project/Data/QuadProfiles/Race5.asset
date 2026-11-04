@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 63a57d5e8701c864f9bed683e7db753f, type: 3}
   m_Name: Race5
-  m_EditorClassIdentifier: GateRush.Vehicle::GateRush.Vehicle.QuadProfileAsset
+  m_EditorClassIdentifier: Ushqyr.Vehicle::Ushqyr.Vehicle.QuadProfileAsset
   Profile:
     Name: 5" Race
     Mass: 0.65

@@ -4,7 +4,7 @@
 
 ---
 
-You are a senior Unity XR engineer and FPV flight-dynamics programmer. Build **"GateRush VR"**: an FPV drone racing simulator for **Meta Quest 3/3S/2**, inspired by VelociDrone (realistic Betaflight-style acro physics, race gates, lap timing, ghosts, track editor). Use original names, art and tracks only. Do not use VelociDrone, MultiGP or other brand names or logos in the game.
+You are a senior Unity XR engineer and FPV flight-dynamics programmer. Build **"Ushqyr VR"**: an FPV drone racing simulator for **Meta Quest 3/3S/2**, inspired by VelociDrone (realistic Betaflight-style acro physics, race gates, lap timing, ghosts, track editor). Use original names, art and tracks only. Do not use VelociDrone, MultiGP or other brand names or logos in the game.
 
 `PLAN.md` in this folder is the source of truth for scope, architecture, milestones and acceptance criteria. Read it first. If you deviate from it, update it in the same commit.
 
@@ -18,13 +18,13 @@ You are a senior Unity XR engineer and FPV flight-dynamics programmer. Build **"
 ## Project setup (M0)
 - Editor: the latest **Unity 6 LTS** (≥ 6000.0.66f2; prefer 6.1+ if it's available as LTS), with modules **Android Build Support + OpenJDK + Android SDK & NDK**.
 - Template: URP 3D (look up the real template id with `unity templates list`).
-- Project path: `./GateRush`. Build profile: **Meta Quest** (fall back to Android if it's missing), ARM64, IL2CPP, Vulkan, min API per Meta's current requirement.
+- Project path: `./Ushqyr`. Build profile: **Meta Quest** (fall back to Android if it's missing), ARM64, IL2CPP, Vulkan, min API per Meta's current requirement.
 - Packages: `com.unity.xr.management`, `com.unity.xr.openxr`, `com.unity.inputsystem`, `com.unity.textmeshpro` (or the built-in UGUI in Unity 6), `com.unity.test-framework`, and the **Meta XR Core SDK** `com.meta.xr.sdk.core`. Get it through Meta's scoped registry `https://npm.developer.oculus.com/` (verify this first). If that doesn't work, stop and ask me to install it from the Asset Store. Do **not** install the deprecated Oculus XR Plugin.
 - OpenXR: enable the Meta Quest feature group on Android, interaction profile = Oculus Touch Controller Profile, render mode = Single Pass Instanced, foveation on. Then run Meta's Project Setup Tool fixes through code if an API exists (e.g. `OVRProjectSetup`); otherwise list the remaining items for me.
 - Quality: one Quest quality level (MSAA 4x, no realtime shadows, HDR off, render scale 1.0), target 72 Hz with a 90 Hz option.
 
 ## Engineering rules
-- Folder layout and namespaces exactly as in PLAN.md §4 (`GateRush.Flight`, `GateRush.Input`, …), with assembly definitions per area. `GateRush.Flight` must have **no reference to UnityEngine** except `Mathf`-free math. Use `System.Numerics` or our own `Vec3`/`Quat` structs so it is fully unit-testable and deterministic.
+- Folder layout and namespaces exactly as in PLAN.md §4 (`Ushqyr.Flight`, `Ushqyr.Input`, …), with assembly definitions per area. `Ushqyr.Flight` must have **no reference to UnityEngine** except `Mathf`-free math. Use `System.Numerics` or our own `Vec3`/`Quat` structs so it is fully unit-testable and deterministic.
 - `QuadSimulator.Step(ref QuadState s, in PilotInput input, in QuadProfile p, float dt)` with fixed sub-steps (default 1 ms, max 16 per frame, with an accumulator). The MonoBehaviour bridge copies the state to the Transform and interpolates for rendering.
 - Implement **Betaflight rates** and **Actual rates** exactly per the Betaflight formulas, with unit tests against known values (e.g. RC Rate 1.0 / Super 0.7 / Expo 0 → ~667 °/s at full stick).
 - Rate PID per axis with D-term low-pass and an I-term limit; Air Mode; Quad-X mixer with desaturation; first-order motor lag; thrust ∝ ω²; yaw from motor torque; linear+quadratic body-axis drag; gravity 9.81. Angle/Horizon modes use an outer attitude loop.
@@ -46,9 +46,9 @@ You are a senior Unity XR engineer and FPV flight-dynamics programmer. Build **"
 Work milestone by milestone (M0 → M8 in PLAN.md; M9 is a stretch goal). For each milestone:
 1. Post a short plan (files and classes you will touch).
 2. Implement it, with tests for anything in `Flight/`, `Race/` (lap timing, checkpoint order) and `Track/` (JSON round-trip).
-3. Verify: compile clean, tests green, play-mode smoke test through `unity command editor_play` (or an equivalent the Editor exposes), and read the console logs. From M3 on, also build the APK: `unity build ./GateRush --target Android --execute-method GateRush.EditorTools.BuildScript.BuildQuest` → `Builds/GateRush.apk`.
+3. Verify: compile clean, tests green, play-mode smoke test through `unity command editor_play` (or an equivalent the Editor exposes), and read the console logs. From M3 on, also build the APK: `unity build ./Ushqyr --target Android --execute-method Ushqyr.EditorTools.BuildScript.BuildQuest` → `Builds/Ushqyr.apk`.
 4. Update `PLAN.md` (✅ the milestone, note deviations) and `CHANGELOG.md`, then commit.
-5. Tell me what to test on the headset (`adb install -r Builds/GateRush.apk`) and what to look for.
+5. Tell me what to test on the headset (`adb install -r Builds/Ushqyr.apk`) and what to look for.
 
 Move the input-diagnostics part of M6 forward to **M3**, so I can plug my BetaFPV radio into the headset early and send you the device names and axis readings. Then you can fill in the presets.
 

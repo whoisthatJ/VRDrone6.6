@@ -149,7 +149,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b879abd6632b69a478c550b474bdb947, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: GateRush.Core::GateRush.Core.SceneSwitcher
+  m_EditorClassIdentifier: Ushqyr.Core::Ushqyr.Core.SceneSwitcher
   menuScene: Menu
 --- !u!114 &1562082402
 MonoBehaviour:
@@ -162,7 +162,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 40b5f521d9846254a8a336035e2afd8c, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: GateRush.Core::GateRush.Core.PerfLogger
+  m_EditorClassIdentifier: Ushqyr.Core::Ushqyr.Core.PerfLogger
   intervalSeconds: 5
 --- !u!114 &1562082403
 MonoBehaviour:
@@ -175,7 +175,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e435c5c6d98419940ae8a04b1ffe19df, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: GateRush.Core::GateRush.Core.AppBootstrap
+  m_EditorClassIdentifier: Ushqyr.Core::Ushqyr.Core.AppBootstrap
   firstScene: Menu
 --- !u!4 &1562082404
 Transform:

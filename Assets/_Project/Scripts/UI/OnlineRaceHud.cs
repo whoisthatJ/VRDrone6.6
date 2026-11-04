@@ -1,17 +1,17 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
-using GateRush.Core;
-using GateRush.Game;
-using GateRush.Net;
-using GateRush.Race;
+using Ushqyr.Core;
+using Ushqyr.Game;
+using Ushqyr.Net;
+using Ushqyr.Race;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-namespace GateRush.UI
+namespace Ushqyr.UI
 {
     /// <summary>
     /// Online race overlay: live positions, name tags over the other quads, "waiting for pilots" while everyone

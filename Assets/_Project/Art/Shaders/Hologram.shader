@@ -2,7 +2,7 @@
 // guidance. Fresnel rim glow, moving scanlines, a little flicker, and a glitch (sliced vertex offsets + flashing)
 // driven by _Glitch. _BaseColor / _Intensity are the same properties NextGateHighlight sets on gate LEDs, so a ring
 // takes its next / later / passed colour like any gate.
-Shader "GateRush/Hologram"
+Shader "Ushqyr/Hologram"
 {
     Properties
     {

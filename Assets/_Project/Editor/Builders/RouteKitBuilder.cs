@@ -1,9 +1,9 @@
 using System.IO;
-using GateRush.Track;
+using Ushqyr.Track;
 using UnityEditor;
 using UnityEngine;
 
-namespace GateRush.EditorTools.Builders
+namespace Ushqyr.EditorTools.Builders
 {
     /// <summary>
     /// Materials and procedural textures for generated spline-track geometry (lane LEDs, hardware, chevron boards,
@@ -46,10 +46,10 @@ namespace GateRush.EditorTools.Builders
             var m = AssetDatabase.LoadAssetAtPath<Material>(path);
             if (m == null)
             {
-                m = new Material(Shader.Find("GateRush/LED"));
+                m = new Material(Shader.Find("Ushqyr/LED"));
                 AssetDatabase.CreateAsset(m, path);
             }
-            m.shader = Shader.Find("GateRush/LED");
+            m.shader = Shader.Find("Ushqyr/LED");
             m.SetColor("_BaseColor", Color.white);
             m.SetFloat("_Intensity", intensity);
             EditorUtility.SetDirty(m);

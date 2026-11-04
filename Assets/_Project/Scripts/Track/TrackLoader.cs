@@ -1,8 +1,8 @@
 using System.Collections.Generic;
-using GateRush.Race;
+using Ushqyr.Race;
 using UnityEngine;
 
-namespace GateRush.Track
+namespace Ushqyr.Track
 {
     /// <summary>Result of instantiating a track.</summary>
     public sealed class LoadedTrack
@@ -40,7 +40,7 @@ namespace GateRush.Track
                 var prefab = prefabs.Gate(g.Type);
                 if (prefab == null)
                 {
-                    Debug.LogWarning($"[GateRush] Track '{data.Id}': unknown gate type '{g.Type}', using Square");
+                    Debug.LogWarning($"[Ushqyr] Track '{data.Id}': unknown gate type '{g.Type}', using Square");
                     prefab = prefabs.Gate("Square");
                 }
                 var go = Object.Instantiate(prefab, g.Position, TrackData.GateRotation(g), root);
@@ -69,7 +69,7 @@ namespace GateRush.Track
                 var prefab = prefabs.Prop(p.Type);
                 if (prefab == null)
                 {
-                    Debug.LogWarning($"[GateRush] Track '{data.Id}': unknown prop type '{p.Type}', skipped");
+                    Debug.LogWarning($"[Ushqyr] Track '{data.Id}': unknown prop type '{p.Type}', skipped");
                     continue;
                 }
                 var go = Object.Instantiate(prefab, p.Position, Quaternion.Euler(p.Euler), root);

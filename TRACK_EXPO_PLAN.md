@@ -29,7 +29,7 @@ So the plan supports two modes, and you choose:
 - **Not** Google Photorealistic 3D Tiles: Google's terms don't allow caching them for offline use, and a sim must work offline.
 - Satellite imagery isn't used for tracing either. The reference photo and the public dimensions are enough.
 
-**c) Names.** Don't use "EXPO", "Nur Alem", "Astana Hub", "AIFC" or other logos/trademarks on in-game signage. Use our own GATERUSH branding and neutral names.
+**c) Names.** Don't use "EXPO", "Nur Alem", "Astana Hub", "AIFC" or other logos/trademarks on in-game signage. Use our own USHQYR branding and neutral names.
 
 ## 2. Scale and zones
 - **Origin:** the sphere centre = world (0, 0, 0). OSM lat/lon is converted to local metres with a local tangent-plane projection (east = +X, north = +Z), so 1 unit = 1 m.

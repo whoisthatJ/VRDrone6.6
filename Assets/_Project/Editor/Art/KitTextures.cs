@@ -1,14 +1,14 @@
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
-using static GateRush.EditorTools.Art.ArtProcedural;
+using static Ushqyr.EditorTools.Art.ArtProcedural;
 
-namespace GateRush.EditorTools.Art
+namespace Ushqyr.EditorTools.Art
 {
     /// <summary>
     /// T2 obstacle-kit textures, all procedural (our own, no licence questions), written next to the other procedural
     /// sets so <see cref="MaterialLibrary"/> picks them up: padded fabric with stitched seams (normal map), safety net
-    /// (alpha), GATERUSH feather-flag print, landing pad, numbered start grid and chevron turn sign.
+    /// (alpha), USHQYR feather-flag print, landing pad, numbered start grid and chevron turn sign.
     /// </summary>
     public static class KitTextures
     {
@@ -95,7 +95,7 @@ namespace GateRush.EditorTools.Art
             }
         }
 
-        /// <summary>Feather flag print: navy with an orange edge band, "GATERUSH" running up the flag and a chevron emblem on top.</summary>
+        /// <summary>Feather flag print: navy with an orange edge band, "USHQYR" running up the flag and a chevron emblem on top.</summary>
         public static void BrandFlag()
         {
             const int w = 256, h = 1024;
@@ -114,7 +114,7 @@ namespace GateRush.EditorTools.Art
                 px[y * w + x] = C(c.r, c.g, c.b);
             }
             // Letters run bottom → top, rotated 90° (read with your head tilted left, like most feather flags).
-            DrawText(px, w, h, "GATERUSH", x0: 0.3f, y0: 0.06f, cell: 0.06f, vertical: true, color: Color.white);
+            DrawText(px, w, h, "USHQYR", x0: 0.3f, y0: 0.06f, cell: 0.06f, vertical: true, color: Color.white);
             Save(File("BrandFlag", "Albedo"), w, h, px);
         }
 
@@ -190,7 +190,7 @@ namespace GateRush.EditorTools.Art
         }
 
         /// <summary>
-        /// Stadium perimeter LED board content (T3): "GATERUSH" in white between orange chevrons on a dark navy
+        /// Stadium perimeter LED board content (T3): "USHQYR" in white between orange chevrons on a dark navy
         /// screen with a fine pixel grid. U runs along the board, repeated and scrolled by LedBoardScroller.
         /// </summary>
         public static void LedBanner()
@@ -214,7 +214,7 @@ namespace GateRush.EditorTools.Art
                 if (v < 0.06f || v > 0.94f) c = orange * 0.8f;
                 px[y * w + x] = C(c.r, c.g, c.b);
             }
-            DrawText(px, w, h, "GATERUSH", x0: 0.18f, y0: 0.12f, cell: 0.0137f, vertical: false, color: Color.white);
+            DrawText(px, w, h, "USHQYR", x0: 0.255f, y0: 0.12f, cell: 0.0137f, vertical: false, color: Color.white);
             // LED pixel grid: dark gaps every 4 px.
             for (int y = 0; y < h; y++)
             for (int x = 0; x < w; x++)
@@ -454,6 +454,8 @@ namespace GateRush.EditorTools.Art
             ['U'] = new[] { "#...#", "#...#", "#...#", "#...#", "#...#", "#...#", ".###." },
             ['S'] = new[] { ".####", "#....", "#....", ".###.", "....#", "....#", "####." },
             ['H'] = new[] { "#...#", "#...#", "#...#", "#####", "#...#", "#...#", "#...#" },
+            ['Q'] = new[] { ".###.", "#...#", "#...#", "#...#", "#.#.#", "#..#.", ".##.#" },
+            ['Y'] = new[] { "#...#", "#...#", ".#.#.", "..#..", "..#..", "..#..", "..#.." },
             ['1'] = new[] { "..#..", ".##..", "..#..", "..#..", "..#..", "..#..", ".###." },
             ['2'] = new[] { ".###.", "#...#", "....#", "...#.", "..#..", ".#...", "#####" },
             ['3'] = new[] { "####.", "....#", "....#", ".###.", "....#", "....#", "####." },

@@ -1,13 +1,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using GateRush.Race;
-using GateRush.Track;
+using Ushqyr.Race;
+using Ushqyr.Track;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 
-namespace GateRush.EditorTools.Art
+namespace Ushqyr.EditorTools.Art
 {
     /// <summary>
     /// Tools > Art > Verify: checks that the art pass left gameplay alone. For every track it sphere-casts the quad's

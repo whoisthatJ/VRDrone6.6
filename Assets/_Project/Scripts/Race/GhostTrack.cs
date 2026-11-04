@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using UnityEngine;
 
-namespace GateRush.Race
+namespace Ushqyr.Race
 {
     /// <summary>
     /// One lap of recorded poses at a fixed sample interval. Preallocated: recording never allocates.

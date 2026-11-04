@@ -1,11 +1,11 @@
-using GateRush.UI;
+using Ushqyr.UI;
 using TMPro;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace GateRush.EditorTools.Builders
+namespace Ushqyr.EditorTools.Builders
 {
     /// <summary>Builds Assets/_Project/Scenes/InputDiagnostics.unity: a desktop camera facing a world-space diagnostics panel.</summary>
     public static class DiagnosticsSceneBuilder
@@ -16,7 +16,7 @@ namespace GateRush.EditorTools.Builders
         private const float CanvasScale = 0.001f;
         private static readonly Vector2 PanelSize = new Vector2(1500f, 1200f);
 
-        [MenuItem("GateRush/Builders/Build Input Diagnostics Scene")]
+        [MenuItem("Ushqyr/Builders/Build Input Diagnostics Scene")]
         public static string Build()
         {
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);

@@ -12,7 +12,7 @@ using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace GateRush.EditorTools.Art
+namespace Ushqyr.EditorTools.Art
 {
     /// <summary>
     /// Downloads CC0 assets from Poly Haven (api.polyhaven.com) and ambientCG (ambientcg.com) into the project.
@@ -23,7 +23,7 @@ namespace GateRush.EditorTools.Art
     /// </summary>
     public static class ArtDownloader
     {
-        private const string UserAgent = "GateRushArtPipeline/1.0 (Unity editor tool; github.com/whoisthatJ/VRDrone6.6)";
+        private const string UserAgent = "UshqyrArtPipeline/1.0 (Unity editor tool; github.com/whoisthatJ/VRDrone6.6)";
         private static readonly HttpClient Http = CreateClient();
         private static readonly ConcurrentQueue<Action> MainThread = new ConcurrentQueue<Action>();
         private static bool _pumping;

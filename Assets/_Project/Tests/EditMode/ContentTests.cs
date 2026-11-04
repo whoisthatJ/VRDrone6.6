@@ -1,10 +1,10 @@
 using System.Linq;
-using GateRush.Game;
-using GateRush.Track;
+using Ushqyr.Game;
+using Ushqyr.Track;
 using NUnit.Framework;
 using UnityEditor;
 
-namespace GateRush.Tests
+namespace Ushqyr.Tests
 {
     /// <summary>Checks the shipped content: track JSON, catalogs and scenes fit together.</summary>
     public class ContentTests
@@ -17,7 +17,7 @@ namespace GateRush.Tests
         public void EveryCatalogTrack_ParsesValidatesAndHasAScene()
         {
             var catalog = Tracks;
-            Assert.IsNotNull(catalog, "TrackCatalog asset missing (run GateRush/Builders/Build All Scenes)");
+            Assert.IsNotNull(catalog, "TrackCatalog asset missing (run Ushqyr/Builders/Build All Scenes)");
             Assert.That(catalog.Tracks.Count, Is.GreaterThanOrEqualTo(3));
             var buildScenes = EditorBuildSettings.scenes.Where(s => s.enabled).Select(s => System.IO.Path.GetFileNameWithoutExtension(s.path)).ToList();
 
@@ -60,7 +60,7 @@ namespace GateRush.Tests
         [TestCase("Thrustmaster T.16000M", null)]
         public void RadioPresets_MatchExpectedDeviceNames(string deviceName, string expectedPreset)
         {
-            var lib = AssetDatabase.LoadAssetAtPath<GateRush.Input.ControllerPresetLibrary>("Assets/_Project/Data/Radios/ControllerPresets.asset");
+            var lib = AssetDatabase.LoadAssetAtPath<Ushqyr.Input.ControllerPresetLibrary>("Assets/_Project/Data/Radios/ControllerPresets.asset");
             Assert.IsNotNull(lib);
             var preset = lib.Find(deviceName, deviceName);
             Assert.AreEqual(expectedPreset, preset != null ? preset.DisplayName : null);

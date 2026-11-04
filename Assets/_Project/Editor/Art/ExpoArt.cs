@@ -1,10 +1,10 @@
 using System.Collections.Generic;
-using GateRush.Core;
+using Ushqyr.Core;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-namespace GateRush.EditorTools.Art
+namespace Ushqyr.EditorTools.Art
 {
     /// <summary>
     /// Track_Expo: the Astana EXPO 2017 site (Adrian Smith + Gordon Gill) at real scale, laid out from OpenStreetMap
@@ -62,7 +62,7 @@ namespace GateRush.EditorTools.Art
             ctx.Log.Append(ground != null ? " ground;" : " no ground;");
             BuildSteppe(ctx);
             // Hero buildings from the OSM footprints (Sphere District E2 generators).
-            ctx.Log.Append(GateRush.EditorTools.SphereDistrict.SphereDistrictHeroes.Build(ctx));
+            ctx.Log.Append(Ushqyr.EditorTools.SphereDistrict.SphereDistrictHeroes.Build(ctx));
             BuildStreetscape(ctx);
             BuildCity(ctx);
             BuildSkyline(ctx);
@@ -252,13 +252,13 @@ namespace GateRush.EditorTools.Art
 
         private static void BuildStreetscape(ArtContext ctx)
         {
-            var geo = AssetDatabase.LoadAssetAtPath<GateRush.Track.Geo.GeoDataAsset>(GateRush.EditorTools.SphereDistrict.OsmImporter.DataPath);
+            var geo = AssetDatabase.LoadAssetAtPath<Ushqyr.Track.Geo.GeoDataAsset>(Ushqyr.EditorTools.SphereDistrict.OsmImporter.DataPath);
             if (geo == null)
             {
                 ctx.Log.Append(" no geo data;");
                 return;
             }
-            var st = new GateRush.EditorTools.SphereDistrict.StreetscapeGenerator(geo.Data, GateRush.EditorTools.Builders.RouteLibrary.ExpoCorridors());
+            var st = new Ushqyr.EditorTools.SphereDistrict.StreetscapeGenerator(geo.Data, Ushqyr.EditorTools.Builders.RouteLibrary.ExpoCorridors());
             st.BuildRoads();
             st.BuildAreas();
             st.BuildFootwayProps();
@@ -368,11 +368,11 @@ namespace GateRush.EditorTools.Art
         /// <summary>The city from the OSM footprints (E4) and the far ring of blocks beyond the mapped area.</summary>
         private static void BuildCity(ArtContext ctx)
         {
-            var geo = AssetDatabase.LoadAssetAtPath<GateRush.Track.Geo.GeoDataAsset>(GateRush.EditorTools.SphereDistrict.OsmImporter.DataPath);
+            var geo = AssetDatabase.LoadAssetAtPath<Ushqyr.Track.Geo.GeoDataAsset>(Ushqyr.EditorTools.SphereDistrict.OsmImporter.DataPath);
             if (geo == null) return;
             var group = G(ctx, "Sphere District City");
-            ctx.Log.Append(GateRush.EditorTools.SphereDistrict.CityGenerator.Build(ctx, geo.Data, group));
-            ctx.Log.Append(GateRush.EditorTools.SphereDistrict.CityGenerator.BuildFarRing(group, ParkBearing));
+            ctx.Log.Append(Ushqyr.EditorTools.SphereDistrict.CityGenerator.Build(ctx, geo.Data, group));
+            ctx.Log.Append(Ushqyr.EditorTools.SphereDistrict.CityGenerator.BuildFarRing(group, ParkBearing));
         }
 
         /// <summary>

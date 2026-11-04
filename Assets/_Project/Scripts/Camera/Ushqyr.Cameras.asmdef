@@ -1,11 +1,11 @@
 {
-    "name": "GateRush.Cameras",
-    "rootNamespace": "GateRush.Cameras",
+    "name": "Ushqyr.Cameras",
+    "rootNamespace": "Ushqyr.Cameras",
     "references": [
-        "GateRush.Flight",
-        "GateRush.Vehicle",
+        "Ushqyr.Flight",
+        "Ushqyr.Vehicle",
         "Unity.InputSystem",
-        "GateRush.Input",
+        "Ushqyr.Input",
         "Unity.Cinemachine",
         "Unity.RenderPipelines.Core.Runtime"
     ],

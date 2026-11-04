@@ -1,10 +1,10 @@
 using System.Collections.Generic;
-using GateRush.Core;
+using Ushqyr.Core;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-namespace GateRush.EditorTools.Art
+namespace Ushqyr.EditorTools.Art
 {
     /// <summary>
     /// Track_Stadium (T3): a football stadium with an athletics track. Striped 105 × 68 m pitch with full markings and

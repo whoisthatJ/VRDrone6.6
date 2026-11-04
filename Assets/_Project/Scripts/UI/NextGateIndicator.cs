@@ -1,9 +1,9 @@
-using GateRush.Race;
-using GateRush.Vehicle;
+using Ushqyr.Race;
+using Ushqyr.Vehicle;
 using TMPro;
 using UnityEngine;
 
-namespace GateRush.UI
+namespace Ushqyr.UI
 {
     /// <summary>
     /// Screen-space marker for the next gate: a bracket on the gate with its distance while it is in view, an arrow at
@@ -34,8 +34,8 @@ namespace GateRush.UI
             var gate = race != null && race.isActiveAndEnabled ? race.NextGate : null;
             if (_camera == null || !_camera.isActiveAndEnabled) _camera = Camera.main;
             // Route guidance (from the race): Off hides it; Standard shows the edge arrow only after a missed gate; Trainer always.
-            var guidance = race != null ? race.Guidance : GateRush.Core.RouteGuidanceLevel.Standard;
-            if (gate == null || _camera == null || guidance == GateRush.Core.RouteGuidanceLevel.Off)
+            var guidance = race != null ? race.Guidance : Ushqyr.Core.RouteGuidanceLevel.Standard;
+            if (gate == null || _camera == null || guidance == Ushqyr.Core.RouteGuidanceLevel.Off)
             {
                 Show(false, false);
                 return;
@@ -51,7 +51,7 @@ namespace GateRush.UI
                 Show(true, false);
                 marker.anchoredPosition = new Vector2((view.x - 0.5f) * size.x, (view.y - 0.5f) * size.y);
             }
-            else if (guidance != GateRush.Core.RouteGuidanceLevel.Trainer && race.Now >= race.WrongGateUntil)
+            else if (guidance != Ushqyr.Core.RouteGuidanceLevel.Trainer && race.Now >= race.WrongGateUntil)
             {
                 Show(false, false);
                 return;

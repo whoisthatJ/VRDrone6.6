@@ -1,7 +1,7 @@
 # Headset test: M5 (content + settings)
 
 ```
-adb install -r Builds/GateRush.apk
+adb install -r Builds/Ushqyr.apk
 adb logcat -s Unity
 ```
 
@@ -18,8 +18,8 @@ The app now starts in the **main menu**. Point with either controller and pull t
    - Rates: switch to *Custom*, try Betaflight vs Actual; the orange line shows max deg/s.
    - Camera: tilt, FOV, default view, goggles screen size/follow.
    - Input: Touch throttle *Centre = hover* vs *Trigger*; deadband; expo.
-   - Comfort: vignette strength, **90 Hz**. Check that `[GateRush] FPS avg` reads ~90 in the log.
+   - Comfort: vignette strength, **90 Hz**. Check that `[Ushqyr] FPS avg` reads ~90 in the log.
    - Physics: crash speed, drag, motor lag.
 6. **Performance**: FPS in all three tracks, especially Hangar 7 and Dockyard.
 
-Settings file on the headset: `/sdcard/Android/data/com.gaterush.vr/files/settings.json`.
+Settings file on the headset: `/sdcard/Android/data/com.ushqyr.vr/files/settings.json`.

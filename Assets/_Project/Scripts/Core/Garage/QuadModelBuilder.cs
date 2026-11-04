@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-namespace GateRush.Garage
+namespace Ushqyr.Garage
 {
     /// <summary>Materials the procedural quad uses (assigned by the scene builder).</summary>
     [Serializable]

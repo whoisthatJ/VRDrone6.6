@@ -1,6 +1,6 @@
 using System;
 
-namespace GateRush.Flight
+namespace Ushqyr.Flight
 {
     /// <summary>Body-axis linear + quadratic drag and rotational damping.</summary>
     public static class AeroModel

@@ -1,4 +1,4 @@
-namespace GateRush.EditorTools.Art
+namespace Ushqyr.EditorTools.Art
 {
     /// <summary>Hangar art pass (V5).</summary>
     public static partial class HangarArt

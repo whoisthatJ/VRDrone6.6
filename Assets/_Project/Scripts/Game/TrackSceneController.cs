@@ -1,13 +1,13 @@
-using GateRush.Cameras;
-using GateRush.Core;
-using GateRush.Flight;
-using GateRush.Input;
-using GateRush.Race;
-using GateRush.Track;
-using GateRush.Vehicle;
+using Ushqyr.Cameras;
+using Ushqyr.Core;
+using Ushqyr.Flight;
+using Ushqyr.Input;
+using Ushqyr.Race;
+using Ushqyr.Track;
+using Ushqyr.Vehicle;
 using UnityEngine;
 
-namespace GateRush.Game
+namespace Ushqyr.Game
 {
     /// <summary>
     /// Sits in every track scene: loads the selected track's JSON (gates, props, spawn) into the environment,
@@ -34,11 +34,11 @@ namespace GateRush.Game
         [SerializeField] private RadioDeviceProvider radioProvider;
 
         [Header("Track editor")]
-        [SerializeField] private GateRush.TrackEditor.TrackEditorController editor;
+        [SerializeField] private Ushqyr.TrackEditor.TrackEditorController editor;
 
         [Header("Garage builds")]
         [Tooltip("Materials for a garage build's generated model (replaces the stock quad visual).")]
-        [SerializeField] private GateRush.Garage.QuadModelMaterials buildMaterials = new GateRush.Garage.QuadModelMaterials();
+        [SerializeField] private Ushqyr.Garage.QuadModelMaterials buildMaterials = new Ushqyr.Garage.QuadModelMaterials();
 
         [Header("Feed and audio")]
         [SerializeField] private QuadAudio quadAudio;
@@ -78,7 +78,7 @@ namespace GateRush.Game
             if (editor != null) editor.gameObject.SetActive(false);
             LoadTrack(GameFlow.TakeTrackToLoad());
             if (views != null) views.Apply((ViewMode)settings.Camera.ViewMode);
-            if (GateRush.Net.NetRace.InRace && Track != null) gameObject.AddComponent<OnlineRaceDriver>().Configure(this, vehicle, race, buildMaterials);
+            if (Ushqyr.Net.NetRace.InRace && Track != null) gameObject.AddComponent<OnlineRaceDriver>().Configure(this, vehicle, race, buildMaterials);
             // A short showdown of the track before the pilot's view (not for online races: the host starts those).
             else if (Track != null)
             {
@@ -121,8 +121,8 @@ namespace GateRush.Game
             if (quadAudio != null && phase == RacePhase.Racing) quadAudio.Beep();
             // Opt-in (Settings > Pilot): the race's best lap goes to the track's online leaderboard.
             if (phase == RacePhase.Finished && SaveSystem.Settings.Online.PostLapTimes && race.Timer.HasBestLap
-                && GateRush.Net.OnlineLeaderboards.Has(race.TrackId))
-                _ = GateRush.Net.OnlineLeaderboards.PostLapAsync(race.TrackId, (float)race.Timer.BestLap, vehicle.Profile.Name);
+                && Ushqyr.Net.OnlineLeaderboards.Has(race.TrackId))
+                _ = Ushqyr.Net.OnlineLeaderboards.PostLapAsync(race.TrackId, (float)race.Timer.BestLap, vehicle.Profile.Name);
         }
 
         // ---------- editor / test fly ----------
@@ -139,7 +139,7 @@ namespace GateRush.Game
             if (views != null) views.SetFreeCamera(true);
             if (hud != null) hud.SetActive(false);
             editor.Begin(data);
-            Debug.Log($"[GateRush] Editing track '{data.Name}' ({data.Environment})");
+            Debug.Log($"[Ushqyr] Editing track '{data.Name}' ({data.Environment})");
         }
 
         private void TestFly(TrackData data)
@@ -162,7 +162,7 @@ namespace GateRush.Game
                 EnterEditor(data);
                 return true;
             };
-            Debug.Log($"[GateRush] Test-flying '{data.Name}' (menu button returns to the editor)");
+            Debug.Log($"[Ushqyr] Test-flying '{data.Name}' (menu button returns to the editor)");
         }
 
         private void UnloadTrack()
@@ -179,7 +179,7 @@ namespace GateRush.Game
             if (data == null || data.Environment != environment) data = tracks.Load(tracks.FirstFor(environment));
             if (data == null)
             {
-                Debug.LogError($"[GateRush] No track available for environment '{environment}'");
+                Debug.LogError($"[Ushqyr] No track available for environment '{environment}'");
                 return;
             }
             LoadData(data);
@@ -189,7 +189,7 @@ namespace GateRush.Game
         {
             UnloadTrack();
             var errors = data.Validate(trackPrefabs.GateTypes(), trackPrefabs.PropTypes());
-            foreach (var e in errors) Debug.LogWarning($"[GateRush] Track '{data.Id}': {e}");
+            foreach (var e in errors) Debug.LogWarning($"[Ushqyr] Track '{data.Id}': {e}");
 
             Track = TrackLoader.Load(data, trackPrefabs);
             vehicle.SpawnPoint = Track.Spawn;
@@ -222,7 +222,7 @@ namespace GateRush.Game
             area.Configure(vehicle, data, Track.Spawn, environment.StartsWith("expo"));
             race.enabled = !data.FreeFlight;
             ApplyGuidance(SaveSystem.Settings);
-            Debug.Log($"[GateRush] Track '{data.Name}' loaded: {Track.Gates.Length} gates, {data.Props.Count} props, {data.Laps} laps");
+            Debug.Log($"[Ushqyr] Track '{data.Name}' loaded: {Track.Gates.Length} gates, {data.Props.Count} props, {data.Laps} laps");
         }
 
         /// <summary>Applies everything from the settings to the scene. Safe to call any time.</summary>
@@ -280,13 +280,13 @@ namespace GateRush.Game
         private void ApplyQuad(GameSettings s)
         {
             // A garage build flies its composed profile and its own model.
-            var build = GateRush.Garage.BuildLibrary.IsBuildId(s.QuadId) ? GateRush.Garage.BuildLibrary.Default.Resolve(s.QuadId) : null;
-            if (build != null && GateRush.Garage.BuildComposer.Validate(build).Count > 0) build = null;
-            var entry = build != null ? quads.Find(build.Size == GateRush.Garage.SizeClass.Whoop ? "whoop65" : "race5") : quads.Find(s.QuadId);
+            var build = Ushqyr.Garage.BuildLibrary.IsBuildId(s.QuadId) ? Ushqyr.Garage.BuildLibrary.Default.Resolve(s.QuadId) : null;
+            if (build != null && Ushqyr.Garage.BuildComposer.Validate(build).Count > 0) build = null;
+            var entry = build != null ? quads.Find(build.Size == Ushqyr.Garage.SizeClass.Whoop ? "whoop65" : "race5") : quads.Find(s.QuadId);
             if (entry == null || entry.Profile == null || vehicle == null) return;
             string quadKey = build != null ? s.QuadId + "|" + build.ToJson().GetHashCode() : entry.Id;
 
-            QuadProfile p = build != null ? GateRush.Garage.BuildComposer.Compose(build) : entry.Profile.Profile;
+            QuadProfile p = build != null ? Ushqyr.Garage.BuildComposer.Compose(build) : entry.Profile.Profile;
             if (s.UseCustomRates) p.Rates = s.Rates;
             p.Aero.LinearDrag = p.Aero.LinearDrag * s.Physics.DragScale;
             p.Aero.QuadraticDrag = p.Aero.QuadraticDrag * s.Physics.DragScale;
@@ -309,7 +309,7 @@ namespace GateRush.Game
                     ? new Vector3(0f, 0.004f, build.Frame.BodyLengthMm * 0.0005f + 0.005f) // front of the stack (model is centred on it)
                     : entry.CameraOffset;
             if (views != null) views.SetQuadScale(visualScale);
-            if (quadAudio != null) quadAudio.MaxRpm = build != null ? GateRush.Garage.BuildComposer.FullThrottle(build.Motor, build.Prop, build.Battery).RevPerSec * 60f : entry.MotorRpm;
+            if (quadAudio != null) quadAudio.MaxRpm = build != null ? Ushqyr.Garage.BuildComposer.FullThrottle(build.Motor, build.Prop, build.Battery).RevPerSec * 60f : entry.MotorRpm;
 
             // A different quad means a different ghost and a fresh start.
             if (_appliedQuadId != null && _appliedQuadId != quadKey && race != null)
@@ -329,24 +329,24 @@ namespace GateRush.Game
             Destroy(_buildModel);
             _buildModel = null;
             foreach (var r in quadVisual.GetComponentsInChildren<Renderer>(true)) r.enabled = true;
-            var spinner = FindAnyObjectByType<GateRush.Vehicle.PropVisuals>();
+            var spinner = FindAnyObjectByType<Ushqyr.Vehicle.PropVisuals>();
             if (spinner != null && _stockProps != null) spinner.Configure(_stockProps, _stockDiscs);
         }
 
         /// <summary>Hides the stock quad model and shows the build's generated one (props spin through PropVisuals).</summary>
-        private void ApplyBuildVisual(GateRush.Garage.QuadBuild build)
+        private void ApplyBuildVisual(Ushqyr.Garage.QuadBuild build)
         {
             if (quadVisual == null || buildMaterials == null || buildMaterials.Carbon == null) return;
             if (_buildModel != null) Destroy(_buildModel);
             quadVisual.localScale = Vector3.one;
             foreach (var r in quadVisual.GetComponentsInChildren<Renderer>(true)) r.enabled = false;
-            var model = GateRush.Garage.QuadModelBuilder.Build(build, buildMaterials, quadVisual, quadVisual.gameObject.layer);
+            var model = Ushqyr.Garage.QuadModelBuilder.Build(build, buildMaterials, quadVisual, quadVisual.gameObject.layer);
             // The generated model's origin is the bottom plate; centre the stack on the body.
             model.Root.transform.localPosition = Vector3.down * (build.Frame.PlateMm * 0.001f + build.Frame.StackMm * 0.0005f);
             foreach (var t in model.Root.GetComponentsInChildren<Transform>(true)) t.gameObject.layer = quadVisual.gameObject.layer;
             _buildModel = model.Root;
-            var spinner = vehicle != null ? vehicle.GetComponentInChildren<GateRush.Vehicle.PropVisuals>(true) : null;
-            if (spinner == null) spinner = FindAnyObjectByType<GateRush.Vehicle.PropVisuals>();
+            var spinner = vehicle != null ? vehicle.GetComponentInChildren<Ushqyr.Vehicle.PropVisuals>(true) : null;
+            if (spinner == null) spinner = FindAnyObjectByType<Ushqyr.Vehicle.PropVisuals>();
             if (spinner != null)
             {
                 _stockProps ??= spinner.Props;

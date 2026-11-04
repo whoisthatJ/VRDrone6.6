@@ -1,9 +1,9 @@
 using System.IO;
-using GateRush.Race;
+using Ushqyr.Race;
 using NUnit.Framework;
 using UnityEngine;
 
-namespace GateRush.Tests
+namespace Ushqyr.Tests
 {
     public class LapTimerTests
     {

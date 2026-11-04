@@ -1,12 +1,12 @@
 {
-    "name": "GateRush.Race",
-    "rootNamespace": "GateRush.Race",
+    "name": "Ushqyr.TrackEditor",
+    "rootNamespace": "Ushqyr.TrackEditor",
     "references": [
-        "GateRush.Flight",
-        "GateRush.Input",
-        "GateRush.Vehicle",
-        "GateRush.Core",
-        "Unity.InputSystem"
+        "Ushqyr.Core",
+        "Ushqyr.Track",
+        "Ushqyr.Race",
+        "Unity.InputSystem",
+        "Unity.TextMeshPro"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -1,10 +1,10 @@
 using System;
-using GateRush.Input;
-using GateRush.Race;
-using GateRush.Vehicle;
+using Ushqyr.Input;
+using Ushqyr.Race;
+using Ushqyr.Vehicle;
 using UnityEngine;
 
-namespace GateRush.Game
+namespace Ushqyr.Game
 {
     /// <summary>
     /// Pauses the race when the active controller changes mid-race (a radio unplugged, a Bluetooth link dropped, or a
@@ -73,7 +73,7 @@ namespace GateRush.Game
             Reason = reason;
             _held = 0f;
             Time.timeScale = paused ? 0f : 1f;
-            Debug.Log(paused ? $"[GateRush] Race paused: {reason}" : "[GateRush] Race resumed");
+            Debug.Log(paused ? $"[Ushqyr] Race paused: {reason}" : "[Ushqyr] Race resumed");
             PausedChanged?.Invoke(paused);
         }
 

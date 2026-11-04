@@ -7,7 +7,7 @@
 
 ---
 
-You are a senior Unity gameplay and technical-art engineer continuing **GateRush**, an FPV drone racing simulator inspired by VelociDrone. **Important: we dropped VR.** The game is now a **desktop PC simulator** (Windows, monitor, played with an RC radio such as a BetaFPV, a gamepad or a keyboard). Wherever older docs mention VR, XR, Quest, Link, goggles mode or comfort settings, that is obsolete.
+You are a senior Unity gameplay and technical-art engineer continuing **Ushqyr**, an FPV drone racing simulator inspired by VelociDrone. **Important: we dropped VR.** The game is now a **desktop PC simulator** (Windows, monitor, played with an RC radio such as a BetaFPV, a gamepad or a keyboard). Wherever older docs mention VR, XR, Quest, Link, goggles mode or comfort settings, that is obsolete.
 
 ## First: get oriented (don't skip)
 1. Read `TRACK_GARAGE_PLAN.md` (the source of truth for this work), then `PLAN.md`, `FLIGHT_PHYSICS.md` and `VISUALS_PLAN.md`.
@@ -18,7 +18,7 @@ You are a senior Unity gameplay and technical-art engineer continuing **GateRush
 ## Rules
 - **Unity CLI and live Editor.** If an Editor is connected, drive it with `unity command` / `unity command eval`, and never hand-edit `.unity`, `.prefab`, `.mat` or `.asset` YAML. Build scenes, prefabs and generated content with **repeatable Editor scripts** in `Assets/_Project/Editor/` (menu items + `-executeMethod`). Use `unity-package-management` for packages (`com.unity.splines`, `com.unity.cinemachine`), the `ui` / `ui-uitk` skills for all menus and HUD, `urp-postprocessing` for bloom/DoF/color grading, and `physics-3d-collision` when colliders or triggers misbehave.
 - **Don't break the flight model.** The garage feeds the existing `QuadProfile`; don't change physics formulas unless a test proves a bug. Keep all existing tests green. Add EditMode/PlayMode tests for anything new with logic: track generation, checkpoint ordering, lap validation, build stats, save/load.
-- **No copied branding.** The references contain other companies' logos ("EREADRONE", "DRL"). Use our own brand "GATERUSH" and fictional part brands. Reproduce the **structure, layout and mood**, not the logos.
+- **No copied branding.** The references contain other companies' logos ("EREADRONE", "DRL"). Use our own brand "USHQYR" and fictional part brands. Reproduce the **structure, layout and mood**, not the logos.
 - **Licensing.** Use only CC0 assets (Poly Haven, ambientCG, …) or procedural geometry you generate. Log every asset in `Assets/_Project/Art/ASSET_LICENSES.md`.
 - **Performance (desktop):** ≥ 144 fps on an RTX 3060/4060-class PC at High; ≥ 60 fps on a GTX 1060/1650-class PC at Low.
   - LEDs are HDR emissive + bloom, never one light per LED.
@@ -62,7 +62,7 @@ You are a senior Unity gameplay and technical-art engineer continuing **GateRush
 - Build an `Obstacle_Showroom` scene showing them all, take screenshots, and review them yourself.
 
 ### T3: Stadium environment
-- Striped pitch with line markings, a red tartan running track with lanes, stands with GPU-instanced seats, dugouts, perimeter LED boards with an animated GATERUSH brand, and floodlight towers.
+- Striped pitch with line markings, a red tartan running track with lanes, stands with GPU-instanced seats, dugouts, perimeter LED boards with an animated USHQYR brand, and floodlight towers.
 - Lighting presets **Night (default) / Dusk / Day**, switchable from the menu.
 
 ### T4: "Serpent Arena" layout, reproducing `ref_track_stadium.png`

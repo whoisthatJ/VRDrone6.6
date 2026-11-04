@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace GateRush.Vehicle
+namespace Ushqyr.Vehicle
 {
     /// <summary>
     /// Spins the four prop transforms from motor speed and cross-fades to translucent blur discs at speed.

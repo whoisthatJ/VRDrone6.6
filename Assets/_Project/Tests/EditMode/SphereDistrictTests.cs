@@ -1,12 +1,12 @@
 using System.Collections.Generic;
 using System.Linq;
-using GateRush.EditorTools.SphereDistrict;
-using GateRush.Track.Geo;
+using Ushqyr.EditorTools.SphereDistrict;
+using Ushqyr.Track.Geo;
 using NUnit.Framework;
 using UnityEditor;
 using UnityEngine;
 
-namespace GateRush.Tests
+namespace Ushqyr.Tests
 {
     /// <summary>Sphere District E2: polygon tools behind the hero generators and the generated buildings.</summary>
     public class SphereDistrictTests
@@ -46,7 +46,7 @@ namespace GateRush.Tests
         public void PetalPavilions_FromOsm_HaveCourtyardsAndSkylights()
         {
             var asset = AssetDatabase.LoadAssetAtPath<GeoDataAsset>(OsmImporter.DataPath);
-            Assert.IsNotNull(asset, "run GateRush > Sphere District > Import OSM");
+            Assert.IsNotNull(asset, "run Ushqyr > Sphere District > Import OSM");
             var petals = asset.Data.Buildings.Where(b => b.HeroRole == "pavilion").ToList();
             Assert.AreEqual(4, petals.Count, "four petal pavilions");
             foreach (var b in petals)
@@ -81,13 +81,13 @@ namespace GateRush.Tests
             foreach (var (t, min, max, top) in new[]
             {
                 // P3: the Sprint climbs up through the Halo (≤ ~60 m), the Pro crosses the sphere (≤ ~115 m).
-                (GateRush.EditorTools.Builders.RouteLibrary.ExpoSprint(), 1200f, 1800f, 65f),
-                (GateRush.EditorTools.Builders.RouteLibrary.ExpoPro(), 2300f, 3300f, 116f),
+                (Ushqyr.EditorTools.Builders.RouteLibrary.ExpoSprint(), 1200f, 1800f, 65f),
+                (Ushqyr.EditorTools.Builders.RouteLibrary.ExpoPro(), 2300f, 3300f, 116f),
             })
             {
                 Assert.IsTrue(t.Route.AirCourse, t.Id);
                 Assert.AreEqual("Finish", t.Route.Obstacles[t.Route.FinishObstacle].Type, t.Id);
-                var route = new GateRush.Track.TrackRoute(t.Route);
+                var route = new Ushqyr.Track.TrackRoute(t.Route);
                 Assert.That(route.Length, Is.InRange(min, max), t.Id);
                 float high = 0f;
                 foreach (var k in t.Route.Knots) high = Mathf.Max(high, k.Position.y);
@@ -99,7 +99,7 @@ namespace GateRush.Tests
         [Test]
         public void ExpoFreeFlight_HasNoGates_FourSpawns_AndValidates()
         {
-            var t = GateRush.EditorTools.Builders.RouteLibrary.ExpoFreeFlight();
+            var t = Ushqyr.EditorTools.Builders.RouteLibrary.ExpoFreeFlight();
             Assert.IsTrue(t.FreeFlight);
             Assert.IsFalse(t.IsSplineTrack);
             Assert.AreEqual(3, t.ExtraSpawns.Count);

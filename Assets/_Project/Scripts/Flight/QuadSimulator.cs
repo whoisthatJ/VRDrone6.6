@@ -1,6 +1,6 @@
 using System;
 
-namespace GateRush.Flight
+namespace Ushqyr.Flight
 {
     /// <summary>
     /// Deterministic quad flight model. Pure C#: no engine types, no allocations.

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace GateRush.Core
+namespace Ushqyr.Core
 {
     /// <summary>One translated string: the English key with its Kazakh and Russian text.</summary>
     public struct Translation

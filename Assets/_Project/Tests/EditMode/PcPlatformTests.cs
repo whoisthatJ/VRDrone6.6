@@ -1,8 +1,8 @@
-using GateRush.Input;
+using Ushqyr.Input;
 using NUnit.Framework;
 using UnityEditor;
 
-namespace GateRush.Tests
+namespace Ushqyr.Tests
 {
     public class PcPlatformTests
     {
@@ -16,7 +16,7 @@ namespace GateRush.Tests
         public void ShippedLibrary_RoutesRadioNamesToPresets(string product, string expected)
         {
             var library = AssetDatabase.LoadAssetAtPath<ControllerPresetLibrary>(LibraryPath);
-            Assert.IsNotNull(library, "run GateRush/Builders/Build Radio Presets");
+            Assert.IsNotNull(library, "run Ushqyr/Builders/Build Radio Presets");
             var preset = library.Find(product, product);
             Assert.IsNotNull(preset, product);
             Assert.AreEqual(expected, preset.DisplayName);

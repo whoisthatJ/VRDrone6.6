@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using System.IO;
-using GateRush.Track;
+using Ushqyr.Track;
 using UnityEditor;
 using UnityEngine;
 
-namespace GateRush.EditorTools.Builders
+namespace Ushqyr.EditorTools.Builders
 {
     /// <summary>
     /// The built-in courses, defined here and written to Assets/_Project/Data/Tracks/*.json.
@@ -29,7 +29,7 @@ namespace GateRush.EditorTools.Builders
             yield return Industrial();
         }
 
-        [MenuItem("GateRush/Builders/Write Built-in Track JSON")]
+        [MenuItem("Ushqyr/Builders/Write Built-in Track JSON")]
         public static List<string> WriteAll()
         {
             Directory.CreateDirectory(TrackDir);
@@ -120,7 +120,7 @@ namespace GateRush.EditorTools.Builders
 
         private static TrackData Make(string id, string name, string env, float startYaw, Vector3 spawn, G[] gates)
         {
-            var t = new TrackData { Id = id, Name = name, Author = "GateRush", Environment = env, Laps = 3 };
+            var t = new TrackData { Id = id, Name = name, Author = "Ushqyr", Environment = env, Laps = 3 };
             t.Spawn.Position = spawn;
             t.Spawn.Yaw = startYaw;
             for (int i = 0; i < gates.Length; i++)

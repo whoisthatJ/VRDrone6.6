@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
-namespace GateRush.Net
+namespace Ushqyr.Net
 {
     /// <summary>One sample of a pilot's quad, sent 20 times a second. <see cref="Time"/> is server time.</summary>
     public struct PilotSnapshot
@@ -13,7 +13,7 @@ namespace GateRush.Net
         public Vector3 Velocity;
         /// <summary>Motor speeds 0..255 (RR, FR, RL, FL), for the prop spin.</summary>
         public byte M0, M1, M2, M3;
-        /// <summary><see cref="GateRush.Race.RaceSession.Progress"/>.</summary>
+        /// <summary><see cref="Ushqyr.Race.RaceSession.Progress"/>.</summary>
         public float Progress;
         public byte Lap;
         public bool Armed;

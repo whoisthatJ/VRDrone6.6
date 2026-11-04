@@ -1,12 +1,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using GateRush.EditorTools.Builders;
+using Ushqyr.EditorTools.Builders;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-namespace GateRush.EditorTools.Art
+namespace Ushqyr.EditorTools.Art
 {
     /// <summary>
     /// Track_Field (V4): a sports field at golden hour. Unity Terrain (flat across the whole play area so the existing
@@ -65,7 +65,7 @@ namespace GateRush.EditorTools.Art
         }
 
         /// <summary>Spawn → every gate in order → back to the first gate.</summary>
-        public static List<Vector3> CourseLine(GateRush.Track.TrackData t)
+        public static List<Vector3> CourseLine(Ushqyr.Track.TrackData t)
         {
             var pts = new List<Vector3> { t.Spawn.Position };
             pts.AddRange(t.Gates.Select(g => g.Position));
@@ -108,7 +108,7 @@ namespace GateRush.EditorTools.Art
             return near + far;
         }
 
-        private static Terrain BuildTerrain(ArtContext ctx, GateRush.Track.TrackData course, List<Vector3> line)
+        private static Terrain BuildTerrain(ArtContext ctx, Ushqyr.Track.TrackData course, List<Vector3> line)
         {
             AssetDatabase.DeleteAsset(TerrainDataPath);
             var td = new TerrainData { heightmapResolution = 513 };
@@ -312,7 +312,7 @@ namespace GateRush.EditorTools.Art
             foreach (var t in RouteLibrary.All())
             {
                 if (t.Environment != "field") continue;
-                var route = new GateRush.Track.TrackRoute(t.Route);
+                var route = new Ushqyr.Track.TrackRoute(t.Route);
                 float radius = t.Route.CorridorWidth * 0.5f + t.Route.OuterLineGap + 0.6f;
                 for (float d = 0f; d < route.Length; d += 0.5f) Mark(route.Sample(d).Position, radius);
                 Mark(t.Spawn.Position, 3.6f);

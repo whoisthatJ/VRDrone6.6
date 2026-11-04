@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System.IO;
-using GateRush.EditorTools.Art;
-using GateRush.Game;
-using GateRush.Garage;
-using GateRush.UI;
+using Ushqyr.EditorTools.Art;
+using Ushqyr.Game;
+using Ushqyr.Garage;
+using Ushqyr.UI;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -13,7 +13,7 @@ using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.UI;
 
-namespace GateRush.EditorTools.Builders
+namespace Ushqyr.EditorTools.Builders
 {
     /// <summary>
     /// Builds Assets/_Project/Scenes/Garage.unity (T7): a workshop corner — workbench with a blue cutting mat, a
@@ -44,7 +44,7 @@ namespace GateRush.EditorTools.Builders
             Set("Pad", "M_Rubber_Black");
         }
 
-        [MenuItem("GateRush/Builders/Build Garage Scene")]
+        [MenuItem("Ushqyr/Builders/Build Garage Scene")]
         public static string Build()
         {
             KitTextures.CuttingMat();

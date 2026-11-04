@@ -1,7 +1,7 @@
 using System;
-using GateRush.Flight;
+using Ushqyr.Flight;
 
-namespace GateRush.Input
+namespace Ushqyr.Input
 {
     /// <summary>Calibrated range of one raw channel.</summary>
     [Serializable]

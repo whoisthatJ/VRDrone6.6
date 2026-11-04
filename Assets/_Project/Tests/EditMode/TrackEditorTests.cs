@@ -1,9 +1,9 @@
 using System.IO;
-using GateRush.Track;
+using Ushqyr.Track;
 using NUnit.Framework;
 using UnityEngine;
 
-namespace GateRush.Tests
+namespace Ushqyr.Tests
 {
     public class TrackEditModelTests
     {
@@ -142,7 +142,7 @@ namespace GateRush.Tests
         [SetUp]
         public void SetUp()
         {
-            _dir = Path.Combine(Path.GetTempPath(), "gaterush-tracks-" + System.Guid.NewGuid().ToString("N"));
+            _dir = Path.Combine(Path.GetTempPath(), "ushqyr-tracks-" + System.Guid.NewGuid().ToString("N"));
             _lib = new TrackLibrary(_dir);
         }
 

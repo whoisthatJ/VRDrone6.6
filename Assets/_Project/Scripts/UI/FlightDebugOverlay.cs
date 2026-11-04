@@ -1,9 +1,9 @@
-using GateRush.Flight;
-using GateRush.Vehicle;
+using Ushqyr.Flight;
+using Ushqyr.Vehicle;
 using TMPro;
 using UnityEngine;
 
-namespace GateRush.UI
+namespace Ushqyr.UI
 {
     /// <summary>
     /// Debug overlay: arm/mode, sticks, setpoint vs gyro per axis, motor bars, speed/altitude.

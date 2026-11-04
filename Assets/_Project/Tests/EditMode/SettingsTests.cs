@@ -1,9 +1,9 @@
 using System.IO;
-using GateRush.Core;
-using GateRush.Flight;
+using Ushqyr.Core;
+using Ushqyr.Flight;
 using NUnit.Framework;
 
-namespace GateRush.Tests
+namespace Ushqyr.Tests
 {
     public class SettingsTests
     {
@@ -83,7 +83,7 @@ namespace GateRush.Tests
         [Test]
         public void SaveAndLoad_FileRoundTrip()
         {
-            string path = Path.Combine(Path.GetTempPath(), "gaterush-settings-test.json");
+            string path = Path.Combine(Path.GetTempPath(), "ushqyr-settings-test.json");
             try
             {
                 var s = new GameSettings { PilotName = "Disk" };

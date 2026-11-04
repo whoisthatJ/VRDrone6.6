@@ -1,9 +1,9 @@
 """
-GateRush quad part generator (Phase 3, P2). Run headless:
+Ushqyr quad part generator (Phase 3, P2). Run headless:
 
     blender -b --factory-startup -P Tools/Blender/quadgen.py -- <parts.json> <out_dir>
 
-parts.json is written by the Unity exporter (GateRush > Quads > Generate Quad Parts) from the garage part data, so
+parts.json is written by the Unity exporter (Ushqyr > Quads > Generate Quad Parts) from the garage part data, so
 every mesh matches the physics. Each part is modelled in Blender (X right, Y forward, Z up, metres) with bevels,
 smooth shading and UVs, then written as <out_dir>/<id>.json: vertices, normals and UVs in Unity axes (x, z, y) plus
 one index list per material slot (Carbon, Edge, Metal, Bell, Copper, Prop, PropBlur, Lipo, Plastic, Led, Lens, Pad,

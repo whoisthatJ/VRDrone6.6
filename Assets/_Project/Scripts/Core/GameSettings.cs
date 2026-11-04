@@ -1,15 +1,15 @@
 using System;
-using GateRush.Flight;
+using Ushqyr.Flight;
 using UnityEngine;
 
-namespace GateRush.Core
+namespace Ushqyr.Core
 {
     [Serializable]
     public sealed class CameraPrefs
     {
         [Range(0f, 60f)] public float TiltDegrees = 25f;
         [Range(90f, 150f)] public float HorizontalFov = 120f;
-        /// <summary>0 = FPV, 1 = Chase, 2 = Line of sight (GateRush.Cameras.ViewMode).</summary>
+        /// <summary>0 = FPV, 1 = Chase, 2 = Line of sight (Ushqyr.Cameras.ViewMode).</summary>
         public int ViewMode;
         /// <summary>Wide-angle FPV lens distortion (barrel), FPV view only.</summary>
         public bool LensDistortion;
@@ -18,7 +18,7 @@ namespace GateRush.Core
     [Serializable]
     public sealed class InputPrefs
     {
-        /// <summary>GateRush.Input.ThrottleMapping for gamepads.</summary>
+        /// <summary>Ushqyr.Input.ThrottleMapping for gamepads.</summary>
         public int GamepadThrottle = 1;
         [Range(0f, 0.3f)] public float Deadband = 0.02f;
         [Range(0f, 1f)] public float Expo;
@@ -26,7 +26,7 @@ namespace GateRush.Core
         public bool InvertPitch;
         /// <summary>Flip roll on the right stick (all controllers).</summary>
         public bool InvertRoll;
-        /// <summary>GateRush.Input.RadioBackend: 0 = auto, 1 = Input System, 2 = Android raw reader, 3 = Windows HID.</summary>
+        /// <summary>Ushqyr.Input.RadioBackend: 0 = auto, 1 = Input System, 2 = Android raw reader, 3 = Windows HID.</summary>
         public int RadioBackend;
     }
 
@@ -38,7 +38,7 @@ namespace GateRush.Core
         [Range(0f, 1f)] public float MotorVolume = 0.6f;
         /// <summary>Developer readout (sticks, rates, motors) instead of the clean OSD.</summary>
         public bool ShowDebugOverlay;
-        /// <summary>Stadium time of day: 0 night (floodlights), 1 dusk, 2 day (GateRush.Core.TimeOfDay).</summary>
+        /// <summary>Stadium time of day: 0 night (floodlights), 1 dusk, 2 day (Ushqyr.Core.TimeOfDay).</summary>
         public int StadiumLighting;
         /// <summary>Sphere District (Expo) time of day: 0 night, 1 golden hour, 2 summer day (default, like the reference photo).</summary>
         public int ExpoLighting = 2;

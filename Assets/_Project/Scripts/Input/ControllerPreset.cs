@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
-namespace GateRush.Input
+namespace Ushqyr.Input
 {
     /// <summary>
     /// Default mapping for a known radio, picked automatically when the device name matches <see cref="NamePattern"/>.
     /// Shipped values are educated guesses until confirmed on hardware with the diagnostics screen (<see cref="Verified"/>).
     /// A per-device calibration always wins over a preset.
     /// </summary>
-    [CreateAssetMenu(menuName = "GateRush/Controller Preset", fileName = "ControllerPreset")]
+    [CreateAssetMenu(menuName = "Ushqyr/Controller Preset", fileName = "ControllerPreset")]
     public sealed class ControllerPreset : ScriptableObject
     {
         public string DisplayName = "Radio";

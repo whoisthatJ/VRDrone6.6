@@ -1,8 +1,8 @@
-using GateRush.Race;
+using Ushqyr.Race;
 using UnityEditor;
 using UnityEngine;
 
-namespace GateRush.EditorTools.Builders
+namespace Ushqyr.EditorTools.Builders
 {
     public enum GateKind
     {
@@ -22,7 +22,7 @@ namespace GateRush.EditorTools.Builders
 
         public static string PrefabPath(GateKind kind) => $"{PrefabDir}/Gate_{kind}.prefab";
 
-        [MenuItem("GateRush/Builders/Build Gate Prefabs")]
+        [MenuItem("Ushqyr/Builders/Build Gate Prefabs")]
         public static void BuildAll()
         {
             int layer = LayerMask.NameToLayer(TrackSceneBuilder.TrackLayerName);

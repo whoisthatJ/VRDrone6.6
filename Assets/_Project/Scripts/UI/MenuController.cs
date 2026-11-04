@@ -1,13 +1,13 @@
 using System.Globalization;
-using GateRush.Core;
-using GateRush.Flight;
-using GateRush.Game;
-using GateRush.Race;
+using Ushqyr.Core;
+using Ushqyr.Flight;
+using Ushqyr.Game;
+using Ushqyr.Race;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace GateRush.UI
+namespace Ushqyr.UI
 {
     /// <summary>
     /// World-space main menu built at runtime: fly, choose quad, choose track, settings (rates, camera, input,
@@ -62,7 +62,7 @@ namespace GateRush.UI
 
         private void ShowMain()
         {
-            var p = NewPage("GATERUSH");
+            var p = NewPage("USHQYR");
             _summary = UiKit.Label(p, "", new Vector2(Margin, -120f), new Vector2(ContentWidth, 120f), 32f, TextAlignmentOptions.TopLeft, UiKit.DimTextColor);
             UpdateSummary();
             // Language switch, readable whatever the current language is.
@@ -99,7 +99,7 @@ namespace GateRush.UI
         {
             var p = NewPage(L.T("Credits"));
             string text =
-                "<color=#fa3>GATERUSH</color>\n" +
+                "<color=#fa3>USHQYR</color>\n" +
                 L.T("A desktop FPV drone racing simulator.") + "\n\n" +
                 "<color=#fa3>" + L.T("Map data") + "</color>\n" +
                 "© OpenStreetMap contributors (ODbL), openstreetmap.org/copyright\n" +
@@ -168,7 +168,7 @@ namespace GateRush.UI
         {
             var p = NewPage(L.T("Choose track"));
             var venues = tracks.Environments;
-            var user = GateRush.Track.TrackLibrary.Default.LoadAll();
+            var user = Ushqyr.Track.TrackLibrary.Default.LoadAll();
             const int cols = 3;
             const float gap = 20f;
             float cw = (ContentWidth - (cols - 1) * gap) / cols, ch = (cw - 16f) * 9f / 16f + 84f;
@@ -227,7 +227,7 @@ namespace GateRush.UI
             var rows = new System.Collections.Generic.List<(string id, string name, string info, Texture2D preview)>();
             foreach (var t in tracks.TracksFor(v.Environment))
                 rows.Add((t.Id, L.T(string.IsNullOrEmpty(t.Variation) ? t.DisplayName : t.Variation), L.T(t.Description), t.Preview));
-            foreach (var u in GateRush.Track.TrackLibrary.Default.LoadAll())
+            foreach (var u in Ushqyr.Track.TrackLibrary.Default.LoadAll())
                 if (u.Environment == v.Environment)
                     rows.Add((u.Id, u.Name, L.F("Your track: {0}, {1} gates, {2} laps", EnvironmentName(u.Environment), u.Gates.Count, u.Laps), null));
 
@@ -278,7 +278,7 @@ namespace GateRush.UI
         {
             var e = tracks.Find(S.TrackId);
             if (e != null) return tracks.EnvironmentOf(e);
-            foreach (var u in GateRush.Track.TrackLibrary.Default.LoadAll())
+            foreach (var u in Ushqyr.Track.TrackLibrary.Default.LoadAll())
                 if (u.Id == S.TrackId) return u.Environment;
             return "";
         }

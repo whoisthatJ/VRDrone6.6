@@ -1,14 +1,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace GateRush.Net
+namespace Ushqyr.Net
 {
     /// <summary>One pilot in an online race (the local one included).</summary>
     public sealed class NetPilot
     {
         public ulong ClientId;
         public string Name = "Pilot";
-        /// <summary><see cref="GateRush.Garage.QuadBuild"/> JSON, so everyone sees the same quad.</summary>
+        /// <summary><see cref="Ushqyr.Garage.QuadBuild"/> JSON, so everyone sees the same quad.</summary>
         public string BuildJson = "";
         /// <summary>Start grid slot, 0..<see cref="OnlineRules.MaxPilots"/>-1.</summary>
         public int Slot;

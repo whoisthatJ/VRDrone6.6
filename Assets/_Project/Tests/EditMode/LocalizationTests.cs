@@ -2,12 +2,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using GateRush.Core;
+using Ushqyr.Core;
 using NUnit.Framework;
 using UnityEditor;
 using UnityEngine.Localization.Tables;
 
-namespace GateRush.Tests
+namespace Ushqyr.Tests
 {
     /// <summary>
     /// Every string the code passes to L.T / L.F has a Kazakh and a Russian translation with the same placeholders,
@@ -94,7 +94,7 @@ namespace GateRush.Tests
             foreach (var table in tables)
             {
                 var stale = sheets.Keys.Where(k => table.GetEntry(k) == null).Take(5).ToList();
-                Assert.IsEmpty(stale, $"{table.LocaleIdentifier.Code} table is behind the sheets: run GateRush > Localization > Import Strings");
+                Assert.IsEmpty(stale, $"{table.LocaleIdentifier.Code} table is behind the sheets: run Ushqyr > Localization > Import Strings");
             }
             var kk = tables.First(t => t.LocaleIdentifier.Code == "kk");
             var sample = sheets.Values.First();

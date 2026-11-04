@@ -2,7 +2,7 @@
     "Version": 1,
     "Id": "spline-test",
     "Name": "Spline Test Loop",
-    "Author": "GateRush",
+    "Author": "Ushqyr",
     "Environment": "field",
     "Laps": 2,
     "Spawn": {

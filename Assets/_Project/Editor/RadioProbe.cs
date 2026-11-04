@@ -8,10 +8,10 @@ using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
 using UnityEngine.InputSystem.LowLevel;
 
-namespace GateRush.EditorTools
+namespace Ushqyr.EditorTools
 {
     /// <summary>
-    /// GateRush > Diagnostics > Probe Radio: lists every Input System device with its controls and raw values, then
+    /// Ushqyr > Diagnostics > Probe Radio: lists every Input System device with its controls and raw values, then
     /// records live input for a few seconds (events per device, min/max of every raw axis and button). Works in edit
     /// mode and Play mode. Report in <see cref="OutPath"/>. Use it when a radio shows up but its sticks do nothing.
     /// </summary>
@@ -29,7 +29,7 @@ namespace GateRush.EditorTools
         private static double _end;
         private static bool _running;
 
-        [MenuItem("GateRush/Diagnostics/Probe Radio (20 s)")]
+        [MenuItem("Ushqyr/Diagnostics/Probe Radio (20 s)")]
         private static void Menu() => Start(20f);
 
         public static string Describe()

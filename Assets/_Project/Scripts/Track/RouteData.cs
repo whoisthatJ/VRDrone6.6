@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace GateRush.Track
+namespace Ushqyr.Track
 {
     /// <summary>A route spline knot. Zero tangents = auto-smooth (Catmull-Rom like) through the neighbours.</summary>
     [Serializable]

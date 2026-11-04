@@ -1,11 +1,11 @@
 # Headset test: M6 (BetaFPV radios)
 
 > M6 was not built into an APK (builds are skipped on request). Build once before testing:
-> `GateRush/Build/Build Quest APK` in the Editor. That first build also compiles the Android radio plugin
-> (`Assets/Plugins/Android/GateRushRadio.androidlib`). If Gradle complains about it, send me the error.
+> `Ushqyr/Build/Build Quest APK` in the Editor. That first build also compiles the Android radio plugin
+> (`Assets/Plugins/Android/UshqyrRadio.androidlib`). If Gradle complains about it, send me the error.
 
 ```
-adb install -r Builds/GateRush.apk
+adb install -r Builds/Ushqyr.apk
 adb logcat -s Unity
 ```
 
@@ -29,9 +29,9 @@ adb logcat -s Unity
 
 ## 5. Send me
 ```
-adb pull /sdcard/Android/data/com.gaterush.vr/files/input-devices.txt
-adb pull /sdcard/Android/data/com.gaterush.vr/files/radios.json
-adb logcat -d -s Unity | findstr "GateRush][Input"
+adb pull /sdcard/Android/data/com.ushqyr.vr/files/input-devices.txt
+adb pull /sdcard/Android/data/com.ushqyr.vr/files/radios.json
+adb logcat -d -s Unity | findstr "Ushqyr][Input"
 ```
 plus: which radio and mode, which `chN` each stick/switch moved, and whether the default preset already flew correctly.
 I'll turn that into verified presets.

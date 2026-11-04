@@ -1,6 +1,6 @@
 # Headset test: M7 (VR track editor)
 
-> No APK was built for M7. Build once (`GateRush/Build/Build Quest APK`) before testing.
+> No APK was built for M7. Build once (`Ushqyr/Build/Build Quest APK`) before testing.
 
 Main menu → **Track editor** → *New track in: Open Field / Hangar / Dockyard*, or *Copy and edit* a built-in.
 
@@ -26,8 +26,8 @@ Gate numbers float above each gate (`START`, 1, 2, ...); the line shows the race
 5. Comfort/usability: is pointing precise enough? Is the panel readable on the wrist? Movement speed OK?
 
 ## Sharing
-Tracks are `.json` files in `/sdcard/Android/data/com.gaterush.vr/files/tracks/`.
+Tracks are `.json` files in `/sdcard/Android/data/com.ushqyr.vr/files/tracks/`.
 ```
-adb pull /sdcard/Android/data/com.gaterush.vr/files/tracks/ ./my-tracks
-adb push friend-track.json /sdcard/Android/data/com.gaterush.vr/files/tracks/
+adb pull /sdcard/Android/data/com.ushqyr.vr/files/tracks/ ./my-tracks
+adb push friend-track.json /sdcard/Android/data/com.ushqyr.vr/files/tracks/
 ```

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
-namespace GateRush.Input
+namespace Ushqyr.Input
 {
     /// <summary>Per-device radio calibrations (keyed by name + VID/PID), saved as JSON in persistentDataPath/radios.json.</summary>
     public sealed class RadioCalibrationStore
@@ -59,7 +59,7 @@ namespace GateRush.Input
             }
             catch (Exception e) when (e is IOException || e is ArgumentException)
             {
-                Debug.LogWarning($"[GateRush] Radio calibrations unreadable ({e.Message}); starting fresh");
+                Debug.LogWarning($"[Ushqyr] Radio calibrations unreadable ({e.Message}); starting fresh");
                 _data = new Data();
             }
         }
@@ -72,7 +72,7 @@ namespace GateRush.Input
             }
             catch (IOException e)
             {
-                Debug.LogWarning($"[GateRush] Could not save radio calibrations: {e.Message}");
+                Debug.LogWarning($"[Ushqyr] Could not save radio calibrations: {e.Message}");
             }
         }
     }

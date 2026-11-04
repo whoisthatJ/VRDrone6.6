@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
-using GateRush.Flight;
+using Ushqyr.Flight;
 using NUnit.Framework;
 
-namespace GateRush.Tests
+namespace Ushqyr.Tests
 {
     /// <summary>Every shipped quad class must hover cleanly and track rate steps (catches bad PID sizing).</summary>
     public class QuadProfilesTests

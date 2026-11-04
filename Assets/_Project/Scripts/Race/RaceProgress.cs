@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace GateRush.Race
+namespace Ushqyr.Race
 {
     /// <summary>Pure helpers behind <see cref="RaceSession.Progress"/> (standings between pilots).</summary>
     public static class RaceProgress

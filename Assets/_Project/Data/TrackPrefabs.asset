@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ee25e03ca3b082c469edcac0fbb7fefc, type: 3}
   m_Name: TrackPrefabs
-  m_EditorClassIdentifier: GateRush.Track::GateRush.Track.TrackPrefabs
+  m_EditorClassIdentifier: Ushqyr.Track::Ushqyr.Track.TrackPrefabs
   Gates:
   - Type: Square
     Prefab: {fileID: 1751057744249282918, guid: 61545293cdccbeb4092e71640412a724, type: 3}

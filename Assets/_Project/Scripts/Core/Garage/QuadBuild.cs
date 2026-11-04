@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using UnityEngine;
 
-namespace GateRush.Garage
+namespace Ushqyr.Garage
 {
     /// <summary>A quad as parts (saved as JSON). Visual parts (style, colour) don't change the physics.</summary>
     [Serializable]

@@ -1,7 +1,7 @@
 # Headset test: M8 (polish + performance)
 
-> No APK was built for M8. Build once (`GateRush/Build/Build Quest APK`) before testing.
-> Baked lighting is in the scenes; if you ever run *Build All Scenes* again, re-run *GateRush/Lighting/Bake All Track Lighting*.
+> No APK was built for M8. Build once (`Ushqyr/Build/Build Quest APK`) before testing.
+> Baked lighting is in the scenes; if you ever run *Build All Scenes* again, re-run *Ushqyr/Lighting/Bake All Track Lighting*.
 
 ## Look & listen
 1. **OSD** (Goggles view): voltage + per-cell at top-left, mAh, LQ; mode at the top; timer bottom-centre; throttle bottom-left; speed/altitude bottom-right; crosshair and a horizon bar that tilts with the quad.

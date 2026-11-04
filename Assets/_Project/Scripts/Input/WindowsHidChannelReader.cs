@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using UnityEngine;
 
-namespace GateRush.Input
+namespace Ushqyr.Input
 {
     /// <summary>
     /// Reads a USB joystick/radio straight from Windows (hid.dll), bypassing the Input System. A background thread
@@ -71,7 +71,7 @@ namespace GateRush.Input
             _channels = axes.ToArray();
             _values = new float[_channels.Length];
 
-            _thread = new Thread(Run) { IsBackground = true, Name = "GateRush HID " + product };
+            _thread = new Thread(Run) { IsBackground = true, Name = "Ushqyr HID " + product };
             _thread.Start();
         }
 
@@ -128,7 +128,7 @@ namespace GateRush.Input
             }
             catch (Exception e)
             {
-                Debug.LogWarning($"[GateRush][Input] Windows HID open failed for {path}: {e.Message}");
+                Debug.LogWarning($"[Ushqyr][Input] Windows HID open failed for {path}: {e.Message}");
                 return Fail();
             }
 
@@ -259,7 +259,7 @@ namespace GateRush.Input
             }
             catch (Exception e)
             {
-                Debug.LogWarning("[GateRush][Input] Windows HID read stopped: " + e.Message);
+                Debug.LogWarning("[Ushqyr][Input] Windows HID read stopped: " + e.Message);
             }
             finally
             {
@@ -305,7 +305,7 @@ namespace GateRush.Input
         {
             if (_stop) return;
             _stop = true;
-            if (_thread.IsAlive && !_thread.Join(1000)) Debug.LogWarning("[GateRush][Input] Windows HID reader thread did not stop");
+            if (_thread.IsAlive && !_thread.Join(1000)) Debug.LogWarning("[Ushqyr][Input] Windows HID reader thread did not stop");
             CloseHandle(_handle);
             HidD_FreePreparsedData(_preparsed);
         }

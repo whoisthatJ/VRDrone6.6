@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-namespace GateRush.Track
+namespace Ushqyr.Track
 {
     /// <summary>
     /// Accumulates simple procedural geometry (tubes, boxes, beams, quads) into one mesh with a sub-mesh per material,

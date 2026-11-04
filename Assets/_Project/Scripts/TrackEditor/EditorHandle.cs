@@ -1,7 +1,7 @@
-using GateRush.Track;
+using Ushqyr.Track;
 using UnityEngine;
 
-namespace GateRush.TrackEditor
+namespace Ushqyr.TrackEditor
 {
     /// <summary>Marks an editor object (gate, prop or spawn) so pointer hits map back to the model.</summary>
     public sealed class EditorHandle : MonoBehaviour

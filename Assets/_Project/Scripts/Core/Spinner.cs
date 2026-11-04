@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace GateRush.Core
+namespace Ushqyr.Core
 {
     /// <summary>Turns its transform at a steady rate about a local axis (wind turbine rotors, fans).</summary>
     public sealed class Spinner : MonoBehaviour
