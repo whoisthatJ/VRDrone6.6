@@ -249,9 +249,9 @@ namespace GateRush.Track
             for (int i = 0; i < n; i++)
             {
                 var o = r.Obstacles[i];
-                var p = route.Sample(o.Distance);
-                Vector3 pos = Deck(r, p) + p.Right * o.Lateral + Vector3.up * o.Height;
-                var rot = Quaternion.LookRotation(p.FlatForward) * Quaternion.Euler(0f, o.Yaw, 0f);
+                var p = o.Align3D ? route.Frame(o.Distance) : route.Sample(o.Distance);
+                Vector3 pos = o.Align3D ? p.Position + p.Right * o.Lateral + p.Up * o.Height : Deck(r, p) + p.Right * o.Lateral + Vector3.up * o.Height;
+                var rot = (o.Align3D ? Quaternion.LookRotation(p.Forward, p.Up) : Quaternion.LookRotation(p.FlatForward)) * Quaternion.Euler(0f, o.Yaw, 0f);
 
                 GameObject prefab = prefabs != null ? prefabs.Gate(o.Type) ?? prefabs.Prop(o.Type) : null;
                 if (prefab == null && prefabs != null)
@@ -267,6 +267,8 @@ namespace GateRush.Track
                 go.name = $"Obstacle {i} ({o.Type})";
 
                 var gates = go.GetComponentsInChildren<Gate>(true);
+                // 3D obstacles: the (first) opening's centre sits on the flight line.
+                if (o.Align3D && gates.Length > 0) go.transform.position += pos - gates[0].OpeningCenterWorld;
                 if (!o.IsCheckpoint)
                 {
                     foreach (var gate in gates)
@@ -283,7 +285,7 @@ namespace GateRush.Track
                     foreach (var gate in gates)
                     {
                         if (tinted) gate.IdleColor = tint;
-                        float along = Vector3.Dot(gate.OpeningCenterWorld - pos, p.FlatForward);
+                        float along = Vector3.Dot(gate.OpeningCenterWorld - pos, o.Align3D ? p.Forward : p.FlatForward);
                         entries.Add((i, gate, p.Distance + along));
                     }
                     // The finish is the obstacle's first opening along the route.

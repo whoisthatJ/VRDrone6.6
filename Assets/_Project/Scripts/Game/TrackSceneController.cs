@@ -197,7 +197,19 @@ namespace GateRush.Game
             }
             race.SetCourse(Track.Gates, Track.Spawn, data.Id, data.Laps, data.Name);
             var beacon = race.GetComponent<NextGateBeacon>();
-            if (beacon != null) beacon.Show = data.Route.AirCourse;
+            if (beacon != null)
+            {
+                beacon.Show = data.Route.AirCourse;
+                // P3: holo chevrons along the flight line (the route's 3D frame).
+                var line = Track.Route;
+                if (data.Route.AirCourse && line != null)
+                    beacon.SetRoute(p => line.ClosestDistance(p), d =>
+                    {
+                        var f = line.Frame(d);
+                        return (f.Position, Quaternion.LookRotation(f.Forward, f.Up));
+                    }, line.Length);
+                else beacon.ClearRoute();
+            }
             // E7: open venues have a flyable area with a soft boundary; free-flight tracks have no race at all.
             var area = GetComponent<FlightArea>();
             if (area == null) area = gameObject.AddComponent<FlightArea>();

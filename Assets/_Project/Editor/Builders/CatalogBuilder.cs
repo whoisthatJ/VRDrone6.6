@@ -63,8 +63,8 @@ namespace GateRush.EditorTools.Builders
             catalog.Tracks.Add(Entry("spline-test", "Spline Test Loop", "Figure-eight lane track with an overpass (spline track system test)."));
             catalog.Tracks.Add(Entry("stadium-oval", "Stadium Oval", "Floodlit football stadium: an easy oval around the pitch. Learn the lanes and gates."));
             catalog.Tracks.Add(Entry("serpent-arena", "Serpent Arena", "The stadium race track: loops round the landing pads, a figure-eight at the centre spot and four overpasses."));
-            catalog.Tracks.Add(Entry("expo-v2-sprint", "Expo Sprint", "Beginner, 1.2 km: up the south walkway, over a pavilion into its courtyard, round the sphere at 3 m, a park slalom and back down the walkway. Trainer guidance recommended."));
-            catalog.Tracks.Add(Entry("expo-v2-pro", "Expo Pro", "Advanced, 2.2 km: the courtyard hop, a helix round the sphere to 90 m, the dive into the park, the ring-road sweeper and a second courtyard."));
+            catalog.Tracks.Add(Entry("expo-v2-sprint", "Expo Sprint", "Beginner, 1.5 km: the courtyard hop, round the sphere at 3 m, a climb straight up through the Holo Halo and back down the axis. Trainer guidance recommended."));
+            catalog.Tracks.Add(Entry("expo-v2-pro", "Expo Pro", "Advanced, 2.9 km: over the top of the sphere, down through the Holo Halo, the needle dive, the ladder, a split-S, the ring road and a second courtyard."));
             catalog.Tracks.Add(Entry("expo-v2-free", "Expo Free Flight", "No gates: fly anywhere within 1.2 km of the sphere and up to 150 m. F / D-pad up switches between the south plaza, above the sphere, the park and the ring road; T resets."));
             catalog.Environments.Clear();
             catalog.Environments.Add(new TrackCatalog.EnvironmentScene { Environment = "field", SceneName = "Track_Field" });

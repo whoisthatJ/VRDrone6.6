@@ -28,7 +28,7 @@ namespace GateRush.EditorTools.Art
     public static class ObstacleKit
     {
         public const string PrefabDir = "Assets/_Project/Prefabs/Obstacles";
-        public static readonly string[] GateTypes = { "Single", "Double", "Slalom", "Cube", "Ladder", "Dive", "Ramp", "Arch", "Finish", "Air" };
+        public static readonly string[] GateTypes = { "Single", "Double", "Slalom", "Cube", "Ladder", "Dive", "Ramp", "Arch", "Finish", "Air", "HoloRing", "HoloHalo" };
         public static readonly string[] PropTypes = { "ChevronBoard", "ChevronBoardLeft", "Flag", "LandingPad", "StartPad" };
 
         public const float TrussSize = 0.29f;
@@ -81,6 +81,8 @@ namespace GateRush.EditorTools.Art
             private readonly TrackMesh[,] _meshes = new TrackMesh[3, SlotCount];
             private readonly List<(Mesh, Matrix4x4, int)>[] _parts = { new List<(Mesh, Matrix4x4, int)>(), new List<(Mesh, Matrix4x4, int)>(), new List<(Mesh, Matrix4x4, int)>() };
             public readonly TrackMesh Leds = new TrackMesh(1);
+            /// <summary>Material of the LED renderer (the hologram for holo rings).</summary>
+            public string LedMaterial = "M_LED_Gate";
             public readonly List<(Vector3 center, Vector3 size, Quaternion rotation)> Colliders = new List<(Vector3, Vector3, Quaternion)>();
             /// <summary>Applied to everything added (lets a sub-assembly, e.g. the tilted dive frame, use its own axes).</summary>
             public Matrix4x4 Frame = Matrix4x4.identity;
@@ -457,6 +459,31 @@ namespace GateRush.EditorTools.Art
                     gates.Add((new Vector3(0f, b + H / 2, 0f), new Vector2(W, H), Quaternion.identity));
                     break;
 
+                case "HoloRing":
+                case "HoloHalo":
+                {
+                    // P3: a ring of light, no supports and no collider. HoloRing 6 m across (scale for 4-8 m); the Holo
+                    // Halo is the 35 m set piece with projector beams. The opening is the square inside the ring.
+                    bool halo = type == "HoloHalo";
+                    float R = halo ? 17.5f : 3f, tube = halo ? 0.9f : 0.18f;
+                    int seg = halo ? 96 : 48;
+                    var ring = new List<Vector3>();
+                    for (int k = 0; k <= seg; k++)
+                    {
+                        float a = k * Mathf.PI * 2f / seg;
+                        ring.Add(new Vector3(Mathf.Cos(a) * R, Mathf.Sin(a) * R, 0f));
+                    }
+                    g.Leds.AddTube(0, ring, tube, halo ? 14 : 10);
+                    // A thinner inner band so the ring reads as a hologram, not a hose.
+                    var inner = ring.ConvertAll(p => p * (halo ? 0.94f : 0.9f));
+                    g.Leds.AddTube(0, inner, tube * 0.35f, 6);
+                    g.LedMaterial = "M_Holo";
+                    float side = R * 1.38f;
+                    gates.Add((Vector3.zero, new Vector2(side, side), Quaternion.identity));
+                    idle = new Color(0.25f, 0.9f, 1f);
+                    break;
+                }
+
                 case "Finish":
                 {
                     // T6 finish cube: 4 m black box truss, nets on the sides, top and round the entry, red foam tubes
@@ -564,6 +591,17 @@ namespace GateRush.EditorTools.Art
             hl.Leds = new[] { ledRenderer };
             hl.Show(GateVisualState.Idle, idle);
             if (type == "Finish") AddFinishAnchors(root);
+            if (type == "HoloRing" || type == "HoloHalo")
+            {
+                bool halo = type == "HoloHalo";
+                var ring = root.AddComponent<HoloRing>();
+                ring.Radius = halo ? 17.5f : 3f;
+                ring.Tube = halo ? 0.9f : 0.18f;
+                ring.SpinDegPerSec = halo ? 6f : 0f;
+                ring.Projectors = halo ? 4 : 0;
+                ring.BeamMaterial = halo ? MaterialLibrary.Get("M_Holo_Beam") : null;
+                ring.Renderers = new[] { ledRenderer };
+            }
             return root;
         }
 
@@ -784,7 +822,7 @@ namespace GateRush.EditorTools.Art
                 go.transform.SetParent(root.transform, false);
                 go.AddComponent<MeshFilter>().sharedMesh = ArtPass.MeshAsset($"{name}_LEDs", () => g.Leds.ToMesh($"{name}_LEDs"));
                 var mr = go.AddComponent<MeshRenderer>();
-                mr.sharedMaterial = MaterialLibrary.Get("M_LED_Gate");
+                mr.sharedMaterial = MaterialLibrary.Get(g.LedMaterial);
                 mr.shadowCastingMode = ShadowCastingMode.Off;
                 mr.receiveShadows = false;
                 ledRenderer = mr;

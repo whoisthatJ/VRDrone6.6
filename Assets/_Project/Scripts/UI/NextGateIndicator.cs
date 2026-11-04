@@ -25,6 +25,8 @@ namespace GateRush.UI
         private Camera _camera;
         private int _shownMetres = -1;
 
+        private int _shownDy;
+
         private void Awake() => _canvas = (RectTransform)GetComponentInParent<Canvas>().transform;
 
         private void LateUpdate()
@@ -72,10 +74,16 @@ namespace GateRush.UI
             {
                 Vector3 from = vehicle != null ? vehicle.transform.position : _camera.transform.position;
                 int metres = Mathf.RoundToInt(Vector3.Distance(from, target));
-                if (metres != _shownMetres)
+                // P3: how far above (↑) or below (↓) the gate is, once that matters (vertical routes).
+                int dy = Mathf.RoundToInt(target.y - from.y);
+                if (Mathf.Abs(dy) < 5) dy = 0;
+                if (metres != _shownMetres || dy != _shownDy)
                 {
                     _shownMetres = metres;
-                    distance.SetText("{0}M", metres);
+                    _shownDy = dy;
+                    if (dy > 0) distance.SetText("{0:0}M ↑{1:0}", (float)metres, (float)dy);
+                    else if (dy < 0) distance.SetText("{0:0}M ↓{1:0}", (float)metres, (float)-dy);
+                    else distance.SetText("{0}M", metres);
                 }
                 distance.rectTransform.anchoredPosition = (onScreen ? marker.anchoredPosition : arrow.anchoredPosition) + new Vector2(0f, -56f);
             }

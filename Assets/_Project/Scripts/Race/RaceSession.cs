@@ -104,7 +104,51 @@ namespace GateRush.Race
         /// <summary>Metres flown during the race (respawn jumps excluded).</summary>
         public float Distance { get; private set; }
         private bool _crashPending;
+
+        /// <summary>P3: seconds added for touching a HoloRing rim.</summary>
+        public const float RimPenalty = 0.5f;
+        /// <summary>Raised when a HoloRing rim is touched (the HUD shows the penalty).</summary>
+        public event Action<HoloRing> RimTouched;
+        /// <summary>Until when the HUD shows the last rim penalty.</summary>
+        public double RimTouchedUntil { get; private set; }
+        private HoloRing[] _rings = new HoloRing[0];
+        private float[] _ringCooldown = new float[0];
+
+        private void FindRings()
+        {
+            var list = new System.Collections.Generic.List<HoloRing>();
+            foreach (var g in gates)
+            {
+                var r = g != null ? g.GetComponentInParent<HoloRing>() : null;
+                if (r != null && !list.Contains(r)) list.Add(r);
+            }
+            _rings = list.ToArray();
+            _ringCooldown = new float[_rings.Length];
+        }
+
+        /// <summary>Touching a ring's rim (tube + the quad's ~0.2 m) glitches it and costs <see cref="RimPenalty"/>.</summary>
+        private void CheckRims(Vector3 from, Vector3 to, double now)
+        {
+            for (int i = 0; i < _rings.Length; i++)
+            {
+                var r = _rings[i];
+                if (r == null || now < _ringCooldown[i]) continue;
+                // Only near the ring: cheap reject by distance to the centre.
+                float reach = r.WorldRadius + r.WorldTube + 2f;
+                if ((to - r.CentreWorld).sqrMagnitude > reach * reach) continue;
+                float touch = r.WorldTube + 0.2f;
+                bool hit = false;
+                for (int k = 0; k <= 4 && !hit; k++) hit = r.RimDistance(Vector3.Lerp(from, to, k / 4f)) < touch;
+                if (!hit) continue;
+                _ringCooldown[i] = (float)now + 1f;
+                _timer.AddPenalty(RimPenalty);
+                r.Glitch();
+                RimTouchedUntil = now + 1.2;
+                RimTouched?.Invoke(r);
+            }
+        }
         public GhostSystem Ghosts => ghosts;
+        public QuadVehicle Vehicle => vehicle;
 
         /// <summary>
         /// Online races: the start comes from <see cref="ScheduleStart"/> (same moment for every pilot) instead of
@@ -172,6 +216,7 @@ namespace GateRush.Race
             laps = Mathf.Clamp(lapCount, 1, 10);
             _timer = new LapTimer(Mathf.Max(1, gates.Length), laps);
             for (int i = 0; i < gates.Length; i++) gates[i].Order = i;
+            FindRings();
             ReloadGhost();
             Restart();
         }
@@ -271,6 +316,11 @@ namespace GateRush.Race
                         float step = Vector3.Distance(_prevPos, new Vector3(q.x, q.y, q.z));
                         Distance += step;
                         if (now > _prevTime) TopSpeed = Mathf.Max(TopSpeed, step / (float)(now - _prevTime));
+                    }
+                    if (_hasPrev && _rings.Length > 0)
+                    {
+                        var q2 = vehicle.State.Position;
+                        CheckRims(_prevPos, new Vector3(q2.x, q2.y, q2.z), now);
                     }
                     CheckGates(now);
                     if (ghosts != null && _phase == RacePhase.Racing)

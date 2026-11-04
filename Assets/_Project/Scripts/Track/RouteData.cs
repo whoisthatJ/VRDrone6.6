@@ -14,6 +14,8 @@ namespace GateRush.Track
         public Vector3 TangentIn;
         /// <summary>Bezier tangent towards the next knot, relative to <see cref="Position"/>.</summary>
         public Vector3 TangentOut;
+        /// <summary>P3: roll about the route at this knot, degrees (180 = inverted, the top of a loop). Interpolated between knots.</summary>
+        public float Roll;
 
         public bool AutoTangents => TangentIn == Vector3.zero && TangentOut == Vector3.zero;
     }
@@ -37,6 +39,11 @@ namespace GateRush.Track
         public string Color = "";
         /// <summary>Counts for the race (flown in route order). Off = scenery.</summary>
         public bool IsCheckpoint = true;
+        /// <summary>
+        /// P3: turn with the route's full 3D frame (tangent and roll), with the opening centred on the flight line:
+        /// rings on climbs, dives, vertical and inverted sections. Off = the old placement (yaw only, on the deck).
+        /// </summary>
+        public bool Align3D;
     }
 
     /// <summary>

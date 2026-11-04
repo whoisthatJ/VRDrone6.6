@@ -30,6 +30,10 @@ namespace GateRush.Race
         private Vector3 _stuckAnchor;
         private float _stuckTimer;
         private int _rescueGate = -1, _rescuesAtGate;
+        // Progress watchdog: moving but not getting through the next gate (circling under a ring) also needs a rescue.
+        private int _progressGate = -1;
+        private float _progressTimer;
+        private const float ProgressSeconds = 45f;
         private Transform _rescueSpawn;
         private System.Func<float, Vector3> _line;
         private float _lineLength, _lineDistance = -1f;
@@ -116,13 +120,16 @@ namespace GateRush.Race
             float along = Vector3.Dot(pos - centre, gateFwd);
             // Only commit to the opening once lined up with it: on a bend the quad reaches the last few metres from
             // the side, so keep steering for the approach point until the sideways offset is small.
-            float offAxis = Mathf.Abs(Vector3.Dot(pos - centre, Vector3.Cross(Vector3.up, gateFwd).normalized));
-            bool lined = offAxis < 0.8f || along > -1.5f;
+            // Distance from the gate's axis: sideways for upright gates; the full radial offset for rings on climbs and drops.
+            bool steep = Mathf.Abs(gateFwd.y) > 0.7f;
+            float offAxis = steep ? ((pos - centre) - gateFwd * along).magnitude : Mathf.Abs(Vector3.Dot(pos - centre, Vector3.Cross(Vector3.up, gateFwd).normalized));
+            bool lined = offAxis < (steep ? 1.5f : 0.8f) || along > -1.5f;
             Vector3 target;
             bool onLine = _line != null && (centre - pos).magnitude > approachDistance + 6f;
             if (onLine) target = _line(Mathf.Repeat(LineDistance(pos) + LineLookahead, _lineLength));
             else if (along >= 0f) target = centre - gateFwd * (approachDistance * 2f);
-            else if (along < -approachDistance || !lined) target = centre - gateFwd * approachDistance;
+            // Commit a metre before the approach point: holding exactly on it never gets through (vertical rings).
+            else if (along < -(approachDistance + 1f) || !lined) target = centre - gateFwd * approachDistance;
             else target = centre + gateFwd * 4f;
 
             Vector3 fwd = vehicle.transform.forward;
@@ -138,13 +145,23 @@ namespace GateRush.Race
             float targetSpeed = cruiseSpeed * Mathf.Lerp(0.3f, 1f, turnFactor);
             // Big height changes (hops over buildings, the helix, the dive): slow down so the climb keeps up.
             targetSpeed *= Mathf.Lerp(1f, 0.35f, Mathf.Clamp01(Mathf.Abs(target.y - pos.y) / 12f));
+            // Slow down as the target comes overhead or underneath (rings on vertical climbs and drops).
+            targetSpeed *= Mathf.Clamp01(flatTo.magnitude / 6f);
 
             // Default rates give ~670 °/s at full stick; keep turns gentle (≤ ~150 °/s).
             pilot.Yaw = Mathf.Clamp(headingError / 90f, -0.5f, 0.5f);
-            pilot.Pitch = Mathf.Clamp(0.12f + 0.06f * (targetSpeed - vForward), -0.3f, 0.45f);
+            pilot.Pitch = Mathf.Clamp((targetSpeed > 1f ? 0.12f : 0f) + 0.06f * (targetSpeed - vForward), -0.3f, 0.45f);
             // Kill sideways drift so the quad goes where it points; on the final approach also centre on the opening.
             float lateralOffset = along < 0f && along >= -approachDistance ? Vector3.Dot(pos - centre, right) : 0f;
             pilot.Roll = Mathf.Clamp(-0.12f * vLateral - 0.2f * lateralOffset, -0.5f, 0.5f);
+            // Target nearly overhead / underneath (a ring on a vertical climb or drop): hold the heading and slide onto
+            // the axis with pitch and roll, instead of yawing after a tiny offset that keeps flipping round.
+            if (flatTo.magnitude < 3f && Mathf.Abs(toTarget.y) > 1f)
+            {
+                pilot.Yaw = 0f;
+                pilot.Pitch = Mathf.Clamp(0.06f * Vector3.Dot(flatTo, flatFwd) - 0.12f * vForward, -0.25f, 0.25f);
+                pilot.Roll = Mathf.Clamp(0.06f * Vector3.Dot(flatTo, right) - 0.12f * vLateral, -0.25f, 0.25f);
+            }
 
             float tilt = Mathf.Max(Mathf.Abs(pilot.Pitch), Mathf.Abs(pilot.Roll)) * vehicle.Profile.AngleMode.MaxAngleDeg * Mathf.Deg2Rad;
             // Cascade: altitude error → desired climb rate → throttle.
@@ -169,15 +186,23 @@ namespace GateRush.Race
                 _stuckTimer = 0f;
                 return false;
             }
-            if ((pos - _stuckAnchor).sqrMagnitude > stuckDistance * stuckDistance)
+            if (next != _progressGate)
+            {
+                _progressGate = next;
+                _progressTimer = 0f;
+            }
+            _progressTimer += Time.deltaTime;
+            bool noProgress = _progressTimer >= ProgressSeconds;
+            if (!noProgress && (pos - _stuckAnchor).sqrMagnitude > stuckDistance * stuckDistance)
             {
                 _stuckAnchor = pos;
                 _stuckTimer = 0f;
                 return false;
             }
             _stuckTimer += Time.deltaTime;
-            if (_stuckTimer < stuckSeconds) return false;
+            if (!noProgress && _stuckTimer < stuckSeconds) return false;
             _stuckTimer = 0f;
+            _progressTimer = 0f;
 
             if (next != _rescueGate)
             {
@@ -187,7 +212,7 @@ namespace GateRush.Race
             string touching = "";
             foreach (var c in Physics.OverlapSphere(pos, 0.6f, ~0, QueryTriggerInteraction.Ignore))
                 touching += " " + c.transform.root.name + "/" + c.name;
-            LastReport = $"{(vehicle.IsCrashed ? "crashed" : "stuck")} before {gate.name} at {pos:F1}, touching:{(touching.Length > 0 ? touching : " nothing")}";
+            LastReport = $"{(vehicle.IsCrashed ? "crashed" : noProgress ? "no progress" : "stuck")} before {gate.name} at {pos:F1}, touching:{(touching.Length > 0 ? touching : " nothing")}";
 
             if (++_rescuesAtGate > maxRescuesPerGate)
             {

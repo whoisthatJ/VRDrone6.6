@@ -175104,8 +175104,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: GateRush.Race::GateRush.Race.NextGateBeacon
   session: {fileID: 1681649348}
   material: {fileID: 2100000, guid: f6a4e52493688fc4eab78cc333aa6ce4, type: 2}
+  guide: {fileID: 2100000, guid: 1c4a109364b50334f8ac45bf725a16f9, type: 2}
   radius: 0.9
   height: 150
+  chevrons: 6
+  chevronSpacing: 10
 --- !u!1 &1693523705
 GameObject:
   m_ObjectHideFlags: 0

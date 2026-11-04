@@ -23,7 +23,7 @@ namespace GateRush.UI
         [SerializeField] private float lapFlashSeconds = 2f;
         [SerializeField] private float goSeconds = 1f;
 
-        private enum CentreMode { None, ArmToStart, Countdown, Go, Hold, MissedGate, Lap, Finish, Boundary, FreeFlight }
+        private enum CentreMode { None, ArmToStart, Countdown, Go, Hold, MissedGate, Lap, Finish, Boundary, FreeFlight, RimTouched }
 
         private CentreMode _centreMode = (CentreMode)(-1);
         private int _shownCount = -1;
@@ -122,6 +122,7 @@ namespace GateRush.UI
                 case RacePhase.Racing:
                     if (session.WaitingForRelease) SetCentre(CentreMode.Hold, L.T("ARM + THROTTLE UP"));
                     else if (now < session.WrongGateUntil) SetCentre(CentreMode.MissedGate, L.T("<color=#ff4a3d>MISSED GATE - GO BACK</color>"));
+                    else if (now < session.RimTouchedUntil) SetCentre(CentreMode.RimTouched, L.T("<color=#ff5ad8>RING TOUCHED +0.5 s</color>"));
                     else if (now < _lapFlashUntil) ShowLapFlash();
                     else if (now - timer.StartTime < goSeconds) SetCentre(CentreMode.Go, L.T("GO!"));
                     else SetCentre(CentreMode.None, "");

@@ -195,6 +195,45 @@ namespace GateRush.EditorTools.Art
             return sb.ToString();
         }
 
+        /// <summary>P3: the vertical elements of Expo Pro v2 (Sphere Crest, Holo Halo, needle, ladder) and two pilot's-eye views.</summary>
+        public static string CaptureExpoVertical(string tag)
+        {
+            ArtJobs.RequireCleanScenes();
+            const string sceneName = "Track_Expo";
+            EditorSceneManager.OpenScene(ArtJobs.ScenePath(sceneName), OpenSceneMode.Single);
+            var venue = Object.FindAnyObjectByType<GateRush.Core.StadiumLighting>();
+            if (venue != null) venue.Apply(GateRush.Core.TimeOfDay.Day);
+            var prefabs = AssetDatabase.LoadAssetAtPath<TrackPrefabs>(PrefabsPath);
+            var course = RouteLibrary.ExpoPro();
+            var track = TrackLoader.Load(course, prefabs);
+            bool asyncShaders = ShaderUtil.allowAsyncCompilation;
+            ShaderUtil.allowAsyncCompilation = false;
+            try
+            {
+                var source = GameObject.Find("Main Camera")?.GetComponent<Camera>();
+                var route = new TrackRoute(course.Route);
+                Vector3 Line(Vector3 near) => route.Sample(route.ClosestDistance(near)).Position;
+                Vector3 halo = RouteLibrary.ExpoPoint(12f, 200f, 60f), needle = RouteLibrary.ExpoPoint(12f, 471f, 50f), ladder = RouteLibrary.ExpoPoint(305f, 287f, 28f);
+                var shots = new List<Bookmark>
+                {
+                    new Bookmark("v2_crest", RouteLibrary.ExpoPoint(150f, 230f, 140f), new Vector3(0f, 95f, 0f), 50f),
+                    new Bookmark("v2_halo", RouteLibrary.ExpoPoint(60f, 170f, 95f), halo, 55f),
+                    new Bookmark("v2_needle", RouteLibrary.ExpoPoint(25f, 560f, 70f), needle, 50f),
+                    new Bookmark("v2_ladder", RouteLibrary.ExpoPoint(330f, 360f, 40f), ladder, 55f),
+                    // Pilot's eye: just before the crest, and above the Halo looking down the drop.
+                    new Bookmark("v2_fpv_crest", Line(RouteLibrary.ExpoPoint(170f, 45f, 98f)), new Vector3(0f, 113f, 0f), 60f),
+                    new Bookmark("v2_fpv_halo", Line(RouteLibrary.ExpoPoint(12f, 205f, 86f)), halo + Vector3.down * 25f, 70f),
+                };
+                return sceneName + ": " + CaptureSet(sceneName, shots, source, tag);
+            }
+            finally
+            {
+                ShaderUtil.allowAsyncCompilation = asyncShaders;
+                Object.DestroyImmediate(track.Root.gameObject);
+                ArtJobs.ReturnToBoot();
+            }
+        }
+
         /// <summary>P2: each shipped build on the garage turntable (detailed parts), three-quarter view and top view.</summary>
         public static string CaptureQuads(string tag)
         {

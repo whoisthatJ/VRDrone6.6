@@ -21,230 +21,308 @@ MonoBehaviour:
     Laps: 2
     Spawn:
       Position: {x: -81.24672, y: 0.15, z: -276.3033}
-      Yaw: 16.392883
+      Yaw: 16.393301
       Name: 
     Gates: []
     Props:
     - Type: Flag
-      Position: {x: -79.55401, y: 0, z: -281.17926}
-      Euler: {x: 0, y: 16.392883, z: 0}
+      Position: {x: -79.55404, y: 0, z: -281.17926}
+      Euler: {x: 0, y: 16.393301, z: 0}
       Scale: {x: 1, y: 1, z: 1}
     - Type: Flag
-      Position: {x: -77.18334, y: 0, z: -273.12073}
-      Euler: {x: 0, y: 16.392883, z: 0}
+      Position: {x: -77.18331, y: 0, z: -273.12073}
+      Euler: {x: 0, y: 16.393301, z: 0}
       Scale: {x: 1, y: 1, z: 1}
     Route:
       Knots:
       - Position: {x: -84.70236, y: 1.8, z: -287.79422}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
+        Roll: 0
       - Position: {x: -73.9734, y: 1.8, z: -251.34029}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
+        Roll: 0
       - Position: {x: -65.50316, y: 2.2, z: -222.56085}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
+        Roll: 0
       - Position: {x: -56.65453, y: 6, z: -204.28966}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
+        Roll: 0
       - Position: {x: -44.76526, y: 18, z: -193.89964}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
+        Roll: 0
       - Position: {x: -26.721237, y: 31, z: -190.13147}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
+        Roll: 0
       - Position: {x: -3.2810502, y: 22, z: -187.97137}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
+        Roll: 0
       - Position: {x: 26.025385, y: 10, z: -185.18013}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
+        Roll: 0
       - Position: {x: 63.95778, y: 7, z: -175.72252}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
+        Roll: 0
       - Position: {x: 95.79707, y: 9, z: -159.43312}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: 114.53633, y: 21, z: -141.44055}
+        Roll: 0
+      - Position: {x: 114.53633, y: 27, z: -141.44055}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: 111.72287, y: 31, z: -111.72287}
+        Roll: 0
+      - Position: {x: 109.756035, y: 36, z: -113.65568}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: 97.14326, y: 15, z: -78.66504}
+        Roll: 0
+      - Position: {x: 76.7771, y: 40, z: -94.8118}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: 79.86355, y: 4, z: -60.18151}
+        Roll: 0
+      - Position: {x: 43.000004, y: 62, z: -74.47818}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: 64.45165, y: 3, z: -40.27387}
+        Roll: 0
+      - Position: {x: 18.541021, y: 86, z: -57.06339}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: 57.32125, y: 3, z: -20.863228}
+        Roll: 0
+      - Position: {x: 1.2563802, y: 104, z: -35.97807}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: 60.76788, y: 3, z: 5.316504}
+        Roll: 0
+      - Position: {x: 0, y: 113, z: 0}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: 52.827553, y: 3, z: 30.499998}
+        Roll: 0
+      - Position: {x: 7.4848213, y: 104, z: 35.213314}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: 42.215702, y: 4.1, z: 45.270794}
+        Roll: 0
+      - Position: {x: 11.643055, y: 82, z: 54.776268}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: 27.529709, y: 5.2, z: 56.444267}
+        Roll: 0
+      - Position: {x: 13.930084, y: 55, z: 65.53589}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: 9.964873, y: 6.3, z: 62.91575}
+        Roll: 0
+      - Position: {x: 16.632936, y: 28, z: 78.25181}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: -8.990583, y: 7.4, z: 63.971313}
+        Roll: 0
+      - Position: {x: 21.206993, y: 6, z: 99.77106}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: -27.681498, y: 8.5, z: 59.36316}
+        Roll: 0
+      - Position: {x: 31.186754, y: 12, z: 146.72214}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: -44.43028, y: 9.6, z: 49.344814}
+        Roll: 0
+      - Position: {x: 44.077282, y: 30, z: 207.3673}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: -57.68736, y: 10.7, z: 34.66207}
+        Roll: 0
+      - Position: {x: 51.977924, y: 55, z: 244.53691}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: -66.174164, y: 11.8, z: 16.499073}
+        Roll: 0
+      - Position: {x: 51.14628, y: 86, z: 240.62431}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: -69.0053, y: 12.9, z: -3.6164052}
+        Roll: 0
+      - Position: {x: 45.32475, y: 93, z: 213.23618}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: -65.77848, y: 14, z: -23.941408}
+        Roll: 0
+      - Position: {x: 41.998165, y: 82, z: 197.58582}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: -53.84198, y: 19.428572, z: -45.178787}
+        Roll: 0
+      - Position: {x: 41.58234, y: 60, z: 195.62953}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: -35.285717, y: 24.857143, z: -61.116646}
+        Roll: 0
+      - Position: {x: 41.58234, y: 40, z: 195.62953}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: -12.304222, y: 30.285715, z: -69.78066}
+        Roll: 0
+      - Position: {x: 44.28519, y: 21, z: 208.34544}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: 12.353831, y: 35.714287, z: -70.06204}
+        Roll: 0
+      - Position: {x: 51.977924, y: 13, z: 244.53691}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: 35.714283, y: 41.142857, z: -61.85896}
+        Roll: 0
+      - Position: {x: 68.61086, y: 32, z: 322.78873}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: 54.93634, y: 46.57143, z: -46.09705}
+        Roll: 0
+      - Position: {x: 87.322914, y: 52, z: 410.822}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: 67.657875, y: 52, z: -24.625444}
+        Roll: 0
+      - Position: {x: 97.926414, y: 55, z: 460.70752}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: 72.28571, y: 57.428574, z: 0.0000008619985}
+        Roll: 0
+      - Position: {x: 103.95585, y: 36, z: 489.07382}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: 68.19483, y: 62.857143, z: 24.820887}
+        Roll: 0
+      - Position: {x: 91.68624, y: 10, z: 519.97845}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: 55.81181, y: 68.28571, z: 46.83166}
+        Roll: 0
+      - Position: {x: 47.499878, y: 8, z: 542.92615}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: 36.57144, y: 73.71429, z: 63.34357}
+        Roll: 0
+      - Position: {x: 0, y: 8, z: 500}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: 12.750758, y: 79.14286, z: 72.31303}
+        Roll: 0
+      - Position: {x: -61.23616, y: 8, z: 435.71796}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: -12.800362, y: 84.57143, z: 72.5944}
+        Roll: 0
+      - Position: {x: -131.67784, y: 7, z: 361.78165}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: -37.000004, y: 90, z: 64.08588}
+        Roll: 0
+      - Position: {x: -220.81308, y: 7, z: 245.23781}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: -54.079002, y: 70, z: 90.00256}
+        Roll: 0
+      - Position: {x: -236.40321, y: 7, z: 184.69846}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: -67.87332, y: 42, z: 122.44677}
+        Roll: 0
+      - Position: {x: -235.09666, y: 15, z: 164.61641}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: -90.00003, y: 18, z: 155.88455}
+        Roll: 0
+      - Position: {x: -235.09666, y: 28, z: 164.61641}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: -126.37384, y: 6, z: 173.93864}
+        Roll: 0
+      - Position: {x: -235.09666, y: 41, z: 164.61641}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: -184.90388, y: 4, z: 160.73442}
+        Roll: 0
+      - Position: {x: -235.09666, y: 52, z: 164.61641}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: -238.39584, y: 4, z: 126.75735}
+        Roll: 0
+      - Position: {x: -267.1351, y: 62, z: 166.92462}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: -281.90778, y: 4, z: 102.606026}
+        Roll: 0
+      - Position: {x: -316.09927, y: 64, z: 182.49997}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
+        Roll: 0
+      - Position: {x: -350.7403, y: 55, z: 202.49997}
+        TangentIn: {x: 0, y: 0, z: 0}
+        TangentOut: {x: 0, y: 0, z: 0}
+        Roll: 0
+      - Position: {x: -358.296, y: 38, z: 215.28584}
+        TangentIn: {x: 0, y: 0, z: 0}
+        TangentOut: {x: 0, y: 0, z: 0}
+        Roll: 0
+      - Position: {x: -348.09866, y: 24, z: 192.95424}
+        TangentIn: {x: 0, y: 0, z: 0}
+        TangentOut: {x: 0, y: 0, z: 0}
+        Roll: 0
+      - Position: {x: -326.2708, y: 14, z: 152.14255}
+        TangentIn: {x: 0, y: 0, z: 0}
+        TangentOut: {x: 0, y: 0, z: 0}
+        Roll: 0
+      - Position: {x: -316.74872, y: 5, z: 109.065346}
+        TangentIn: {x: 0, y: 0, z: 0}
+        TangentOut: {x: 0, y: 0, z: 0}
+        Roll: 0
       - Position: {x: -328.19223, y: 4, z: 34.494358}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
+        Roll: 0
       - Position: {x: -329.79898, y: 4, z: -11.516922}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
+        Roll: 0
       - Position: {x: -324.98657, y: 4, z: -57.303883}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: -313.84863, y: 4, z: -101.97564}
-        TangentIn: {x: 0, y: 0, z: 0}
-        TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: -296.60205, y: 4, z: -144.66241}
-        TangentIn: {x: 0, y: 0, z: 0}
-        TangentOut: {x: 0, y: 0, z: 0}
-      - Position: {x: -273.5824, y: 4, z: -184.53366}
-        TangentIn: {x: 0, y: 0, z: 0}
-        TangentOut: {x: 0, y: 0, z: 0}
+        Roll: 0
       - Position: {x: -294.48816, y: 4, z: -57.242653}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
+        Roll: 0
       - Position: {x: -240.49867, y: 12, z: -46.74817}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
+        Roll: 0
       - Position: {x: -198.91063, y: 26, z: -49.593994}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
+        Roll: 0
       - Position: {x: -183.5539, y: 31, z: -59.640297}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
+        Roll: 0
       - Position: {x: -174.48718, y: 25, z: -77.6867}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
+        Roll: 0
       - Position: {x: -165.41086, y: 13, z: -95.499985}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
+        Roll: 0
       - Position: {x: -150.51004, y: 7, z: -117.59135}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
+        Roll: 0
       - Position: {x: -125.30729, y: 7, z: -144.14952}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
+        Roll: 0
       - Position: {x: -95.99999, y: 13, z: -166.27687}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
+        Roll: 0
       - Position: {x: -73.422905, y: 31, z: -181.72803}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
+        Roll: 0
       - Position: {x: -48.427837, y: 16, z: -216.65352}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
+        Roll: 0
       - Position: {x: -55.62657, y: 4, z: -248.85876}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
+        Roll: 0
       - Position: {x: -64.35231, y: 2.5, z: -287.89545}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
+        Roll: 0
       - Position: {x: -75.169395, y: 3, z: -313.10312}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
+        Roll: 0
       - Position: {x: -90.31685, y: 2.5, z: -304.9047}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
+        Roll: 0
       Closed: 1
       CorridorWidth: 5
       OuterLineGap: 0.35
@@ -260,6 +338,7 @@ MonoBehaviour:
         Scale: 1
         Color: white
         IsCheckpoint: 1
+        Align3D: 0
       - Type: Finish
         Distance: 38
         Lateral: 0
@@ -268,6 +347,7 @@ MonoBehaviour:
         Scale: 1
         Color: 
         IsCheckpoint: 1
+        Align3D: 0
       - Type: Air
         Distance: 228.5
         Lateral: 0
@@ -276,6 +356,7 @@ MonoBehaviour:
         Scale: 1
         Color: blue
         IsCheckpoint: 1
+        Align3D: 0
       - Type: Air
         Distance: 264.5
         Lateral: 0
@@ -284,134 +365,178 @@ MonoBehaviour:
         Scale: 1
         Color: blue
         IsCheckpoint: 1
-      - Type: Air
-        Distance: 325.75
+        Align3D: 0
+      - Type: HoloRing
+        Distance: 327.25
         Lateral: 0
         Height: 0
         Yaw: 0
         Scale: 1
-        Color: white
+        Color: 
         IsCheckpoint: 1
+        Align3D: 1
+      - Type: HoloRing
+        Distance: 411.25
+        Lateral: 0
+        Height: 0
+        Yaw: 0
+        Scale: 1
+        Color: 
+        IsCheckpoint: 1
+        Align3D: 1
+      - Type: HoloRing
+        Distance: 482.5
+        Lateral: 0
+        Height: 0
+        Yaw: 0
+        Scale: 1
+        Color: 
+        IsCheckpoint: 1
+        Align3D: 1
+      - Type: HoloRing
+        Distance: 520.25
+        Lateral: 0
+        Height: 0
+        Yaw: 0
+        Scale: 1.2
+        Color: 
+        IsCheckpoint: 1
+        Align3D: 1
+      - Type: HoloRing
+        Distance: 587.75
+        Lateral: 0
+        Height: 0
+        Yaw: 0
+        Scale: 1
+        Color: 
+        IsCheckpoint: 1
+        Align3D: 1
+      - Type: HoloRing
+        Distance: 617
+        Lateral: 0
+        Height: 0
+        Yaw: 0
+        Scale: 1
+        Color: 
+        IsCheckpoint: 1
+        Align3D: 1
+      - Type: HoloRing
+        Distance: 647
+        Lateral: 0
+        Height: 0
+        Yaw: 0
+        Scale: 1
+        Color: 
+        IsCheckpoint: 1
+        Align3D: 1
+      - Type: HoloRing
+        Distance: 678.75
+        Lateral: 0
+        Height: 0
+        Yaw: 0
+        Scale: 1.2
+        Color: 
+        IsCheckpoint: 1
+        Align3D: 1
+      - Type: HoloHalo
+        Distance: 943
+        Lateral: 0
+        Height: 0
+        Yaw: 0
+        Scale: 1
+        Color: 
+        IsCheckpoint: 1
+        Align3D: 1
+      - Type: HoloRing
+        Distance: 1251
+        Lateral: 0
+        Height: 0
+        Yaw: 0
+        Scale: 1
+        Color: 
+        IsCheckpoint: 1
+        Align3D: 1
+      - Type: HoloRing
+        Distance: 1868.75
+        Lateral: 0
+        Height: 0
+        Yaw: 0
+        Scale: 1
+        Color: 
+        IsCheckpoint: 1
+        Align3D: 1
+      - Type: HoloRing
+        Distance: 1882
+        Lateral: 0
+        Height: 0
+        Yaw: 0
+        Scale: 1
+        Color: 
+        IsCheckpoint: 1
+        Align3D: 1
+      - Type: HoloRing
+        Distance: 1895
+        Lateral: 0
+        Height: 0
+        Yaw: 0
+        Scale: 1
+        Color: 
+        IsCheckpoint: 1
+        Align3D: 1
+      - Type: HoloRing
+        Distance: 1992
+        Lateral: 0
+        Height: 0
+        Yaw: 0
+        Scale: 1.2
+        Color: 
+        IsCheckpoint: 1
+        Align3D: 1
+      - Type: HoloRing
+        Distance: 2057
+        Lateral: 0
+        Height: 0
+        Yaw: 0
+        Scale: 1
+        Color: 
+        IsCheckpoint: 1
+        Align3D: 1
       - Type: Single
-        Distance: 466
+        Distance: 2300.25
         Lateral: 0
         Height: 0
         Yaw: 0
         Scale: 1
         Color: red
         IsCheckpoint: 1
+        Align3D: 0
       - Type: Air
-        Distance: 548.25
+        Distance: 2569.75
         Lateral: 0
         Height: 0
         Yaw: 0
         Scale: 1
         Color: blue
         IsCheckpoint: 1
+        Align3D: 0
       - Type: Air
-        Distance: 626.25
+        Distance: 2606.5
         Lateral: 0
         Height: 0
         Yaw: 0
         Scale: 1
         Color: blue
         IsCheckpoint: 1
-      - Type: Air
-        Distance: 712.5
-        Lateral: 0
-        Height: 0
-        Yaw: 0
-        Scale: 1
-        Color: blue
-        IsCheckpoint: 1
-      - Type: Air
-        Distance: 813.75
-        Lateral: 0
-        Height: 0
-        Yaw: 0
-        Scale: 1
-        Color: white
-        IsCheckpoint: 1
-      - Type: Air
-        Distance: 916.75
-        Lateral: 0
-        Height: 0
-        Yaw: 0
-        Scale: 1
-        Color: white
-        IsCheckpoint: 1
-      - Type: Air
-        Distance: 1048
-        Lateral: 0
-        Height: 0
-        Yaw: 0
-        Scale: 1
-        Color: red
-        IsCheckpoint: 1
-      - Type: Air
-        Distance: 1130.5
-        Lateral: 0
-        Height: 0
-        Yaw: 0
-        Scale: 1
-        Color: blue
-        IsCheckpoint: 1
-      - Type: Single
-        Distance: 1281.25
-        Lateral: 0
-        Height: 0
-        Yaw: 0
-        Scale: 1
-        Color: red
-        IsCheckpoint: 1
-      - Type: Slalom
-        Distance: 1344.75
-        Lateral: 0
-        Height: 0
-        Yaw: 0
-        Scale: 1
-        Color: white
-        IsCheckpoint: 1
-      - Type: Single
-        Distance: 1524
-        Lateral: 0
-        Height: 0
-        Yaw: 0
-        Scale: 1
-        Color: red
-        IsCheckpoint: 1
-      - Type: Single
-        Distance: 1616.25
-        Lateral: 0
-        Height: 0
-        Yaw: 0
-        Scale: 1
-        Color: red
-        IsCheckpoint: 1
-      - Type: Air
-        Distance: 2032.75
-        Lateral: 0
-        Height: 0
-        Yaw: 0
-        Scale: 1
-        Color: blue
-        IsCheckpoint: 1
-      - Type: Air
-        Distance: 2069.25
-        Lateral: 0
-        Height: 0
-        Yaw: 0
-        Scale: 1
-        Color: blue
-        IsCheckpoint: 1
+        Align3D: 0
       - Type: Double
-        Distance: 2222
+        Distance: 2759
         Lateral: 0
         Height: 0
         Yaw: 0
         Scale: 1
         Color: red
         IsCheckpoint: 1
+        Align3D: 0
       AirCourse: 1
     FreeFlight: 0
     ExtraSpawns: []

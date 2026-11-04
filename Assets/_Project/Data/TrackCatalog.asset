@@ -39,11 +39,11 @@ MonoBehaviour:
     Json: {fileID: 4900000, guid: ce521c4b474270e46a5b63650c7880bf, type: 3}
   - Id: expo-v2-sprint
     DisplayName: Expo Sprint
-    Description: 'Beginner, 1.2 km: up the south walkway, over a pavilion into its courtyard, round the sphere at 3 m, a park slalom and back down the walkway. Trainer guidance recommended.'
+    Description: 'Beginner, 1.5 km: the courtyard hop, round the sphere at 3 m, a climb straight up through the Holo Halo and back down the axis. Trainer guidance recommended.'
     Json: {fileID: 4900000, guid: 920dde672eb45d04a8d5f4dd14ef57c4, type: 3}
   - Id: expo-v2-pro
     DisplayName: Expo Pro
-    Description: 'Advanced, 2.2 km: the courtyard hop, a helix round the sphere to 90 m, the dive into the park, the ring-road sweeper and a second courtyard.'
+    Description: 'Advanced, 2.9 km: over the top of the sphere, down through the Holo Halo, the needle dive, the ladder, a split-S, the ring road and a second courtyard.'
     Json: {fileID: 4900000, guid: ad8e9fd3e09cb5249995716d7866676b, type: 3}
   - Id: expo-v2-free
     DisplayName: Expo Free Flight

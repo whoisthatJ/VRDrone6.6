@@ -10,7 +10,7 @@ namespace GateRush.Tests
     /// <summary>The T2 obstacle kit: every prefab is registered, LOD'd, collides with primitives only and has its checkpoints.</summary>
     public class ObstacleKitTests
     {
-        private static readonly string[] GateTypes = { "Single", "Double", "Slalom", "Cube", "Ladder", "Dive", "Ramp", "Arch", "Finish", "Air" };
+        private static readonly string[] GateTypes = { "Single", "Double", "Slalom", "Cube", "Ladder", "Dive", "Ramp", "Arch", "Finish", "Air", "HoloRing", "HoloHalo" };
         private static readonly string[] PropTypes = { "ChevronBoard", "ChevronBoardLeft", "Flag", "LandingPad", "StartPad" };
 
         private static TrackPrefabs Prefabs => AssetDatabase.LoadAssetAtPath<TrackPrefabs>("Assets/_Project/Data/TrackPrefabs.asset");
@@ -21,13 +21,16 @@ namespace GateRush.Tests
             var prefab = Prefabs.Gate(type);
             Assert.IsNotNull(prefab, $"{type} not registered in TrackPrefabs (run Build All Scenes)");
 
+            // Holo rings are light: no collider, nothing to show at the far LOD, and they float (placed in 3D).
+            bool holo = type.StartsWith("Holo");
             var lod = prefab.GetComponent<LODGroup>();
             Assert.IsNotNull(lod, "LODGroup");
-            Assert.AreEqual(3, lod.lodCount, "LOD0/1/2");
-            foreach (var l in lod.GetLODs()) Assert.IsNotEmpty(l.renderers);
+            Assert.AreEqual(holo ? 2 : 3, lod.lodCount, "LOD0/1/2 (holo rings: LOD0/1 and cull)");
+            foreach (var l in lod.GetLODs().Take(holo ? 2 : 3)) Assert.IsNotEmpty(l.renderers);
 
             Assert.IsEmpty(prefab.GetComponentsInChildren<MeshCollider>(true), "no mesh colliders on obstacles");
-            Assert.IsNotEmpty(prefab.GetComponentsInChildren<BoxCollider>(true), "box colliders");
+            if (holo) Assert.IsEmpty(prefab.GetComponentsInChildren<Collider>(true), "holo rings don't collide");
+            else Assert.IsNotEmpty(prefab.GetComponentsInChildren<BoxCollider>(true), "box colliders");
 
             var gates = prefab.GetComponentsInChildren<Gate>(true);
             Assert.AreEqual(type == "Slalom" ? 3 : 1, gates.Length, "checkpoints");
@@ -45,7 +48,7 @@ namespace GateRush.Tests
                 {
                     Vector3 c = g.OpeningCenterWorld;
                     Assert.IsTrue(bounds.Contains(c), $"opening centre {c} outside {bounds}");
-                    Assert.Greater(c.y - g.OpeningSize.y / 2f * Mathf.Abs(g.transform.up.y), -0.01f, "opening above ground");
+                    if (!holo) Assert.Greater(c.y - g.OpeningSize.y / 2f * Mathf.Abs(g.transform.up.y), -0.01f, "opening above ground");
                 }
             }
             finally

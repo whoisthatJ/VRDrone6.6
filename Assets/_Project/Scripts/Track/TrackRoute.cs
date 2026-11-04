@@ -28,6 +28,8 @@ namespace GateRush.Track
         private const int SamplesPerKnot = 96;
 
         private readonly Vector3[] _points;
+        private Vector3[] _ups;
+        private float[] _knotDistances;
 
         public TrackRoute(RouteData data)
         {
@@ -97,6 +99,79 @@ namespace GateRush.Track
             float f = x - i;
             if (Closed && i >= _points.Length - 1) return _points[_points.Length - 1];
             return Vector3.LerpUnclamped(_points[i], _points[i + 1], f);
+        }
+
+        /// <summary>
+        /// P3: the full 3D frame at <paramref name="distance"/>: <c>Forward</c> is the tangent (vertical and inverted
+        /// sections included), <c>Up</c> is world up projected off the tangent where the route is not steep, carried
+        /// along (parallel transport) through steep and vertical parts, then turned by the knots' interpolated
+        /// <see cref="RouteKnot.Roll"/>. <c>FlatForward</c> is as in <see cref="Sample"/>.
+        /// </summary>
+        public RoutePoint Frame(float distance)
+        {
+            var p = Sample(distance);
+            EnsureFrames();
+            float x = p.Distance / Step;
+            int i = Mathf.Clamp((int)x, 0, _ups.Length - 1);
+            int j = Mathf.Min(i + 1, _ups.Length - 1);
+            Vector3 up = Vector3.Slerp(_ups[i], _ups[j], x - i);
+            up = Vector3.ProjectOnPlane(up, p.Forward).normalized;
+            float roll = RollAt(p.Distance);
+            if (Mathf.Abs(roll) > 0.01f) up = Quaternion.AngleAxis(roll, p.Forward) * up;
+            p.Up = up;
+            p.Right = Vector3.Cross(up, p.Forward).normalized;
+            return p;
+        }
+
+        private const float SteepY = 0.85f;
+
+        private void EnsureFrames()
+        {
+            if (_ups != null) return;
+            _ups = new Vector3[_points.Length];
+            Vector3 prevT = Vector3.zero, prevUp = Vector3.up;
+            for (int k = 0; k < _points.Length; k++)
+            {
+                Vector3 t = (PositionAt(k * Step + 1f) - PositionAt(k * Step - 1f)).normalized;
+                if (t.sqrMagnitude < 0.5f) t = prevT.sqrMagnitude > 0.5f ? prevT : Vector3.forward;
+                Vector3 up;
+                if (Mathf.Abs(t.y) < SteepY || k == 0)
+                {
+                    up = Vector3.ProjectOnPlane(Vector3.up, t);
+                    if (up.sqrMagnitude < 1e-6f) up = Vector3.ProjectOnPlane(Vector3.forward, t);
+                }
+                else up = Quaternion.FromToRotation(prevT, t) * prevUp;   // parallel transport
+                up.Normalize();
+                _ups[k] = up;
+                prevT = t;
+                prevUp = up;
+            }
+            _knotDistances = new float[Data.Knots.Count];
+            for (int k = 0; k < Data.Knots.Count; k++) _knotDistances[k] = ClosestDistance(Data.Knots[k].Position);
+        }
+
+        /// <summary>The knots' roll, interpolated linearly along the route between the knots on either side.</summary>
+        private float RollAt(float d)
+        {
+            int n = Data.Knots.Count;
+            bool any = false;
+            for (int k = 0; k < n; k++) any |= Mathf.Abs(Data.Knots[k].Roll) > 0.01f;
+            if (!any) return 0f;
+            int prev = -1, next = -1;
+            float backD = float.MaxValue, aheadD = float.MaxValue;
+            for (int k = 0; k < n; k++)
+            {
+                float kd = _knotDistances[k];
+                float back = Closed ? Wrap(d - kd) : d - kd;
+                float ahead = Closed ? Wrap(kd - d) : kd - d;
+                if (back >= 0f && back < backD) { backD = back; prev = k; }
+                if (ahead >= 0f && ahead < aheadD) { aheadD = ahead; next = k; }
+            }
+            if (prev < 0) return Data.Knots[next].Roll;
+            if (next < 0) return Data.Knots[prev].Roll;
+            float span = backD + aheadD;
+            float f = span > 1e-4f ? backD / span : 0f;
+            return Mathf.Lerp(Data.Knots[prev].Roll, Data.Knots[next].Roll, f);
         }
 
         /// <summary>Distance along the route of the closest route point to <paramref name="p"/>.</summary>

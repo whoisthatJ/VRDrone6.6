@@ -293,97 +293,150 @@ namespace GateRush.EditorTools.Builders
         }
 
         /// <summary>
-        /// Expo Sprint (~1.2 km, beginner): up the walkway, the courtyard hop, anticlockwise round the sphere at 3 m, out
-        /// to the park for a slalom and back (U-turn at 230 m), on round the west side, south through the pod gap and
-        /// down the walkway, a U-turn on the south plaza and into the finish cube. The first version of this route lives
-        /// on, frozen, as expo-astana in Track_Expo_v1 (P1a).
+        /// Expo Sprint, version 2 (P3, beginner, ~1.5 km, top ~62 m): up the walkway, the courtyard roof hop, under the
+        /// canopy and round the sphere at 3 m, then a gentle climb straight **up through the Holo Halo** (50 m) over the
+        /// north plaza, a descending turn and back down the axis through the slalom, round the west side, down the
+        /// walkway and the plaza U-turn into the finish cube. The first version is frozen as expo-astana in Track_Expo_v1.
         /// </summary>
         public static TrackData ExpoSprint()
         {
             var k = ExpoOpening();
             Arc(k, 110f, 10f, 20f, OrbitRadius, OrbitRadius, 3f, 3f);       // 16-20 orbit to the north
-            k.Add(B(6f, 95f, 4f));                                           // 21
-            k.Add(B(9f, 135f, 4.5f));                                        // 22
-            k.Add(B(11f, 172f, 4.5f));                                       // 23 park slalom
-            k.Add(B(12f, 205f, 5f));                                         // 24
-            k.Add(B(9f, 232f, 6f));                                          // 25 U-turn (to the left, clear of the 41 pavilion)
-            k.Add(B(1f, 238f, 6f));                                          // 26
-            k.Add(B(354f, 222f, 5f));                                        // 27
-            k.Add(B(357f, 180f, 4.5f));                                      // 28 back down the axis
-            k.Add(B(356f, 120f, 4f));                                        // 29
-            k.Add(B(352f, 80f, 3f));                                         // 30
-            Arc(k, 340f, 220f, 20f, OrbitRadius, OrbitRadius, 3f, 3f);       // 31-36 west side of the orbit
-            k.Add(B(205f, 70f, 3f));                                         // 37
-            k.Add(B(WalkSouth + 1f, 100f, 3f));                              // 38 south pod gap
-            k.Add(B(WalkSouth, 150f, 3f));                                   // 39
-            k.Add(B(WalkSouth, 210f, 3f));                                   // 40
-            k.Add(B(WalkSouth, 265f, 2.5f));                                 // 41
-            k.Add(B(WalkSouth, 305f, 2.5f));                                 // 42
-            k.Add(B(193.5f, 322f, 3f));                                      // 43 U-turn on the south plaza
-            k.Add(B(196.5f, 318f, 2.5f));                                    // 44
+            k.Add(B(7f, 95f, 4f));                                           // 21
+            k.Add(B(10f, 140f, 8f));                                         // 22
+            k.Add(B(12f, 178f, 20f));                                        // 23 lining up under the Halo
+            k.Add(B(12f, 200f, 35f));                                        // 24
+            int halo = k.Count;
+            k.Add(B(12f, 200f, 50f));                                        // 25 up through the Halo
+            k.Add(B(12f, 200f, 62f));                                        // 26
+            k.Add(B(15f, 224f, 58f));                                        // 27
+            k.Add(B(19f, 252f, 42f));                                        // 28 descending turn
+            k.Add(B(10f, 270f, 26f));                                        // 29
+            k.Add(B(0f, 255f, 14f));                                         // 30
+            k.Add(B(355f, 222f, 8f));                                        // 31
+            int slalom = k.Count;
+            k.Add(B(357f, 175f, 5f));                                        // 32 slalom down the axis
+            k.Add(B(356f, 120f, 4f));                                        // 33
+            k.Add(B(352f, 80f, 3f));                                         // 34
+            Arc(k, 340f, 220f, 20f, OrbitRadius, OrbitRadius, 3f, 3f);       // west side of the orbit
+            int west = k.Count - 4;
+            k.Add(B(205f, 70f, 3f));
+            k.Add(B(WalkSouth + 1f, 100f, 3f));                              // south pod gap
+            k.Add(B(WalkSouth, 150f, 3f));
+            int walk = k.Count;
+            k.Add(B(WalkSouth, 210f, 3f));
+            k.Add(B(WalkSouth, 265f, 2.5f));
+            k.Add(B(WalkSouth, 305f, 2.5f));
+            k.Add(B(193.5f, 322f, 3f));                                      // plaza U-turn
+            k.Add(B(196.5f, 318f, 2.5f));
 
             var t = ExpoTrack("expo-v2-sprint", "Expo Sprint", 2, k);
             var r = t.Route;
             var route = new TrackRoute(r);
             float At(int knot) => route.ClosestDistance(k[knot]);
             void Add(string type, int knot, string color) => r.Obstacles.Add(new RouteObstacle { Type = type, Distance = At(knot), Color = color, IsCheckpoint = true });
+            void Add3(string type, int knot, string color, float scale = 1f) => r.Obstacles.Add(new RouteObstacle { Type = type, Distance = At(knot), Color = color, IsCheckpoint = true, Align3D = true, Scale = scale });
             Add("Finish", 1, "");
             Add("Single", 2, "red");
-            Add("Air", 8, "blue");        // courtyard (room to drop in after the wing)
+            Add("Air", 8, "blue");        // courtyard
             Add("Air", 9, "blue");
-            Add("Air", 11, "white");      // over the inner wing
-            Add("Single", 16, "red");     // under the canopy, east
-            Add("Single", 19, "red");     // north-east
-            Add("Slalom", 23, "white");   // park
-            Add("Air", 26, "blue");       // U-turn
-            Add("Single", 29, "red");     // back down the axis
-            Add("Single", 32, "red");     // north-west orbit
-            Add("Single", 35, "red");     // south-west, under the canopy
-            Add("Double", 40, "red");     // walkway, southbound
-            Add("Single", 0, "white");    // the straight into the finish, after the plaza U-turn
+            Add3("HoloRing", 11, "");     // over the inner wing
+            Add("Single", 16, "red");     // under the canopy
+            Add("Single", 19, "red");
+            Add3("HoloRing", 23, "");     // lining up
+            Add3("HoloHalo", halo, "");   // straight up through the Halo
+            Add3("HoloRing", 28, "");     // descending turn
+            Add("Slalom", slalom, "white");
+            Add("Single", west, "red");   // west orbit
+            Add("Double", walk, "red");   // walkway, southbound
+            Add("Single", 0, "white");    // the straight into the finish
             return Finish(t, route, k);
         }
 
         /// <summary>
-        /// Expo Pro (~2.2 km, advanced): the Sprint opening, then a 1.25-turn helix round the sphere from 3 m to 90 m
-        /// (clear of the canopy sector until 14 m), the dive down the north-west side into the park (slalom), a fast
-        /// sweeper along the ring road, the second courtyard (226 pavilion, west wing in, east wing out), and down the
-        /// walkway to the south plaza U-turn and the finish cube.
+        /// Expo Pro, version 2 (P3, advanced, ~2.9 km, top ~113 m): the courtyard roof hop, then the **Sphere Crest**
+        /// (climb the south-east flank, a crest ring over the top above the turbines, a dive series down the north side,
+        /// a pull-out ring at 6 m), the **Holo Halo** loop (under it, up and back over it, then a vertical drop through
+        /// its centre), the **monument-top dive**, the **ladder** (three stacked rings, straight up), a **split-S** from a
+        /// high ring, the ring-road sweeper and the 226° pavilion's courtyard home. The first version is frozen as
+        /// expo-pro in Track_Expo_v1.
         /// </summary>
         public static TrackData ExpoPro()
         {
             var k = ExpoOpening();
-            Arc(k, 110f, 60f, 25f, OrbitRadius, OrbitRadius, 3f, 3f);          // 16-17 to the canopy's north edge
-            Arc(k, 60f, -110f, 17f, OrbitRadius, 70f, 3f, 14f);                // 18-27 climbing, canopy-free side
-            Arc(k, -110f, -390f, 20f, 70f, 74f, 14f, 90f);                     // 28-41 helix to 90 m
-            int helixTop = k.Count - 1;
-            k.Add(B(329f, 105f, 70f));                                         // dive
-            k.Add(B(331f, 140f, 42f));
-            k.Add(B(330f, 180f, 18f));
-            int diveBottom = k.Count;
-            k.Add(B(324f, 215f, 6f));                                          // park
-            k.Add(B(311f, 245f, 4f));
-            int slalom = k.Count;
-            k.Add(B(298f, 270f, 4f));                                          // park slalom
-            k.Add(B(290f, 300f, 4f));
+            k.RemoveRange(12, k.Count - 12);                                   // keep 0-11: walkway, cube, courtyard, inner wing
+            k[10] = B(141f, 182f, 27f);                                        // climb out higher: the crest follows
+            k[11] = B(136f, 158f, 36f);
+            int crestStart = k.Count;
+            k.Add(B(141f, 122f, 40f));                                         // climbing the south-east flank
+            k.Add(B(150f, 86f, 62f));
+            k.Add(B(162f, 60f, 86f));
+            k.Add(B(178f, 36f, 104f));
+            int crest = k.Count;
+            k.Add(new Vector3(0f, 113f, 0f));                                  // crest, over the turbines
+            k.Add(B(12f, 36f, 104f));                                          // dive series down the north side
+            int dive1 = k.Count;
+            k.Add(B(12f, 56f, 82f));
+            int dive2 = k.Count;
+            k.Add(B(12f, 67f, 55f));
+            int dive3 = k.Count;
+            k.Add(B(12f, 80f, 28f));
+            int pullOut = k.Count;
+            k.Add(B(12f, 102f, 6f));                                           // pull-out at 6 m
+            k.Add(B(12f, 150f, 12f));
+            k.Add(B(12f, 212f, 30f));                                          // under the Halo
+            k.Add(B(12f, 250f, 55f));                                          // up ...
+            k.Add(B(12f, 246f, 86f));                                          // ... and back over the top
+            k.Add(B(12f, 218f, 93f));
+            k.Add(B(12f, 202f, 82f));
+            int halo = k.Count;
+            k.Add(B(12f, 200f, 60f));                                          // straight down through the centre
+            k.Add(B(12f, 200f, 40f));
+            k.Add(B(12f, 213f, 21f));
+            k.Add(B(12f, 250f, 13f));
+            k.Add(B(12f, 330f, 32f));                                          // climbing to the needle
+            k.Add(B(12f, 420f, 52f));
+            int needle = k.Count;
+            k.Add(B(12f, 471f, 55f));                                          // the ring just over the needle's top
+            k.Add(B(12f, 500f, 36f));                                          // dive
+            k.Add(B(10f, 528f, 10f));
+            k.Add(B(5f, 545f, 8f));                                            // turning west, inside the park
+            k.Add(B(0f, 500f, 8f));
+            k.Add(B(352f, 440f, 8f));
+            k.Add(B(340f, 385f, 7f));
+            k.Add(B(318f, 330f, 7f));
+            k.Add(B(308f, 300f, 7f));
+            int ladder = k.Count;
+            k.Add(B(305f, 287f, 15f));                                         // the ladder: three rings, straight up
+            k.Add(B(305f, 287f, 28f));
+            k.Add(B(305f, 287f, 41f));
+            k.Add(B(305f, 287f, 52f));
+            k.Add(B(302f, 315f, 62f));
+            int high = k.Count;
+            k.Add(B(300f, 365f, 64f));                                         // the high ring, then the split-S
+            k.Add(B(300f, 405f, 55f));
+            k.Add(B(301f, 418f, 38f));
+            k.Add(B(299f, 398f, 24f));
+            k.Add(B(295f, 360f, 14f));
+            k.Add(B(289f, 335f, 5f));
             int sweepStart = k.Count;
-            Arc(k, 284f, 236f, 8f, 330f, 330f, 4f, 4f);                       // ring-road sweeper
+            Arc(k, 284f, 260f, 8f, 330f, 330f, 4f, 4f);                       // ring-road sweeper
             int sweepEnd = k.Count - 1;
-            k.Add(B(259f, 300f, 4f));                                          // turning in to the 226 pavilion
+            k.Add(B(259f, 300f, 4f));                                          // into the 226 pavilion's courtyard
             k.Add(B(259f, 245f, 12f));
             k.Add(B(256f, 205f, 26f));
-            k.Add(B(252f, 193f, 31f));                                         // over its west wing
+            k.Add(B(252f, 193f, 31f));
             k.Add(B(246f, 191f, 25f));
             k.Add(B(240f, 191f, 13f));
             int court2 = k.Count;
-            k.Add(B(232f, 191f, 7f));                                          // courtyard
+            k.Add(B(232f, 191f, 7f));
             k.Add(B(221f, 191f, 7f));
             k.Add(B(210f, 192f, 13f));
-            k.Add(B(202f, 196f, 31f));                                         // over its east wing
-            k.Add(B(WalkSouth, 222f, 16f));                                    // down into the walkway
+            k.Add(B(202f, 196f, 31f));
+            k.Add(B(WalkSouth, 222f, 16f));
             k.Add(B(WalkSouth, 255f, 4f));
             k.Add(B(WalkSouth, 295f, 2.5f));
-            k.Add(B(193.5f, 322f, 3f));                                        // south plaza U-turn
+            k.Add(B(193.5f, 322f, 3f));                                        // plaza U-turn
             k.Add(B(196.5f, 318f, 2.5f));
 
             var t = ExpoTrack("expo-v2-pro", "Expo Pro", 2, k);
@@ -391,21 +444,30 @@ namespace GateRush.EditorTools.Builders
             var route = new TrackRoute(r);
             float At(int knot) => route.ClosestDistance(k[knot]);
             void Add(string type, int knot, string color) => r.Obstacles.Add(new RouteObstacle { Type = type, Distance = At(knot), Color = color, IsCheckpoint = true });
+            void Add3(string type, int knot, string color, float scale = 1f) => r.Obstacles.Add(new RouteObstacle { Type = type, Distance = At(knot), Color = color, IsCheckpoint = true, Align3D = true, Scale = scale });
             Add("Finish", 1, "");
-            Add("Air", 8, "blue");        // first courtyard
+            Add("Air", 8, "blue");                      // first courtyard
             Add("Air", 9, "blue");
-            Add("Air", 11, "white");
-            Add("Single", 16, "red");     // under the canopy
-            for (int h = 20; h < helixTop - 1; h += 4) Add("Air", h, h > 30 ? "white" : "blue");   // up the helix
-            Add("Air", helixTop, "red");  // top of the helix: the dive starts here
-            Add("Air", helixTop + 2, "blue");
-            Add("Single", diveBottom + 1, "red");
-            Add("Slalom", slalom, "white");
-            for (int s = sweepStart + 1; s < sweepEnd; s += 2) Add("Single", s, "red");   // gates along the ring road
-            Add("Air", court2, "blue");   // second courtyard
+            Add3("HoloRing", 11, "");                   // over the inner wing
+            Add3("HoloRing", crestStart + 1, "");       // up the flank
+            Add3("HoloRing", crestStart + 3, "");
+            Add3("HoloRing", crest, "", 1.2f);          // the crest
+            Add3("HoloRing", dive1, "");                // dive series
+            Add3("HoloRing", dive2, "");
+            Add3("HoloRing", dive3, "");
+            Add3("HoloRing", pullOut, "", 1.2f);        // pull-out at 6 m
+            Add3("HoloHalo", halo, "");                 // down through the Halo
+            Add3("HoloRing", needle, "");               // over the needle
+            Add3("HoloRing", ladder, "");               // the ladder
+            Add3("HoloRing", ladder + 1, "");
+            Add3("HoloRing", ladder + 2, "");
+            Add3("HoloRing", high, "", 1.2f);           // the high ring before the split-S
+            Add3("HoloRing", high + 2, "");             // the bottom of the split-S
+            for (int s = sweepStart + 1; s < sweepEnd; s += 2) Add("Single", s, "red");
+            Add("Air", court2, "blue");                 // second courtyard
             Add("Air", court2 + 1, "blue");
             Add("Double", court2 + 5, "red");
-            Add("Single", 0, "white");    // the straight into the finish
+            Add("Single", 0, "white");                  // the straight into the finish
             return Finish(t, route, k);
         }
 

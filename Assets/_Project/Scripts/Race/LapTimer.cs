@@ -67,6 +67,7 @@ namespace GateRush.Race
             BestLapIndex = -1;
             Array.Clear(_laps, 0, _laps.Length);
             _holeshotDone = false;
+            Penalties = 0;
         }
 
         public void Start(double time)
@@ -106,6 +107,18 @@ namespace GateRush.Race
             Finished = true;
             FinishTime = time;
             return PassResult.RaceFinished;
+        }
+
+        /// <summary>Seconds of time penalties so far (touched HoloRing rims).</summary>
+        public double Penalties { get; private set; }
+
+        /// <summary>P3: adds a time penalty to the race and the current lap (moves their start back).</summary>
+        public void AddPenalty(double seconds)
+        {
+            if (!Started || Finished || seconds <= 0) return;
+            StartTime -= seconds;
+            LapStartTime -= seconds;
+            Penalties += seconds;
         }
 
         public double CurrentLapTime(double now) => !Started ? 0 : (Finished ? _laps[TotalLaps - 1] : now - LapStartTime);

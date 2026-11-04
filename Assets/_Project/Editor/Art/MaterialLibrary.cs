@@ -35,6 +35,7 @@ namespace GateRush.EditorTools.Art
 
         public const string EnvLit = "GateRush/Env Lit";
         public const string Led = "GateRush/LED";
+        public const string Hologram = "GateRush/Hologram";
     }
 
     /// <summary>
@@ -156,6 +157,10 @@ namespace GateRush.EditorTools.Art
             new MatDef { Name = "M_Expo_Water", Texture = "proc:Water", Tint = new Color(0.22f, 0.34f, 0.44f), TileMeters = 6f, Smoothness = 0.97f, Metallic = 0f, NormalScale = 0.25f, Macro = 0f },
             Plain("M_Expo_Solar", new Color(0.1f, 0.2f, 0.42f), 0.88f, 0.2f),
             Plain("M_Expo_Tower", new Color(0.2f, 0.27f, 0.33f), 0.9f, 0.3f),
+            // P3 holograms: HoloRing gates, the Holo Halo and its beams, the 3D guidance (additive light).
+            new MatDef { Name = "M_Holo", Shader = MatDef.Hologram, Tint = new Color(0.25f, 0.9f, 1f), LedIntensity = 4.5f },
+            new MatDef { Name = "M_Holo_Beam", Shader = MatDef.Hologram, Tint = new Color(0.3f, 0.8f, 1f), LedIntensity = 0.6f },
+            new MatDef { Name = "M_Holo_Guide", Shader = MatDef.Hologram, Tint = new Color(0.3f, 1f, 0.45f), LedIntensity = 1.6f },
             // E6 next-gate beacon: a translucent green light column.
             new MatDef { Name = "M_Beacon", Tint = new Color(0.35f, 1f, 0.5f, 0.16f), Smoothness = 0f, Metallic = 0f, Macro = 0f, Transparent = true, DoubleSided = true, Emission = new Color(0.25f, 1f, 0.4f) * 1.6f },
             // E4 city: light grey precast panels and bitumen-grey roofs (Astana slabs read pale from the air).
@@ -259,6 +264,14 @@ namespace GateRush.EditorTools.Art
             m.shader = shader;
             m.shaderKeywords = new string[0];
 
+            if (d.Shader == MatDef.Hologram)
+            {
+                m.SetColor("_BaseColor", d.Tint);
+                m.SetFloat("_Intensity", d.LedIntensity);
+                m.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
+                EditorUtility.SetDirty(m);
+                return true;
+            }
             if (d.Shader == MatDef.Led)
             {
                 m.SetColor("_BaseColor", d.Tint);

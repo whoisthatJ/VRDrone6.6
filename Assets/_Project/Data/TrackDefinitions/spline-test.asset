@@ -46,51 +46,67 @@ MonoBehaviour:
       - Position: {x: 60, y: 1.5023857, z: 0}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
+        Roll: 0
       - Position: {x: 48.351814, y: 1.5000467, z: 18.503439}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
+        Roll: 0
       - Position: {x: 28.284271, y: 1.5000004, z: 20}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
+        Roll: 0
       - Position: {x: 12.387562, y: 1.5, z: 11.444614}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
+        Roll: 0
       - Position: {x: -0.0000013113416, y: 1.5, z: -0.0000013113416}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
+        Roll: 0
       - Position: {x: -12.387565, y: 1.5, z: -11.444617}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
+        Roll: 0
       - Position: {x: -28.284271, y: 1.5000004, z: -20}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
+        Roll: 0
       - Position: {x: -48.35182, y: 1.5000467, z: -18.503435}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
+        Roll: 0
       - Position: {x: -60, y: 1.5023857, z: 0.0000052453665}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
+        Roll: 0
       - Position: {x: -48.351814, y: 1.55087, z: 18.503437}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
+        Roll: 0
       - Position: {x: -28.284264, y: 1.9525173, z: 19.999998}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
+        Roll: 0
       - Position: {x: -12.387549, y: 3.179341, z: 11.444605}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
+        Roll: 0
       - Position: {x: 0.00000035774642, y: 4.1, z: -0.00000035774642}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
+        Roll: 0
       - Position: {x: 12.387568, y: 3.1793401, z: -11.444619}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
+        Roll: 0
       - Position: {x: 28.284286, y: 1.9525157, z: -20.000004}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
+        Roll: 0
       - Position: {x: 48.351814, y: 1.55087, z: -18.503439}
         TangentIn: {x: 0, y: 0, z: 0}
         TangentOut: {x: 0, y: 0, z: 0}
+        Roll: 0
       Closed: 1
       CorridorWidth: 4
       OuterLineGap: 0.35
@@ -106,6 +122,7 @@ MonoBehaviour:
         Scale: 1
         Color: white
         IsCheckpoint: 1
+        Align3D: 0
       - Type: Single
         Distance: 43
         Lateral: 0
@@ -114,6 +131,7 @@ MonoBehaviour:
         Scale: 1
         Color: red
         IsCheckpoint: 1
+        Align3D: 0
       - Type: Ladder
         Distance: 67.5
         Lateral: 0
@@ -122,6 +140,7 @@ MonoBehaviour:
         Scale: 1
         Color: green
         IsCheckpoint: 1
+        Align3D: 0
       - Type: Cube
         Distance: 94.25
         Lateral: 0
@@ -130,6 +149,7 @@ MonoBehaviour:
         Scale: 1
         Color: green
         IsCheckpoint: 1
+        Align3D: 0
       - Type: Double
         Distance: 121
         Lateral: 0
@@ -138,6 +158,7 @@ MonoBehaviour:
         Scale: 1
         Color: red
         IsCheckpoint: 1
+        Align3D: 0
       - Type: Single
         Distance: 156.25
         Lateral: 0
@@ -146,6 +167,7 @@ MonoBehaviour:
         Scale: 1
         Color: red
         IsCheckpoint: 1
+        Align3D: 0
       - Type: Slalom
         Distance: 191.5
         Lateral: 0
@@ -154,6 +176,7 @@ MonoBehaviour:
         Scale: 1
         Color: white
         IsCheckpoint: 1
+        Align3D: 0
       - Type: Single
         Distance: 215.5
         Lateral: 0
@@ -162,6 +185,7 @@ MonoBehaviour:
         Scale: 1
         Color: red
         IsCheckpoint: 1
+        Align3D: 0
       - Type: Single
         Distance: 234.5
         Lateral: 0
@@ -170,6 +194,7 @@ MonoBehaviour:
         Scale: 1
         Color: blue
         IsCheckpoint: 1
+        Align3D: 0
       - Type: Dive
         Distance: 253.5
         Lateral: 0
@@ -178,6 +203,7 @@ MonoBehaviour:
         Scale: 1
         Color: blue
         IsCheckpoint: 1
+        Align3D: 0
       - Type: Ladder
         Distance: 291.25
         Lateral: 0
@@ -186,6 +212,7 @@ MonoBehaviour:
         Scale: 1
         Color: green
         IsCheckpoint: 1
+        Align3D: 0
       - Type: ChevronBoardLeft
         Distance: 2
         Lateral: 4.5
@@ -194,6 +221,7 @@ MonoBehaviour:
         Scale: 1
         Color: 
         IsCheckpoint: 0
+        Align3D: 0
       - Type: ChevronBoard
         Distance: 158.25
         Lateral: -4.5
@@ -202,6 +230,7 @@ MonoBehaviour:
         Scale: 1
         Color: 
         IsCheckpoint: 0
+        Align3D: 0
       AirCourse: 0
     FreeFlight: 0
     ExtraSpawns: []

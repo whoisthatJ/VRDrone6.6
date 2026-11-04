@@ -106,7 +106,8 @@
                     "x": 0.0,
                     "y": 0.0,
                     "z": 0.0
-                }
+                },
+                "Roll": 0.0
             },
             {
                 "Position": {
@@ -123,7 +124,8 @@
                     "x": 0.0,
                     "y": 0.0,
                     "z": 0.0
-                }
+                },
+                "Roll": 0.0
             },
             {
                 "Position": {
@@ -140,7 +142,8 @@
                     "x": 0.0,
                     "y": 0.0,
                     "z": 0.0
-                }
+                },
+                "Roll": 0.0
             },
             {
                 "Position": {
@@ -157,7 +160,8 @@
                     "x": 0.0,
                     "y": 0.0,
                     "z": 0.0
-                }
+                },
+                "Roll": 0.0
             },
             {
                 "Position": {
@@ -174,7 +178,8 @@
                     "x": 0.0,
                     "y": 0.0,
                     "z": 0.0
-                }
+                },
+                "Roll": 0.0
             },
             {
                 "Position": {
@@ -191,7 +196,8 @@
                     "x": 0.0,
                     "y": 0.0,
                     "z": 0.0
-                }
+                },
+                "Roll": 0.0
             },
             {
                 "Position": {
@@ -208,7 +214,8 @@
                     "x": 0.0,
                     "y": 0.0,
                     "z": 0.0
-                }
+                },
+                "Roll": 0.0
             },
             {
                 "Position": {
@@ -225,7 +232,8 @@
                     "x": 0.0,
                     "y": 0.0,
                     "z": 0.0
-                }
+                },
+                "Roll": 0.0
             },
             {
                 "Position": {
@@ -242,7 +250,8 @@
                     "x": 0.0,
                     "y": 0.0,
                     "z": 0.0
-                }
+                },
+                "Roll": 0.0
             },
             {
                 "Position": {
@@ -259,7 +268,8 @@
                     "x": 0.0,
                     "y": 0.0,
                     "z": 0.0
-                }
+                },
+                "Roll": 0.0
             },
             {
                 "Position": {
@@ -276,7 +286,8 @@
                     "x": 0.0,
                     "y": 0.0,
                     "z": 0.0
-                }
+                },
+                "Roll": 0.0
             },
             {
                 "Position": {
@@ -293,7 +304,8 @@
                     "x": 0.0,
                     "y": 0.0,
                     "z": 0.0
-                }
+                },
+                "Roll": 0.0
             },
             {
                 "Position": {
@@ -310,7 +322,8 @@
                     "x": 0.0,
                     "y": 0.0,
                     "z": 0.0
-                }
+                },
+                "Roll": 0.0
             },
             {
                 "Position": {
@@ -327,7 +340,8 @@
                     "x": 0.0,
                     "y": 0.0,
                     "z": 0.0
-                }
+                },
+                "Roll": 0.0
             },
             {
                 "Position": {
@@ -344,7 +358,8 @@
                     "x": 0.0,
                     "y": 0.0,
                     "z": 0.0
-                }
+                },
+                "Roll": 0.0
             },
             {
                 "Position": {
@@ -361,7 +376,8 @@
                     "x": 0.0,
                     "y": 0.0,
                     "z": 0.0
-                }
+                },
+                "Roll": 0.0
             }
         ],
         "Closed": true,
@@ -379,7 +395,8 @@
                 "Yaw": 0.0,
                 "Scale": 1.0,
                 "Color": "white",
-                "IsCheckpoint": true
+                "IsCheckpoint": true,
+                "Align3D": false
             },
             {
                 "Type": "Single",
@@ -389,7 +406,8 @@
                 "Yaw": 0.0,
                 "Scale": 1.0,
                 "Color": "red",
-                "IsCheckpoint": true
+                "IsCheckpoint": true,
+                "Align3D": false
             },
             {
                 "Type": "Ladder",
@@ -399,7 +417,8 @@
                 "Yaw": 0.0,
                 "Scale": 1.0,
                 "Color": "green",
-                "IsCheckpoint": true
+                "IsCheckpoint": true,
+                "Align3D": false
             },
             {
                 "Type": "Cube",
@@ -409,7 +428,8 @@
                 "Yaw": 0.0,
                 "Scale": 1.0,
                 "Color": "green",
-                "IsCheckpoint": true
+                "IsCheckpoint": true,
+                "Align3D": false
             },
             {
                 "Type": "Double",
@@ -419,7 +439,8 @@
                 "Yaw": 0.0,
                 "Scale": 1.0,
                 "Color": "red",
-                "IsCheckpoint": true
+                "IsCheckpoint": true,
+                "Align3D": false
             },
             {
                 "Type": "Single",
@@ -429,7 +450,8 @@
                 "Yaw": 0.0,
                 "Scale": 1.0,
                 "Color": "red",
-                "IsCheckpoint": true
+                "IsCheckpoint": true,
+                "Align3D": false
             },
             {
                 "Type": "Slalom",
@@ -439,7 +461,8 @@
                 "Yaw": 0.0,
                 "Scale": 1.0,
                 "Color": "white",
-                "IsCheckpoint": true
+                "IsCheckpoint": true,
+                "Align3D": false
             },
             {
                 "Type": "Single",
@@ -449,7 +472,8 @@
                 "Yaw": 0.0,
                 "Scale": 1.0,
                 "Color": "red",
-                "IsCheckpoint": true
+                "IsCheckpoint": true,
+                "Align3D": false
             },
             {
                 "Type": "Single",
@@ -459,7 +483,8 @@
                 "Yaw": 0.0,
                 "Scale": 1.0,
                 "Color": "blue",
-                "IsCheckpoint": true
+                "IsCheckpoint": true,
+                "Align3D": false
             },
             {
                 "Type": "Dive",
@@ -469,7 +494,8 @@
                 "Yaw": 0.0,
                 "Scale": 1.0,
                 "Color": "blue",
-                "IsCheckpoint": true
+                "IsCheckpoint": true,
+                "Align3D": false
             },
             {
                 "Type": "Ladder",
@@ -479,7 +505,8 @@
                 "Yaw": 0.0,
                 "Scale": 1.0,
                 "Color": "green",
-                "IsCheckpoint": true
+                "IsCheckpoint": true,
+                "Align3D": false
             },
             {
                 "Type": "ChevronBoardLeft",
@@ -489,7 +516,8 @@
                 "Yaw": 0.0,
                 "Scale": 1.0,
                 "Color": "",
-                "IsCheckpoint": false
+                "IsCheckpoint": false,
+                "Align3D": false
             },
             {
                 "Type": "ChevronBoard",
@@ -499,7 +527,8 @@
                 "Yaw": 0.0,
                 "Scale": 1.0,
                 "Color": "",
-                "IsCheckpoint": false
+                "IsCheckpoint": false,
+                "Align3D": false
             }
         ],
         "AirCourse": false

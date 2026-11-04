@@ -80,8 +80,9 @@ namespace GateRush.Tests
         {
             foreach (var (t, min, max, top) in new[]
             {
-                (GateRush.EditorTools.Builders.RouteLibrary.ExpoSprint(), 1000f, 1500f, 40f),
-                (GateRush.EditorTools.Builders.RouteLibrary.ExpoPro(), 2000f, 2600f, 95f),
+                // P3: the Sprint climbs up through the Halo (≤ ~60 m), the Pro crosses the sphere (≤ ~115 m).
+                (GateRush.EditorTools.Builders.RouteLibrary.ExpoSprint(), 1200f, 1800f, 65f),
+                (GateRush.EditorTools.Builders.RouteLibrary.ExpoPro(), 2300f, 3300f, 116f),
             })
             {
                 Assert.IsTrue(t.Route.AirCourse, t.Id);

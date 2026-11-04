@@ -84,7 +84,7 @@ namespace GateRush.EditorTools.Builders
 
             var ghostVisual = BuildGhostVisual(mats);
             var race = BuildRace(quad, spawn, ghostVisual);
-            race.gameObject.AddComponent<NextGateBeacon>().Configure(race, GateRush.EditorTools.Art.MaterialLibrary.Get("M_Beacon"));
+            race.gameObject.AddComponent<NextGateBeacon>().Configure(race, GateRush.EditorTools.Art.MaterialLibrary.Get("M_Beacon"), GateRush.EditorTools.Art.MaterialLibrary.Get("M_Holo_Guide"));
 
             var guard = pilotGo.AddComponent<ControllerHotplugGuard>();
             var gso = new SerializedObject(guard);

@@ -1910,6 +1910,18 @@ MonoBehaviour:
     m_Localized: 'Digital HD camera and air unit with two antennas instead of the analog camera and VTX: a clear feed, a little heavier.'
     m_Metadata:
       m_Items: []
+  - m_Id: 450717305270272
+    m_Localized: <color=#ff5ad8>RING TOUCHED +0.5 s</color>
+    m_Metadata:
+      m_Items: []
+  - m_Id: 450717380767744
+    m_Localized: 'Beginner, 1.5 km: the courtyard hop, round the sphere at 3 m, a climb straight up through the Holo Halo and back down the axis. Trainer guidance recommended.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 450717380767745
+    m_Localized: 'Advanced, 2.9 km: over the top of the sphere, down through the Holo Halo, the needle dive, the ladder, a split-S, the ring road and a second courtyard.'
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []
