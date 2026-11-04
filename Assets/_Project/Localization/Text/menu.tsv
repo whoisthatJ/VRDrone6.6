@@ -149,3 +149,38 @@ The original Expo Pro (Track_Expo_v1): helix to 90 m, the park dive, the ring-ro
 Free flight in the original district (Track_Expo_v1).	Алғашқы аудандағы еркін ұшу (Track_Expo_v1).	Свободный полёт в первоначальном районе (Track_Expo_v1).
 Beginner, 1.5 km: the courtyard hop, round the sphere at 3 m, a climb straight up through the Holo Halo and back down the axis. Trainer guidance recommended.	Бастаушы, 1,5 км: аулаға секіру, сфераны 3 м биіктікте айналу, Holo Halo арқылы тік көтерілу және осьпен кері. Жаттықтырушы нұсқауы ұсынылады.	Для начинающих, 1,5 км: прыжок во двор, облёт сферы на 3 м, подъём вертикально сквозь Holo Halo и обратно по оси. Рекомендуется режим тренера.
 Advanced, 2.9 km: over the top of the sphere, down through the Holo Halo, the needle dive, the ladder, a split-S, the ring road and a second courtyard.	Тәжірибелі, 2,9 км: сфераның үстінен, Holo Halo арқылы төмен, стела үстінен құлдилау, баспалдақ, сплит-S, айналма жол және екінші аула.	Для опытных, 2,9 км: через верх сферы, вниз сквозь Holo Halo, пике со стелы, лестница, сплит-S, кольцевая и второй двор.
+Race	Жарыс	Гонка
+Bots	Боттар	Боты
+None	Жоқ	Нет
+Bot level	Бот деңгейі	Уровень ботов
+Rookie	Жаңадан бастаушы	Новичок
+Amateur	Әуесқой	Любитель
+Pro	Кәсіби	Профи
+Elite	Элита	Элита
+Adaptive	Бейімделгіш	Адаптивный
+Midair collisions	Ауадағы соқтығысу	Столкновения в воздухе
+Track intro	Трасса шолуы	Обзор трассы
+Bots fly the same quad class and physics as you. Adaptive bots follow your recent lap times. With collisions off they are ghosts.	Боттар сізбен бірдей квадрокоптер класында және физикамен ұшады. Бейімделгіш боттар соңғы айналым уақыттарыңызға сай ұшады. Соқтығысу өшірулі болса, олар елес болады.	Боты летают на квадрокоптерах того же класса и с той же физикой, что и вы. Адаптивные боты подстраиваются под ваши последние времена кругов. Без столкновений они — призраки.
+{0} variations	{0} нұсқа	Вариантов: {0}
++{0} yours	+{0} сіздікі	+{0} ваших
+All venues	Барлық алаңдар	Все площадки
+Stadium	Стадион	Стадион
+Expo Astana Classic	Expo Astana Classic	Expo Astana Classic
+A big outdoor field: a floating gate, a hurdle and a figure-eight lane track.	Үлкен ашық алаң: қалқымалы қақпа, кедергі және сегіз пішінді жолақ трассасы.	Большое открытое поле: парящие ворота, барьер и трасса-восьмёрка.
+Indoor hall with crates, columns and walls.	Жәшіктер, бағандар мен қабырғалары бар жабық зал.	Закрытый зал с ящиками, колоннами и стенами.
+Container corridors at the port.	Порттағы контейнер дәліздері.	Коридоры из контейнеров в порту.
+Floodlit football stadium with lane tracks round the pitch.	Прожекторлары бар футбол стадионы, алаң айналасында жолақ трассалары.	Футбольный стадион с прожекторами и трассами вокруг поля.
+The Expo district in Astana: the sphere, the pavilions, holo rings and vertical routes.	Астанадағы Expo ауданы: сфера, павильондар, голо-сақиналар және тік маршруттар.	Район Expo в Астане: сфера, павильоны, голо-кольца и вертикальные маршруты.
+The first version of the Expo district, with its original routes and records.	Expo ауданының алғашқы нұсқасы: бастапқы маршруттар мен рекордтар.	Первая версия района Expo с исходными маршрутами и рекордами.
+Classic loop	Классикалық шеңбер	Классический круг
+Hall circuit	Зал трассасы	Трасса в зале
+Container run	Контейнерлер арасы	Между контейнерами
+Figure-eight	Сегіздік	Восьмёрка
+Oval	Сопақ	Овал
+Serpent	Жылан	Змейка
+Sprint	Спринт	Спринт
+Free flight	Еркін ұшу	Свободный полёт
+Classic Sprint	Классикалық спринт	Классический спринт
+Classic Pro	Классикалық Pro	Классический Pro
+Classic Free Flight	Классикалық еркін ұшу	Классический свободный полёт
+1 variation	1 нұсқа	1 вариант

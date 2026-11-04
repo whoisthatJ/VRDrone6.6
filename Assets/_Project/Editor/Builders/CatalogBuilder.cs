@@ -57,48 +57,58 @@ namespace GateRush.EditorTools.Builders
         {
             var catalog = LoadOrCreate<TrackCatalog>(TrackCatalogPath);
             catalog.Tracks.Clear();
-            catalog.Tracks.Add(Entry("field", "Open Field", "Big outdoor loop with a floating gate and a hurdle. Room to learn."));
-            catalog.Tracks.Add(Entry("hangar", "Hangar 7", "Indoor hall: tight turns between crates, columns and walls. Whoop heaven."));
-            catalog.Tracks.Add(Entry("industrial", "Dockyard", "Container corridors and a gate above a container stack."));
-            catalog.Tracks.Add(Entry("spline-test", "Spline Test Loop", "Figure-eight lane track with an overpass (spline track system test)."));
-            catalog.Tracks.Add(Entry("stadium-oval", "Stadium Oval", "Floodlit football stadium: an easy oval around the pitch. Learn the lanes and gates."));
-            catalog.Tracks.Add(Entry("serpent-arena", "Serpent Arena", "The stadium race track: loops round the landing pads, a figure-eight at the centre spot and four overpasses."));
-            catalog.Tracks.Add(Entry("expo-v2-sprint", "Expo Sprint", "Beginner, 1.5 km: the courtyard hop, round the sphere at 3 m, a climb straight up through the Holo Halo and back down the axis. Trainer guidance recommended."));
-            catalog.Tracks.Add(Entry("expo-v2-pro", "Expo Pro", "Advanced, 2.9 km: over the top of the sphere, down through the Holo Halo, the needle dive, the ladder, a split-S, the ring road and a second courtyard."));
-            catalog.Tracks.Add(Entry("expo-v2-free", "Expo Free Flight", "No gates: fly anywhere within 1.2 km of the sphere and up to 150 m. F / D-pad up switches between the south plaza, above the sphere, the park and the ring road; T resets."));
+            catalog.Tracks.Add(Entry("field", "field", "Classic loop", "Open Field", "Big outdoor loop with a floating gate and a hurdle. Room to learn."));
+            catalog.Tracks.Add(Entry("hangar", "hangar", "Hall circuit", "Hangar 7", "Indoor hall: tight turns between crates, columns and walls. Whoop heaven."));
+            catalog.Tracks.Add(Entry("industrial", "industrial", "Container run", "Dockyard", "Container corridors and a gate above a container stack."));
+            catalog.Tracks.Add(Entry("spline-test", "field", "Figure-eight", "Spline Test Loop", "Figure-eight lane track with an overpass (spline track system test)."));
+            catalog.Tracks.Add(Entry("stadium-oval", "stadium", "Oval", "Stadium Oval", "Floodlit football stadium: an easy oval around the pitch. Learn the lanes and gates."));
+            catalog.Tracks.Add(Entry("serpent-arena", "stadium", "Serpent", "Serpent Arena", "The stadium race track: loops round the landing pads, a figure-eight at the centre spot and four overpasses."));
+            catalog.Tracks.Add(Entry("expo-v2-sprint", "expo", "Sprint", "Expo Sprint", "Beginner, 1.5 km: the courtyard hop, round the sphere at 3 m, a climb straight up through the Holo Halo and back down the axis. Trainer guidance recommended."));
+            catalog.Tracks.Add(Entry("expo-v2-pro", "expo", "Pro", "Expo Pro", "Advanced, 2.9 km: over the top of the sphere, down through the Holo Halo, the needle dive, the ladder, a split-S, the ring road and a second courtyard."));
+            catalog.Tracks.Add(Entry("expo-v2-free", "expo", "Free flight", "Expo Free Flight", "No gates: fly anywhere within 1.2 km of the sphere and up to 150 m. F / D-pad up switches between the south plaza, above the sphere, the park and the ring road; T resets."));
             catalog.Environments.Clear();
-            catalog.Environments.Add(new TrackCatalog.EnvironmentScene { Environment = "field", SceneName = "Track_Field" });
-            catalog.Environments.Add(new TrackCatalog.EnvironmentScene { Environment = "hangar", SceneName = "Track_Hangar" });
-            catalog.Environments.Add(new TrackCatalog.EnvironmentScene { Environment = "industrial", SceneName = "Track_Industrial" });
-            catalog.Environments.Add(new TrackCatalog.EnvironmentScene { Environment = "stadium", SceneName = "Track_Stadium" });
-            catalog.Environments.Add(new TrackCatalog.EnvironmentScene { Environment = "expo", SceneName = "Track_Expo" });
+            catalog.Environments.Add(new TrackCatalog.EnvironmentScene { Environment = "field", SceneName = "Track_Field", DisplayName = "Open Field", Description = "A big outdoor field: a floating gate, a hurdle and a figure-eight lane track." });
+            catalog.Environments.Add(new TrackCatalog.EnvironmentScene { Environment = "hangar", SceneName = "Track_Hangar", DisplayName = "Hangar 7", Description = "Indoor hall with crates, columns and walls." });
+            catalog.Environments.Add(new TrackCatalog.EnvironmentScene { Environment = "industrial", SceneName = "Track_Industrial", DisplayName = "Dockyard", Description = "Container corridors at the port." });
+            catalog.Environments.Add(new TrackCatalog.EnvironmentScene { Environment = "stadium", SceneName = "Track_Stadium", DisplayName = "Stadium", Description = "Floodlit football stadium with lane tracks round the pitch." });
+            catalog.Environments.Add(new TrackCatalog.EnvironmentScene { Environment = "expo", SceneName = "Track_Expo", DisplayName = "Expo Astana", Description = "The Expo district in Astana: the sphere, the pavilions, holo rings and vertical routes." });
             // Phase 3 P1a: the first Sphere District, frozen with its original routes and records.
             if (System.IO.File.Exists(GateRush.EditorTools.SphereDistrict.TrackFreezer.FrozenScene))
             {
-                catalog.Tracks.Add(Frozen("expo-astana", "Expo Classic Sprint", "The original Expo Sprint (Track_Expo_v1): the courtyard hop, the low sphere orbit and the park slalom, in the first look of the district."));
-                catalog.Tracks.Add(Frozen("expo-pro", "Expo Classic Pro", "The original Expo Pro (Track_Expo_v1): helix to 90 m, the park dive, the ring-road sweeper and the second courtyard."));
-                catalog.Tracks.Add(Frozen("expo-free", "Expo Classic Free Flight", "Free flight in the original district (Track_Expo_v1)."));
-                catalog.Environments.Add(new TrackCatalog.EnvironmentScene { Environment = GateRush.EditorTools.SphereDistrict.TrackFreezer.Environment, SceneName = "Track_Expo_v1" });
+                catalog.Tracks.Add(Frozen("expo-astana", "Classic Sprint", "Expo Classic Sprint", "The original Expo Sprint (Track_Expo_v1): the courtyard hop, the low sphere orbit and the park slalom, in the first look of the district."));
+                catalog.Tracks.Add(Frozen("expo-pro", "Classic Pro", "Expo Classic Pro", "The original Expo Pro (Track_Expo_v1): helix to 90 m, the park dive, the ring-road sweeper and the second courtyard."));
+                catalog.Tracks.Add(Frozen("expo-free", "Classic Free Flight", "Expo Classic Free Flight", "Free flight in the original district (Track_Expo_v1)."));
+                catalog.Environments.Add(new TrackCatalog.EnvironmentScene { Environment = GateRush.EditorTools.SphereDistrict.TrackFreezer.Environment, SceneName = "Track_Expo_v1", DisplayName = "Expo Astana Classic", Description = "The first version of the Expo district, with its original routes and records." });
             }
             EditorUtility.SetDirty(catalog);
             return catalog;
         }
 
-        private static TrackCatalog.Entry Frozen(string id, string name, string description) => new TrackCatalog.Entry
+        private static TrackCatalog.Entry Frozen(string id, string variation, string name, string description) => new TrackCatalog.Entry
         {
             Id = id,
+            Environment = GateRush.EditorTools.SphereDistrict.TrackFreezer.Environment,
+            Variation = variation,
+            Preview = PreviewFor(id),
             DisplayName = name,
             Description = description,
             Json = AssetDatabase.LoadAssetAtPath<TextAsset>(GateRush.EditorTools.SphereDistrict.TrackFreezer.TrackJson(id)),
         };
 
-        private static TrackCatalog.Entry Entry(string id, string name, string description) => new TrackCatalog.Entry
+        private static TrackCatalog.Entry Entry(string id, string environment, string variation, string name, string description) => new TrackCatalog.Entry
         {
             Id = id,
+            Environment = environment,
+            Variation = variation,
+            Preview = PreviewFor(id),
             DisplayName = name,
             Description = description,
             Json = AssetDatabase.LoadAssetAtPath<TextAsset>($"{CourseLibrary.TrackDir}/{id}.json"),
         };
+
+        public const string PreviewDir = "Assets/_Project/Art/Previews";
+
+        private static Texture2D PreviewFor(string id) => AssetDatabase.LoadAssetAtPath<Texture2D>($"{PreviewDir}/{id}.png");
 
         private static QuadProfileAsset Profile(string file, QuadProfile values)
         {

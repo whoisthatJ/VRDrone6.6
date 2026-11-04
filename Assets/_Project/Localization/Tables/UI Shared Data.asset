@@ -1919,6 +1919,158 @@ MonoBehaviour:
     m_Key: 'Advanced, 2.9 km: over the top of the sphere, down through the Holo Halo, the needle dive, the ladder, a split-S, the ring road and a second courtyard.'
     m_Metadata:
       m_Items: []
+  - m_Id: 587820118831104
+    m_Key: RACE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820206911488
+    m_Key: racing
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820206911489
+    m_Key: 'Watch winner replay: R  /  gamepad Y'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820211105792
+    m_Key: Race
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820211105793
+    m_Key: Bots
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820211105794
+    m_Key: None
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820211105795
+    m_Key: Bot level
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820211105796
+    m_Key: Rookie
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820211105797
+    m_Key: Amateur
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820211105798
+    m_Key: Pro
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820211105799
+    m_Key: Elite
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820211105800
+    m_Key: Adaptive
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820211105801
+    m_Key: Midair collisions
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820211105802
+    m_Key: Track intro
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820211105803
+    m_Key: Bots fly the same quad class and physics as you. Adaptive bots follow your recent lap times. With collisions off they are ghosts.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820211105804
+    m_Key: '{0} variations'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820211105805
+    m_Key: +{0} yours
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820211105806
+    m_Key: All venues
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820211105807
+    m_Key: Stadium
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820211105808
+    m_Key: Expo Astana Classic
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820211105809
+    m_Key: 'A big outdoor field: a floating gate, a hurdle and a figure-eight lane track.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820211105810
+    m_Key: Indoor hall with crates, columns and walls.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820211105811
+    m_Key: Container corridors at the port.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820211105812
+    m_Key: Floodlit football stadium with lane tracks round the pitch.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820211105813
+    m_Key: 'The Expo district in Astana: the sphere, the pavilions, holo rings and vertical routes.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820211105814
+    m_Key: The first version of the Expo district, with its original routes and records.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820211105815
+    m_Key: Classic loop
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820211105816
+    m_Key: Hall circuit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820211105817
+    m_Key: Container run
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820211105818
+    m_Key: Figure-eight
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820211105819
+    m_Key: Oval
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820211105820
+    m_Key: Serpent
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820211105821
+    m_Key: Sprint
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820211105822
+    m_Key: Free flight
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820211105823
+    m_Key: Classic Sprint
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820211105824
+    m_Key: Classic Pro
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820211105825
+    m_Key: Classic Free Flight
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820211105826
+    m_Key: 1 variation
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

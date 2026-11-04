@@ -159,67 +159,143 @@ namespace GateRush.UI
             BackButton(p);
         }
 
-        private const int TracksPerPage = 5;
+        private const int TracksPerPage = 4;
         private int _trackPage;
+        private string _venue;
 
+        /// <summary>Choose track, step 1: one card per venue (scene) with its preview.</summary>
         private void ShowTracks()
         {
             var p = NewPage(L.T("Choose track"));
-            var board = new LocalLeaderboard();
-            board.Load(LocalLeaderboard.DefaultPath);
-
-            // Newest first: your own tracks (newest first), then the built-in ones from the latest to the oldest.
-            var rows = new System.Collections.Generic.List<(string id, string name, string info)>();
-            foreach (var u in GateRush.Track.TrackLibrary.Default.LoadAll())
-                rows.Add((u.Id, u.Name, L.F("Your track: {0}, {1} gates, {2} laps", EnvironmentName(u.Environment), u.Gates.Count, u.Laps)));
-            for (int i = tracks.Tracks.Count - 1; i >= 0; i--)
+            var venues = tracks.Environments;
+            var user = GateRush.Track.TrackLibrary.Default.LoadAll();
+            const int cols = 3;
+            const float gap = 20f;
+            float cw = (ContentWidth - (cols - 1) * gap) / cols, ch = (cw - 16f) * 9f / 16f + 84f;
+            string selectedEnv = SelectedEnvironment();
+            int shown = 0;
+            for (int i = 0; i < venues.Count; i++)
             {
-                var t = tracks.Tracks[i];
-                rows.Add((t.Id, L.T(t.DisplayName), L.T(t.Description)));
-            }
-
-            int pages = Mathf.Max(1, (rows.Count + TracksPerPage - 1) / TracksPerPage);
-            _trackPage = Mathf.Clamp(_trackPage, 0, pages - 1);
-            float y = -130f;
-            for (int i = _trackPage * TracksPerPage; i < rows.Count && i < (_trackPage + 1) * TracksPerPage; i++)
-            {
-                var row = rows[i];
-                var tb = board.Board(row.id);
-                string record = tb.BestLap > 0f
-                    ? L.F("Lap record {0:F2}s ({1})", tb.BestLap, tb.BestLapPilot)
-                    : L.T("No lap record yet");
-                var b = UiKit.Button(p, "", new Vector2(Margin, y), new Vector2(ContentWidth - 250f, 125f), () =>
+                var v = venues[i];
+                var list = tracks.TracksFor(v.Environment);
+                int mine = 0;
+                foreach (var u in user)
+                    if (u.Environment == v.Environment) mine++;
+                if (list.Count == 0 && mine == 0) continue;
+                float x = Margin + (shown % cols) * (cw + gap), y = -130f - (shown / cols) * (ch + gap);
+                shown++;
+                string env = v.Environment;
+                var b = UiKit.Button(p, "", new Vector2(x, y), new Vector2(cw, ch), () =>
                 {
-                    S.TrackId = row.id;
-                    _dirty = true;
-                    ShowTracks();
+                    _venue = env;
+                    _trackPage = 0;
+                    ShowVenue();
                 });
+                if (env == selectedEnv) UiKit.SetButtonColor(b, UiKit.SelectedColor);
+                Preview(b.transform, list.Count > 0 ? list[0].Preview : null, new Vector2(8f, -8f), new Vector2(cw - 16f, (cw - 16f) * 9f / 16f));
                 var label = b.GetComponentInChildren<TMP_Text>();
-                label.alignment = TextAlignmentOptions.MidlineLeft;
-                label.fontSize = 26f;
-                label.text = $"<size=36><b>{row.name}</b></size>   <color=#ffb347>{record}</color>\n<color=#bbb>{row.info}</color>";
-                if (row.id == S.TrackId) UiKit.SetButtonColor(b, UiKit.SelectedColor);
-                UiKit.Button(p, L.T("Fly"), new Vector2(Margin + ContentWidth - 230f, y), new Vector2(230f, 125f), () =>
-                {
-                    CommitIfDirty();
-                    GameFlow.Race(tracks, row.id);
-                }, 38f);
-                y -= 140f;
-            }
-
-            if (pages > 1)
-            {
-                float py = -(Height - 110f);
-                UiKit.Button(p, "<", new Vector2(Width - Margin - 420f, py), new Vector2(90f, 70f), () => { _trackPage = (_trackPage - 1 + pages) % pages; ShowTracks(); });
-                UiKit.Label(p, $"{_trackPage + 1}/{pages}", new Vector2(Width - Margin - 320f, py), new Vector2(120f, 70f), 30f, TextAlignmentOptions.Center);
-                UiKit.Button(p, ">", new Vector2(Width - Margin - 190f, py), new Vector2(90f, 70f), () => { _trackPage = (_trackPage + 1) % pages; ShowTracks(); });
+                var lr = label.rectTransform;
+                lr.anchorMin = new Vector2(0f, 0f);
+                lr.anchorMax = new Vector2(1f, 0f);
+                lr.pivot = new Vector2(0.5f, 0f);
+                lr.anchoredPosition = new Vector2(0f, 8f);
+                lr.sizeDelta = new Vector2(-24f, 72f);
+                label.alignment = TextAlignmentOptions.BottomLeft;
+                label.fontSize = 24f;
+                string name = L.T(string.IsNullOrEmpty(v.DisplayName) ? EnvironmentName(env) : v.DisplayName);
+                string count = (list.Count == 1 ? L.T("1 variation") : L.F("{0} variations", list.Count)) + (mine > 0 ? "  " + L.F("+{0} yours", mine) : "");
+                label.text = $"<size=34><b>{name}</b></size>\n<color=#bbb>{count}</color>";
             }
             BackButton(p);
         }
 
+        /// <summary>Choose track, step 2: the variations of one venue (and your tracks there), with previews.</summary>
+        private void ShowVenue()
+        {
+            var v = tracks.Venue(_venue);
+            if (v == null)
+            {
+                ShowTracks();
+                return;
+            }
+            var p = NewPage(L.T(string.IsNullOrEmpty(v.DisplayName) ? EnvironmentName(v.Environment) : v.DisplayName));
+            var board = new LocalLeaderboard();
+            board.Load(LocalLeaderboard.DefaultPath);
+            if (!string.IsNullOrEmpty(v.Description))
+                UiKit.Label(p, L.T(v.Description), new Vector2(Margin, -105f), new Vector2(ContentWidth, 40f), 24f, TextAlignmentOptions.TopLeft, UiKit.DimTextColor);
+
+            var rows = new System.Collections.Generic.List<(string id, string name, string info, Texture2D preview)>();
+            foreach (var t in tracks.TracksFor(v.Environment))
+                rows.Add((t.Id, L.T(string.IsNullOrEmpty(t.Variation) ? t.DisplayName : t.Variation), L.T(t.Description), t.Preview));
+            foreach (var u in GateRush.Track.TrackLibrary.Default.LoadAll())
+                if (u.Environment == v.Environment)
+                    rows.Add((u.Id, u.Name, L.F("Your track: {0}, {1} gates, {2} laps", EnvironmentName(u.Environment), u.Gates.Count, u.Laps), null));
+
+            int pages = Mathf.Max(1, (rows.Count + TracksPerPage - 1) / TracksPerPage);
+            _trackPage = Mathf.Clamp(_trackPage, 0, pages - 1);
+            const float rowH = 168f, thumbW = 268f;
+            float y = -160f;
+            for (int i = _trackPage * TracksPerPage; i < rows.Count && i < (_trackPage + 1) * TracksPerPage; i++)
+            {
+                var row = rows[i];
+                var tb = board.Board(row.id);
+                string record = tb.BestLap > 0f ? L.F("Lap record {0:F2}s ({1})", tb.BestLap, tb.BestLapPilot) : L.T("No lap record yet");
+                var b = UiKit.Button(p, "", new Vector2(Margin, y), new Vector2(ContentWidth - 250f, rowH - 14f), () =>
+                {
+                    S.TrackId = row.id;
+                    _dirty = true;
+                    ShowVenue();
+                });
+                Preview(b.transform, row.preview, new Vector2(7f, -7f), new Vector2(thumbW - 14f, rowH - 28f));
+                var label = b.GetComponentInChildren<TMP_Text>();
+                var lr = label.rectTransform;
+                lr.offsetMin = new Vector2(thumbW + 12f, 6f);
+                lr.offsetMax = new Vector2(-16f, -6f);
+                label.alignment = TextAlignmentOptions.MidlineLeft;
+                label.fontSize = 24f;
+                label.text = $"<size=36><b>{row.name}</b></size>   <color=#ffb347>{record}</color>\n<color=#bbb>{row.info}</color>";
+                if (row.id == S.TrackId) UiKit.SetButtonColor(b, UiKit.SelectedColor);
+                UiKit.Button(p, L.T("Fly"), new Vector2(Margin + ContentWidth - 230f, y), new Vector2(230f, rowH - 14f), () =>
+                {
+                    CommitIfDirty();
+                    GameFlow.Race(tracks, row.id);
+                }, 38f);
+                y -= rowH;
+            }
+
+            float py = -(Height - 110f);
+            if (pages > 1)
+            {
+                UiKit.Button(p, "<", new Vector2(Width - Margin - 420f, py), new Vector2(90f, 70f), () => { _trackPage = (_trackPage - 1 + pages) % pages; ShowVenue(); });
+                UiKit.Label(p, $"{_trackPage + 1}/{pages}", new Vector2(Width - Margin - 320f, py), new Vector2(120f, 70f), 30f, TextAlignmentOptions.Center);
+                UiKit.Button(p, ">", new Vector2(Width - Margin - 190f, py), new Vector2(90f, 70f), () => { _trackPage = (_trackPage + 1) % pages; ShowVenue(); });
+            }
+            UiKit.Button(p, L.T("All venues"), new Vector2(Margin + 290f, py), new Vector2(260f, 70f), ShowTracks, 30f);
+            BackButton(p);
+        }
+
+        private string SelectedEnvironment()
+        {
+            var e = tracks.Find(S.TrackId);
+            if (e != null) return tracks.EnvironmentOf(e);
+            foreach (var u in GateRush.Track.TrackLibrary.Default.LoadAll())
+                if (u.Id == S.TrackId) return u.Environment;
+            return "";
+        }
+
+        /// <summary>A track preview image (or a dark placeholder) inside a button, top-left anchored.</summary>
+        private static void Preview(Transform parent, Texture2D tex, Vector2 pos, Vector2 size)
+        {
+            var r = UiKit.Rect(parent, "Preview", pos, size);
+            var img = r.gameObject.AddComponent<UnityEngine.UI.RawImage>();
+            img.texture = tex;
+            img.color = tex != null ? Color.white : new Color(0.08f, 0.09f, 0.12f, 1f);
+            img.raycastTarget = false;
+        }
+
         // ---------- settings ----------
 
-        private static readonly string[] Tabs = { "Rates", "Camera", "Input", "Graphics", "Feed", "Physics", "Pilot" };
+        private static readonly string[] Tabs = { "Rates", "Camera", "Input", "Graphics", "Feed", "Physics", "Race", "Pilot" };
 
         private void ShowSettings()
         {
@@ -245,6 +321,7 @@ namespace GateRush.UI
                 case "Graphics": BuildGraphics(content); break;
                 case "Feed": BuildFeed(content); break;
                 case "Physics": BuildPhysics(content); break;
+                case "Race": BuildRace(content); break;
                 default: BuildPilot(content); break;
             }
 
@@ -438,6 +515,18 @@ namespace GateRush.UI
             UiKit.StepperRow(c, L.T("Ghost lanes"), -450f, OffOn, guide.GhostLanes ? 1 : 0, i => { guide.GhostLanes = i == 1; Changed(); }, ContentWidth);
             UiKit.Label(c, L.T("Trainer adds a racing line (green: fast, yellow: brake, red: slow) and an arrow to the next gate. Ghost lanes: fly through the lane posts."),
                 new Vector2(0f, -540f), new Vector2(ContentWidth, 60f), 26f, TextAlignmentOptions.TopLeft, UiKit.DimTextColor);
+        }
+
+        private void BuildRace(RectTransform c)
+        {
+            var race = S.Race;
+            UiKit.StepperRow(c, L.T("Bots"), 0f, new[] { L.T("None"), "1", "2", "3", "4", "5", "6", "7" }, Mathf.Clamp(race.BotCount, 0, 7), i => { race.BotCount = i; Changed(); }, ContentWidth);
+            UiKit.StepperRow(c, L.T("Bot level"), -90f, new[] { L.T("Rookie"), L.T("Amateur"), L.T("Pilot"), L.T("Pro"), L.T("Elite"), L.T("Adaptive") },
+                Mathf.Clamp(race.BotLevel, 0, 5), i => { race.BotLevel = i; Changed(); }, ContentWidth);
+            UiKit.StepperRow(c, L.T("Midair collisions"), -180f, OffOn, race.BotCollisions ? 1 : 0, i => { race.BotCollisions = i == 1; Changed(); }, ContentWidth);
+            UiKit.StepperRow(c, L.T("Track intro"), -270f, OffOn, race.TrackIntro ? 1 : 0, i => { race.TrackIntro = i == 1; Changed(); }, ContentWidth);
+            UiKit.Label(c, L.T("Bots fly the same quad class and physics as you. Adaptive bots follow your recent lap times. With collisions off they are ghosts."),
+                new Vector2(0f, -360f), new Vector2(ContentWidth, 60f), 26f, TextAlignmentOptions.TopLeft, UiKit.DimTextColor);
         }
 
         private void BuildPhysics(RectTransform c)

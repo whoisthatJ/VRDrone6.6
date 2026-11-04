@@ -1922,6 +1922,158 @@ MonoBehaviour:
     m_Localized: 'Advanced, 2.9 km: over the top of the sphere, down through the Holo Halo, the needle dive, the ladder, a split-S, the ring road and a second courtyard.'
     m_Metadata:
       m_Items: []
+  - m_Id: 587820118831104
+    m_Localized: RACE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820206911488
+    m_Localized: racing
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820206911489
+    m_Localized: 'Watch winner replay: R  /  gamepad Y'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820211105792
+    m_Localized: Race
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820211105793
+    m_Localized: Bots
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820211105794
+    m_Localized: None
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820211105795
+    m_Localized: Bot level
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820211105796
+    m_Localized: Rookie
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820211105797
+    m_Localized: Amateur
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820211105798
+    m_Localized: Pro
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820211105799
+    m_Localized: Elite
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820211105800
+    m_Localized: Adaptive
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820211105801
+    m_Localized: Midair collisions
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820211105802
+    m_Localized: Track intro
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820211105803
+    m_Localized: Bots fly the same quad class and physics as you. Adaptive bots follow your recent lap times. With collisions off they are ghosts.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820211105804
+    m_Localized: '{0} variations'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820211105805
+    m_Localized: +{0} yours
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820211105806
+    m_Localized: All venues
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820211105807
+    m_Localized: Stadium
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820211105808
+    m_Localized: Expo Astana Classic
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820211105809
+    m_Localized: 'A big outdoor field: a floating gate, a hurdle and a figure-eight lane track.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820211105810
+    m_Localized: Indoor hall with crates, columns and walls.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820211105811
+    m_Localized: Container corridors at the port.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820211105812
+    m_Localized: Floodlit football stadium with lane tracks round the pitch.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820211105813
+    m_Localized: 'The Expo district in Astana: the sphere, the pavilions, holo rings and vertical routes.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820211105814
+    m_Localized: The first version of the Expo district, with its original routes and records.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820211105815
+    m_Localized: Classic loop
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820211105816
+    m_Localized: Hall circuit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820211105817
+    m_Localized: Container run
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820211105818
+    m_Localized: Figure-eight
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820211105819
+    m_Localized: Oval
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820211105820
+    m_Localized: Serpent
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820211105821
+    m_Localized: Sprint
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820211105822
+    m_Localized: Free flight
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820211105823
+    m_Localized: Classic Sprint
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820211105824
+    m_Localized: Classic Pro
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820211105825
+    m_Localized: Classic Free Flight
+    m_Metadata:
+      m_Items: []
+  - m_Id: 587820211105826
+    m_Localized: 1 variation
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

@@ -64,6 +64,20 @@ namespace GateRush.Core
         public bool GhostLanes;
     }
 
+    /// <summary>P4 race mode: bots on the grid.</summary>
+    [Serializable]
+    public sealed class RacePrefs
+    {
+        /// <summary>0-7 bots in offline races.</summary>
+        public int BotCount = 3;
+        /// <summary>Rookie, Amateur, Pilot, Pro, Elite, Adaptive.</summary>
+        public int BotLevel = 2;
+        /// <summary>Midair collisions with bots (off = ghost bots).</summary>
+        public bool BotCollisions = true;
+        /// <summary>The track showdown before a race.</summary>
+        public bool TrackIntro = true;
+    }
+
     /// <summary>Online features. Everything is off until the player opts in (the game never connects on its own).</summary>
     [Serializable]
     public sealed class OnlinePrefs
@@ -109,6 +123,7 @@ namespace GateRush.Core
         public GraphicsPrefs Graphics = new GraphicsPrefs();
         public GuidancePrefs Guidance = new GuidancePrefs();
         public OnlinePrefs Online = new OnlinePrefs();
+        public RacePrefs Race = new RacePrefs();
 
         /// <summary>Brings every value into its valid range (after loading or editing).</summary>
         public void Clamp()

@@ -17,60 +17,108 @@ MonoBehaviour:
     DisplayName: Open Field
     Description: Big outdoor loop with a floating gate and a hurdle. Room to learn.
     Json: {fileID: 4900000, guid: 2b962c0c5c2525843a77e4114911506d, type: 3}
+    Environment: field
+    Variation: Classic loop
+    Preview: {fileID: 2800000, guid: 9a5d670f37f2b2a4996bb57eb20be2ec, type: 3}
   - Id: hangar
     DisplayName: Hangar 7
     Description: 'Indoor hall: tight turns between crates, columns and walls. Whoop heaven.'
     Json: {fileID: 4900000, guid: 2dd414e040841ea4790a3db43389531c, type: 3}
+    Environment: hangar
+    Variation: Hall circuit
+    Preview: {fileID: 2800000, guid: 931cc078b650ab34081a6a1cb6dbd2f2, type: 3}
   - Id: industrial
     DisplayName: Dockyard
     Description: Container corridors and a gate above a container stack.
     Json: {fileID: 4900000, guid: ee31c46cd8b798a40b850617b17648aa, type: 3}
+    Environment: industrial
+    Variation: Container run
+    Preview: {fileID: 2800000, guid: 5d1adb48ec598c44cbc9a6143180e250, type: 3}
   - Id: spline-test
     DisplayName: Spline Test Loop
     Description: Figure-eight lane track with an overpass (spline track system test).
     Json: {fileID: 4900000, guid: 9c367b8fd3d888d41ba92c0abd0a3c02, type: 3}
+    Environment: field
+    Variation: Figure-eight
+    Preview: {fileID: 2800000, guid: 03609e818a40d1d46afa0b4b22cb2f3a, type: 3}
   - Id: stadium-oval
     DisplayName: Stadium Oval
     Description: 'Floodlit football stadium: an easy oval around the pitch. Learn the lanes and gates.'
     Json: {fileID: 4900000, guid: 481cab861150c8a458796624b8d6e691, type: 3}
+    Environment: stadium
+    Variation: Oval
+    Preview: {fileID: 2800000, guid: 0c64401d540bc3e4a8ca0d39814f0524, type: 3}
   - Id: serpent-arena
     DisplayName: Serpent Arena
     Description: 'The stadium race track: loops round the landing pads, a figure-eight at the centre spot and four overpasses.'
     Json: {fileID: 4900000, guid: ce521c4b474270e46a5b63650c7880bf, type: 3}
+    Environment: stadium
+    Variation: Serpent
+    Preview: {fileID: 2800000, guid: 11f08e3c5f41d4c49be5a7a271675443, type: 3}
   - Id: expo-v2-sprint
     DisplayName: Expo Sprint
     Description: 'Beginner, 1.5 km: the courtyard hop, round the sphere at 3 m, a climb straight up through the Holo Halo and back down the axis. Trainer guidance recommended.'
     Json: {fileID: 4900000, guid: 920dde672eb45d04a8d5f4dd14ef57c4, type: 3}
+    Environment: expo
+    Variation: Sprint
+    Preview: {fileID: 2800000, guid: ddf57c4774c4eee4db69e89673d3457a, type: 3}
   - Id: expo-v2-pro
     DisplayName: Expo Pro
     Description: 'Advanced, 2.9 km: over the top of the sphere, down through the Holo Halo, the needle dive, the ladder, a split-S, the ring road and a second courtyard.'
     Json: {fileID: 4900000, guid: ad8e9fd3e09cb5249995716d7866676b, type: 3}
+    Environment: expo
+    Variation: Pro
+    Preview: {fileID: 2800000, guid: 85c1400af0cc0c4408e706eb15b9d152, type: 3}
   - Id: expo-v2-free
     DisplayName: Expo Free Flight
     Description: 'No gates: fly anywhere within 1.2 km of the sphere and up to 150 m. F / D-pad up switches between the south plaza, above the sphere, the park and the ring road; T resets.'
     Json: {fileID: 4900000, guid: c52a1f8a5e1761d4581cda615da13d67, type: 3}
+    Environment: expo
+    Variation: Free flight
+    Preview: {fileID: 2800000, guid: f602d35177b42704ea2f1445ace87991, type: 3}
   - Id: expo-astana
     DisplayName: Expo Classic Sprint
     Description: 'The original Expo Sprint (Track_Expo_v1): the courtyard hop, the low sphere orbit and the park slalom, in the first look of the district.'
     Json: {fileID: 4900000, guid: addb4e50095f6bb438e51f185e08324a, type: 3}
+    Environment: expo_v1
+    Variation: Classic Sprint
+    Preview: {fileID: 2800000, guid: 0dbed073530460f49afc198ff2166c18, type: 3}
   - Id: expo-pro
     DisplayName: Expo Classic Pro
     Description: 'The original Expo Pro (Track_Expo_v1): helix to 90 m, the park dive, the ring-road sweeper and the second courtyard.'
     Json: {fileID: 4900000, guid: 6948040d84bb9c747b437a728c118a82, type: 3}
+    Environment: expo_v1
+    Variation: Classic Pro
+    Preview: {fileID: 2800000, guid: a88633d0a72d9054b9d7aaac2e4816b3, type: 3}
   - Id: expo-free
     DisplayName: Expo Classic Free Flight
     Description: Free flight in the original district (Track_Expo_v1).
     Json: {fileID: 4900000, guid: ee843bf88a3b87e488b9470c7a4a9bcf, type: 3}
+    Environment: expo_v1
+    Variation: Classic Free Flight
+    Preview: {fileID: 2800000, guid: 01e2e97603d36dc4aa47f29fe46d472e, type: 3}
   Environments:
   - Environment: field
     SceneName: Track_Field
+    DisplayName: Open Field
+    Description: 'A big outdoor field: a floating gate, a hurdle and a figure-eight lane track.'
   - Environment: hangar
     SceneName: Track_Hangar
+    DisplayName: Hangar 7
+    Description: Indoor hall with crates, columns and walls.
   - Environment: industrial
     SceneName: Track_Industrial
+    DisplayName: Dockyard
+    Description: Container corridors at the port.
   - Environment: stadium
     SceneName: Track_Stadium
+    DisplayName: Stadium
+    Description: Floodlit football stadium with lane tracks round the pitch.
   - Environment: expo
     SceneName: Track_Expo
+    DisplayName: Expo Astana
+    Description: 'The Expo district in Astana: the sphere, the pavilions, holo rings and vertical routes.'
   - Environment: expo_v1
     SceneName: Track_Expo_v1
+    DisplayName: Expo Astana Classic
+    Description: The first version of the Expo district, with its original routes and records.

@@ -87,17 +87,33 @@ namespace GateRush.Game
             Place(0f);
         }
 
+        /// <summary>The high orbit over the course (shot 1, also the menu preview): <paramref name="e"/> 0..1 along the orbit.</summary>
+        public static void Overview(Transform spawn, Vector3 centre, float radius, float e, out Vector3 pos, out Vector3 look)
+        {
+            float yaw = spawn.eulerAngles.y + 200f + 30f * e;
+            Vector3 dir = Quaternion.Euler(0f, yaw, 0f) * Vector3.forward;
+            pos = centre - dir * (radius * 1.05f) + Vector3.up * (radius * 0.55f + 12f);
+            look = centre;
+        }
+
+        /// <summary>Centre and radius of a course (gates, spawn and flight line).</summary>
+        public static void Extent(LoadedTrack track, out Vector3 centre, out float radius)
+        {
+            var b = new Bounds(track.Spawn.position, Vector3.one);
+            foreach (var g in track.Gates)
+                if (g != null) b.Encapsulate(g.AimPointWorld);
+            var route = track.Route;
+            if (route != null)
+                for (float d = 0f; d < route.Length; d += Mathf.Max(5f, route.Length / 64f)) b.Encapsulate(route.Sample(d).Position);
+            centre = b.center;
+            radius = Mathf.Clamp(Mathf.Max(b.extents.x, b.extents.z), 20f, 600f);
+        }
+
         // The course's extent, and a stretch of flight line through a gate in the middle of the lap for shot 2.
         private void Frame()
         {
-            var b = new Bounds(_track.Spawn.position, Vector3.one);
-            foreach (var g in _track.Gates)
-                if (g != null) b.Encapsulate(g.AimPointWorld);
+            Extent(_track, out _centre, out _radius);
             var route = _track.Route;
-            if (route != null)
-                for (float d = 0f; d < route.Length; d += Mathf.Max(5f, route.Length / 64f)) b.Encapsulate(route.Sample(d).Position);
-            _centre = b.center;
-            _radius = Mathf.Clamp(Mathf.Max(b.extents.x, b.extents.z), 20f, 600f);
 
             var gates = _track.Gates;
             Gate gate = gates.Length > 0 ? gates[Mathf.Clamp(gates.Length / 2, 0, gates.Length - 1)] : null;
@@ -156,14 +172,9 @@ namespace GateRush.Game
             switch (shot)
             {
                 case 0:
-                {
                     // High orbit over the whole course.
-                    float yaw = spawn.eulerAngles.y + 200f + 30f * e;
-                    Vector3 dir = Quaternion.Euler(0f, yaw, 0f) * Vector3.forward;
-                    pos = _centre - dir * (_radius * 1.05f) + Vector3.up * (_radius * 0.55f + 12f);
-                    look = _centre;
+                    Overview(spawn, _centre, _radius, e, out pos, out look);
                     break;
-                }
                 case 1 when _run != null:
                 {
                     // Down the flight line through a gate.
