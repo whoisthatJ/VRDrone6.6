@@ -10,6 +10,21 @@ namespace Ushqyr.Strike
 {
     public enum StrikePhase { Idle, Countdown, Round, Finished }
 
+    /// <summary>
+    /// The online side of a round (P6), supplied by the game's online driver: the shared round clock, and where the
+    /// local pilot's hit claims and crashes go. The host resolves its own claims locally through the same referee.
+    /// </summary>
+    public interface IStrikeLink
+    {
+        /// <summary>Seconds since the round's start on the shared clock (negative during the countdown).</summary>
+        float Clock { get; }
+        bool IsHost { get; }
+        /// <summary>The local pilot's key (grid slot).</summary>
+        int LocalPilot { get; }
+        void ClaimHit(in StrikeWire.HitClaim claim);
+        void ReportCrash(float time);
+    }
+
     /// <summary>Lobby choices for a round.</summary>
     [Serializable]
     public struct StrikeOptions
@@ -56,9 +71,21 @@ namespace Ushqyr.Strike
         public IReadOnlyList<StrikeBot> Bots => _bots;
         public StrikeOptions Options => _options;
         /// <summary>Seconds into the round (0 before the start, RoundSeconds after the end).</summary>
-        public float RoundTime => Phase == StrikePhase.Round ? Mathf.Min(StrikeRules.RoundSeconds, Time.time - _roundStart) : Phase == StrikePhase.Finished ? StrikeRules.RoundSeconds : 0f;
+        public float RoundTime => Phase == StrikePhase.Round ? Mathf.Clamp(Link != null ? Link.Clock : Time.time - _roundStart, 0f, StrikeRules.RoundSeconds) : Phase == StrikePhase.Finished ? StrikeRules.RoundSeconds : 0f;
         public float TimeLeft => StrikeRules.RoundSeconds - RoundTime;
-        public float CountdownLeft => Phase == StrikePhase.Countdown ? Mathf.Max(0f, StrikeRules.CountdownSeconds - (Time.time - _phaseStart)) : 0f;
+        public float CountdownLeft => Phase != StrikePhase.Countdown ? 0f : Link != null ? Mathf.Max(0f, -Link.Clock) : Mathf.Max(0f, StrikeRules.CountdownSeconds - (Time.time - _phaseStart));
+        /// <summary>Online round (P6): set before <see cref="Begin"/>; null offline.</summary>
+        public IStrikeLink Link { get; set; }
+        public bool Online => Link != null;
+        /// <summary>Other pilots' scores in an online round (by pilot key), as the host reports them.</summary>
+        private readonly Dictionary<int, StrikeScore> _remote = new Dictionary<int, StrikeScore>();
+        /// <summary>Host side of an online round: a bot hit (bot index, confirm) or crash (bot index).</summary>
+        public event Action<int, StrikeWire.HitConfirm> BotHit;
+        public event Action<int> BotCrashed;
+        /// <summary>Online: the reset button after the round (the host takes everyone back to the lobby).</summary>
+        public event Action RestartRequested;
+        /// <summary>The pad the local pilot starts on (online pilots spread over the pads by grid slot).</summary>
+        public int StartPad { get; set; }
         /// <summary>The last scoring event for the HUD: text and time.</summary>
         public string LastEvent { get; private set; } = "";
         public float LastEventTime { get; private set; } = -10f;
@@ -103,12 +130,20 @@ namespace Ushqyr.Strike
             PlayerScore = new StrikeScore { Pilot = string.IsNullOrEmpty(_options.PilotName) ? "Pilot" : _options.PilotName };
             var collision = _player.BaseCollision;
             var level = BotDifficultyProfile.For(_options.BotLevel);
-            for (int i = 0; i < Mathf.Clamp(_options.Bots, 0, 3); i++)
+            _remote.Clear();
+            int botCount = Link == null || Link.IsHost ? Mathf.Clamp(_options.Bots, 0, 3) : 0;
+            for (int i = 0; i < botCount; i++)
             {
                 var build = BotRoster.BuildFor(size, i);
                 var bot = new StrikeBot(i, BotRoster.NameFor(i, _options.Seed), _director, BuildComposer.Compose(build), level, collision, _options.Seed * 13 + i);
                 int index = i;
-                bot.Hit = (slot, pts) => Event($"{bot.Score.Pilot} +{pts}");
+                bot.Hit = (slot, pts) =>
+                {
+                    Event($"{bot.Score.Pilot} +{pts}");
+                    var target = _director.Targets[slot];
+                    BotHit?.Invoke(index, new StrikeWire.HitConfirm { Slot = slot, Generation = target.Plan.Generation, Pilot = StrikeWire.BotKeyBase + index, Points = pts, Time = target.DisabledAt });
+                };
+                bot.Crashed = () => BotCrashed?.Invoke(index);
                 _bots.Add(bot);
                 var root = new GameObject("Strike Bot " + bot.Score.Pilot).transform;
                 root.SetParent(transform, false);
@@ -116,7 +151,7 @@ namespace Ushqyr.Strike
                 _botVisuals.Add(root);
             }
             // Player on pad 0, bots on the others (they take turns if there are more bots than pads).
-            PlacePlayer(0);
+            PlacePlayer(StartPad);
             for (int i = 0; i < _bots.Count; i++)
             {
                 int pad = (i + 1) % layout.Pads.Length;
@@ -155,7 +190,9 @@ namespace Ushqyr.Strike
         // The reset button after a round (T / L-stick click) starts a new one.
         private void OnPlayerRespawned()
         {
-            if (Phase == StrikePhase.Finished && _player != null && _player.LastInput.Reset) _restartQueued = true;
+            if (Phase != StrikePhase.Finished || _player == null || !_player.LastInput.Reset) return;
+            if (Link != null) RestartRequested?.Invoke();
+            else _restartQueued = true;
         }
 
         private void Update()
@@ -168,7 +205,8 @@ namespace Ushqyr.Strike
             if (_director == null) return;
             if (Phase == StrikePhase.Countdown)
             {
-                Lights(CountdownLeft);
+                // Online the wait for GO can be longer than 3 s: red until the last three.
+                Lights(Mathf.Min(CountdownLeft, StrikeRules.CountdownSeconds));
                 if (CountdownLeft <= 0f) SetPhase(StrikePhase.Round);
                 return;
             }
@@ -238,6 +276,22 @@ namespace Ushqyr.Strike
 
         private void ResolvePlayer(int slot, float speed, float t)
         {
+            if (Link != null)
+            {
+                // Online the host decides: a candidate hit is claimed, anything else is a crash.
+                if (slot >= 0 && StrikeRules.IsHit(speed))
+                {
+                    var target = _director.Targets[slot];
+                    Link.ClaimHit(new StrikeWire.HitClaim { Slot = slot, Generation = target.Plan.Generation, Time = t, Speed = speed, Position = _player.transform.position });
+                    Event("...");
+                }
+                else
+                {
+                    Link.ReportCrash(t);
+                    Event(slot >= 0 ? Ushqyr.Core.L.T("Too slow: bump") : Ushqyr.Core.L.T("Crash"));
+                }
+                return;
+            }
             if (slot >= 0 && StrikeRules.IsHit(speed) && _director.Hit(slot, t, 100))
             {
                 int pts = PlayerScore.Hit(_director.Targets[slot].Plan.Class, speed);
@@ -326,13 +380,51 @@ namespace Ushqyr.Strike
         {
             var list = new List<StrikeScore> { PlayerScore };
             foreach (var b in _bots) list.Add(b.Score);
+            foreach (var r in _remote.Values) list.Add(r);
             list.Sort(StrikeScore.Compare);
             return list;
         }
 
+        // ---------- online (P6) ----------
+
+        /// <summary>A hit the host confirmed: disables the target here too (the host already did) and tells the pilot.</summary>
+        public void ApplyConfirm(in StrikeWire.HitConfirm c, string pilotName)
+        {
+            if (_director == null || c.Slot < 0 || c.Slot >= _director.Targets.Count) return;
+            var t = _director.Targets[c.Slot];
+            if (t.Plan.Generation == c.Generation && t.Active) _director.Hit(c.Slot, c.Time, c.Pilot);
+            bool me = Link != null && c.Pilot == Link.LocalPilot;
+            Event(me ? $"+{c.Points}" : $"{pilotName} +{c.Points}");
+        }
+
+        /// <summary>The host turned the local pilot's claim down.</summary>
+        public void ApplyReject(RefereeVerdict v)
+        {
+            Event(v == RefereeVerdict.AlreadyDown || v == RefereeVerdict.Stale ? Ushqyr.Core.L.T("Too late: already hit") : Ushqyr.Core.L.T("Not counted"));
+        }
+
+        /// <summary>A score from the host: the local pilot's, another pilot's, or (on clients) a bot's.</summary>
+        public void ApplyScore(in StrikeWire.ScoreState s, string pilotName)
+        {
+            if (Link == null) return;
+            if (s.Pilot == Link.LocalPilot)
+            {
+                s.ApplyTo(PlayerScore);
+                return;
+            }
+            if (Link.IsHost && s.Pilot >= StrikeWire.BotKeyBase) return; // the host's own bots keep their scores
+            if (!_remote.TryGetValue(s.Pilot, out var r)) _remote[s.Pilot] = r = new StrikeScore();
+            r.Pilot = pilotName;
+            s.ApplyTo(r);
+        }
+
+        /// <summary>A pilot left the online round.</summary>
+        public void RemovePilot(int pilot) => _remote.Remove(pilot);
+
         /// <summary>A new round with a new seed (the same options).</summary>
         public void Restart(SizeClass size)
         {
+            if (Link != null) return; // online: the host starts the next round from the lobby
             var o = _options;
             o.Seed = 0;
             if (_player != null) Begin(_player, o, _materials, size);

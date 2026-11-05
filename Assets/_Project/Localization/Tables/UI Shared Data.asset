@@ -2155,6 +2155,46 @@ MonoBehaviour:
     m_Key: 'Steppe range with roads, berms and revetments: FPV strike training against static, moving and evasive targets.'
     m_Metadata:
       m_Items: []
+  - m_Id: 720657811763200
+    m_Key: 'Too late: already hit'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 720657874677760
+    m_Key: Not counted
+    m_Metadata:
+      m_Items: []
+  - m_Id: 720657874677761
+    m_Key: Waiting for the other pilots
+    m_Metadata:
+      m_Items: []
+  - m_Id: 720657874677762
+    m_Key: 'Back to the lobby: T  /  gamepad L-stick click     Leave: Esc'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 720657874677763
+    m_Key: 'Waiting for the host     Leave: Esc'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 720657874677764
+    m_Key: LAN race
+    m_Metadata:
+      m_Items: []
+  - m_Id: 720657874677765
+    m_Key: Host a LAN race
+    m_Metadata:
+      m_Items: []
+  - m_Id: 720657874677766
+    m_Key: Host address
+    m_Metadata:
+      m_Items: []
+  - m_Id: 720657874677767
+    m_Key: Join LAN
+    m_Metadata:
+      m_Items: []
+  - m_Id: 720657874677768
+    m_Key: Could not open the LAN race (is the port in use?).
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

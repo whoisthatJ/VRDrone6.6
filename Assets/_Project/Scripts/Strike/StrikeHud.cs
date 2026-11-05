@@ -128,7 +128,9 @@ namespace Ushqyr.Strike
             float since = Time.time - _session.LastEventTime;
             _event.text = since < 1.6f ? _session.LastEvent : "";
             _event.alpha = Mathf.Clamp01(1.6f - since);
-            _centre.text = phase == StrikePhase.Countdown ? Mathf.CeilToInt(_session.CountdownLeft).ToString() : phase == StrikePhase.Round && _session.RoundTime < 0.8f ? L.T("GO!") : "";
+            float left = _session.CountdownLeft;
+            _centre.text = phase == StrikePhase.Countdown ? (left > StrikeRules.CountdownSeconds + 0.5f ? L.T("Waiting for the other pilots") : Mathf.CeilToInt(left).ToString())
+                : phase == StrikePhase.Round && _session.RoundTime < 0.8f ? L.T("GO!") : "";
 
             _refresh -= Time.unscaledDeltaTime;
             if (_refresh <= 0f)
@@ -235,7 +237,10 @@ namespace Ushqyr.Strike
                 sb.AppendLine(Inv($"{n}. {e.Score}   {e.Pilot}   ") + L.F("hits {0}", e.Hits) + "   " + e.Date);
             }
             sb.AppendLine();
-            sb.AppendLine("<size=80%>" + L.T("New round: T  /  gamepad L-stick click     Menu: Esc") + "</size>");
+            string hint = !_session.Online ? L.T("New round: T  /  gamepad L-stick click     Menu: Esc")
+                : _session.Link.IsHost ? L.T("Back to the lobby: T  /  gamepad L-stick click     Leave: Esc")
+                : L.T("Waiting for the host     Leave: Esc");
+            sb.AppendLine("<size=80%>" + hint + "</size>");
             return sb.ToString();
         }
 

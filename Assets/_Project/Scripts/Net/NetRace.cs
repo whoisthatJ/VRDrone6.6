@@ -84,6 +84,8 @@ namespace Ushqyr.Net
             };
             var race = go.AddComponent<NetRace>();
             race._net = net;
+            // Hook the callbacks now: a direct (LAN) host starts in this same frame, before Start() would run.
+            race.Hook();
             Created?.Invoke(race);
             return race;
         }
@@ -98,8 +100,14 @@ namespace Ushqyr.Net
             if (_net == null) _net = GetComponent<NetworkManager>();
         }
 
-        private void Start()
+        private bool _hooked;
+
+        private void Start() => Hook();
+
+        private void Hook()
         {
+            if (_hooked || _net == null) return;
+            _hooked = true;
             _net.OnClientStarted += OnStarted;
             _net.OnClientStopped += OnStopped;
             _net.OnClientConnectedCallback += OnClientConnected;
@@ -140,6 +148,7 @@ namespace Ushqyr.Net
             m.RegisterNamedMessageHandler(MsgStateDown, OnStateDown);
             m.RegisterNamedMessageHandler(MsgFinishDown, OnFinishDown);
             m.RegisterNamedMessageHandler(MsgLobby, OnLobby);
+            foreach (var kv in _extra) RegisterExtraHandler(kv.Key);
             _registered = true;
             Phase = OnlinePhase.Lobby;
         }
@@ -395,6 +404,120 @@ namespace Ushqyr.Net
             Phase = OnlinePhase.Lobby;
             foreach (var p in Pilots.Values) p.ResetRace();
             ReturnedToLobby?.Invoke();
+        }
+
+        // ---------- mode messages (P6) ----------
+
+        private readonly Dictionary<string, Action<ulong, byte[]>> _extra = new Dictionary<string, Action<ulong, byte[]>>();
+
+        /// <summary>Bytes sent and received through mode messages since the race network started (for cost reports).</summary>
+        public long ExtraBytesSent { get; private set; }
+        public long ExtraBytesReceived { get; private set; }
+
+        /// <summary>
+        /// A game mode's own message (the Strike Range): <paramref name="handler"/> gets the sender and the payload.
+        /// Re-registering a name replaces its handler.
+        /// </summary>
+        public void RegisterExtra(string name, Action<ulong, byte[]> handler)
+        {
+            _extra[name] = handler;
+            if (_registered) RegisterExtraHandler(name);
+        }
+
+        public void UnregisterExtra(string name)
+        {
+            if (!_extra.Remove(name)) return;
+            if (_registered && _net != null && _net.CustomMessagingManager != null) _net.CustomMessagingManager.UnregisterNamedMessageHandler(name);
+        }
+
+        private void RegisterExtraHandler(string name)
+        {
+            _net.CustomMessagingManager.RegisterNamedMessageHandler(name, (sender, r) =>
+            {
+                r.ReadValueSafe(out byte[] data);
+                ExtraBytesReceived += data != null ? data.Length : 0;
+                if (_extra.TryGetValue(name, out var h)) h(sender, data);
+            });
+        }
+
+        /// <summary>A mode message to the host (reliable, or unreliable for frequent state).</summary>
+        public void SendExtraToHost(string name, byte[] data, bool reliable = true)
+        {
+            if (!CanSend) return;
+            using var w = ExtraWriter(data);
+            _net.CustomMessagingManager.SendNamedMessage(name, NetworkManager.ServerClientId, w, reliable ? NetworkDelivery.ReliableSequenced : NetworkDelivery.UnreliableSequenced);
+            ExtraBytesSent += data.Length;
+        }
+
+        /// <summary>Host: a mode message to every pilot, the host included.</summary>
+        public void SendExtraToAll(string name, byte[] data, bool reliable = true)
+        {
+            if (!CanSend || !IsHost) return;
+            using var w = ExtraWriter(data);
+            _net.CustomMessagingManager.SendNamedMessageToAll(name, w, reliable ? NetworkDelivery.ReliableSequenced : NetworkDelivery.UnreliableSequenced);
+            ExtraBytesSent += data.Length;
+        }
+
+        /// <summary>Host: a mode message to one pilot.</summary>
+        public void SendExtraTo(ulong clientId, string name, byte[] data)
+        {
+            if (!CanSend || !IsHost) return;
+            using var w = ExtraWriter(data);
+            _net.CustomMessagingManager.SendNamedMessage(name, clientId, w, NetworkDelivery.ReliableSequenced);
+            ExtraBytesSent += data.Length;
+        }
+
+        private static FastBufferWriter ExtraWriter(byte[] data)
+        {
+            var w = new FastBufferWriter((data?.Length ?? 0) + 16, Allocator.Temp, 64 * 1024);
+            w.WriteValueSafe(data ?? Array.Empty<byte>());
+            return w;
+        }
+
+        // ---------- direct / LAN sessions (P6) ----------
+
+        public const ushort DefaultPort = 7777;
+
+        /// <summary>
+        /// Hosts (or joins) a race over a direct address instead of a Unity session: a classroom LAN, or a forwarded
+        /// port. No Unity account, sign-in or internet needed.
+        /// </summary>
+        public bool StartDirect(bool host, string address, ushort port)
+        {
+            var transport = GetComponent<UnityTransport>();
+            if (_net == null || transport == null || _net.IsListening) return false;
+            if (host) transport.SetConnectionData("0.0.0.0", port, "0.0.0.0");
+            else transport.SetConnectionData(string.IsNullOrWhiteSpace(address) ? "127.0.0.1" : address.Trim(), port);
+            return host ? _net.StartHost() : _net.StartClient();
+        }
+
+        /// <summary>Leaves a direct session (Unity sessions shut the network down themselves).</summary>
+        public void StopDirect()
+        {
+            if (_net != null && _net.IsListening) _net.Shutdown();
+            ResetState();
+        }
+
+        /// <summary>This PC's LAN addresses (IPv4), for the host to read out to the class.</summary>
+        public static List<string> LocalAddresses()
+        {
+            var list = new List<string>();
+            try
+            {
+                foreach (var ni in System.Net.NetworkInformation.NetworkInterface.GetAllNetworkInterfaces())
+                {
+                    if (ni.OperationalStatus != System.Net.NetworkInformation.OperationalStatus.Up ||
+                        ni.NetworkInterfaceType == System.Net.NetworkInformation.NetworkInterfaceType.Loopback) continue;
+                    foreach (var a in ni.GetIPProperties().UnicastAddresses)
+                        if (a.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork) list.Add(a.Address.ToString());
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning("[Ushqyr] Listing the network addresses: " + e.Message);
+            }
+            if (list.Count == 0) list.Add("127.0.0.1");
+            return list;
         }
 
         // ---------- sending ----------

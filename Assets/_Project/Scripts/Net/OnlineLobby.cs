@@ -29,11 +29,15 @@ namespace Ushqyr.Net
         private const string StateLobby = "lobby", StateRacing = "racing";
 
         public static ISession Current { get; private set; }
-        public static bool InSession => Current != null;
-        public static bool IsHost => Current != null && Current.IsHost;
-        public static string Code => Current?.Code ?? "";
-        public static string Name => Current?.Name ?? "";
-        public static int PlayerCount => Current?.PlayerCount ?? 0;
+        /// <summary>In a direct / LAN race (P6): no Unity session, the race network connects by address.</summary>
+        public static bool Direct { get; private set; }
+        public static string DirectAddress { get; private set; } = "";
+        private static string _directTrack = "", _directTrackName = "";
+        public static bool InSession => Current != null || Direct;
+        public static bool IsHost => Direct ? NetRace.Instance != null && NetRace.Instance.IsHost : Current != null && Current.IsHost;
+        public static string Code => Direct ? DirectAddress : Current?.Code ?? "";
+        public static string Name => Direct ? Core.L.T("LAN race") : Current?.Name ?? "";
+        public static int PlayerCount => Direct ? (NetRace.Instance != null ? NetRace.Instance.Pilots.Count : 0) : Current?.PlayerCount ?? 0;
         public static int MaxPlayers => Current?.MaxPlayers ?? OnlineRules.MaxPilots;
         public static string LastError { get; private set; } = "";
 
@@ -42,8 +46,50 @@ namespace Ushqyr.Net
         /// <summary>We are no longer in the session; the argument says why.</summary>
         public static event Action<string> Ended;
 
-        public static string TrackId => Prop(KeyTrack);
-        public static string TrackName => Prop(KeyTrackName);
+        public static string TrackId => Direct ? _directTrack : Prop(KeyTrack);
+        public static string TrackName => Direct ? _directTrackName : Prop(KeyTrackName);
+
+        /// <summary>Hosts a LAN race on <paramref name="port"/>; the others join with this PC's address.</summary>
+        public static bool HostDirect(string trackId, string trackName, ushort port = NetRace.DefaultPort)
+        {
+            return StartDirect(true, "", port, trackId, trackName);
+        }
+
+        /// <summary>Joins a LAN race at "address" or "address:port".</summary>
+        public static bool JoinDirect(string address)
+        {
+            string host = (address ?? "").Trim();
+            ushort port = NetRace.DefaultPort;
+            int colon = host.LastIndexOf(':');
+            if (colon > 0 && ushort.TryParse(host.Substring(colon + 1), out ushort p))
+            {
+                port = p;
+                host = host.Substring(0, colon);
+            }
+            return StartDirect(false, host, port, "", "");
+        }
+
+        private static bool StartDirect(bool host, string address, ushort port, string trackId, string trackName)
+        {
+            LastError = "";
+            if (Current != null) _ = LeaveAsync();
+            var net = NetRace.Ensure();
+            if (!net.StartDirect(host, address, port))
+            {
+                LastError = Core.L.T("Could not open the LAN race (is the port in use?).");
+                return false;
+            }
+            Direct = true;
+            _directTrack = trackId ?? "";
+            _directTrackName = trackName ?? "";
+            DirectAddress = host ? string.Join(" / ", NetRace.LocalAddresses()) + (port != NetRace.DefaultPort ? ":" + port : "") : address + (port != NetRace.DefaultPort ? ":" + port : "");
+            net.RosterChanged -= RaiseChanged;
+            net.RosterChanged += RaiseChanged;
+            Changed?.Invoke();
+            return true;
+        }
+
+        private static void RaiseChanged() => Changed?.Invoke();
 
         public static async Task<bool> CreateAsync(string trackId, string trackName, bool isPrivate)
         {
@@ -123,6 +169,13 @@ namespace Ushqyr.Net
         /// <summary>Host: changes the track shown in the lobby and the list.</summary>
         public static async Task SetTrackAsync(string trackId, string trackName)
         {
+            if (Direct)
+            {
+                _directTrack = trackId ?? "";
+                _directTrackName = trackName ?? "";
+                Changed?.Invoke();
+                return;
+            }
             if (!IsHost) return;
             var host = Current.AsHost();
             host.SetProperties(new Dictionary<string, SessionProperty>
@@ -136,6 +189,7 @@ namespace Ushqyr.Net
         /// <summary>Host: hides the race from the list and stops new pilots joining while racing.</summary>
         public static async Task SetRacingAsync(bool racing)
         {
+            if (Direct) return;
             if (!IsHost) return;
             var host = Current.AsHost();
             host.IsLocked = racing;
@@ -148,6 +202,16 @@ namespace Ushqyr.Net
 
         public static async Task LeaveAsync()
         {
+            if (Direct)
+            {
+                Direct = false;
+                if (NetRace.Instance != null)
+                {
+                    NetRace.Instance.RosterChanged -= RaiseChanged;
+                    NetRace.Instance.StopDirect();
+                }
+                return;
+            }
             var s = Current;
             if (s == null) return;
             Detach(s);
@@ -167,6 +231,11 @@ namespace Ushqyr.Net
         public static List<string> PlayerNames()
         {
             var names = new List<string>();
+            if (Direct && NetRace.Instance != null)
+            {
+                foreach (var p in NetRace.Instance.Pilots.Values) names.Add(p.Name);
+                return names;
+            }
             if (Current == null) return names;
             foreach (var p in Current.Players)
             {

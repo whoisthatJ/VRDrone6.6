@@ -32,6 +32,8 @@ namespace Ushqyr.Game
             net.LoadRequested += OnLoad;
             net.ReturnedToLobby += OnLobby;
             net.Disconnected += OnDisconnected;
+            // P6: the Strike Range round setup can arrive before the range scene has loaded.
+            net.RegisterExtra(Ushqyr.Strike.StrikeWire.Setup, (sender, data) => OnlineStrikeDriver.PendingSetup = Ushqyr.Strike.StrikeWire.DecodeSetup(data));
         }
 
         /// <summary>Callsign and quad this PC races with (call before creating or joining a race).</summary>
@@ -69,6 +71,8 @@ namespace Ushqyr.Game
             var net = NetRace.Instance;
             if (net == null || !net.IsHost) return;
             _ = OnlineLobby.SetRacingAsync(true);
+            var data = GameFlow.Catalog != null ? GameFlow.Resolve(GameFlow.Catalog, trackId) : null;
+            if (data != null && data.Environment == "steppe") OnlineStrikeDriver.HostAnnounce(net, net.RaceId + 1, SaveSystem.Settings.Strike);
             net.StartRace(trackId, Laps);
         }
 

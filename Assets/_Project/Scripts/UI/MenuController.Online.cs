@@ -19,7 +19,7 @@ namespace Ushqyr.UI
 
         private OnlinePage _onlinePage;
         private TMP_Text _onlineStatus;
-        private TMP_InputField _codeField;
+        private TMP_InputField _codeField, _lanField;
         private bool _onlineBusy;
         private bool _onlineHooked;
         private List<OpenRace> _openRaces = new List<OpenRace>();
@@ -107,6 +107,13 @@ namespace Ushqyr.UI
             var codeBox = UiKit.Rect(p, "Code", new Vector2(Margin + half + 30f, y), new Vector2(codeW, 90f));
             _codeField = InputField(codeBox, L.T("Race code"));
             UiKit.Button(p, L.T("Join"), new Vector2(Margin + half + 30f + codeW + 20f, y), new Vector2(210f, 90f), () => Go(OnlineLobby.JoinByCodeAsync(_codeField.text), L.T("Joining...")));
+            y -= 110f;
+
+            // P6: LAN / direct address, for a classroom without internet or Unity accounts.
+            UiKit.Button(p, L.T("Host a LAN race"), new Vector2(Margin, y), new Vector2(half, 90f), () => Go(System.Threading.Tasks.Task.FromResult(OnlineLobby.HostDirect(track.Id, track.DisplayName)), L.T("Opening your race...")));
+            var ipBox = UiKit.Rect(p, "LAN address", new Vector2(Margin + half + 30f, y), new Vector2(codeW, 90f));
+            _lanField = InputField(ipBox, L.T("Host address"));
+            UiKit.Button(p, L.T("Join LAN"), new Vector2(Margin + half + 30f + codeW + 20f, y), new Vector2(210f, 90f), () => Go(System.Threading.Tasks.Task.FromResult(OnlineLobby.JoinDirect(_lanField.text)), L.T("Joining...")));
             y -= 120f;
 
             UiKit.Label(p, L.T("Open races"), new Vector2(Margin, y), new Vector2(half, 60f), 34f, TextAlignmentOptions.MidlineLeft, UiKit.AccentColor);
@@ -114,7 +121,7 @@ namespace Ushqyr.UI
             y -= 75f;
             if (_openRaces.Count == 0)
                 UiKit.Label(p, L.T("No open races listed. Refresh, start a quick race, or host one."), new Vector2(Margin, y), new Vector2(ContentWidth, 60f), 28f, TextAlignmentOptions.MidlineLeft, UiKit.DimTextColor);
-            for (int i = 0; i < _openRaces.Count && i < 4; i++)
+            for (int i = 0; i < _openRaces.Count && i < 3; i++)
             {
                 var r = _openRaces[i];
                 UiKit.Label(p, $"{r.Name}   <color=#aab>{L.T(r.TrackName)}</color>   {r.Pilots}/{r.MaxPilots}", new Vector2(Margin, y), new Vector2(ContentWidth - 260f, 60f), 30f);
