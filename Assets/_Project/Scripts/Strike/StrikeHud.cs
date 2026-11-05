@@ -124,7 +124,8 @@ namespace Ushqyr.Strike
             var phase = _session.Phase;
             _timer.text = phase == StrikePhase.Round ? Clock(_session.TimeLeft) : "";
             var ps = _session.PlayerScore;
-            _score.text = L.F("SCORE {0}", ps.Score) + "\n" + L.F("STREAK x{0:0.0}  HITS {1}", ps.Multiplier, ps.Hits);
+            _score.text = L.F("SCORE {0}", ps.Score) + "\n" + L.F("STREAK x{0:0.0}  HITS {1}", ps.Multiplier, ps.Hits)
+                + (_session.Wind.magnitude > 0.3f ? "\n<size=70%>" + L.F("WIND {0:0} m/s", _session.Wind.magnitude) + "</size>" : "");
             float since = Time.time - _session.LastEventTime;
             _event.text = since < 1.6f ? _session.LastEvent : "";
             _event.alpha = Mathf.Clamp01(1.6f - since);

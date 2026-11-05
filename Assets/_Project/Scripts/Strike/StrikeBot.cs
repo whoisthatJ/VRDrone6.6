@@ -21,7 +21,7 @@ namespace Ushqyr.Strike
 
         private readonly RangeDirector _director;
         private readonly TrajectoryFollower _follower;
-        private readonly PhysicsSettings _env;
+        private PhysicsSettings _env;
         private readonly System.Random _rng;
         private CollisionHook _hook;
         private PilotInput _input;
@@ -59,6 +59,9 @@ namespace Ushqyr.Strike
             _rng = new System.Random(seed);
             Score = new StrikeScore { Pilot = name };
         }
+
+        /// <summary>The range's wind (the bots fly in the same air as the pilot).</summary>
+        public void SetWind(Vector3 wind) => _env.Wind = TrajectoryFollower.ToF(wind);
 
         public Vector3 Position => TrajectoryFollower.ToU(State.Position);
         public Vector3 Velocity => TrajectoryFollower.ToU(State.Velocity);

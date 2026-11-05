@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Ushqyr.Strike
 {
@@ -67,6 +68,21 @@ namespace Ushqyr.Strike
             RangeDifficulty.Normal => (2f, 1f),
             _ => (4f, 4f),
         };
+
+        /// <summary>
+        /// The range's wind at <paramref name="time"/>: a steady wind from a direction picked by the seed, with gusts
+        /// (two slow sines, so every PC computes the same wind from the seed and the shared clock).
+        /// </summary>
+        public static Vector3 WindAt(RangeDifficulty d, int seed, float time)
+        {
+            var (steady, gust) = Wind(d);
+            if (steady <= 0f && gust <= 0f) return Vector3.zero;
+            float heading = StrikeRandom.Value((uint)seed, 41u, 0u) * Mathf.PI * 2f;
+            float g = gust * (0.6f * Mathf.Sin(time * 0.7f + seed % 7) + 0.4f * Mathf.Sin(time * 1.9f + seed % 3));
+            float swing = 0.25f * Mathf.Sin(time * 0.23f);
+            float speed = Mathf.Max(0f, steady + g);
+            return new Vector3(Mathf.Sin(heading + swing), 0f, Mathf.Cos(heading + swing)) * speed;
+        }
 
         /// <summary>How many targets of each class are out at once.</summary>
         public static (int statics, int moving, int evasive) Mix(RangeDifficulty d) => d switch

@@ -2198,6 +2198,10 @@ MonoBehaviour:
     m_Localized: Could not open the LAN race (is the port in use?).
     m_Metadata:
       m_Items: []
+  - m_Id: 743403581075456
+    m_Localized: WIND {0:0} m/s
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

@@ -67,7 +67,7 @@ points, 3–5 hits each).
 
 ## Not done yet
 
-- **Wind** (Normal 2 m/s, Hard 4 m/s with gusts) is in `StrikeRules.Wind` but the flight model has no wind input yet.
-  It goes into the flight core in P7, with tests, so it doesn't change the race physics by accident.
+- Wind (Normal 2 m/s, Hard 4 m/s with gusts) was added in P7: `StrikeRules.WindAt` from the seed and the round clock,
+  applied to the pilot and the bots as relative airflow in the flight model (zero everywhere else).
 - The previews show the bare range: the targets only exist once a round starts.
 - Not played through on the Quest headset or with a radio yet.

@@ -70,6 +70,8 @@ namespace Ushqyr.Strike
         public RangeLayout Layout => layout;
         public IReadOnlyList<StrikeBot> Bots => _bots;
         public StrikeOptions Options => _options;
+        /// <summary>The wind right now (m/s, world); zero on Easy.</summary>
+        public Vector3 Wind { get; private set; }
         /// <summary>Seconds into the round (0 before the start, RoundSeconds after the end).</summary>
         public float RoundTime => Phase == StrikePhase.Round ? Mathf.Clamp(Link != null ? Link.Clock : Time.time - _roundStart, 0f, StrikeRules.RoundSeconds) : Phase == StrikePhase.Finished ? StrikeRules.RoundSeconds : 0f;
         public float TimeLeft => StrikeRules.RoundSeconds - RoundTime;
@@ -183,7 +185,12 @@ namespace Ushqyr.Strike
                 if (_player != null) _player.HoldAtSpawn = false;
                 PlayerScore.Launch();
             }
-            if (p == StrikePhase.Finished) Finish();
+            if (p == StrikePhase.Finished)
+            {
+                Wind = Vector3.zero;
+                if (_player != null) _player.SetWind(Vector3.zero);
+                Finish();
+            }
             PhaseChanged?.Invoke(p);
         }
 
@@ -213,6 +220,9 @@ namespace Ushqyr.Strike
             if (Phase != StrikePhase.Round) return;
             float t = RoundTime;
             Lights(-1f);
+            Wind = StrikeRules.WindAt(_options.Difficulty, _options.Seed, t);
+            if (_player != null) _player.SetWind(Wind);
+            foreach (var b in _bots) b.SetWind(Wind);
             _director.Update(t);
             foreach (var v in _views) v.Sync(t);
             Physics.SyncTransforms();
@@ -432,6 +442,7 @@ namespace Ushqyr.Strike
 
         private void OnDestroy()
         {
+            if (_player != null) _player.SetWind(Vector3.zero);
             if (_player != null)
             {
                 _player.Crashed -= OnPlayerCrashed;

@@ -261,6 +261,8 @@ namespace Ushqyr.Flight
         public int MaxSubSteps;
         /// <summary>Motor thrust follows the loaded battery voltage (sag under load, weaker as the pack drains).</summary>
         public bool BatterySag;
+        /// <summary>Wind (m/s, world): the air the quad moves through. Zero everywhere but the Strike Range (P7).</summary>
+        public Vec3 Wind;
 
         public static PhysicsSettings Default => new PhysicsSettings
         {

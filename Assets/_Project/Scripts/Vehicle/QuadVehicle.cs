@@ -39,6 +39,8 @@ namespace Ushqyr.Vehicle
 
         /// <summary>Battery sag on/off (the pack state itself lives in the flight state).</summary>
         public void SetBatterySag(bool enabled) => _env.BatterySag = enabled;
+        /// <summary>Wind the quad flies in (m/s, world); zero by default (P7, Strike Range).</summary>
+        public void SetWind(Vector3 wind) => _env.Wind = CollisionHook.FromUnity(wind);
         public float HoverThrottle { get; private set; }
         public PilotInputSource InputSource
         {

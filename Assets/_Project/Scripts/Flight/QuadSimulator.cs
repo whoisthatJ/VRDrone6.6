@@ -32,7 +32,8 @@ namespace Ushqyr.Flight
 
             // 4. Motors → forces and torques in body frame.
             Quat q = s.Orientation;
-            Vec3 vBody = q.Conjugate * s.Velocity;
+            // Air velocity: drag and rotor inflow see the quad's motion relative to the wind.
+            Vec3 vBody = q.Conjugate * (s.Velocity - env.Wind);
             Vec3 thrustBody = Vec3.Zero;
             Vec3 torqueBody = Vec3.Zero;
             // Battery sag: thrust follows the loaded pack voltage from the previous step.
