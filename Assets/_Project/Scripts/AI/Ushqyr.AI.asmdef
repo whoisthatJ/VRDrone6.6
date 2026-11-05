@@ -1,0 +1,20 @@
+{
+    "name": "Ushqyr.AI",
+    "rootNamespace": "Ushqyr.AI",
+    "references": [
+        "Ushqyr.Flight",
+        "Ushqyr.Vehicle",
+        "Ushqyr.Race",
+        "Ushqyr.Track",
+        "Ushqyr.Core"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

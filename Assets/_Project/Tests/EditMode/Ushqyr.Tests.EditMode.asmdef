@@ -18,7 +18,8 @@
         "Unity.Netcode.Runtime",
         "Unity.Collections",
         "Unity.Localization",
-        "Ushqyr.EditorTools"
+        "Ushqyr.EditorTools",
+        "Ushqyr.AI"
     ],
     "includePlatforms": [
         "Editor"

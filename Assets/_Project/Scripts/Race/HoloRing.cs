@@ -47,15 +47,26 @@ namespace Ushqyr.Race
         /// <summary>A short glitch (the rim was touched).</summary>
         public void Glitch(float seconds = 0.6f) => _glitchUntil = Time.time + seconds;
 
+        private string BeamsName => "Projector Beams " + name;
+
         private void OnEnable()
         {
-            if (Projectors > 0 && BeamMaterial != null && _beams == null) BuildBeams();
+            if (Projectors <= 0 || BeamMaterial == null || _beams != null) return;
+            // Reuse the beams left from before (a domain reload forgets the reference, the DontSave object stays).
+            var parent = transform.parent;
+            var old = parent != null ? parent.Find(BeamsName) : null;
+            if (old != null) _beams = old;
+            else BuildBeams();
         }
 
-        private void OnDisable()
+        // The beams are a sibling (they don't spin with the ring), so they switch off and on with the parent by
+        // themselves. They are not destroyed in OnDisable: that runs while the parent is being deactivated or torn
+        // down, when Unity refuses to destroy anything in that hierarchy.
+        private void OnDestroy()
         {
-            if (_beams != null) DestroyImmediate(_beams.gameObject);
-            _beams = null;
+            if (_beams == null || !_beams.gameObject.activeInHierarchy) return;
+            if (Application.isPlaying) Destroy(_beams.gameObject);
+            else DestroyImmediate(_beams.gameObject);
         }
 
         private void Update()
@@ -76,7 +87,7 @@ namespace Ushqyr.Race
         /// <summary>Thin light beams from points round the rim straight down to the ground (y = 0), in world space.</summary>
         private void BuildBeams()
         {
-            var go = new GameObject("Projector Beams") { hideFlags = HideFlags.DontSave, layer = gameObject.layer };
+            var go = new GameObject(BeamsName) { hideFlags = HideFlags.DontSave, layer = gameObject.layer };
             _beams = go.transform;
             _beams.SetParent(transform.parent, false);
             var mesh = new Mesh { name = "Beams" };

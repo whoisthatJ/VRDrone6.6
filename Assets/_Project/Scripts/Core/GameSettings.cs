@@ -68,8 +68,8 @@ namespace Ushqyr.Core
     [Serializable]
     public sealed class RacePrefs
     {
-        /// <summary>0-7 bots in offline races.</summary>
-        public int BotCount = 3;
+        /// <summary>0-7 bots in offline races (off by default while the bots are being finished).</summary>
+        public int BotCount = 0;
         /// <summary>Rookie, Amateur, Pilot, Pro, Elite, Adaptive.</summary>
         public int BotLevel = 2;
         /// <summary>Midair collisions with bots (off = ghost bots).</summary>

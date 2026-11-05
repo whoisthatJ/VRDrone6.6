@@ -78,6 +78,8 @@ namespace Ushqyr.UI
             var timer = session.Timer;
             double now = session.Now;
 
+            Standings(now);
+
             if (lapInfo != null)
             {
                 float best = timer.HasBestLap ? (float)timer.BestLap : 0f;
@@ -134,6 +136,78 @@ namespace Ushqyr.UI
             }
         }
 
+        // ---------- P4: race positions ----------
+
+        private Ushqyr.AI.BotRace _bots;
+        private TMP_Text _standings;
+        private bool _botsLooked;
+        private float _standingsTimer;
+
+        private Ushqyr.AI.BotRace Bots
+        {
+            get
+            {
+                if (_bots == null && !_botsLooked)
+                {
+                    _bots = FindAnyObjectByType<Ushqyr.AI.BotRace>();
+                    _botsLooked = _bots != null;
+                }
+                return _bots;
+            }
+        }
+
+        /// <summary>Live positions and gaps (top right) while racing bots; refreshed 5 times a second.</summary>
+        private void Standings(double now)
+        {
+            var bots = Bots;
+            bool on = bots != null && bots.Active && lapInfo != null;
+            if (!on)
+            {
+                if (_standings != null && _standings.gameObject.activeSelf) _standings.gameObject.SetActive(false);
+                return;
+            }
+            if (_standings == null)
+            {
+                _standings = Instantiate(lapInfo, lapInfo.transform.parent);
+                _standings.name = "Race Standings";
+                var rt = _standings.rectTransform;
+                rt.anchorMin = rt.anchorMax = rt.pivot = new Vector2(1f, 1f);
+                rt.anchoredPosition = new Vector2(-30f, -30f);
+                rt.sizeDelta = new Vector2(420f, 400f);
+                _standings.alignment = TextAlignmentOptions.TopRight;
+                _standings.fontSize = lapInfo.fontSize * 0.8f;
+            }
+            if (!_standings.gameObject.activeSelf) _standings.gameObject.SetActive(true);
+            _standingsTimer -= Time.unscaledDeltaTime;
+            if (_standingsTimer > 0f) return;
+            _standingsTimer = 0.2f;
+            var sb = new StringBuilder();
+            foreach (var r in bots.Standings)
+            {
+                string colour = r.IsPlayer ? "#ffffff" : "#" + ColorUtility.ToHtmlStringRGB(r.Tint);
+                string gap = r.Position == 1 ? "" : r.Gap > 0 ? Inv($"  +{r.Gap:F1}") : "";
+                string mark = r.Finished ? "  <size=80%>" + L.T("FIN") + "</size>" : "";
+                sb.Append(r.IsPlayer ? "<b>" : "").Append(r.Position).Append(". <color=").Append(colour).Append('>').Append(r.Name).Append("</color>")
+                    .Append(gap).Append(mark).Append(r.IsPlayer ? "</b>" : "").Append('\n');
+            }
+            _standings.SetText(sb.ToString());
+        }
+
+        private void AppendRaceResults(StringBuilder sb)
+        {
+            var bots = Bots;
+            if (bots == null || !bots.Active) return;
+            sb.AppendLine("<b>" + L.T("RACE") + "</b>");
+            foreach (var r in bots.Standings)
+            {
+                string time = r.Finished ? Inv($"{r.TotalTime:F2}") : L.T("racing");
+                string line = Inv($"{r.Position}. ") + r.Name + "   " + time;
+                sb.AppendLine(r.IsPlayer ? "<color=#5f5>" + line + "</color>" : line);
+            }
+            sb.AppendLine("<size=80%>" + L.T("Watch winner replay: R  /  gamepad Y") + "</size>");
+            sb.AppendLine();
+        }
+
         // E7 free flight: no timing, the spawn point and the keys instead of the lap counter.
         private void FreeFlightHud(Ushqyr.Game.FlightArea area)
         {
@@ -173,6 +247,7 @@ namespace Ushqyr.UI
             var t = session.Timer;
             var sb = new StringBuilder();
             sb.AppendLine("<b>" + L.T("RESULTS") + "</b>");
+            AppendRaceResults(sb);
             for (int i = 0; i < t.CompletedLaps; i++)
                 sb.AppendLine(L.F("Lap {0}   {1:F2}", i + 1, t.LapTime(i)) + (i == t.BestLapIndex ? "  <color=#5f5>" + L.T("best") + "</color>" : ""));
             sb.AppendLine(L.F("Total   {0}", Inv($"<b>{t.TotalTime(0):F2}</b>")));

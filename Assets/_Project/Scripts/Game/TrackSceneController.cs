@@ -82,8 +82,9 @@ namespace Ushqyr.Game
             // A short showdown of the track before the pilot's view (not for online races: the host starts those).
             else if (Track != null)
             {
+                SetupBots(settings);
                 var hudText = hud != null ? hud.GetComponentInChildren<TMPro.TMP_Text>(true) : null;
-                TrackIntro.Play(gameObject, views, vehicle, race, Track, hud, hudText != null ? hudText.font : null);
+                if (settings.Race.TrackIntro) TrackIntro.Play(gameObject, views, vehicle, race, Track, hud, hudText != null ? hudText.font : null);
             }
         }
 
@@ -163,6 +164,59 @@ namespace Ushqyr.Game
                 return true;
             };
             Debug.Log($"[Ushqyr] Test-flying '{data.Name}' (menu button returns to the editor)");
+        }
+
+        // ---------- P4: bots ----------
+
+        /// <summary>Race mode bots for an offline race (none in free flight, online or the track editor).</summary>
+        public Ushqyr.AI.BotRace Bots { get; private set; }
+
+        private void SetupBots(GameSettings s)
+        {
+            if (Track == null || Track.Data.FreeFlight || !race.enabled || s.Race.BotCount <= 0)
+            {
+                if (Bots != null) Bots.Clear();
+                return;
+            }
+            if (Bots == null) Bots = new GameObject("Bots").AddComponent<Ushqyr.AI.BotRace>();
+            var size = QuadSize(s);
+            var build = Ushqyr.AI.BotRoster.ReferenceBuild(size);
+            var profile = Ushqyr.Garage.BuildComposer.Compose(build);
+            int mask = vehicle.BaseCollision.TrackGeometry;
+            var line = Ushqyr.AI.RacingLineAsset.Get(Track.Data.Id, (int)size, Track.Route, Track.Data.Route, Track.Gates,
+                Track.Spawn.position, profile, mask, out bool rebaked);
+            if (rebaked) Debug.Log($"[Ushqyr][Bots] Racing line for '{Track.Data.Id}' baked at load (no up-to-date cached line)");
+            var options = new Ushqyr.AI.BotRaceOptions
+            {
+                Count = Mathf.Clamp(s.Race.BotCount, 0, 7),
+                Level = (Ushqyr.AI.BotLevel)Mathf.Clamp(s.Race.BotLevel, 0, 5),
+                Collisions = s.Race.BotCollisions,
+                PlayerPace = RecentLap(),
+                Seed = Random.Range(0, 1000),
+            };
+            Bots.Configure(race, vehicle, Track, line, options, size, buildMaterials, s.PilotName, 0);
+            var replay = GetComponent<WinnerReplay>();
+            if (replay == null) replay = gameObject.AddComponent<WinnerReplay>();
+            replay.Configure(Bots, views, buildMaterials);
+            Debug.Log($"[Ushqyr][Bots] {options.Count} {options.Level} bots, collisions {(options.Collisions ? "on" : "off")}, line {line.Length:F0} m / {line.LapTime:F1} s");
+        }
+
+        private static Ushqyr.Garage.SizeClass QuadSize(GameSettings s)
+        {
+            var build = Ushqyr.Garage.BuildLibrary.IsBuildId(s.QuadId) ? Ushqyr.Garage.BuildLibrary.Default.Resolve(s.QuadId) : null;
+            if (build != null) return build.Size;
+            return s.QuadId == "whoop65" ? Ushqyr.Garage.SizeClass.Whoop : Ushqyr.Garage.SizeClass.Five;
+        }
+
+        /// <summary>The player's recent lap time on this track (mean of the last races), or 0.</summary>
+        private float RecentLap()
+        {
+            var board = race.Board;
+            if (board == null || board.History.Count == 0 || Track == null) return 0f;
+            int n = Mathf.Min(5, board.History.Count);
+            float sum = 0f;
+            for (int i = board.History.Count - n; i < board.History.Count; i++) sum += board.History[i];
+            return sum / n / Mathf.Max(1, Track.Data.Laps);
         }
 
         private void UnloadTrack()

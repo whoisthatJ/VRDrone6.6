@@ -101,6 +101,14 @@ namespace Ushqyr.Vehicle
         /// made during the respawn delay is kept instead of being wiped.</summary>
         public bool LastRespawnDisarmed { get; private set; } = true;
 
+        /// <summary>A midair hit from another quad (P4 race mode): a velocity change, or a crash when it was hard.</summary>
+        public void ApplyImpulse(Vector3 dv, bool crash)
+        {
+            if (_crashed || HoldAtSpawn) return;
+            _state.Velocity += CollisionHook.FromUnity(dv);
+            if (crash) _collision.Crashed = true;
+        }
+
         public void Respawn() => Respawn(true);
 
         private void Respawn(bool disarm)

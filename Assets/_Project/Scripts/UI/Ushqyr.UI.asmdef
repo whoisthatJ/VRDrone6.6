@@ -11,6 +11,7 @@
         "Ushqyr.Track",
         "Ushqyr.Cameras",
         "Ushqyr.Net",
+        "Ushqyr.AI",
         "Unity.InputSystem",
         "Unity.TextMeshPro",
         "UnityEngine.UI",

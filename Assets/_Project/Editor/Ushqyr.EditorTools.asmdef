@@ -12,6 +12,7 @@
         "Ushqyr.Game",
         "Ushqyr.Track",
         "Ushqyr.TrackEditor",
+        "Ushqyr.AI",
         "Unity.TextMeshPro",
         "UnityEngine.UI",
         "Unity.InputSystem",
