@@ -116,7 +116,17 @@ namespace Ushqyr.Game
             var route = _track.Route;
 
             var gates = _track.Gates;
-            Gate gate = gates.Length > 0 ? gates[Mathf.Clamp(gates.Length / 2, 0, gates.Length - 1)] : null;
+            // A gate near the middle of the lap, preferring one close to the ground and facing sideways (a holo ring high
+            // up would show mostly sky).
+            Gate gate = null;
+            int mid = gates.Length / 2;
+            for (int k = 0; k < gates.Length && gate == null; k++)
+            {
+                int i = (mid + (k % 2 == 0 ? k / 2 : -(k + 1) / 2) + gates.Length) % gates.Length;
+                var g = gates[i];
+                if (g != null && g.AimPointWorld.y - _track.Spawn.position.y < 12f && Mathf.Abs(g.transform.forward.y) < 0.4f) gate = g;
+            }
+            if (gate == null && gates.Length > 0) gate = gates[Mathf.Clamp(mid, 0, gates.Length - 1)];
             if (route != null && gate != null)
             {
                 float at = route.ClosestDistance(gate.AimPointWorld);
@@ -140,7 +150,7 @@ namespace Ushqyr.Game
         private void Update()
         {
             if (!Playing) return;
-            _t += Time.unscaledDeltaTime;
+            _t += Time.deltaTime;
             if (_t >= ShotSeconds * Shots || SkipPressed())
             {
                 Finish();

@@ -783,7 +783,7 @@ namespace Ushqyr.UI
             var logo = UiKit.Rect(bottom, "Logo", new Vector2(0f, 0f), new Vector2(150f, 64f));
             logo.anchorMin = logo.anchorMax = logo.pivot = new Vector2(0f, 0f);
             UiKit.Image(logo, new Color(1f, 0.4f, 0.05f));
-            var lt = UiKit.Label(logo, "GATE\nRUSH", Vector2.zero, new Vector2(150f, 64f), 22f, TextAlignmentOptions.Center, Color.white);
+            var lt = UiKit.Label(logo, "USHQYR", Vector2.zero, new Vector2(150f, 64f), 24f, TextAlignmentOptions.Center, Color.white);
             lt.fontStyle = FontStyles.Bold | FontStyles.Italic;
             _summary = UiKit.Label(bottom, "", new Vector2(175f, 0f), new Vector2(900f, 64f), 22f, TextAlignmentOptions.MidlineLeft, Color.white);
             ((RectTransform)_summary.transform).anchorMin = ((RectTransform)_summary.transform).anchorMax = ((RectTransform)_summary.transform).pivot = new Vector2(0f, 0f);
