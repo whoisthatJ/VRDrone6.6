@@ -78,6 +78,20 @@ namespace Ushqyr.Core
         public bool TrackIntro = true;
     }
 
+    /// <summary>P5 Strike Range lobby choices.</summary>
+    [Serializable]
+    public sealed class StrikePrefs
+    {
+        /// <summary>Easy, Normal, Hard (the target mix).</summary>
+        public int Difficulty = 1;
+        /// <summary>0-3 bots.</summary>
+        public int Bots = 0;
+        /// <summary>Rookie .. Elite (as race bots).</summary>
+        public int BotLevel = 2;
+        /// <summary>Day, Overcast, Dusk.</summary>
+        public int Weather = 0;
+    }
+
     /// <summary>Online features. Everything is off until the player opts in (the game never connects on its own).</summary>
     [Serializable]
     public sealed class OnlinePrefs
@@ -124,6 +138,7 @@ namespace Ushqyr.Core
         public GuidancePrefs Guidance = new GuidancePrefs();
         public OnlinePrefs Online = new OnlinePrefs();
         public RacePrefs Race = new RacePrefs();
+        public StrikePrefs Strike = new StrikePrefs();
 
         /// <summary>Brings every value into its valid range (after loading or editing).</summary>
         public void Clamp()
@@ -140,6 +155,12 @@ namespace Ushqyr.Core
             Graphics ??= new GraphicsPrefs();
             Guidance ??= new GuidancePrefs();
             Online ??= new OnlinePrefs();
+            Race ??= new RacePrefs();
+            Strike ??= new StrikePrefs();
+            Strike.Difficulty = Mathf.Clamp(Strike.Difficulty, 0, 2);
+            Strike.Bots = Mathf.Clamp(Strike.Bots, 0, 3);
+            Strike.BotLevel = Mathf.Clamp(Strike.BotLevel, 0, 4);
+            Strike.Weather = Mathf.Clamp(Strike.Weather, 0, 2);
             Guidance.RouteGuidance = Mathf.Clamp(Guidance.RouteGuidance, 0, 2);
             Graphics.Clamp();
             Feed.VtxNoise = Mathf.Clamp(Feed.VtxNoise, 0, 2);

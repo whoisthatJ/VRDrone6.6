@@ -56,6 +56,7 @@ namespace Ushqyr.Game
         private void Start()
         {
             GameFlow.Catalog = tracks;
+            HudFlags.HideFreeFlightInfo = false;
             var settings = SaveSystem.Settings;
             ApplySettings(settings);
             SaveSystem.SettingsChanged += ApplySettings;
@@ -80,6 +81,7 @@ namespace Ushqyr.Game
             if (views != null) views.Apply((ViewMode)settings.Camera.ViewMode);
             if (Ushqyr.Net.NetRace.InRace && Track != null) gameObject.AddComponent<OnlineRaceDriver>().Configure(this, vehicle, race, buildMaterials);
             // A short showdown of the track before the pilot's view (not for online races: the host starts those).
+            else if (Track != null && SetupStrike(settings)) { }
             else if (Track != null)
             {
                 SetupBots(settings);
@@ -199,6 +201,36 @@ namespace Ushqyr.Game
             if (replay == null) replay = gameObject.AddComponent<WinnerReplay>();
             replay.Configure(Bots, views, buildMaterials);
             Debug.Log($"[Ushqyr][Bots] {options.Count} {options.Level} bots, collisions {(options.Collisions ? "on" : "off")}, line {line.Length:F0} m / {line.LapTime:F1} s");
+        }
+
+        /// <summary>The P5 Strike Range round, when this scene has a <see cref="Ushqyr.Strike.StrikeSession"/>.</summary>
+        public Ushqyr.Strike.StrikeSession Strike { get; private set; }
+
+        private bool SetupStrike(GameSettings s)
+        {
+            Strike = FindAnyObjectByType<Ushqyr.Strike.StrikeSession>();
+            HudFlags.HideFreeFlightInfo = Strike != null && Strike.Layout != null;
+            if (!HudFlags.HideFreeFlightInfo) return false;
+            var weather = (Ushqyr.Strike.RangeWeather)s.Strike.Weather;
+            Ushqyr.Strike.RangeLighting.Requested = weather;
+            var lighting = FindAnyObjectByType<Ushqyr.Strike.RangeLighting>();
+            if (lighting != null) lighting.Apply(weather);
+            var options = new Ushqyr.Strike.StrikeOptions
+            {
+                Difficulty = (Ushqyr.Strike.RangeDifficulty)s.Strike.Difficulty,
+                Bots = s.Strike.Bots,
+                BotLevel = (Ushqyr.AI.BotLevel)s.Strike.BotLevel,
+                PilotName = s.PilotName,
+            };
+            var hudText = hud != null ? hud.GetComponentInChildren<TMPro.TMP_Text>(true) : null;
+            var cam = views != null ? views.OutputCamera : null;
+            if (cam == null) cam = Camera.main;
+            var strikeHud = Strike.GetComponent<Ushqyr.Strike.StrikeHud>();
+            if (strikeHud == null) strikeHud = Strike.gameObject.AddComponent<Ushqyr.Strike.StrikeHud>();
+            strikeHud.Configure(Strike, vehicle.transform, cam, hudText != null ? hudText.font : null);
+            Strike.Begin(vehicle, options, buildMaterials, QuadSize(s));
+            Debug.Log($"[Ushqyr][Strike] Round: {options.Difficulty}, {options.Bots} {options.BotLevel} bots, {weather}");
+            return true;
         }
 
         private static Ushqyr.Garage.SizeClass QuadSize(GameSettings s)

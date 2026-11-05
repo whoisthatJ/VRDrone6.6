@@ -24,15 +24,15 @@ namespace Ushqyr.EditorTools.Builders
     {
         public const string TrackLayerName = "TrackGeometry";
         public const string LocalQuadLayerName = "LocalQuad";
-        public static readonly string[] Environments = { "field", "hangar", "industrial", "stadium", "expo" };
+        public static readonly string[] Environments = { "field", "hangar", "industrial", "stadium", "expo", "steppe" };
         private const string MatDir = "Assets/_Project/Art/Materials";
 
         /// <summary>Camera far plane: the Expo city and its skyline reach 4.5 km, the other venues end well inside 1.5 km.</summary>
-        public static float FarClipFor(string environment) => environment == "expo" ? 6000f : 1500f;
+        public static float FarClipFor(string environment) => environment == "expo" ? 6000f : environment == "steppe" ? 2800f : 1500f;
         private static float _farClip = 1500f;
         private const string DataDir = "Assets/_Project/Data";
 
-        public static string ScenePath(string environment) =>
+        public static string ScenePath(string environment) => environment == "steppe" ? "Assets/_Project/Scenes/Range_Steppe.unity" :
             $"Assets/_Project/Scenes/Track_{char.ToUpperInvariant(environment[0])}{environment.Substring(1)}.unity";
 
         [MenuItem("Ushqyr/Builders/Build Track Scenes")]

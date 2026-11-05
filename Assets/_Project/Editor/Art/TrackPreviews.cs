@@ -21,7 +21,7 @@ namespace Ushqyr.EditorTools.Art
         [MenuItem("Ushqyr/Tracks/Capture Track Previews")]
         public static void Menu() => Debug.Log(CaptureAll());
 
-        public static string CaptureAll()
+        public static string CaptureAll(string onlyEnvironment = null)
         {
             ArtJobs.RequireCleanScenes();
             var cat = AssetDatabase.LoadAssetAtPath<TrackCatalog>("Assets/_Project/Data/TrackCatalog.asset");
@@ -32,13 +32,19 @@ namespace Ushqyr.EditorTools.Art
             {
                 foreach (var venue in cat.Environments)
                 {
+                    if (!string.IsNullOrEmpty(onlyEnvironment) && venue.Environment != onlyEnvironment) continue;
                     var tracks = cat.TracksFor(venue.Environment);
                     if (tracks.Count == 0) continue;
                     EditorSceneManager.OpenScene(ArtJobs.ScenePath(venue.SceneName), OpenSceneMode.Single);
                     var lighting = Object.FindAnyObjectByType<Ushqyr.Core.StadiumLighting>();
                     // The menu look: day at the Expo, floodlit night in the stadium (the game's defaults).
                     if (lighting != null) lighting.Apply(lighting.Venue == "stadium" ? Ushqyr.Core.TimeOfDay.Night : Ushqyr.Core.TimeOfDay.Day);
-                    else DynamicGI.UpdateEnvironment();
+                    else
+                    {
+                        var range = Object.FindAnyObjectByType<Ushqyr.Strike.RangeLighting>();
+                        if (range != null) range.Apply(Ushqyr.Strike.RangeWeather.Day);
+                        DynamicGI.UpdateEnvironment();
+                    }
                     var source = GameObject.Find("Main Camera")?.GetComponent<Camera>();
                     foreach (var entry in tracks)
                     {

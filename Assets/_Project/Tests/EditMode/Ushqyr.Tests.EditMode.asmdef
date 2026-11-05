@@ -19,7 +19,8 @@
         "Unity.Collections",
         "Unity.Localization",
         "Ushqyr.EditorTools",
-        "Ushqyr.AI"
+        "Ushqyr.AI",
+        "Ushqyr.Strike"
     ],
     "includePlatforms": [
         "Editor"

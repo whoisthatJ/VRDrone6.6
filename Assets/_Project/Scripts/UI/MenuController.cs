@@ -263,6 +263,8 @@ namespace Ushqyr.UI
                 y -= rowH;
             }
 
+            if (v.Environment == "steppe") StrikeLobby(p, y - 20f);
+
             float py = -(Height - 110f);
             if (pages > 1)
             {
@@ -272,6 +274,19 @@ namespace Ushqyr.UI
             }
             UiKit.Button(p, L.T("All venues"), new Vector2(Margin + 290f, py), new Vector2(260f, 70f), ShowTracks, 30f);
             BackButton(p);
+        }
+
+        /// <summary>P5 Strike Range lobby: target mix, bots and the light (saved with the settings).</summary>
+        private void StrikeLobby(Transform page, float y)
+        {
+            var st = S.Strike;
+            var c = UiKit.Rect(page, "Strike Lobby", new Vector2(Margin, y), new Vector2(ContentWidth, 420f));
+            UiKit.StepperRow(c, L.T("Difficulty"), 0f, new[] { L.T("Easy"), L.T("Normal"), L.T("Hard") }, st.Difficulty, i => { st.Difficulty = i; _dirty = true; }, ContentWidth);
+            UiKit.StepperRow(c, L.T("Bots"), -80f, new[] { L.T("None"), "1", "2", "3" }, st.Bots, i => { st.Bots = i; _dirty = true; }, ContentWidth);
+            UiKit.StepperRow(c, L.T("Bot level"), -160f, new[] { L.T("Rookie"), L.T("Amateur"), L.T("Pilot"), L.T("Pro"), L.T("Elite") }, st.BotLevel, i => { st.BotLevel = i; _dirty = true; }, ContentWidth);
+            UiKit.StepperRow(c, L.T("Light"), -240f, new[] { L.T("Day"), L.T("Overcast"), L.T("Dusk") }, st.Weather, i => { st.Weather = i; _dirty = true; }, ContentWidth);
+            UiKit.Label(c, L.T("Easy: static targets only. Normal adds moving convoys and a few evasive vehicles; Hard has more of both. Hit at 8 m/s or faster; streaks multiply the points."),
+                new Vector2(0f, -320f), new Vector2(ContentWidth, 80f), 24f, TextAlignmentOptions.TopLeft, UiKit.DimTextColor);
         }
 
         private string SelectedEnvironment()

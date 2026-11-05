@@ -2074,6 +2074,90 @@ MonoBehaviour:
     m_Localized: 1 variation
     m_Metadata:
       m_Items: []
+  - m_Id: 708479650099200
+    m_Localized: SCORE {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 708479746568192
+    m_Localized: STREAK x{0:0.0}  HITS {1}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 708479746568193
+    m_Localized: ROUND OVER
+    m_Metadata:
+      m_Items: []
+  - m_Id: 708479746568194
+    m_Localized: hits {0} ({1} / {2} / {3})   accuracy {4:0}%   best streak {5}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 708479746568195
+    m_Localized: Best rounds ({0})
+    m_Metadata:
+      m_Items: []
+  - m_Id: 708479746568196
+    m_Localized: you are #{0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 708479746568197
+    m_Localized: hits {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 708479746568198
+    m_Localized: 'New round: T  /  gamepad L-stick click     Menu: Esc'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 708479746568199
+    m_Localized: 'Too slow: bump'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 708479746568200
+    m_Localized: Crash
+    m_Metadata:
+      m_Items: []
+  - m_Id: 708479746568201
+    m_Localized: Difficulty
+    m_Metadata:
+      m_Items: []
+  - m_Id: 708479746568202
+    m_Localized: Easy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 708479750762496
+    m_Localized: Normal
+    m_Metadata:
+      m_Items: []
+  - m_Id: 708479750762497
+    m_Localized: Hard
+    m_Metadata:
+      m_Items: []
+  - m_Id: 708479750762498
+    m_Localized: Light
+    m_Metadata:
+      m_Items: []
+  - m_Id: 708479750762499
+    m_Localized: Overcast
+    m_Metadata:
+      m_Items: []
+  - m_Id: 708479750762500
+    m_Localized: 'Easy: static targets only. Normal adds moving convoys and a few evasive vehicles; Hard has more of both. Hit at 8 m/s or faster; streaks multiply the points.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 708479750762501
+    m_Localized: Strike Range
+    m_Metadata:
+      m_Items: []
+  - m_Id: 708479750762502
+    m_Localized: Strike rounds
+    m_Metadata:
+      m_Items: []
+  - m_Id: 708479750762503
+    m_Localized: 'Two-minute rounds on a 1.2 km steppe range: hit static, moving and evasive vehicles from three launch pads, alone or against bots.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 708479750762504
+    m_Localized: 'Steppe range with roads, berms and revetments: FPV strike training against static, moving and evasive targets.'
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

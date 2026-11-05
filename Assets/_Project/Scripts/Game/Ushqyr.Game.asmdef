@@ -12,6 +12,7 @@
         "Ushqyr.TrackEditor",
         "Ushqyr.Net",
         "Ushqyr.AI",
+        "Ushqyr.Strike",
         "Unity.InputSystem",
         "Unity.TextMeshPro",
         "UnityEngine.UI"

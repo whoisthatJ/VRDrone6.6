@@ -12,6 +12,7 @@ namespace Ushqyr.UI
     /// </summary>
     public sealed class RaceHud : MonoBehaviour
     {
+
         [SerializeField] private RaceSession session;
         [SerializeField] private TMP_Text lapInfo;
         [SerializeField] private TMP_Text centre;
@@ -213,8 +214,13 @@ namespace Ushqyr.UI
         {
             if (lapInfo != null)
             {
-                string spawn = area != null ? L.T(area.SpawnName) : "";
-                if (spawn != _shownSpawn)
+                string spawn = HudFlags.HideFreeFlightInfo ? "-" : area != null ? L.T(area.SpawnName) : "";
+                if (spawn != _shownSpawn && HudFlags.HideFreeFlightInfo)
+                {
+                    _shownSpawn = spawn;
+                    lapInfo.SetText("");
+                }
+                else if (spawn != _shownSpawn)
                 {
                     _shownSpawn = spawn;
                     lapInfo.SetText(L.F("FREE FLIGHT   {0}", spawn) + "\n" + L.T("F / D-pad up: next spawn   T: reset"));

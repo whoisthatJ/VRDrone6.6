@@ -72,6 +72,12 @@ namespace Ushqyr.EditorTools.Builders
             catalog.Environments.Add(new TrackCatalog.EnvironmentScene { Environment = "industrial", SceneName = "Track_Industrial", DisplayName = "Dockyard", Description = "Container corridors at the port." });
             catalog.Environments.Add(new TrackCatalog.EnvironmentScene { Environment = "stadium", SceneName = "Track_Stadium", DisplayName = "Stadium", Description = "Floodlit football stadium with lane tracks round the pitch." });
             catalog.Environments.Add(new TrackCatalog.EnvironmentScene { Environment = "expo", SceneName = "Track_Expo", DisplayName = "Expo Astana", Description = "The Expo district in Astana: the sphere, the pavilions, holo rings and vertical routes." });
+            // P5: the Strike Range (steppe), one "variation" — a free-flight scene where StrikeSession runs the rounds.
+            if (System.IO.File.Exists(Ushqyr.EditorTools.Range.RangeSteppeBuilder.TrackJsonPath))
+            {
+                catalog.Tracks.Add(Entry("strike-steppe", "steppe", "Strike rounds", "Strike Range", "Two-minute rounds on a 1.2 km steppe range: hit static, moving and evasive vehicles from three launch pads, alone or against bots."));
+                catalog.Environments.Add(new TrackCatalog.EnvironmentScene { Environment = "steppe", SceneName = "Range_Steppe", DisplayName = "Strike Range", Description = "Steppe range with roads, berms and revetments: FPV strike training against static, moving and evasive targets." });
+            }
             // Phase 3 P1a: the first Sphere District, frozen with its original routes and records.
             if (System.IO.File.Exists(Ushqyr.EditorTools.SphereDistrict.TrackFreezer.FrozenScene))
             {

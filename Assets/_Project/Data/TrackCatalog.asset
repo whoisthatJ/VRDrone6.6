@@ -76,6 +76,13 @@ MonoBehaviour:
     Environment: expo
     Variation: Free flight
     Preview: {fileID: 2800000, guid: f602d35177b42704ea2f1445ace87991, type: 3}
+  - Id: strike-steppe
+    DisplayName: Strike Range
+    Description: 'Two-minute rounds on a 1.2 km steppe range: hit static, moving and evasive vehicles from three launch pads, alone or against bots.'
+    Json: {fileID: 4900000, guid: 9304b4bcddfc63c458ce9c3d85db3c28, type: 3}
+    Environment: steppe
+    Variation: Strike rounds
+    Preview: {fileID: 2800000, guid: 8be80005943f26a409591c5b39d73a43, type: 3}
   - Id: expo-astana
     DisplayName: Expo Classic Sprint
     Description: 'The original Expo Sprint (Track_Expo_v1): the courtyard hop, the low sphere orbit and the park slalom, in the first look of the district.'
@@ -118,6 +125,10 @@ MonoBehaviour:
     SceneName: Track_Expo
     DisplayName: Expo Astana
     Description: 'The Expo district in Astana: the sphere, the pavilions, holo rings and vertical routes.'
+  - Environment: steppe
+    SceneName: Range_Steppe
+    DisplayName: Strike Range
+    Description: 'Steppe range with roads, berms and revetments: FPV strike training against static, moving and evasive targets.'
   - Environment: expo_v1
     SceneName: Track_Expo_v1
     DisplayName: Expo Astana Classic

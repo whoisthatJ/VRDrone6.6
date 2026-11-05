@@ -1,0 +1,32 @@
+{
+    "Version": 1,
+    "Id": "strike-steppe",
+    "Name": "Strike Range",
+    "Author": "Ushqyr",
+    "Environment": "steppe",
+    "Laps": 1,
+    "Spawn": {
+        "Position": {
+            "x": -24.0,
+            "y": -0.4072097837924957,
+            "z": -520.0
+        },
+        "Yaw": 0.0,
+        "Name": "Pad 1"
+    },
+    "Gates": [],
+    "Props": [],
+    "Route": {
+        "Knots": [],
+        "Closed": true,
+        "CorridorWidth": 4.0,
+        "OuterLineGap": 0.3499999940395355,
+        "FlightHeight": 1.5,
+        "GroundHeight": 0.0,
+        "FinishObstacle": -1,
+        "Obstacles": [],
+        "AirCourse": false
+    },
+    "FreeFlight": true,
+    "ExtraSpawns": []
+}

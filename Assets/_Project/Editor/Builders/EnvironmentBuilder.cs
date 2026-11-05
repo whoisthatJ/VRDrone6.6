@@ -17,6 +17,7 @@ namespace Ushqyr.EditorTools.Builders
                 case "industrial": Industrial(parent, layer, grid); break;
                 case "stadium": Stadium(parent, layer, grid); break;
                 case "expo": Expo(parent, layer, grid); break;
+                case "steppe": Ushqyr.EditorTools.Range.RangeSteppeBuilder.Build(parent, layer); break;
                 default: Field(parent, layer, grid); break;
             }
             ConfigureLighting(environment, parent);
@@ -39,7 +40,7 @@ namespace Ushqyr.EditorTools.Builders
                 UnityEditor.AssetDatabase.CreateAsset(s, path);
             }
             // The stadium switches time of day at runtime (StadiumLighting): nothing baked there.
-            bool baked = environment != "stadium" && environment != "expo";
+            bool baked = environment != "stadium" && environment != "expo" && environment != "steppe";
             s.bakedGI = baked;
             s.realtimeGI = false;
             s.mixedBakeMode = MixedLightingMode.IndirectOnly;
