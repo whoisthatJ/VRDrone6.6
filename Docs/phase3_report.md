@@ -40,8 +40,13 @@ Windows build, 1920×1080, GTX 1650 Ti laptop, 12 s camera flight per scene (`Do
 | Range_Steppe | 283 / 173 | 279 / 171 | 266 / 165 | 243 / 151 |
 
 - Every scene averages above 90 fps on every preset. Track_Expo is the heaviest and **CPU-bound** (8–9 ms CPU vs
-  6–7 ms GPU): its 1 % lows (77–88 fps) dip under 90. That's the next optimisation target (draw calls of the city and
-  instanced props).
+  6–7 ms GPU): its 1 % lows (77–88 fps) dipped under 90.
+- **Follow-up (2026-11-10):** the district's 721 instanced prop groups (50 772 street props) were all submitted every
+  frame. `InstancedProps` now skips groups outside the view (beyond the 160 m shadow range) and groups too far away for
+  their size (180 m per metre of prop: cars ~900 m, trees ~1.8 km). About 260 groups are submitted instead of 721;
+  aerial screenshots are unchanged (mean pixel difference < 0.1 / 255). Build, same laptop (`Docs/perf/expo_P7b.csv`):
+  Track_Expo Low 117 → 153 fps (1 % low 81 → 106), Medium 121 → 148 (88 → 106), High 109 → 117 (86 → 89),
+  Ultra 109 → 124 (84 → 89); Track_Expo_v1 alike. High / Ultra 1 % lows are now just under 90.
 - The Garage on Ultra is GPU-bound (10.4 ms, depth of field + generated quad detail).
 - One-off frame spikes (worst frame 30–75 ms) on Field and Hangar at Low–High are scene-load hitches in the first
   second of the run, not steady-state.
@@ -61,7 +66,7 @@ Windows build, 1920×1080, GTX 1650 Ti laptop, 12 s camera flight per scene (`Do
 
 ## Known gaps
 
-- Track_Expo 1 % lows under 90 fps on the test laptop (CPU).
+- Track_Expo 1 % lows on High / Ultra at 88–89 fps on the test laptop (Low / Medium: 106).
 - Spline Test Loop and Expo Sprint v2 see an occasional bot crash on some seeds; lower bot levels crash more on Expo.
 - Online Strike: bots don't top up empty slots automatically; no online leaderboard for the range.
 - The track previews of the Strike Range show the bare range (targets only exist in a round).

@@ -74,6 +74,8 @@ namespace Ushqyr.EditorTools.Capture
                 case "shot_fpv": shot = ShotFpv(s); break;
                 case "shot_strike": shot = ShotStrike(s); break;
                 case "shot_garage": shot = ShotGarage(); break;
+                case "perf_expo": shot = PerfExpo(s, "expo-v2-sprint"); break;
+                case "perf_stadium": shot = PerfExpo(s, "stadium-oval"); break;
                 case "menu_lan": shot = MenuStill("ShowOnline", null); break;
                 default: Finish("unknown clip"); yield break;
             }
@@ -710,6 +712,26 @@ namespace Ushqyr.EditorTools.Capture
                 }
             }
             EndStills("garage");
+        }
+
+        // ---------- performance probe ----------
+
+        /// <summary>FPV autopilot on a track at High, then 10 s of FrameStats (real time, no capture framerate).</summary>
+        private IEnumerator PerfExpo(GameSettings s, string track)
+        {
+            s.Feed.ExpoLighting = 2;
+            s.Camera.ViewMode = (int)ViewMode.Fpv;
+            QualitySettings.SetQualityLevel(System.Array.IndexOf(QualitySettings.names, "High"), true);
+            yield return Load(track);
+            var views = FindAnyObjectByType<ViewModeManager>();
+            if (views != null) views.Apply(ViewMode.Fpv);
+            Ushqyr.EditorTools.SphereDistrict.CourseFlightTest.Attach(13f);
+            Time.captureFramerate = 0;
+            yield return new WaitForSecondsRealtime(4f);
+            string file = Path.Combine(_dir, "stats.txt");
+            yield return FrameStats.Sample(600, file);
+            File.WriteAllText(Path.Combine(_dir, "f0000.jpg"), "");
+            Finish(File.Exists(file) ? File.ReadAllText(file).Replace((char)10, (char)32) : "no stats");
         }
 
         // ---------- helpers ----------
