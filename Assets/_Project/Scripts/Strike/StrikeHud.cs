@@ -230,7 +230,7 @@ namespace Ushqyr.Strike
                               (me ? "</color>" : ""));
             }
             sb.AppendLine();
-            sb.AppendLine("<b>" + L.F("Best rounds ({0})", L.T(_session.Options.Difficulty.ToString())) + "</b>" + (_session.LastRank > 0 ? "   " + L.F("you are #{0}", _session.LastRank) : ""));
+            if (_session.Board.Count > 0) sb.AppendLine("<b>" + L.F("Best rounds ({0})", L.T(_session.Options.Difficulty.ToString())) + "</b>" + (_session.LastRank > 0 ? "   " + L.F("you are #{0}", _session.LastRank) : ""));
             int n = 0;
             foreach (var e in _session.Board)
             {

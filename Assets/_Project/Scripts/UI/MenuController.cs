@@ -239,7 +239,8 @@ namespace Ushqyr.UI
             {
                 var row = rows[i];
                 var tb = board.Board(row.id);
-                string record = tb.BestLap > 0f ? L.F("Lap record {0:F2}s ({1})", tb.BestLap, tb.BestLapPilot) : L.T("No lap record yet");
+                string record = v.Environment == "steppe" ? "" // rounds have scores, not laps (best rounds are on the results screen)
+                    : tb.BestLap > 0f ? L.F("Lap record {0:F2}s ({1})", tb.BestLap, tb.BestLapPilot) : L.T("No lap record yet");
                 var b = UiKit.Button(p, "", new Vector2(Margin, y), new Vector2(ContentWidth - 250f, rowH - 14f), () =>
                 {
                     S.TrackId = row.id;

@@ -27,7 +27,17 @@ namespace Ushqyr.EditorTools
 
         /// <summary>Entry point for -executeMethod Ushqyr.EditorTools.BuildScript.BuildWindows. Flat-screen: Standalone has no XR loader, the drone camera renders to the monitor.</summary>
         [MenuItem("Ushqyr/Build/Build Windows (PC)")]
-        public static void BuildWindows() => Build(WindowsPath, BuildTarget.StandaloneWindows64, BuildTargetGroup.Standalone);
+        public static void BuildWindows() => BuildWindowsTo(WindowsPath);
+
+        /// <summary>The Windows player into <paramref name="exePath"/>; opens borderless fullscreen at the monitor's resolution.</summary>
+        public static void BuildWindowsTo(string exePath)
+        {
+            // First launch (no saved settings yet): fullscreen at native resolution. ScreenDisplay keeps it that way.
+            PlayerSettings.fullScreenMode = FullScreenMode.FullScreenWindow;
+            PlayerSettings.defaultIsNativeResolution = true;
+            PlayerSettings.resizableWindow = true;
+            Build(exePath, BuildTarget.StandaloneWindows64, BuildTargetGroup.Standalone);
+        }
 
         /// <summary>Like <see cref="BuildQuestDeferred"/>, for the Windows player.</summary>
         public static string BuildWindowsDeferred()

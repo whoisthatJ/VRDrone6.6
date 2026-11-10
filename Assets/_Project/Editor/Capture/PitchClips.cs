@@ -41,7 +41,7 @@ namespace Ushqyr.EditorTools.Capture
 
         private string _dir;
         private int _frame;
-        private bool _recording;
+        private bool _recording, _stopRecording;
 
         private IEnumerator Start()
         {
@@ -64,6 +64,17 @@ namespace Ushqyr.EditorTools.Capture
                 case "bots_race": shot = BotsRace(s); break;
                 case "aerial_expo": shot = AerialExpo(s); break;
                 case "garage": shot = Garage(); break;
+                case "strike_chase": shot = StrikeChase(s); break;
+                case "strike_targets": shot = StrikeTargets(s); break;
+                case "strike_fpv": shot = StrikeFpv(s); break;
+                case "menu_strike": shot = MenuStill("ShowVenue", "steppe"); break;
+                case "strike_results": shot = StrikeResults(s); break;
+                case "shot_race_chase": shot = ShotRaceChase(s); break;
+                case "shot_expo": shot = ShotExpo(s); break;
+                case "shot_fpv": shot = ShotFpv(s); break;
+                case "shot_strike": shot = ShotStrike(s); break;
+                case "shot_garage": shot = ShotGarage(); break;
+                case "menu_lan": shot = MenuStill("ShowOnline", null); break;
                 default: Finish("unknown clip"); yield break;
             }
             yield return shot;
@@ -128,7 +139,8 @@ namespace Ushqyr.EditorTools.Capture
         }
 
         /// <summary>Records a smoothed chase camera behind <paramref name="target"/> (HUD hidden).</summary>
-        private IEnumerator Follow(ViewModeManager views, Transform target, float seconds, float back, float up)
+        private IEnumerator Follow(ViewModeManager views, Transform target, float seconds, float back, float up,
+            System.Func<Vector3> probe = null, System.Func<Vector3> velocity = null, System.Func<bool> stop = null)
         {
             HideHud();
             // An own camera, not the game's: that one sits on the quad's rig and hides the quad's own layer (FPV).
@@ -168,13 +180,16 @@ namespace Ushqyr.EditorTools.Capture
             var eof = new WaitForEndOfFrame();
             for (int n = 0; n < frames; n++)
             {
-                Vector3 d = target.position - last;
-                last = target.position;
-                if (d.sqrMagnitude > 1e-4f) dir = Vector3.Slerp(dir, d.normalized, 0.15f);
-                Vector3 f = Flat(dir);
-                Vector3 want = target.position - f * back + Vector3.up * up;
-                t.position = Vector3.SmoothDamp(t.position, want, ref vel, 0.03f);
-                t.rotation = Quaternion.LookRotation(target.position + f * 1.2f + Vector3.up * 0.1f - t.position, Vector3.up);
+                if (stop != null && stop()) break;
+                Vector3 at = probe != null ? probe() : target.position;
+                Vector3 d = velocity != null ? velocity() : at - last;
+                last = at;
+                if (d.sqrMagnitude > 1e-4f) dir = Vector3.Slerp(dir, d.normalized, velocity != null ? 0.25f : 0.15f);
+                Vector3 f = probe != null ? dir.normalized : Flat(dir);
+                Vector3 want = at - f * back + Vector3.up * up;
+                // Fast subjects (strike bots at 20+ m/s) are followed exactly; the smoothing would drop them behind.
+                t.position = probe != null ? want : Vector3.SmoothDamp(t.position, want, ref vel, 0.03f);
+                t.rotation = Quaternion.LookRotation(at + f * 3f - t.position, Vector3.up);
                 yield return eof;
                 var request = new UnityEngine.Rendering.RenderPipeline.StandardRequest { destination = rt };
                 if (UnityEngine.Rendering.RenderPipeline.SupportsRenderRequest(cam, request)) UnityEngine.Rendering.RenderPipeline.SubmitRenderRequest(cam, request);
@@ -283,6 +298,420 @@ namespace Ushqyr.EditorTools.Capture
             while (_recording) yield return null;
         }
 
+        // ---------- Strike Range (P5-P7) ----------
+
+        private IEnumerator LoadStrike(GameSettings s, int bots)
+        {
+            s.Strike.Difficulty = 2; // Hard: convoys, evasive vehicles, smoke and wind
+            s.Strike.Bots = bots;
+            s.Strike.BotLevel = 4;
+            s.Strike.Weather = 0;
+            yield return Load("strike-steppe");
+            Ushqyr.Strike.StrikeSession session = null;
+            for (int i = 0; i < 900; i++)
+            {
+                session = FindAnyObjectByType<Ushqyr.Strike.StrikeSession>();
+                if (session != null && session.Phase == Ushqyr.Strike.StrikePhase.Round) break;
+                yield return null;
+            }
+        }
+
+        // Behind an Elite bot from transit into its dive onto a target.
+        private IEnumerator StrikeChase(GameSettings s)
+        {
+            yield return LoadStrike(s, 3);
+            var session = FindAnyObjectByType<Ushqyr.Strike.StrikeSession>();
+            if (session == null || session.Bots.Count == 0)
+            {
+                Finish("no strike bots");
+                yield break;
+            }
+            yield return Wait(2f);
+            Transform target = null;
+            foreach (Transform c in session.transform)
+                if (c.name.StartsWith("Strike Bot ")) { target = c; break; }
+            if (target == null)
+            {
+                Finish("no bot visual");
+                yield break;
+            }
+            var bot = session.Bots[0];
+            float hitAt = -1f;
+            System.Func<bool> stop = () =>
+            {
+                if (hitAt < 0f && bot.Score.Hits > 0) hitAt = Time.time;
+                return hitAt >= 0f && Time.time - hitAt > 1.2f;
+            };
+            yield return Follow(FindAnyObjectByType<ViewModeManager>(), target, 30f, 2.4f, 0.8f, () => bot.Position, () => bot.Velocity, stop);
+        }
+
+        // A camera over a moving convoy target with the strike HUD (timer, scores, radar, markers), bots diving in.
+        private IEnumerator StrikeTargets(GameSettings s)
+        {
+            yield return LoadStrike(s, 3);
+            var session = FindAnyObjectByType<Ushqyr.Strike.StrikeSession>();
+            var views = FindAnyObjectByType<ViewModeManager>();
+            if (session == null || session.Director == null || views == null)
+            {
+                Finish("no strike session");
+                yield break;
+            }
+            int slot = session.Director.Targets.FindIndex(t => t.Plan.Class == Ushqyr.Strike.TargetClass.Moving);
+            if (slot < 0) slot = 0;
+            yield return Wait(4f);
+            views.SetFreeCamera(true);
+            var cam = views.OutputCamera.transform;
+            float seconds = 10f;
+            StartCoroutine(RecordRoutine(seconds));
+            Vector3 smooth = Vector3.zero;
+            for (float t = 0f; t < seconds; t += 1f / PitchClips.Fps)
+            {
+                session.Director.Pose(slot, session.RoundTime, out var p, out float yaw, out _);
+                Vector3 fwd = Quaternion.Euler(0f, yaw, 0f) * Vector3.forward;
+                Vector3 side = Vector3.Cross(Vector3.up, fwd);
+                float a = t / seconds;
+                Vector3 want = p - fwd * Mathf.Lerp(38f, 20f, a) + side * Mathf.Lerp(18f, -10f, a) + Vector3.up * Mathf.Lerp(22f, 12f, a);
+                smooth = t == 0f ? want : Vector3.Lerp(smooth, want, 0.12f);
+                cam.SetPositionAndRotation(smooth, Quaternion.LookRotation(p + fwd * 6f + Vector3.up * 1.5f - smooth, Vector3.up));
+                yield return null;
+            }
+            while (_recording) yield return null;
+            views.SetFreeCamera(false);
+        }
+
+        // The pilot's own view with the HUD: the quad is flown in by an Elite strike bot's autopilot (camera only).
+        private IEnumerator StrikeFpv(GameSettings s)
+        {
+            yield return LoadStrike(s, 2);
+            var session = FindAnyObjectByType<Ushqyr.Strike.StrikeSession>();
+            var views = FindAnyObjectByType<ViewModeManager>();
+            if (session == null || session.Bots.Count == 0 || views == null)
+            {
+                Finish("no strike bots");
+                yield break;
+            }
+            Transform bot = null;
+            foreach (Transform c in session.transform)
+                if (c.name.StartsWith("Strike Bot ")) { bot = c; break; }
+            yield return Wait(1.5f);
+            views.SetFreeCamera(true);
+            var cam = views.OutputCamera.transform;
+            float seconds = 30f;
+            var sim = session.Bots[0];
+            float hitAt = -1f;
+            StartCoroutine(RecordRoutine(seconds));
+            Quaternion rot = bot.rotation;
+            for (float t = 0f; t < seconds; t += 1f / PitchClips.Fps)
+            {
+                foreach (var r in bot.GetComponentsInChildren<Renderer>()) r.enabled = false; // the camera sits inside it
+                if (hitAt < 0f && sim.Score.Hits > 0) hitAt = t;
+                if (hitAt >= 0f && t - hitAt > 1.2f) { _stopRecording = true; break; }
+                // A camera on the bot's nose, tilted up 25° like an FPV camera, smoothed a little.
+                rot = Quaternion.Slerp(rot, bot.rotation * Quaternion.Euler(-25f, 0f, 0f), 0.35f);
+                cam.SetPositionAndRotation(bot.position + bot.forward * 0.08f, rot);
+                yield return null;
+            }
+            while (_recording) yield return null;
+            views.SetFreeCamera(false);
+        }
+
+        // The results screen of a full round against 3 bots (time runs 6x to get there; one frame is kept).
+        private IEnumerator StrikeResults(GameSettings s)
+        {
+            yield return LoadStrike(s, 3);
+            var session = FindAnyObjectByType<Ushqyr.Strike.StrikeSession>();
+            if (session == null)
+            {
+                Finish("no strike session");
+                yield break;
+            }
+            // 3x speed at 60 frames a second: 50 ms of simulation a frame, inside the bots' 64-step cap.
+            Time.captureFramerate = 60;
+            Time.timeScale = 3f;
+            for (int i = 0; i < 20000 && session.Phase != Ushqyr.Strike.StrikePhase.Finished; i++) yield return null;
+            Time.timeScale = 1f;
+            yield return Wait(0.5f);
+            yield return Record(1f / PitchClips.Fps);
+        }
+
+        // A still of a menu page (one frame).
+        private IEnumerator MenuStill(string page, string venue)
+        {
+            if (SceneManager.GetActiveScene().name != GameFlow.MenuScene)
+            {
+                SceneManager.LoadScene(GameFlow.MenuScene);
+                yield return null;
+            }
+            yield return Wait(1f);
+            var menu = FindAnyObjectByType<Ushqyr.UI.MenuController>();
+            var flags = System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance;
+            if (venue != null) typeof(Ushqyr.UI.MenuController).GetField("_venue", flags)?.SetValue(menu, venue);
+            typeof(Ushqyr.UI.MenuController).GetMethod(page, flags)?.Invoke(menu, null);
+            yield return Wait(0.5f);
+            yield return Record(1f / PitchClips.Fps);
+        }
+
+        // ---------- showcase stills (4K) ----------
+
+        public const int StillW = 3840, StillH = 2160;
+        private Camera _stillCam;
+        private RenderTexture _stillRt;
+        private Texture2D _stillTex;
+        private int _still;
+
+        /// <summary>A camera of our own with the game camera's look (post, AA, volumes) and every layer but the VR room.</summary>
+        private Camera StillCamera(Camera game)
+        {
+            if (_stillCam != null) return _stillCam;
+            QualitySettings.SetQualityLevel(System.Array.IndexOf(QualitySettings.names, "Ultra"), true);
+            var go = new GameObject("Still Camera");
+            var cam = go.AddComponent<Camera>();
+            cam.CopyFrom(game);
+            cam.cullingMask = ~0 & ~(1 << LayerMask.NameToLayer("VRRoom")) & ~(1 << LayerMask.NameToLayer("EditorUI"));
+            cam.nearClipPlane = 0.03f;
+            var src = game.GetComponent<UniversalAdditionalCameraData>();
+            var dst = cam.GetUniversalAdditionalCameraData();
+            if (src != null)
+            {
+                dst.renderPostProcessing = src.renderPostProcessing;
+                dst.volumeLayerMask = src.volumeLayerMask;
+            }
+            dst.antialiasing = AntialiasingMode.SubpixelMorphologicalAntiAliasing;
+            dst.antialiasingQuality = AntialiasingQuality.High;
+            cam.enabled = false;
+            _stillRt = new RenderTexture(StillW, StillH, 24, RenderTextureFormat.ARGB32) { antiAliasing = 8 };
+            cam.targetTexture = _stillRt;
+            cam.aspect = StillW / (float)StillH;
+            _stillTex = new Texture2D(StillW, StillH, TextureFormat.RGB24, false);
+            _stillCam = cam;
+            return cam;
+        }
+
+        /// <summary>Renders one 4K still from <paramref name="pos"/> looking at <paramref name="look"/> (call after WaitForEndOfFrame).</summary>
+        private void Still(Camera game, Vector3 pos, Vector3 look, float fov, string tag)
+        {
+            var cam = StillCamera(game);
+            cam.fieldOfView = fov;
+            cam.transform.SetPositionAndRotation(pos, Quaternion.LookRotation(look - pos, Vector3.up));
+            var request = new UnityEngine.Rendering.RenderPipeline.StandardRequest { destination = _stillRt };
+            if (UnityEngine.Rendering.RenderPipeline.SupportsRenderRequest(cam, request)) UnityEngine.Rendering.RenderPipeline.SubmitRenderRequest(cam, request);
+            else cam.Render();
+            var prev = RenderTexture.active;
+            RenderTexture.active = _stillRt;
+            _stillTex.ReadPixels(new Rect(0, 0, StillW, StillH), 0, 0);
+            _stillTex.Apply();
+            RenderTexture.active = prev;
+            File.WriteAllBytes(Path.Combine(_dir, $"s{_still++:00}_{tag}.png"), _stillTex.EncodeToPNG());
+        }
+
+        /// <summary>The Game view with its HUD at twice its size (3840x2160 from a 1080p view).</summary>
+        private IEnumerator ScreenStill(string tag)
+        {
+            ScreenCapture.CaptureScreenshot(Path.Combine(_dir, $"s{_still++:00}_{tag}.png"), 2);
+            yield return null;
+            yield return null;
+        }
+
+        private void EndStills(string note)
+        {
+            if (_stillCam != null) Destroy(_stillCam.gameObject);
+            if (_stillRt != null) Destroy(_stillRt);
+            if (_stillTex != null) Destroy(_stillTex);
+            Finish($"{_still} stills: {note}");
+        }
+
+        private static void ShowModel(Transform t)
+        {
+            foreach (var r in t.GetComponentsInChildren<Renderer>(true)) r.enabled = true;
+            foreach (var tr in t.GetComponentsInChildren<Transform>(true))
+                if (!tr.gameObject.activeSelf && tr.GetComponent<Renderer>() != null) tr.gameObject.SetActive(true);
+        }
+
+        // The player's drone in the pack: a low chase camera behind and to the side, the bots around and ahead.
+        private IEnumerator ShotRaceChase(GameSettings s)
+        {
+            s.Feed.StadiumLighting = 2; // day: the drones read clearly against the track
+            s.Race.BotCount = 5;
+            s.Race.BotLevel = 2; // rookies keep pace with the autopilot, so the pack stays together
+            s.Race.BotCollisions = true;
+            yield return Load("stadium-oval");
+            var views = FindAnyObjectByType<ViewModeManager>();
+            HideHud();
+            Ushqyr.EditorTools.SphereDistrict.CourseFlightTest.Attach(12f);
+            var ctrl = FindAnyObjectByType<TrackSceneController>();
+            var visual = typeof(TrackSceneController).GetField("quadVisual", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.GetValue(ctrl) as Transform;
+            var bots = FindAnyObjectByType<Ushqyr.AI.BotRace>();
+            for (int i = 0; i < 300 && (bots == null || bots.Racers.Count < 2); i++)
+            {
+                yield return null;
+                bots = FindAnyObjectByType<Ushqyr.AI.BotRace>();
+            }
+            if (visual == null || bots == null)
+            {
+                EndStills("no player or bots");
+                yield break;
+            }
+            ShowModel(visual);
+            var game = views.OutputCamera;
+            var eof = new WaitForEndOfFrame();
+            Time.captureFramerate = PitchClips.Fps;
+            Vector3 last = visual.position, fwd = visual.forward;
+            var race = FindAnyObjectByType<RaceSession>();
+            // Wait for GO: then the pack leaves the grid together for a few seconds.
+            for (int i = 0; i < 40 * PitchClips.Fps && race != null && race.Phase != RacePhase.Racing; i++) yield return null;
+            int shots = 0;
+            for (int frame = 0; frame < 5 * PitchClips.Fps; frame++)
+            {
+                yield return eof;
+                Vector3 p = visual.position, d = p - last;
+                last = p;
+                if (d.sqrMagnitude > 1e-5f) fwd = Vector3.Slerp(fwd, d.normalized, 0.3f);
+                if (frame % 4 != 0 || frame < 10) continue;
+                Vector3 f = Flat(fwd), right = Vector3.Cross(Vector3.up, f);
+                // The bots within 8 m: their centre sets the framing.
+                Vector3 pack = Vector3.zero;
+                int n = 0;
+                foreach (var r in bots.Racers)
+                    if (!r.IsPlayer && r.Visual != null && (r.Visual.position - p).magnitude < 8f) { pack += r.Visual.position; n++; }
+                if (n == 0) continue;
+                pack /= n;
+                Vector3 mid = (p + pack) * 0.5f;
+                // 1: low, just behind the player's drone, the pack ahead and beside it.
+                Still(game, p - f * 0.7f + right * 0.18f + Vector3.up * 0.16f, mid + f * 1.5f, 58f, "chase");
+                // 2: from the front-side, the player's drone leading the camera eye, bots behind it.
+                Still(game, p + f * 1.6f + right * 1.1f + Vector3.up * 0.35f, Vector3.Lerp(p, pack, 0.35f), 50f, "front");
+                // 3: a little higher behind the whole group.
+                Still(game, mid - f * 3.2f + Vector3.up * 1.0f, mid + f * 2f, 45f, "pack");
+                shots += 3;
+            }
+            Time.captureFramerate = 0;
+            EndStills("race chase");
+        }
+
+        // The Expo district at golden hour from the air.
+        private IEnumerator ShotExpo(GameSettings s)
+        {
+            s.Feed.ExpoLighting = 1;
+            yield return Load("expo-v2-free");
+            var views = FindAnyObjectByType<ViewModeManager>();
+            var v = FindAnyObjectByType<QuadVehicle>();
+            if (v != null) v.HoldAtSpawn = true;
+            HideHud();
+            yield return Wait(2f);
+            var eof = new WaitForEndOfFrame();
+            var sphere = new Vector3(0f, 45f, 0f);
+            foreach (var (bearing, dist, height, fov) in new[] { (215f, 260f, 110f, 45f), (245f, 190f, 60f, 50f), (170f, 150f, 25f, 55f), (300f, 320f, 140f, 42f) })
+            {
+                yield return eof;
+                Vector3 pos = Ushqyr.EditorTools.Builders.RouteLibrary.ExpoPoint(bearing, dist, height);
+                Still(views.OutputCamera, pos, sphere, fov, "expo");
+            }
+            EndStills("expo");
+        }
+
+        // FPV with the OSD through the Expo Sprint gates.
+        private IEnumerator ShotFpv(GameSettings s)
+        {
+            s.Feed.ExpoLighting = 2;
+            s.Camera.ViewMode = (int)ViewMode.Fpv;
+            QualitySettings.SetQualityLevel(System.Array.IndexOf(QualitySettings.names, "Ultra"), true);
+            yield return Load("expo-v2-sprint");
+            var views = FindAnyObjectByType<ViewModeManager>();
+            if (views != null) views.Apply(ViewMode.Fpv);
+            Ushqyr.EditorTools.SphereDistrict.CourseFlightTest.Attach(13f);
+            yield return Wait(6f);
+            for (int i = 0; i < 16; i++)
+            {
+                yield return ScreenStill("fpv");
+                yield return Wait(1.2f);
+            }
+            EndStills("fpv");
+        }
+
+        // The Strike Range: an Elite bot's dive seen from behind, and its FPV view with the HUD, near the target.
+        private IEnumerator ShotStrike(GameSettings s)
+        {
+            QualitySettings.SetQualityLevel(System.Array.IndexOf(QualitySettings.names, "Ultra"), true);
+            yield return LoadStrike(s, 3);
+            var session = FindAnyObjectByType<Ushqyr.Strike.StrikeSession>();
+            var views = FindAnyObjectByType<ViewModeManager>();
+            if (session == null || session.Bots.Count == 0 || views == null)
+            {
+                EndStills("no strike bots");
+                yield break;
+            }
+            var bot = session.Bots[0];
+            Transform model = null;
+            foreach (Transform c in session.transform)
+                if (c.name.StartsWith("Strike Bot ")) { model = c; break; }
+            var game = views.OutputCamera;
+            var eof = new WaitForEndOfFrame();
+            Time.captureFramerate = PitchClips.Fps;
+            int shots = 0, hits = 0;
+            for (int frame = 0; frame < 110 * PitchClips.Fps && shots < 30; frame++)
+            {
+                yield return eof;
+                if (bot.Down || bot.Target < 0 || frame % 3 != 0) continue;
+                session.Director.Pose(bot.Target, session.RoundTime, out var tp, out _, out _);
+                Vector3 p = bot.Position, v = bot.Velocity;
+                float dist = Vector3.Distance(p, tp);
+                if (dist > 45f || dist < 8f || v.sqrMagnitude < 4f) continue;
+                // Just behind the bot, looking past it at the target: the drone big in the lower third.
+                Vector3 to = (tp + Vector3.up * 1.2f - p).normalized;
+                Vector3 right = Vector3.Cross(Vector3.up, Flat(to));
+                Still(game, p - to * 0.75f + right * 0.22f + Vector3.up * 0.28f, tp + Vector3.up * 1f, 56f, "dive");
+                shots++;
+                if (bot.Score.Hits > hits) hits = bot.Score.Hits;
+            }
+            Time.captureFramerate = 0;
+            // The HUD on the range: a camera over a convoy, scores and radar on screen.
+            int slot = session.Director.Targets.FindIndex(t => t.Active && t.Plan.Class == Ushqyr.Strike.TargetClass.Moving);
+            if (slot >= 0)
+            {
+                views.SetFreeCamera(true);
+                var cam = views.OutputCamera.transform;
+                for (int i = 0; i < 4; i++)
+                {
+                    session.Director.Pose(slot, session.RoundTime, out var tp, out float yaw, out _);
+                    Vector3 fw = Quaternion.Euler(0f, yaw, 0f) * Vector3.forward, side = Vector3.Cross(Vector3.up, fw);
+                    Vector3 at = tp - fw * 22f + side * (8f - i * 5f) + Vector3.up * 11f;
+                    cam.SetPositionAndRotation(at, Quaternion.LookRotation(tp + fw * 6f - at, Vector3.up));
+                    yield return null;
+                    yield return ScreenStill("hud");
+                    yield return Wait(0.8f);
+                }
+                views.SetFreeCamera(false);
+            }
+            EndStills("strike");
+        }
+
+        // The garage: a few classes of drone on the bench.
+        private IEnumerator ShotGarage()
+        {
+            QualitySettings.SetQualityLevel(System.Array.IndexOf(QualitySettings.names, "Ultra"), true);
+            SceneManager.LoadScene(GameFlow.GarageScene);
+            yield return null;
+            yield return Wait(4f);
+            var gc = FindAnyObjectByType<Ushqyr.UI.GarageCamera>();
+            var garage = FindAnyObjectByType<Ushqyr.UI.GarageController>();
+            var flags = System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance;
+            var yaw = typeof(Ushqyr.UI.GarageCamera).GetField("yaw", flags);
+            var setBuild = typeof(Ushqyr.UI.GarageController).GetMethod("SetBuild", flags);
+            float start = gc != null ? (float)yaw.GetValue(gc) : 0f;
+            var builds = new[] { Ushqyr.Garage.QuadPresets.Race5, Ushqyr.Garage.QuadPresets.Freestyle5, Ushqyr.Garage.QuadPresets.Cinewhoop35 };
+            foreach (var b in builds)
+            {
+                if (setBuild != null && garage != null) setBuild.Invoke(garage, new object[] { b, true });
+                foreach (float a in new[] { 20f, 55f })
+                {
+                    if (gc != null) yaw.SetValue(gc, start + a);
+                    yield return Wait(1.2f);
+                    yield return ScreenStill("garage");
+                }
+            }
+            EndStills("garage");
+        }
+
         // ---------- helpers ----------
 
         private IEnumerator Load(string trackId)
@@ -321,7 +750,8 @@ namespace Ushqyr.EditorTools.Capture
             Time.captureFramerate = PitchClips.Fps;
             int frames = Mathf.RoundToInt(seconds * PitchClips.Fps);
             var eof = new WaitForEndOfFrame();
-            for (int i = 0; i < frames; i++)
+            _stopRecording = false;
+            for (int i = 0; i < frames && !_stopRecording; i++)
             {
                 yield return eof;
                 var tex = ScreenCapture.CaptureScreenshotAsTexture();

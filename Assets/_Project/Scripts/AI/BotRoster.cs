@@ -44,6 +44,7 @@ namespace Ushqyr.AI
         }
 
         /// <summary>A name per slot; <paramref name="seed"/> shuffles which names a race gets.</summary>
-        public static string NameFor(int slot, int seed) => Names[(slot + seed * 5) % Names.Length];
+        // Long arithmetic: round seeds go up to int.MaxValue, and seed * 5 would overflow to a negative index.
+        public static string NameFor(int slot, int seed) => Names[(int)(((long)slot + (long)seed * 5) % Names.Length + Names.Length) % Names.Length];
     }
 }

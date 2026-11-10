@@ -53,7 +53,7 @@ namespace Ushqyr.EditorTools.Range
             var sessionGo = new GameObject("Strike Session");
             sessionGo.transform.SetParent(root, false);
             var session = sessionGo.AddComponent<StrikeSession>();
-            session.Configure(layout, lights);
+            session.Configure(layout, lights, EffectMaterial("M_Strike_Smoke", RangeTargetView.NewSmokeMaterial()), EffectMaterial("M_Strike_Scorch", RangeTargetView.NewScorchMaterial()));
             sessionGo.AddComponent<RangeLighting>();
             WriteTrackJson(layout);
         }
@@ -461,6 +461,40 @@ namespace Ushqyr.EditorTools.Range
             m.SetColor("_EmissionColor", Color.black);
             AssetDatabase.CreateAsset(m, path);
             return m;
+        }
+
+        // A smoke / scorch material as an asset, with its soft-disc texture saved beside it.
+        private static Material EffectMaterial(string name, Material fresh)
+        {
+            Directory.CreateDirectory("Assets/_Project/Art/Strike");
+            string texPath = "Assets/_Project/Art/Strike/T_Strike_SoftDisc.png";
+            if (!File.Exists(texPath))
+            {
+                File.WriteAllBytes(texPath, RangeTargetView.SoftDisc.EncodeToPNG());
+                AssetDatabase.ImportAsset(texPath);
+                var imp = (TextureImporter)AssetImporter.GetAtPath(texPath);
+                imp.alphaIsTransparency = true;
+                imp.wrapMode = TextureWrapMode.Clamp;
+                imp.mipmapEnabled = true;
+                imp.SaveAndReimport();
+            }
+            var tex = AssetDatabase.LoadAssetAtPath<Texture2D>(texPath);
+            fresh.SetTexture("_BaseMap", tex);
+            fresh.mainTexture = tex;
+            string path = $"Assets/_Project/Art/Strike/{name}.mat";
+            var existing = AssetDatabase.LoadAssetAtPath<Material>(path);
+            if (existing == null)
+            {
+                AssetDatabase.CreateAsset(fresh, path);
+                return fresh;
+            }
+            existing.shader = fresh.shader;
+            existing.CopyPropertiesFromMaterial(fresh);
+            existing.shaderKeywords = fresh.shaderKeywords;
+            existing.renderQueue = fresh.renderQueue;
+            existing.SetOverrideTag("RenderType", "Transparent");
+            EditorUtility.SetDirty(existing);
+            return existing;
         }
 
         private static Mesh SaveMesh(Mesh mesh, string name)

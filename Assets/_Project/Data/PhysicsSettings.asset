@@ -17,6 +17,10 @@ MonoBehaviour:
     FixedStep: 0.001
     MaxSubSteps: 16
     BatterySag: 0
+    Wind:
+      x: 0
+      y: 0
+      z: 0
   Collision:
     Radius: 0.12
     Restitution: 0.3

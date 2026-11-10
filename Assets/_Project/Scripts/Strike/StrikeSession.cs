@@ -46,6 +46,8 @@ namespace Ushqyr.Strike
         [SerializeField] private RangeLayout layout;
         [Tooltip("Countdown lights per pad: 3 renderers each (red, yellow, green), pad by pad.")]
         [SerializeField] private Renderer[] padLights = new Renderer[0];
+        [Tooltip("Smoke and scorch materials made by the range builder (assets, so their shaders are in builds).")]
+        [SerializeField] private Material smokeMaterial, scorchMaterial;
 
         private QuadVehicle _player;
         private Transform _padSpawn;
@@ -96,8 +98,10 @@ namespace Ushqyr.Strike
         public int LastRank { get; private set; } = -1;
         public event Action<StrikePhase> PhaseChanged;
 
-        public void Configure(RangeLayout rangeLayout, Renderer[] lights)
+        public void Configure(RangeLayout rangeLayout, Renderer[] lights, Material smoke = null, Material scorch = null)
         {
+            smokeMaterial = smoke;
+            scorchMaterial = scorch;
             layout = rangeLayout;
             padLights = lights;
         }
@@ -119,6 +123,8 @@ namespace Ushqyr.Strike
             _size = size;
             Clear();
 
+            if (smokeMaterial != null) RangeTargetView.SmokeOverride = smokeMaterial;
+            if (scorchMaterial != null) RangeTargetView.ScorchOverride = scorchMaterial;
             _director = new RangeDirector(layout, _options.Seed, _options.Difficulty);
             var targets = new GameObject("Targets").transform;
             targets.SetParent(transform, false);
@@ -487,7 +493,13 @@ namespace Ushqyr.Strike
         {
             try
             {
-                if (File.Exists(PathOnDisk)) return JsonUtility.FromJson<StrikeBoard>(File.ReadAllText(PathOnDisk)) ?? new StrikeBoard();
+                if (File.Exists(PathOnDisk))
+                {
+                    var b = JsonUtility.FromJson<StrikeBoard>(File.ReadAllText(PathOnDisk)) ?? new StrikeBoard();
+                    // Rounds without a score are not "best rounds" (early builds saved them).
+                    foreach (var list in new[] { b.Easy, b.Normal, b.Hard }) list?.RemoveAll(e => e == null || e.Score <= 0);
+                    return b;
+                }
             }
             catch (Exception e) when (e is IOException || e is ArgumentException) { }
             return new StrikeBoard();

@@ -81,6 +81,15 @@ namespace Ushqyr.Tests
             Assert.LessOrEqual(StrikeWire.Encode(three).Length, 100);
         }
 
+        /// <summary>Round seeds go up to int.MaxValue (online setups, offline TickCount): bot names must not overflow.</summary>
+        [Test]
+        public void BotNames_WorkForAnySeed()
+        {
+            foreach (int seed in new[] { 0, 1, 1017909653, int.MaxValue, int.MaxValue - 3, -5, int.MinValue })
+                for (int slot = 0; slot < 8; slot++)
+                    Assert.IsFalse(string.IsNullOrEmpty(Ushqyr.AI.BotRoster.NameFor(slot, seed)), $"seed {seed} slot {slot}");
+        }
+
         // ---------- the referee ----------
 
         [Test]

@@ -236,19 +236,74 @@ namespace Ushqyr.Strike
         }
 
         private static Material _smokeMat, _scorchMat;
+        private static Texture2D _disc;
 
-        public static Material SmokeMaterial
+        /// <summary>Material assets made by the range builder (so the shaders ship in builds); runtime fallbacks otherwise.</summary>
+        public static Material SmokeOverride, ScorchOverride;
+
+        /// <summary>A soft round puff: alpha falls off smoothly to the edge (no square billboards).</summary>
+        public static Texture2D SoftDisc
         {
             get
             {
-                if (_smokeMat != null) return _smokeMat;
-                var sh = Shader.Find("Universal Render Pipeline/Particles/Unlit") ?? Shader.Find("Sprites/Default");
-                _smokeMat = new Material(sh) { name = "Range Smoke" };
-                _smokeMat.SetFloat("_Surface", 1f);
-                _smokeMat.SetColor("_BaseColor", new Color(0.3f, 0.3f, 0.3f, 0.6f));
-                return _smokeMat;
+                if (_disc != null) return _disc;
+                const int n = 64;
+                _disc = new Texture2D(n, n, TextureFormat.RGBA32, false) { name = "Soft Disc", wrapMode = TextureWrapMode.Clamp };
+                var px = new Color32[n * n];
+                for (int y = 0; y < n; y++)
+                    for (int x = 0; x < n; x++)
+                    {
+                        float dx = (x + 0.5f) / n * 2f - 1f, dy = (y + 0.5f) / n * 2f - 1f;
+                        float r = Mathf.Sqrt(dx * dx + dy * dy);
+                        float a = Mathf.Clamp01(1f - r);
+                        a = a * a * (3f - 2f * a);
+                        px[y * n + x] = new Color32(255, 255, 255, (byte)(a * 255f));
+                    }
+                _disc.SetPixels32(px);
+                _disc.Apply();
+                return _disc;
             }
         }
+
+        /// <summary>Alpha-blended, no depth writes: what URP's Unlit / Particles Unlit need set besides _Surface.</summary>
+        public static void MakeTransparent(Material m)
+        {
+            m.SetFloat("_Surface", 1f);
+            m.SetFloat("_Blend", 0f);
+            m.SetFloat("_SrcBlend", (float)UnityEngine.Rendering.BlendMode.SrcAlpha);
+            m.SetFloat("_DstBlend", (float)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+            m.SetFloat("_SrcBlendAlpha", (float)UnityEngine.Rendering.BlendMode.One);
+            m.SetFloat("_DstBlendAlpha", (float)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+            m.SetFloat("_ZWrite", 0f);
+            m.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
+            m.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
+            m.SetOverrideTag("RenderType", "Transparent");
+        }
+
+        public static Material NewSmokeMaterial()
+        {
+            var sh = Shader.Find("Universal Render Pipeline/Particles/Unlit") ?? Shader.Find("Sprites/Default");
+            var m = new Material(sh) { name = "Range Smoke" };
+            MakeTransparent(m);
+            m.SetTexture("_BaseMap", SoftDisc);
+            m.mainTexture = SoftDisc;
+            m.SetColor("_BaseColor", new Color(1f, 1f, 1f, 1f));
+            return m;
+        }
+
+        public static Material NewScorchMaterial()
+        {
+            var sh = Shader.Find("Universal Render Pipeline/Unlit") ?? Shader.Find("Unlit/Transparent");
+            var m = new Material(sh) { name = "Scorch" };
+            MakeTransparent(m);
+            m.SetTexture("_BaseMap", SoftDisc);
+            m.mainTexture = SoftDisc;
+            m.SetColor("_BaseColor", new Color(0.04f, 0.035f, 0.03f, 0.85f));
+            return m;
+        }
+
+        public static Material SmokeMaterial => SmokeOverride != null ? SmokeOverride : _smokeMat != null ? _smokeMat : (_smokeMat = NewSmokeMaterial());
+        private static Material ScorchMaterial => ScorchOverride != null ? ScorchOverride : _scorchMat != null ? _scorchMat : (_scorchMat = NewScorchMaterial());
 
         private Transform MakeScorch()
         {
@@ -256,13 +311,9 @@ namespace Ushqyr.Strike
             go.name = "Scorch";
             Destroy(go.GetComponent<Collider>());
             go.transform.localScale = new Vector3(9f, 9f, 1f);
-            if (_scorchMat == null)
-            {
-                var sh = Shader.Find("Universal Render Pipeline/Unlit") ?? Shader.Find("Unlit/Color");
-                _scorchMat = new Material(sh) { name = "Scorch" };
-                _scorchMat.SetColor("_BaseColor", new Color(0.05f, 0.045f, 0.04f));
-            }
-            go.GetComponent<MeshRenderer>().sharedMaterial = _scorchMat;
+            var r = go.GetComponent<MeshRenderer>();
+            r.sharedMaterial = ScorchMaterial;
+            r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
             return go.transform;
         }
 
