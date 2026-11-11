@@ -34,6 +34,34 @@ Rebuild the scene with `TrackSceneBuilder.Build("steppe")` (or *Ushqyr > Builder
   a watchtower and a command tent by the pads.
 - Three concrete pads 24 m apart at the south edge, each with a red / yellow / green light tree for the 3-2-1 countdown.
 
+## Traffic (2026-11-12)
+
+Road vehicles never meet:
+
+- Each convoy and each evasive vehicle gets **its own section of road** (`RangeDirector.Sections`); no two groups
+  ever share a stretch.
+- Inside its section a group drives a **lane loop**: out on the right lane, a U-turn, back on the other lane
+  (lane centres 2.4 m either side of the 10 m road). Convoy members keep 18 m along the loop, so they never pass
+  through each other, and a convoy runs on the round clock, so a respawned member rejoins its line.
+- A hit vehicle's **wreck rolls off the road** (0.8 s) to a spot the director picks: beside its lane, further out
+  or a little along the road, clear of other wrecks and of the traffic passing while it rolls and while it lies
+  there. Deterministic (hits arrive in the same order on every PC). If no spot is free (1 in ~2 000 hits in
+  tests) the wreck burns out and sinks instead.
+- `StrikeTrafficTests`: full rounds on the real layout with random hits, respawns and wrecks, every 0.1 s, every
+  pair of vehicles checked with oriented footprints (Normal and Hard, 8 seeds each): no overlaps.
+
+## Look (2026-11-12, after the FPV strike-sim references)
+
+- **Vehicles** (`VehicleKit`, `RangeVehicles.Model`): chamfered hulls, tracks with road wheels, sprockets and
+  idlers, wheels with hubs, cabs with glass, mirrors and lights, canvas covers, hatches, antennas, stowage;
+  weathered paint (a grime map under the paint colour). Still fictional designs, no insignia. One mesh per
+  material, cached per kind.
+- **Ground** (`RangeSteppeTerrain`): a Unity terrain on the layout's height function, layers of green grass,
+  straw-gold dry grass, bare earth and gravel by the pads, grass tufts, bushes and stones, dusty road edges and
+  wheel ruts, a power line, muted post-processing (ACES, -14 % saturation, light vignette) and more haze.
+- **Hits**: a flash and sparks, then flames under the smoke while the wreck burns.
+- Cost: 10.7 ms a frame in the editor in a round (Expo: 12.4 ms).
+
 ## Rules
 
 | | Static | Moving | Evasive |
@@ -69,5 +97,5 @@ points, 3–5 hits each).
 
 - Wind (Normal 2 m/s, Hard 4 m/s with gusts) was added in P7: `StrikeRules.WindAt` from the seed and the round clock,
   applied to the pilot and the bots as relative airflow in the flight model (zero everywhere else).
-- The previews show the bare range: the targets only exist once a round starts.
+- The menu preview shows the bare range: the targets only exist once a round starts.
 - Not played through on the Quest headset or with a radio yet.

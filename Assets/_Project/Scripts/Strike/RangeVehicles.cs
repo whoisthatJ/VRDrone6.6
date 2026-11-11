@@ -10,12 +10,13 @@ namespace Ushqyr.Strike
     }
 
     /// <summary>
-    /// Fictional generic vehicle silhouettes for the range (P5), built from boxes and cylinders in code: no real-world
-    /// model, insignia, unit or country. Each comes with simple box hitboxes on the track-geometry layer.
+    /// Fictional generic vehicles for the range (P5): no real-world model, insignia, unit or country. Built in code with
+    /// <see cref="VehicleKit"/> (chamfered boxes, wheels, tracks with road wheels, cabs with glass), one mesh per
+    /// material, cached per kind; textured materials from the range. Simple box hitboxes on the track-geometry layer.
     /// </summary>
     public static class RangeVehicles
     {
-        public static readonly Color Tan = new Color(0.62f, 0.56f, 0.42f), Olive = new Color(0.36f, 0.38f, 0.26f),
+        public static readonly Color Tan = new Color(0.66f, 0.6f, 0.45f), Olive = new Color(0.4f, 0.43f, 0.29f),
             Dark = new Color(0.16f, 0.16f, 0.15f), Steel = new Color(0.45f, 0.46f, 0.47f);
 
         private static Material _paint, _dark, _steel;
@@ -42,69 +43,244 @@ namespace Ushqyr.Strike
             return m;
         }
 
+        /// <summary>Half width and half length of a vehicle's footprint (m), for traffic spacing checks.</summary>
+        public static Vector2 Footprint(VehicleKind kind) => kind switch
+        {
+            VehicleKind.Tracked => new Vector2(1.7f, 3.4f),
+            VehicleKind.Wheeled => new Vector2(1.5f, 3.9f),
+            VehicleKind.Truck => new Vector2(1.3f, 3.6f),
+            VehicleKind.Artillery => new Vector2(1.6f, 3.8f),
+            _ => new Vector2(1.6f, 3.6f),
+        };
+
+        /// <summary>
+        /// Materials per <see cref="VehicleKit.Slot"/> (paint, rubber, metal, dark, glass, canvas, light), set from the
+        /// range's material assets (textured, so they ship in builds); flat-colour fallbacks otherwise.
+        /// </summary>
+        public static Material[] MaterialsOverride;
+        private static Material[] _fallback;
+        private static readonly System.Collections.Generic.Dictionary<VehicleKind, Mesh[]> Meshes = new System.Collections.Generic.Dictionary<VehicleKind, Mesh[]>();
+
+        public static Material MaterialFor(VehicleKit.Slot slot)
+        {
+            var o = MaterialsOverride;
+            if (o != null && (int)slot < o.Length && o[(int)slot] != null) return o[(int)slot];
+            if (_fallback == null)
+            {
+                _fallback = new Material[VehicleKit.Slots];
+                var colors = new[] { new Color(0.85f, 0.85f, 0.8f), new Color(0.08f, 0.08f, 0.08f), Steel, Dark, new Color(0.08f, 0.1f, 0.12f), new Color(0.45f, 0.43f, 0.32f), new Color(1f, 0.95f, 0.8f) };
+                for (int i = 0; i < _fallback.Length; i++)
+                {
+                    var shader = Shader.Find("Universal Render Pipeline/Lit") ?? Shader.Find("Standard");
+                    _fallback[i] = new Material(shader) { name = "Range Vehicle " + (VehicleKit.Slot)i, enableInstancing = true };
+                    _fallback[i].SetColor("_BaseColor", colors[i]);
+                    _fallback[i].SetFloat("_Smoothness", i == 4 ? 0.9f : i == 2 ? 0.45f : 0.2f);
+                }
+            }
+            return _fallback[(int)slot];
+        }
+
         /// <summary>Builds a vehicle under <paramref name="parent"/>; the root's forward is the driving direction.</summary>
         public static GameObject Build(VehicleKind kind, Transform parent, int layer, Color paint, int slot = -1)
         {
             var root = new GameObject(kind.ToString());
             root.transform.SetParent(parent, false);
             root.layer = layer;
-            var body = Mat(ref _paint, Tan, 0.15f);
-            var dark = Mat(ref _dark, Dark, 0.1f);
-            var steel = Mat(ref _steel, Steel, 0.4f);
+            if (!Meshes.TryGetValue(kind, out var meshes) || meshes == null || System.Array.TrueForAll(meshes, m => m == null))
+                Meshes[kind] = meshes = Model(kind).Build(kind.ToString());
             var tint = new MaterialPropertyBlock();
-            tint.SetColor("_BaseColor", paint);
-
-            void Box(Vector3 c, Vector3 s, Material m, bool painted = false, Quaternion? r = null) => Part(root.transform, Cube, c, s, r ?? Quaternion.identity, m, painted ? tint : null, layer);
-            void Wheel(Vector3 c, float radius, float width) => Part(root.transform, Cylinder, c, new Vector3(radius * 2f, width * 0.5f, radius * 2f), Quaternion.Euler(0f, 0f, 90f), dark, null, layer);
-
+            for (int i = 0; i < meshes.Length; i++)
+            {
+                if (meshes[i] == null) continue;
+                var go = new GameObject(((VehicleKit.Slot)i).ToString()) { layer = layer };
+                go.transform.SetParent(root.transform, false);
+                go.AddComponent<MeshFilter>().sharedMesh = meshes[i];
+                var mr = go.AddComponent<MeshRenderer>();
+                mr.sharedMaterial = MaterialFor((VehicleKit.Slot)i);
+                mr.shadowCastingMode = (VehicleKit.Slot)i == VehicleKit.Slot.Light ? ShadowCastingMode.Off : ShadowCastingMode.On;
+                if ((VehicleKit.Slot)i == VehicleKit.Slot.Paint)
+                {
+                    tint.SetColor("_BaseColor", paint);
+                    mr.SetPropertyBlock(tint);
+                }
+            }
             switch (kind)
             {
                 case VehicleKind.Tracked:
-                    Box(new Vector3(0f, 0.95f, 0f), new Vector3(3.0f, 1.0f, 6.4f), body, true);
-                    Box(new Vector3(0f, 1.65f, -0.6f), new Vector3(2.4f, 0.6f, 3.6f), body, true);
-                    Box(new Vector3(0f, 1.6f, 2.5f), new Vector3(2.6f, 0.35f, 1.2f), body, true, Quaternion.Euler(-18f, 0f, 0f));
-                    foreach (float sx in new[] { -1.55f, 1.55f }) Box(new Vector3(sx, 0.55f, 0f), new Vector3(0.55f, 1.0f, 6.6f), dark);
-                    Box(new Vector3(0f, 2.15f, -0.9f), new Vector3(1.2f, 0.45f, 1.4f), steel);
                     AddHitbox(root, new Vector3(0f, 1.1f, 0f), new Vector3(3.4f, 2.2f, 6.8f), slot, layer);
                     break;
                 case VehicleKind.Wheeled:
-                    Box(new Vector3(0f, 1.25f, 0f), new Vector3(2.7f, 1.3f, 6.8f), body, true);
-                    Box(new Vector3(0f, 1.25f, 3.6f), new Vector3(2.5f, 0.9f, 0.8f), body, true, Quaternion.Euler(25f, 0f, 0f));
-                    Box(new Vector3(0.5f, 2.05f, 0.4f), new Vector3(1.0f, 0.4f, 1.2f), steel);
-                    for (int i = 0; i < 4; i++)
-                        foreach (float sx in new[] { -1.35f, 1.35f }) Wheel(new Vector3(sx, 0.55f, -2.4f + i * 1.6f), 0.55f, 0.4f);
                     AddHitbox(root, new Vector3(0f, 1.2f, 0f), new Vector3(3.0f, 2.4f, 7.2f), slot, layer);
                     break;
                 case VehicleKind.Truck:
-                    Box(new Vector3(0f, 1.55f, 2.6f), new Vector3(2.4f, 1.7f, 1.8f), body, true);
-                    Box(new Vector3(0f, 1.0f, -0.6f), new Vector3(2.4f, 0.3f, 5.0f), steel);
-                    Box(new Vector3(0f, 1.85f, -0.9f), new Vector3(2.5f, 1.4f, 4.2f), body, true);
-                    for (int i = 0; i < 3; i++)
-                        foreach (float sx in new[] { -1.15f, 1.15f }) Wheel(new Vector3(sx, 0.5f, i == 0 ? 2.4f : -0.4f - (i - 1) * 1.4f), 0.5f, 0.35f);
                     AddHitbox(root, new Vector3(0f, 1.4f, 0.3f), new Vector3(2.7f, 2.8f, 7.0f), slot, layer);
                     break;
                 case VehicleKind.Artillery:
-                    Box(new Vector3(0f, 1.0f, 0f), new Vector3(2.8f, 0.9f, 6.6f), body, true);
-                    Box(new Vector3(0f, 1.7f, -0.8f), new Vector3(2.2f, 0.7f, 2.6f), body, true);
-                    Part(root.transform, Cylinder, new Vector3(0f, 2.3f, 1.6f), new Vector3(0.28f, 2.6f, 0.28f), Quaternion.Euler(70f, 0f, 0f), steel, null, layer);
-                    foreach (float sx in new[] { -1.45f, 1.45f }) Box(new Vector3(sx, 0.55f, 0f), new Vector3(0.5f, 0.95f, 6.6f), dark);
                     AddHitbox(root, new Vector3(0f, 1.2f, 0.4f), new Vector3(3.2f, 2.4f, 7.4f), slot, layer);
                     break;
-                default: // radar truck
-                    Box(new Vector3(0f, 1.55f, 2.6f), new Vector3(2.4f, 1.7f, 1.8f), body, true);
-                    Box(new Vector3(0f, 1.0f, -0.6f), new Vector3(2.4f, 0.3f, 5.0f), steel);
-                    Box(new Vector3(0f, 1.7f, -1.2f), new Vector3(2.2f, 1.1f, 3.0f), body, true);
-                    Part(root.transform, Cylinder, new Vector3(0f, 2.9f, -1.2f), new Vector3(0.25f, 0.7f, 0.25f), Quaternion.identity, steel, null, layer);
-                    var dish = Part(root.transform, Cube, new Vector3(0f, 3.9f, -1.2f), new Vector3(3.2f, 1.4f, 0.12f), Quaternion.Euler(-15f, 0f, 0f), steel, null, layer);
-                    dish.name = "Radar";
-                    dish.AddComponent<Ushqyr.Core.Spinner>();
-                    for (int i = 0; i < 3; i++)
-                        foreach (float sx in new[] { -1.15f, 1.15f }) Wheel(new Vector3(sx, 0.5f, i == 0 ? 2.4f : -0.4f - (i - 1) * 1.4f), 0.5f, 0.35f);
+                default:
                     AddHitbox(root, new Vector3(0f, 1.5f, 0.3f), new Vector3(2.7f, 3.0f, 7.0f), slot, layer);
                     AddHitbox(root, new Vector3(0f, 3.8f, -1.2f), new Vector3(3.2f, 1.6f, 0.6f), slot, layer);
+                    // The radar antenna turns: its own object.
+                    var dishKit = new VehicleKit();
+                    dishKit.Box(VehicleKit.Slot.Metal, Vector3.zero, new Vector3(3.2f, 1.3f, 0.1f), 0.03f);
+                    for (int i = 0; i < 7; i++) dishKit.Box(VehicleKit.Slot.Dark, new Vector3(-1.4f + i * 0.47f, 0f, -0.07f), new Vector3(0.05f, 1.2f, 0.05f), 0.01f);
+                    dishKit.Box(VehicleKit.Slot.Metal, new Vector3(0f, 0f, 0.25f), new Vector3(0.5f, 0.4f, 0.4f), 0.05f);
+                    var dish = new GameObject("Radar") { layer = layer };
+                    dish.transform.SetParent(root.transform, false);
+                    dish.transform.SetLocalPositionAndRotation(new Vector3(0f, 3.9f, -1.2f), Quaternion.identity);
+                    var dm = dishKit.Build("Radar Dish");
+                    for (int i = 0; i < dm.Length; i++)
+                    {
+                        if (dm[i] == null) continue;
+                        var g = new GameObject(((VehicleKit.Slot)i).ToString()) { layer = layer };
+                        g.transform.SetParent(dish.transform, false);
+                        g.transform.localRotation = Quaternion.Euler(-15f, 0f, 0f);
+                        g.AddComponent<MeshFilter>().sharedMesh = dm[i];
+                        g.AddComponent<MeshRenderer>().sharedMaterial = MaterialFor((VehicleKit.Slot)i);
+                    }
+                    dish.AddComponent<Ushqyr.Core.Spinner>();
                     break;
             }
             return root;
+        }
+
+        // ---------- the models (fictional generic designs) ----------
+
+        private static VehicleKit Model(VehicleKind kind)
+        {
+            var k = new VehicleKit();
+            const VehicleKit.Slot P = VehicleKit.Slot.Paint, R = VehicleKit.Slot.Rubber, M = VehicleKit.Slot.Metal, D = VehicleKit.Slot.Dark,
+                G = VehicleKit.Slot.Glass, C = VehicleKit.Slot.Canvas, L = VehicleKit.Slot.Light;
+            switch (kind)
+            {
+                case VehicleKind.Tracked:
+                {
+                    // Tracked carrier: low hull, sloped glacis, small turret, tracks with six road wheels.
+                    foreach (float sx in new[] { -1.3f, 1.3f }) k.Track(sx, 6.4f, 1.05f, 0.5f, 6);
+                    k.Box(P, new Vector3(0f, 1.15f, -0.2f), new Vector3(2.5f, 0.75f, 5.6f), 0.08f);
+                    k.Box(P, new Vector3(0f, 1.18f, 2.75f), new Vector3(2.45f, 0.5f, 1.1f), 0.06f, Quaternion.Euler(-22f, 0f, 0f));
+                    foreach (float sx in new[] { -1f, 1f }) k.Box(P, new Vector3(sx * 1.45f, 1.12f, 0f), new Vector3(0.18f, 0.55f, 5.9f), 0.03f); // side skirts
+                    k.Box(P, new Vector3(0f, 1.62f, -0.3f), new Vector3(2.3f, 0.22f, 4.6f), 0.06f);
+                    k.Box(P, new Vector3(0.2f, 2.0f, 0.2f), new Vector3(1.45f, 0.55f, 1.7f), 0.12f);
+                    k.Box(P, new Vector3(0.2f, 2.0f, 1.1f), new Vector3(1.2f, 0.42f, 0.4f), 0.08f, Quaternion.Euler(-30f, 0f, 0f));
+                    k.Cylinder(M, new Vector3(0.45f, 2.02f, 1.1f), new Vector3(0.45f, 2.06f, 3.3f), 0.07f, 10);
+                    k.Cylinder(D, new Vector3(0.45f, 2.06f, 3.3f), new Vector3(0.45f, 2.07f, 3.45f), 0.1f, 10);
+                    foreach (var (x, z) in new[] { (-0.7f, -1.3f), (0.7f, -1.3f), (-0.6f, 0.4f) })
+                        k.Cylinder(P, new Vector3(x, 1.72f, z), new Vector3(x, 1.8f, z), 0.32f, 14); // hatches
+                    k.Box(G, new Vector3(-0.75f, 1.62f, 1.45f), new Vector3(0.5f, 0.12f, 0.06f), 0.01f, Quaternion.Euler(-30f, 0f, 0f)); // driver's vision block
+                    for (int i = 0; i < 3; i++) k.Box(G, new Vector3(-0.05f + i * 0.28f, 2.2f, 0.95f), new Vector3(0.18f, 0.08f, 0.05f), 0.01f);
+                    k.Cylinder(M, new Vector3(-0.45f, 2.25f, -0.4f), new Vector3(-0.45f, 4.0f, -0.6f), 0.012f, 4); // antennas
+                    k.Cylinder(M, new Vector3(0.95f, 1.75f, -2.4f), new Vector3(0.95f, 3.3f, -2.6f), 0.012f, 4);
+                    foreach (float sx in new[] { -1f, 1f })
+                    {
+                        k.Box(L, new Vector3(sx * 0.95f, 1.5f, 3.08f), new Vector3(0.18f, 0.12f, 0.06f), 0.02f);
+                        k.Box(M, new Vector3(sx * 0.7f, 0.85f, 3.2f), new Vector3(0.2f, 0.25f, 0.3f), 0.03f); // tow hooks
+                        k.Box(P, new Vector3(sx * 0.8f, 1.65f, -2.75f), new Vector3(0.7f, 0.45f, 0.5f), 0.05f); // stowage bins
+                    }
+                    k.Box(D, new Vector3(0.9f, 1.66f, 0.9f), new Vector3(0.6f, 0.04f, 0.9f), 0.01f); // engine grille
+                    k.Box(C, new Vector3(-0.4f, 1.85f, -2.5f), new Vector3(1.0f, 0.35f, 0.5f), 0.12f); // rolled tarp
+                    break;
+                }
+                case VehicleKind.Wheeled:
+                {
+                    // Eight-wheeled carrier: long faceted hull, remote weapon station, side doors.
+                    for (int i = 0; i < 4; i++)
+                        foreach (float sx in new[] { -1f, 1f })
+                            k.Wheel(new Vector3(sx * 1.25f, 0.55f, -2.5f + i * 1.65f + (i >= 2 ? 0.25f : 0f)), 0.55f, 0.42f, sx);
+                    k.Box(P, new Vector3(0f, 1.3f, -0.2f), new Vector3(2.6f, 1.1f, 6.3f), 0.1f);
+                    k.Box(P, new Vector3(0f, 1.2f, 3.15f), new Vector3(2.4f, 0.75f, 1.0f), 0.08f, Quaternion.Euler(28f, 0f, 0f));
+                    k.Box(P, new Vector3(0f, 1.95f, -0.5f), new Vector3(2.2f, 0.3f, 4.8f), 0.08f);
+                    foreach (float sx in new[] { -1f, 1f })
+                    {
+                        k.Box(P, new Vector3(sx * 1.32f, 1.75f, -0.2f), new Vector3(0.12f, 0.35f, 6.0f), 0.04f, Quaternion.Euler(0f, 0f, sx * 25f)); // upper side slope
+                        for (int i = 0; i < 4; i++) k.Box(P, new Vector3(sx * 1.33f, 1.15f, -2.5f + i * 1.65f + (i >= 2 ? 0.25f : 0f)), new Vector3(0.1f, 0.25f, 1.3f), 0.03f); // wheel arches
+                        k.Box(D, new Vector3(sx * 1.31f, 1.35f, 0.6f), new Vector3(0.04f, 0.8f, 0.9f), 0.02f); // side door outline
+                        k.Box(L, new Vector3(sx * 0.9f, 1.55f, 3.25f), new Vector3(0.2f, 0.12f, 0.05f), 0.02f);
+                        k.Box(M, new Vector3(sx * 1.0f, 0.95f, 3.45f), new Vector3(0.18f, 0.2f, 0.2f), 0.03f);
+                    }
+                    k.Box(M, new Vector3(0.4f, 2.3f, 0.4f), new Vector3(0.9f, 0.45f, 0.9f), 0.08f); // weapon station
+                    k.Cylinder(M, new Vector3(0.5f, 2.35f, 0.85f), new Vector3(0.5f, 2.38f, 2.0f), 0.05f, 8);
+                    k.Box(G, new Vector3(0.15f, 2.38f, 0.86f), new Vector3(0.25f, 0.15f, 0.04f), 0.01f);
+                    for (int i = 0; i < 3; i++) k.Box(G, new Vector3(-0.6f + i * 0.4f, 1.88f, 2.65f), new Vector3(0.25f, 0.1f, 0.06f), 0.01f, Quaternion.Euler(28f, 0f, 0f));
+                    foreach (var z in new[] { -2.2f, -0.8f }) k.Cylinder(P, new Vector3(-0.5f, 2.1f, z), new Vector3(-0.5f, 2.16f, z), 0.3f, 14);
+                    k.Cylinder(M, new Vector3(-0.9f, 2.1f, -2.8f), new Vector3(-0.9f, 4.0f, -3.0f), 0.012f, 4);
+                    k.Box(D, new Vector3(0f, 1.3f, -3.36f), new Vector3(1.2f, 0.9f, 0.06f), 0.02f); // rear door
+                    k.Box(C, new Vector3(0.6f, 2.18f, -2.3f), new Vector3(0.9f, 0.25f, 0.9f), 0.1f); // stowage net
+                    break;
+                }
+                case VehicleKind.Truck:
+                    BuildTruckBase(k);
+                    // Cargo bed with a canvas cover on hoops.
+                    k.Box(P, new Vector3(0f, 1.25f, -1.2f), new Vector3(2.45f, 0.12f, 4.2f), 0.03f);
+                    foreach (float sx in new[] { -1f, 1f }) k.Box(P, new Vector3(sx * 1.2f, 1.55f, -1.2f), new Vector3(0.06f, 0.5f, 4.2f), 0.02f);
+                    k.Box(P, new Vector3(0f, 1.55f, -3.28f), new Vector3(2.45f, 0.5f, 0.06f), 0.02f);
+                    k.Box(C, new Vector3(0f, 2.25f, -1.2f), new Vector3(2.4f, 1.0f, 4.15f), 0.35f);
+                    for (int i = 0; i < 4; i++) k.Box(D, new Vector3(0f, 2.76f, -2.9f + i * 1.15f), new Vector3(2.42f, 0.04f, 0.06f), 0.01f);
+                    break;
+                case VehicleKind.Artillery:
+                {
+                    // Self-propelled gun: tracked chassis, a big boxy turret and a long barrel with a muzzle brake.
+                    foreach (float sx in new[] { -1.3f, 1.3f }) k.Track(sx, 6.4f, 1.0f, 0.5f, 6);
+                    k.Box(P, new Vector3(0f, 1.1f, 0f), new Vector3(2.5f, 0.7f, 6.0f), 0.08f);
+                    k.Box(P, new Vector3(0f, 1.1f, 3.0f), new Vector3(2.4f, 0.45f, 0.8f), 0.06f, Quaternion.Euler(-25f, 0f, 0f));
+                    foreach (float sx in new[] { -1f, 1f }) k.Box(P, new Vector3(sx * 1.45f, 1.08f, 0f), new Vector3(0.16f, 0.5f, 6.0f), 0.03f);
+                    k.Box(P, new Vector3(0f, 1.95f, -0.9f), new Vector3(2.3f, 1.05f, 2.9f), 0.12f);
+                    k.Box(P, new Vector3(0f, 1.95f, 0.75f), new Vector3(1.6f, 0.8f, 0.6f), 0.1f, Quaternion.Euler(-20f, 0f, 0f)); // mantlet
+                    k.Cylinder(M, new Vector3(0f, 2.0f, 0.95f), new Vector3(0f, 2.0f, 3.5f), 0.11f, 12);
+                    k.Cylinder(D, new Vector3(0f, 2.0f, 3.5f), new Vector3(0f, 2.0f, 3.75f), 0.16f, 12); // muzzle brake
+                    k.Box(M, new Vector3(0f, 1.62f, 3.25f), new Vector3(0.35f, 0.35f, 0.2f), 0.04f); // travel lock
+                    foreach (float sx in new[] { -1f, 1f }) k.Box(P, new Vector3(sx * 1.22f, 2.0f, -1.2f), new Vector3(0.15f, 0.6f, 1.6f), 0.04f); // turret bins
+                    k.Cylinder(P, new Vector3(0.6f, 2.48f, -1.4f), new Vector3(0.6f, 2.55f, -1.4f), 0.3f, 14);
+                    k.Box(G, new Vector3(-0.6f, 2.45f, -0.1f), new Vector3(0.3f, 0.15f, 0.2f), 0.02f);
+                    k.Cylinder(M, new Vector3(-0.8f, 2.5f, -2.0f), new Vector3(-0.8f, 4.2f, -2.2f), 0.012f, 4);
+                    k.Box(D, new Vector3(0f, 1.6f, -3.05f), new Vector3(1.6f, 0.5f, 0.05f), 0.02f);
+                    foreach (float sx in new[] { -1f, 1f }) k.Box(L, new Vector3(sx * 0.95f, 1.45f, 3.3f), new Vector3(0.18f, 0.12f, 0.05f), 0.02f);
+                    break;
+                }
+                default:
+                    // Radar truck: cab, chassis, an equipment shelter and a mast (the antenna is added separately).
+                    BuildTruckBase(k);
+                    k.Box(P, new Vector3(0f, 1.85f, -1.2f), new Vector3(2.3f, 1.3f, 3.2f), 0.08f);
+                    k.Box(D, new Vector3(1.16f, 1.8f, -0.6f), new Vector3(0.03f, 1.0f, 0.7f), 0.01f); // shelter door
+                    k.Box(M, new Vector3(-1.17f, 2.0f, -1.6f), new Vector3(0.03f, 0.5f, 0.8f), 0.01f); // vent
+                    k.Cylinder(M, new Vector3(0f, 2.5f, -1.2f), new Vector3(0f, 3.4f, -1.2f), 0.14f, 10); // mast
+                    foreach (float sx in new[] { -1f, 1f })
+                        foreach (float z in new[] { -2.9f, 0.2f })
+                        {
+                            // Outriggers: a beam out from the chassis, a jack down to a pad on the ground.
+                            k.Box(M, new Vector3(sx * 0.85f, 0.8f, z), new Vector3(0.9f, 0.14f, 0.16f), 0.02f);
+                            k.Cylinder(M, new Vector3(sx * 1.25f, 0.85f, z), new Vector3(sx * 1.25f, 0.1f, z), 0.06f, 8);
+                            k.Box(D, new Vector3(sx * 1.25f, 0.04f, z), new Vector3(0.35f, 0.06f, 0.35f), 0.02f);
+                        }
+                    break;
+            }
+            return k;
+        }
+
+        // A three-axle truck: chassis, cab with windows, bonnet, bumper, lights, mirrors, fuel tank, wheels.
+        private static void BuildTruckBase(VehicleKit k)
+        {
+            const VehicleKit.Slot P = VehicleKit.Slot.Paint, M = VehicleKit.Slot.Metal, D = VehicleKit.Slot.Dark, G = VehicleKit.Slot.Glass, L = VehicleKit.Slot.Light;
+            foreach (float sx in new[] { -1f, 1f })
+            {
+                k.Wheel(new Vector3(sx * 1.05f, 0.5f, 2.35f), 0.5f, 0.38f, sx);
+                k.Wheel(new Vector3(sx * 1.05f, 0.5f, -0.6f), 0.5f, 0.38f, sx);
+                k.Wheel(new Vector3(sx * 1.05f, 0.5f, -1.95f), 0.5f, 0.38f, sx);
+                k.Box(D, new Vector3(sx * 0.45f, 0.85f, 0f), new Vector3(0.18f, 0.25f, 6.6f), 0.02f); // chassis rails
+                k.Box(P, new Vector3(sx * 1.08f, 1.08f, 2.35f), new Vector3(0.5f, 0.08f, 1.2f), 0.02f); // mudguards
+                k.Box(L, new Vector3(sx * 0.85f, 1.25f, 3.42f), new Vector3(0.22f, 0.16f, 0.05f), 0.02f);
+                k.Box(D, new Vector3(sx * 1.3f, 2.2f, 1.95f), new Vector3(0.05f, 0.3f, 0.2f), 0.01f); // mirrors
+                k.Cylinder(M, new Vector3(sx * 1.22f, 2.05f, 1.9f), new Vector3(sx * 1.3f, 2.2f, 1.95f), 0.015f, 4);
+            }
+            k.Box(P, new Vector3(0f, 1.7f, 1.75f), new Vector3(2.3f, 1.45f, 1.5f), 0.1f); // cab
+            k.Box(P, new Vector3(0f, 1.25f, 2.95f), new Vector3(2.0f, 0.75f, 0.9f), 0.1f); // bonnet
+            k.Box(G, new Vector3(0f, 2.05f, 2.51f), new Vector3(1.9f, 0.55f, 0.04f), 0.02f, Quaternion.Euler(-8f, 0f, 0f)); // windscreen
+            foreach (float sx in new[] { -1f, 1f }) k.Box(G, new Vector3(sx * 1.16f, 2.05f, 1.85f), new Vector3(0.04f, 0.5f, 0.85f), 0.02f);
+            k.Box(D, new Vector3(0f, 1.25f, 3.42f), new Vector3(1.1f, 0.5f, 0.04f), 0.01f); // grille
+            k.Box(M, new Vector3(0f, 0.85f, 3.45f), new Vector3(2.3f, 0.2f, 0.15f), 0.03f); // bumper
+            k.Cylinder(M, new Vector3(-0.85f, 0.95f, 0.6f), new Vector3(-0.85f, 0.95f, 1.4f), 0.28f, 14); // fuel tank
+            k.Cylinder(D, new Vector3(0.95f, 1.6f, 1.0f), new Vector3(0.95f, 2.6f, 1.0f), 0.06f, 8); // exhaust
         }
 
         private static GameObject Part(Transform parent, Mesh mesh, Vector3 c, Vector3 s, Quaternion r, Material m, MaterialPropertyBlock block, int layer)
@@ -172,11 +348,9 @@ namespace Ushqyr.Strike
                 _model = RangeVehicles.Build(t.Plan.Kind, transform, _layer, paint, Slot);
                 _shownDisabled = false;
             }
-            if (t.Active)
-            {
-                _director.Pose(Slot, time, out var p, out float yaw, out _);
-                transform.SetPositionAndRotation(p, Quaternion.Euler(0f, yaw, 0f));
-            }
+            // Active: on its lane. Disabled: the wreck veers off the road (clear of the convoy behind it).
+            _director.ViewPose(Slot, time, out var p, out float yaw);
+            transform.SetPositionAndRotation(p, Quaternion.Euler(0f, yaw, 0f));
             bool disabled = !t.Active;
             if (disabled != _shownDisabled) ShowDisabled(disabled);
         }
@@ -195,12 +369,21 @@ namespace Ushqyr.Strike
             foreach (var c in _model.GetComponentsInChildren<Collider>()) c.enabled = !on;
             if (!Application.isPlaying) return;
             if (_smoke == null) _smoke = MakeSmoke(transform);
+            if (on)
+            {
+                // The hit: a flash and a burst of sparks, then small flames under the smoke while it burns.
+                if (_burst == null) _burst = MakeBurst(transform);
+                if (_fire == null) _fire = MakeFire(transform);
+                _burst.Play(true);
+                _fire.Play();
+            }
+            else if (_fire != null) _fire.Stop(true, ParticleSystemStopBehavior.StopEmitting);
             if (on) _smoke.Play();
             else _smoke.Stop(true, ParticleSystemStopBehavior.StopEmitting);
             if (on)
             {
                 if (_scorch == null) _scorch = MakeScorch();
-                _scorch.SetPositionAndRotation(transform.position + Vector3.up * 0.05f, Quaternion.Euler(90f, Random.Range(0f, 360f), 0f));
+                _scorch.SetPositionAndRotation(transform.position + Vector3.up * 0.05f, Quaternion.Euler(90f, (Slot * 73) % 360, 0f));
                 _scorch.gameObject.SetActive(true);
             }
         }
@@ -239,7 +422,123 @@ namespace Ushqyr.Strike
         private static Texture2D _disc;
 
         /// <summary>Material assets made by the range builder (so the shaders ship in builds); runtime fallbacks otherwise.</summary>
-        public static Material SmokeOverride, ScorchOverride;
+        public static Material SmokeOverride, ScorchOverride, FlashOverride;
+        private ParticleSystem _burst, _fire;
+        private static Material _flashMat;
+
+        /// <summary>Additive glow for flashes, sparks and flames.</summary>
+        public static Material NewFlashMaterial()
+        {
+            var sh = Shader.Find("Universal Render Pipeline/Particles/Unlit") ?? Shader.Find("Sprites/Default");
+            var m = new Material(sh) { name = "Range Flash" };
+            MakeTransparent(m);
+            m.SetFloat("_Blend", 2f); // additive
+            m.SetFloat("_SrcBlend", (float)UnityEngine.Rendering.BlendMode.SrcAlpha);
+            m.SetFloat("_DstBlend", (float)UnityEngine.Rendering.BlendMode.One);
+            m.SetTexture("_BaseMap", SoftDisc);
+            m.mainTexture = SoftDisc;
+            m.SetColor("_BaseColor", Color.white);
+            return m;
+        }
+
+        public static Material FlashMaterial => FlashOverride != null ? FlashOverride : _flashMat != null ? _flashMat : (_flashMat = NewFlashMaterial());
+
+        private static ParticleSystem Particles(Transform parent, string name, Vector3 local)
+        {
+            var go = new GameObject(name);
+            go.transform.SetParent(parent, false);
+            go.transform.localPosition = local;
+            var ps = go.AddComponent<ParticleSystem>();
+            ps.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+            var r = go.GetComponent<ParticleSystemRenderer>();
+            r.sharedMaterial = FlashMaterial;
+            r.shadowCastingMode = ShadowCastingMode.Off;
+            return ps;
+        }
+
+        // One flash plus sparks thrown out and falling.
+        private static ParticleSystem MakeBurst(Transform parent)
+        {
+            var flash = Particles(parent, "Hit Flash", Vector3.up * 1.5f);
+            var main = flash.main;
+            main.loop = false;
+            main.duration = 0.3f;
+            main.startLifetime = 0.18f;
+            main.startSpeed = 0f;
+            main.startSize = new ParticleSystem.MinMaxCurve(7f, 9f);
+            main.startColor = new Color(1f, 0.85f, 0.55f, 1f);
+            main.simulationSpace = ParticleSystemSimulationSpace.World;
+            var em = flash.emission;
+            em.rateOverTime = 0f;
+            em.SetBursts(new[] { new ParticleSystem.Burst(0f, 1), new ParticleSystem.Burst(0.05f, 1) });
+            var size = flash.sizeOverLifetime;
+            size.enabled = true;
+            size.size = new ParticleSystem.MinMaxCurve(1f, AnimationCurve.Linear(0f, 0.6f, 1f, 1.4f));
+            var col = flash.colorOverLifetime;
+            col.enabled = true;
+            var g = new Gradient();
+            g.SetKeys(new[] { new GradientColorKey(Color.white, 0f), new GradientColorKey(new Color(1f, 0.5f, 0.15f), 1f) },
+                new[] { new GradientAlphaKey(1f, 0f), new GradientAlphaKey(0f, 1f) });
+            col.color = g;
+
+            var sparks = Particles(flash.transform, "Sparks", Vector3.zero);
+            var sm = sparks.main;
+            sm.loop = false;
+            sm.duration = 0.3f;
+            sm.startLifetime = new ParticleSystem.MinMaxCurve(0.4f, 1.1f);
+            sm.startSpeed = new ParticleSystem.MinMaxCurve(7f, 18f);
+            sm.startSize = new ParticleSystem.MinMaxCurve(0.08f, 0.18f);
+            sm.startColor = new Color(1f, 0.7f, 0.3f, 1f);
+            sm.gravityModifier = 1.2f;
+            sm.simulationSpace = ParticleSystemSimulationSpace.World;
+            sm.maxParticles = 80;
+            var se = sparks.emission;
+            se.rateOverTime = 0f;
+            se.SetBursts(new[] { new ParticleSystem.Burst(0f, 55) });
+            var shape = sparks.shape;
+            shape.shapeType = ParticleSystemShapeType.Hemisphere;
+            shape.radius = 0.6f;
+            shape.rotation = new Vector3(-90f, 0f, 0f);
+            var sr = sparks.GetComponent<ParticleSystemRenderer>();
+            sr.renderMode = ParticleSystemRenderMode.Stretch;
+            sr.velocityScale = 0.06f;
+            sr.lengthScale = 1.5f;
+            var sc = sparks.colorOverLifetime;
+            sc.enabled = true;
+            var g2 = new Gradient();
+            g2.SetKeys(new[] { new GradientColorKey(new Color(1f, 0.85f, 0.5f), 0f), new GradientColorKey(new Color(0.9f, 0.25f, 0.05f), 1f) },
+                new[] { new GradientAlphaKey(1f, 0f), new GradientAlphaKey(0f, 1f) });
+            sc.color = g2;
+            return flash;
+        }
+
+        // Small flames licking up from the wreck under the smoke.
+        private static ParticleSystem MakeFire(Transform parent)
+        {
+            var fire = Particles(parent, "Fire", Vector3.up * 1.2f);
+            var main = fire.main;
+            main.startLifetime = new ParticleSystem.MinMaxCurve(0.4f, 0.8f);
+            main.startSpeed = new ParticleSystem.MinMaxCurve(1f, 2.2f);
+            main.startSize = new ParticleSystem.MinMaxCurve(0.6f, 1.3f);
+            main.startColor = new Color(1f, 0.55f, 0.2f, 0.85f);
+            main.simulationSpace = ParticleSystemSimulationSpace.World;
+            main.maxParticles = 40;
+            var em = fire.emission;
+            em.rateOverTime = 18f;
+            var shape = fire.shape;
+            shape.shapeType = ParticleSystemShapeType.Box;
+            shape.scale = new Vector3(1.6f, 0.3f, 3f);
+            var size = fire.sizeOverLifetime;
+            size.enabled = true;
+            size.size = new ParticleSystem.MinMaxCurve(1f, AnimationCurve.Linear(0f, 1f, 1f, 0.2f));
+            var col = fire.colorOverLifetime;
+            col.enabled = true;
+            var g = new Gradient();
+            g.SetKeys(new[] { new GradientColorKey(new Color(1f, 0.8f, 0.4f), 0f), new GradientColorKey(new Color(0.8f, 0.2f, 0.05f), 1f) },
+                new[] { new GradientAlphaKey(0.9f, 0f), new GradientAlphaKey(0f, 1f) });
+            col.color = g;
+            return fire;
+        }
 
         /// <summary>A soft round puff: alpha falls off smoothly to the edge (no square billboards).</summary>
         public static Texture2D SoftDisc

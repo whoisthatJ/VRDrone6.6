@@ -76,6 +76,8 @@ namespace Ushqyr.EditorTools.Capture
                 case "shot_garage": shot = ShotGarage(); break;
                 case "perf_expo": shot = PerfExpo(s, "expo-v2-sprint"); break;
                 case "perf_stadium": shot = PerfExpo(s, "stadium-oval"); break;
+                case "perf_steppe": shot = PerfExpo(s, "strike-steppe"); break;
+                case "shot_hitfx": shot = ShotHitFx(s); break;
                 case "menu_lan": shot = MenuStill("ShowOnline", null); break;
                 default: Finish("unknown clip"); yield break;
             }
@@ -712,6 +714,33 @@ namespace Ushqyr.EditorTools.Capture
                 }
             }
             EndStills("garage");
+        }
+
+        // A hit on a moving target, seen from 18 m: the flash, the sparks, then the burning wreck rolling off the road.
+        private IEnumerator ShotHitFx(GameSettings s)
+        {
+            QualitySettings.SetQualityLevel(System.Array.IndexOf(QualitySettings.names, "Ultra"), true);
+            yield return LoadStrike(s, 0);
+            var session = FindAnyObjectByType<Ushqyr.Strike.StrikeSession>();
+            var views = FindAnyObjectByType<ViewModeManager>();
+            int slot = session.Director.Targets.FindIndex(t => t.Active && t.Plan.Class == Ushqyr.Strike.TargetClass.Moving);
+            if (slot < 0) { EndStills("no moving target"); yield break; }
+            yield return Wait(0.5f);
+            session.Director.Pose(slot, session.RoundTime, out var tp, out float yaw, out _);
+            Vector3 fwd = Quaternion.Euler(0f, yaw, 0f) * Vector3.forward, side = Vector3.Cross(Vector3.up, fwd);
+            Vector3 cam = tp + side * 14f + fwd * 9f + Vector3.up * 5f;
+            var game = views.OutputCamera;
+            session.Director.Hit(slot, session.RoundTime, 0);
+            var eof = new WaitForEndOfFrame();
+            Time.captureFramerate = 60;
+            foreach (int frames in new[] { 2, 6, 14, 30, 90, 200 })
+            {
+                for (int i = 0; i < frames; i++) yield return null;
+                yield return eof;
+                Still(game, cam, tp + Vector3.up * 1.5f + fwd * 2f, 50f, "hit");
+            }
+            Time.captureFramerate = 0;
+            EndStills("hit fx");
         }
 
         // ---------- performance probe ----------

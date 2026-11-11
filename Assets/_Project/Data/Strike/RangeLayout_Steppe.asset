@@ -53,11 +53,11 @@ MonoBehaviour:
   - Position: {x: -504.6595, y: 2.1664994, z: -285.0226}
     Yaw: 183.9468
     Revetment: 0
-  - Position: {x: 323.35342, y: -1.243694, z: -34.251774}
-    Yaw: 130.4897
+  - Position: {x: -188.43633, y: -0.3996475, z: 88.85285}
+    Yaw: 8.170016
     Revetment: 0
-  - Position: {x: 254.17241, y: 0.41305542, z: -188.43633}
-    Yaw: 209.61761
+  - Position: {x: 217.73434, y: -0.42089474, z: -172.56729}
+    Yaw: 251.7215
     Revetment: 1
   - Position: {x: -23.669285, y: -0.845188, z: -178.35536}
     Yaw: 308.4993
@@ -95,8 +95,8 @@ MonoBehaviour:
   - Position: {x: -244.79276, y: -0.95013463, z: 101.67887}
     Yaw: 139.96495
     Revetment: 1
-  - Position: {x: -322.16086, y: -1.8954351, z: -275.61072}
-    Yaw: 147.20546
+  - Position: {x: -98.38364, y: -0.17384702, z: -143.61223}
+    Yaw: 96.85515
     Revetment: 0
   Roads:
   - Points:

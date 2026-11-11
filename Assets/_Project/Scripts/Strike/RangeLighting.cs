@@ -45,7 +45,7 @@ namespace Ushqyr.Strike
                 default:
                     sunColor = new Color(1f, 0.96f, 0.88f); sunI = 1.3f; pitch = 48f; yaw = 140f; shadow = 0.85f;
                     skyTint = new Color(0.5f, 0.5f, 0.5f); exposure = 1.3f; ambient = 1f;
-                    fog = new Color(0.74f, 0.8f, 0.86f); fogStart = 300f; fogEnd = 2600f;
+                    fog = new Color(0.76f, 0.8f, 0.84f); fogStart = 180f; fogEnd = 2100f;
                     break;
             }
             if (_sun != null)

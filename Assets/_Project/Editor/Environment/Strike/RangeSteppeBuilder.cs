@@ -38,11 +38,12 @@ namespace Ushqyr.EditorTools.Range
                 for (int x = 0; x < layout.HeightRes; x++)
                     layout.Heights[z * layout.HeightRes + x] = Height(-RangeSize * 0.5f + x * cell, -RangeSize * 0.5f + z * cell);
 
-            Terrain(root, layer);
             Skirt(root, layer);
             layout.Pads = Pads(root, layer, out var lights);
             layout.Roads = Roads(root, layer, layout);
             layout.Spots = Spots(root, layer, layout);
+            // The ground: a terrain on the same height function, with layers, grass, bushes, stones, ruts.
+            RangeSteppeTerrain.Build(root, layer, layout);
             Berms(root, layer, layout);
             Hulks(root, layer, layout);
             Tower(root, layer);
@@ -53,7 +54,7 @@ namespace Ushqyr.EditorTools.Range
             var sessionGo = new GameObject("Strike Session");
             sessionGo.transform.SetParent(root, false);
             var session = sessionGo.AddComponent<StrikeSession>();
-            session.Configure(layout, lights, EffectMaterial("M_Strike_Smoke", RangeTargetView.NewSmokeMaterial()), EffectMaterial("M_Strike_Scorch", RangeTargetView.NewScorchMaterial()));
+            session.Configure(layout, lights, EffectMaterial("M_Strike_Smoke", RangeTargetView.NewSmokeMaterial()), EffectMaterial("M_Strike_Scorch", RangeTargetView.NewScorchMaterial()), VehicleMaterials(), EffectMaterial("M_Strike_Flash", RangeTargetView.NewFlashMaterial()));
             sessionGo.AddComponent<RangeLighting>();
             WriteTrackJson(layout);
         }
@@ -214,7 +215,7 @@ namespace Ushqyr.EditorTools.Range
                 var last = c[c.Length - 1];
                 pts.Add(new Vector3(last.x, Height(last.x, last.y), last.y));
                 roads.Add(new RangeRoad { Points = pts.ToArray() });
-                Ribbon(root, $"Dirt Road {r + 1}", pts, 7f, dirt, layer);
+                Ribbon(root, $"Dirt Road {r + 1}", pts, 10f, dirt, layer); // two lanes (TargetMotion.LaneOffset)
             }
             return roads;
         }
@@ -270,7 +271,7 @@ namespace Ushqyr.EditorTools.Range
         {
             var rng = new System.Random(5511);
             var spots = new List<StaticSpot>();
-            var earth = MaterialLibrary.Get("M_Grass_Worn");
+            var earth = BermMaterial();
             Vector3 pads = new Vector3(0f, 0f, PadZ);
             int guard = 0;
             while (spots.Count < 26 && guard++ < 5000)
@@ -278,7 +279,7 @@ namespace Ushqyr.EditorTools.Range
                 float x = (float)(rng.NextDouble() * 2 - 1) * 540f, z = (float)(rng.NextDouble() * 2 - 1) * 540f;
                 float d = Vector2.Distance(new Vector2(x, z), new Vector2(pads.x, pads.z));
                 if (d < 150f || d > 700f) continue;
-                if (NearRoad(layout, x, z, 18f)) continue;
+                if (NearRoad(layout, x, z, 28f)) continue; // clear of the lanes and of wrecks pulled off the road
                 bool clash = false;
                 foreach (var s in spots) if (Vector2.Distance(new Vector2(s.Position.x, s.Position.z), new Vector2(x, z)) < 30f) clash = true;
                 if (clash) continue;
@@ -309,12 +310,12 @@ namespace Ushqyr.EditorTools.Range
         private static void Berms(Transform root, int layer, RangeLayout layout)
         {
             var rng = new System.Random(7341);
-            var earth = MaterialLibrary.Get("M_Grass_Worn");
+            var earth = BermMaterial();
             int made = 0, guard = 0;
             while (made < 22 && guard++ < 3000)
             {
                 float x = (float)(rng.NextDouble() * 2 - 1) * 560f, z = (float)(rng.NextDouble() * 2 - 1) * 560f;
-                if (Vector2.Distance(new Vector2(x, z), new Vector2(0f, PadZ)) < 120f || NearRoad(layout, x, z, 12f) || NearSpot(layout, x, z, 16f)) continue;
+                if (Vector2.Distance(new Vector2(x, z), new Vector2(0f, PadZ)) < 120f || NearRoad(layout, x, z, 24f) || NearSpot(layout, x, z, 16f)) continue;
                 var size = new Vector3(14f + (float)rng.NextDouble() * 20f, 1.6f + (float)rng.NextDouble() * 1.6f, 4f + (float)rng.NextDouble() * 3f);
                 Berm(root, $"Berm {made}", new Vector3(x, Height(x, z), z), size, (float)rng.NextDouble() * 180f, earth, layer);
                 made++;
@@ -336,21 +337,137 @@ namespace Ushqyr.EditorTools.Range
             go.GetComponent<MeshRenderer>().sharedMaterial = mat;
         }
 
+        /// <summary>
+        /// Vehicle materials per <see cref="VehicleKit.Slot"/>, from the material library: weathered plate steel for the
+        /// paint (tinted per vehicle), black rubber, worn steel, dark plastic, dark glass, canvas and lamp glass.
+        /// </summary>
+        public static Material[] VehicleMaterials()
+        {
+            Directory.CreateDirectory("Assets/_Project/Art/Strike");
+            Material Copy(string name, string from, Color color, float smooth, float metal = 0f)
+            {
+                string path = $"Assets/_Project/Art/Strike/{name}.mat";
+                var src = MaterialLibrary.Get(from);
+                var m = AssetDatabase.LoadAssetAtPath<Material>(path);
+                if (m == null)
+                {
+                    m = new Material(src) { name = name };
+                    AssetDatabase.CreateAsset(m, path);
+                }
+                else m.CopyPropertiesFromMaterial(src);
+                m.enableInstancing = true;
+                m.SetColor("_BaseColor", color);
+                if (m.HasProperty("_Smoothness")) m.SetFloat("_Smoothness", smooth);
+                if (m.HasProperty("_Metallic")) m.SetFloat("_Metallic", metal);
+                EditorUtility.SetDirty(m);
+                return m;
+            }
+            var mats = new Material[VehicleKit.Slots];
+            // Paint: the plate's surface detail (normal map) under a clean colour; the per-vehicle tint is the paint.
+            mats[(int)VehicleKit.Slot.Paint] = Copy("M_Strike_VehiclePaint", "M_Steel_Plate", Color.white, 0.18f, 0.05f);
+            // Weathering: a light, stained wall texture under the paint colour (dust and grime streaks).
+            var grime = GrimeTexture();
+            mats[(int)VehicleKit.Slot.Paint].SetTexture("_BaseMap", grime);
+            mats[(int)VehicleKit.Slot.Paint].mainTexture = grime;
+            mats[(int)VehicleKit.Slot.Paint].SetColor("_BaseColor", Color.white);
+            mats[(int)VehicleKit.Slot.Rubber] = Copy("M_Strike_VehicleRubber", "M_Rubber_Black", new Color(0.32f, 0.3f, 0.28f), 0.12f);
+            mats[(int)VehicleKit.Slot.Metal] = Copy("M_Strike_VehicleMetal", "M_Steel_Plate", new Color(0.62f, 0.62f, 0.6f), 0.35f, 0.5f);
+            mats[(int)VehicleKit.Slot.Dark] = Copy("M_Strike_VehicleDark", "M_Plastic_Black", new Color(0.35f, 0.35f, 0.33f), 0.2f);
+            mats[(int)VehicleKit.Slot.Glass] = Copy("M_Strike_VehicleGlass", "M_City_GlassBlue", new Color(0.12f, 0.15f, 0.17f), 0.92f, 0.2f);
+            mats[(int)VehicleKit.Slot.Canvas] = Copy("M_Strike_VehicleCanvas", "M_Fabric_Canvas", new Color(0.62f, 0.6f, 0.45f), 0.08f);
+            mats[(int)VehicleKit.Slot.Light] = Copy("M_Strike_VehicleLight", "M_Lamp_Warm", new Color(1f, 0.95f, 0.85f), 0.9f);
+            AssetDatabase.SaveAssets();
+            return mats;
+        }
+
         private static void Hulks(Transform root, int layer, RangeLayout layout)
         {
+            RangeVehicles.MaterialsOverride = VehicleMaterials();
             var rng = new System.Random(9917);
             int made = 0, guard = 0;
             while (made < 7 && guard++ < 2000)
             {
                 float x = (float)(rng.NextDouble() * 2 - 1) * 520f, z = (float)(rng.NextDouble() * 2 - 1) * 500f;
-                if (Vector2.Distance(new Vector2(x, z), new Vector2(0f, PadZ)) < 150f || NearRoad(layout, x, z, 14f) || NearSpot(layout, x, z, 20f)) continue;
+                if (Vector2.Distance(new Vector2(x, z), new Vector2(0f, PadZ)) < 150f || NearRoad(layout, x, z, 24f) || NearSpot(layout, x, z, 20f)) continue;
                 var kind = (VehicleKind)(made % 5);
                 var go = RangeVehicles.Build(kind, root, layer, new Color(0.12f, 0.1f, 0.09f));
                 go.name = "Hulk " + kind;
                 foreach (var hb in go.GetComponentsInChildren<StrikeHitbox>()) Object.DestroyImmediate(hb);
+                // Generated meshes must be assets, or the scene loses them when it is saved.
+                foreach (var mf in go.GetComponentsInChildren<MeshFilter>())
+                    if (!AssetDatabase.Contains(mf.sharedMesh)) mf.sharedMesh = SaveMesh(Object.Instantiate(mf.sharedMesh), $"Hulk_{kind}_{mf.gameObject.name}");
+                foreach (var mr in go.GetComponentsInChildren<MeshRenderer>()) mr.SetPropertyBlock(null);
+                foreach (var mr in go.GetComponentsInChildren<MeshRenderer>())
+                    if (mr.gameObject.name == nameof(VehicleKit.Slot.Paint)) mr.sharedMaterial = HulkPaint();
                 go.transform.SetPositionAndRotation(new Vector3(x, Height(x, z) - 0.25f, z), Quaternion.Euler((float)rng.NextDouble() * 6f, (float)rng.NextDouble() * 360f, (float)rng.NextDouble() * 8f - 4f));
                 made++;
             }
+        }
+
+        /// <summary>
+        /// A light grey grime map for vehicle paint: the stained wall texture, made grey, centred on 0.85 brightness
+        /// with gentle contrast, so the paint keeps its colour with dust and streaks over it.
+        /// </summary>
+        private static Texture2D GrimeTexture()
+        {
+            const string path = "Assets/_Project/Art/Strike/T_Strike_VehicleGrime.png";
+            var existing = AssetDatabase.LoadAssetAtPath<Texture2D>(path);
+            if (existing != null) return existing;
+            var src = MaterialLibrary.Get("M_Concrete_Wall").GetTexture("_BaseMap");
+            const int size = 1024;
+            var rt = RenderTexture.GetTemporary(size, size, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.sRGB);
+            Graphics.Blit(src, rt);
+            var prev = RenderTexture.active;
+            RenderTexture.active = rt;
+            var tex = new Texture2D(size, size, TextureFormat.RGB24, false);
+            tex.ReadPixels(new Rect(0, 0, size, size), 0, 0);
+            RenderTexture.active = prev;
+            RenderTexture.ReleaseTemporary(rt);
+            var px = tex.GetPixels();
+            float mean = 0f;
+            foreach (var c in px) mean += c.grayscale;
+            mean /= px.Length;
+            for (int i = 0; i < px.Length; i++)
+            {
+                float g = Mathf.Clamp01(0.85f + (px[i].grayscale - mean) * 0.9f);
+                px[i] = new Color(g, g, g);
+            }
+            tex.SetPixels(px);
+            tex.Apply();
+            File.WriteAllBytes(path, tex.EncodeToPNG());
+            Object.DestroyImmediate(tex);
+            AssetDatabase.ImportAsset(path);
+            return AssetDatabase.LoadAssetAtPath<Texture2D>(path);
+        }
+
+        // Earthworks: churned dirt with some grass, not dark soil.
+        private static Material BermMaterial()
+        {
+            const string path = "Assets/_Project/Art/Strike/M_Strike_Berm.mat";
+            var m = AssetDatabase.LoadAssetAtPath<Material>(path);
+            if (m == null)
+            {
+                m = new Material(MaterialLibrary.Get("M_Dirt_Field")) { name = "M_Strike_Berm" };
+                AssetDatabase.CreateAsset(m, path);
+            }
+            m.SetColor("_BaseColor", new Color(0.82f, 0.78f, 0.62f));
+            EditorUtility.SetDirty(m);
+            return m;
+        }
+
+        // Burnt-out paint for the old hulks.
+        private static Material HulkPaint()
+        {
+            const string path = "Assets/_Project/Art/Strike/M_Strike_HulkPaint.mat";
+            var m = AssetDatabase.LoadAssetAtPath<Material>(path);
+            if (m == null)
+            {
+                m = new Material(MaterialLibrary.Get("M_Steel_Rusty")) { name = "M_Strike_HulkPaint" };
+                AssetDatabase.CreateAsset(m, path);
+            }
+            m.SetColor("_BaseColor", new Color(0.32f, 0.24f, 0.18f));
+            EditorUtility.SetDirty(m);
+            return m;
         }
 
         // ---------- watchtower, tent ----------

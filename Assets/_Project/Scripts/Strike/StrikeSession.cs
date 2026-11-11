@@ -47,7 +47,9 @@ namespace Ushqyr.Strike
         [Tooltip("Countdown lights per pad: 3 renderers each (red, yellow, green), pad by pad.")]
         [SerializeField] private Renderer[] padLights = new Renderer[0];
         [Tooltip("Smoke and scorch materials made by the range builder (assets, so their shaders are in builds).")]
-        [SerializeField] private Material smokeMaterial, scorchMaterial;
+        [SerializeField] private Material smokeMaterial, scorchMaterial, flashMaterial;
+        [Tooltip("Vehicle materials per VehicleKit.Slot (paint, rubber, metal, dark, glass, canvas, light).")]
+        [SerializeField] private Material[] vehicleMaterials = new Material[0];
 
         private QuadVehicle _player;
         private Transform _padSpawn;
@@ -98,8 +100,10 @@ namespace Ushqyr.Strike
         public int LastRank { get; private set; } = -1;
         public event Action<StrikePhase> PhaseChanged;
 
-        public void Configure(RangeLayout rangeLayout, Renderer[] lights, Material smoke = null, Material scorch = null)
+        public void Configure(RangeLayout rangeLayout, Renderer[] lights, Material smoke = null, Material scorch = null, Material[] vehicles = null, Material flash = null)
         {
+            flashMaterial = flash;
+            vehicleMaterials = vehicles ?? new Material[0];
             smokeMaterial = smoke;
             scorchMaterial = scorch;
             layout = rangeLayout;
@@ -124,7 +128,9 @@ namespace Ushqyr.Strike
             Clear();
 
             if (smokeMaterial != null) RangeTargetView.SmokeOverride = smokeMaterial;
+            if (vehicleMaterials != null && vehicleMaterials.Length > 0) RangeVehicles.MaterialsOverride = vehicleMaterials;
             if (scorchMaterial != null) RangeTargetView.ScorchOverride = scorchMaterial;
+            if (flashMaterial != null) RangeTargetView.FlashOverride = flashMaterial;
             _director = new RangeDirector(layout, _options.Seed, _options.Difficulty);
             var targets = new GameObject("Targets").transform;
             targets.SetParent(transform, false);
