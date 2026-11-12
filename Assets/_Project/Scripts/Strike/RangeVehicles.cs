@@ -61,6 +61,15 @@ namespace Ushqyr.Strike
         private static Material[] _fallback;
         private static readonly System.Collections.Generic.Dictionary<VehicleKind, Mesh[]> Meshes = new System.Collections.Generic.Dictionary<VehicleKind, Mesh[]>();
 
+        private sealed class Gear
+        {
+            public VehicleKit.WheelSpec[] Wheels;
+            public Mesh[] WheelMeshes;
+            public Mesh Top, Bottom;
+        }
+
+        private static readonly System.Collections.Generic.Dictionary<VehicleKind, Gear> Gears = new System.Collections.Generic.Dictionary<VehicleKind, Gear>();
+
         public static Material MaterialFor(VehicleKit.Slot slot)
         {
             var o = MaterialsOverride;
@@ -87,7 +96,22 @@ namespace Ushqyr.Strike
             root.transform.SetParent(parent, false);
             root.layer = layer;
             if (!Meshes.TryGetValue(kind, out var meshes) || meshes == null || System.Array.TrueForAll(meshes, m => m == null))
-                Meshes[kind] = meshes = Model(kind).Build(kind.ToString());
+            {
+                var kit = Model(kind);
+                Meshes[kind] = meshes = kit.Build(kind.ToString());
+                var gearParts = new Gear { Wheels = kit.Wheels.ToArray(), WheelMeshes = new Mesh[kit.Wheels.Count] };
+                var byShape = new System.Collections.Generic.Dictionary<string, Mesh>();
+                for (int w = 0; w < gearParts.Wheels.Length; w++)
+                {
+                    var spec = gearParts.Wheels[w];
+                    string key = $"{spec.Road}|{spec.Radius:F3}|{spec.Width:F3}|{spec.Side:F0}";
+                    if (!byShape.TryGetValue(key, out var wm)) byShape[key] = wm = VehicleKit.WheelMesh(spec);
+                    gearParts.WheelMeshes[w] = wm;
+                }
+                if (kit.TopCleats != null) gearParts.Top = kit.TopCleats.Build(kind + " Track Top")[(int)VehicleKit.Slot.Rubber];
+                if (kit.BottomCleats != null) gearParts.Bottom = kit.BottomCleats.Build(kind + " Track Bottom")[(int)VehicleKit.Slot.Rubber];
+                Gears[kind] = gearParts;
+            }
             var tint = new MaterialPropertyBlock();
             for (int i = 0; i < meshes.Length; i++)
             {
@@ -103,6 +127,34 @@ namespace Ushqyr.Strike
                     tint.SetColor("_BaseColor", paint);
                     mr.SetPropertyBlock(tint);
                 }
+            }
+            // Running gear: each wheel its own object (they turn), track cleats in two sliding runs.
+            if (Gears.TryGetValue(kind, out var gear) && gear != null && (gear.Wheels.Length > 0 || gear.Top != null))
+            {
+                var running = root.AddComponent<VehicleRunningGear>();
+                var wheelMats = System.Array.ConvertAll(VehicleKit.WheelSlots, MaterialFor);
+                var wheels = new Transform[gear.Wheels.Length];
+                var radii = new float[gear.Wheels.Length];
+                for (int w = 0; w < wheels.Length; w++)
+                {
+                    var go = new GameObject(gear.WheelMeshes[w].name) { layer = layer };
+                    go.transform.SetParent(root.transform, false);
+                    go.transform.localPosition = gear.Wheels[w].Centre;
+                    go.AddComponent<MeshFilter>().sharedMesh = gear.WheelMeshes[w];
+                    go.AddComponent<MeshRenderer>().sharedMaterials = wheelMats;
+                    wheels[w] = go.transform;
+                    radii[w] = gear.Wheels[w].Radius;
+                }
+                Transform Run(string name, Mesh mesh)
+                {
+                    if (mesh == null) return null;
+                    var go = new GameObject(name) { layer = layer };
+                    go.transform.SetParent(root.transform, false);
+                    go.AddComponent<MeshFilter>().sharedMesh = mesh;
+                    go.AddComponent<MeshRenderer>().sharedMaterial = MaterialFor(VehicleKit.Slot.Rubber);
+                    return go.transform;
+                }
+                running.Set(wheels, radii, Run("Track Top", gear.Top), Run("Track Bottom", gear.Bottom));
             }
             switch (kind)
             {
@@ -433,6 +485,36 @@ namespace Ushqyr.Strike
         }
     }
 
+    /// <summary>Wheels that turn and track runs that slide as a range vehicle drives.</summary>
+    public sealed class VehicleRunningGear : MonoBehaviour
+    {
+        [SerializeField] private Transform[] wheels;
+        [SerializeField] private float[] radii;
+        [SerializeField] private Transform trackTop, trackBottom;
+        private float _distance;
+
+        public void Set(Transform[] wheelTransforms, float[] wheelRadii, Transform top, Transform bottom)
+        {
+            wheels = wheelTransforms;
+            radii = wheelRadii;
+            trackTop = top;
+            trackBottom = bottom;
+        }
+
+        /// <summary>Turns the wheels and runs the tracks for <paramref name="metres"/> driven forwards (negative: back).</summary>
+        public void Advance(float metres)
+        {
+            _distance += metres;
+            if (wheels != null)
+                for (int i = 0; i < wheels.Length; i++)
+                    if (wheels[i] != null) wheels[i].localRotation = Quaternion.Euler(_distance / Mathf.Max(0.05f, radii[i]) * Mathf.Rad2Deg, 0f, 0f);
+            // Over the ground the bottom run stands still, so on the hull it slides back; the top run slides forward.
+            float slide = Mathf.Repeat(_distance, VehicleKit.CleatPitch);
+            if (trackTop != null) trackTop.localPosition = new Vector3(0f, 0f, slide);
+            if (trackBottom != null) trackBottom.localPosition = new Vector3(0f, 0f, -slide);
+        }
+    }
+
     /// <summary>
     /// One target on the range: the vehicle model following its plan, and its disabled look (dark, smoking, a scorch
     /// mark) until it respawns somewhere else with a new vehicle.
@@ -443,6 +525,9 @@ namespace Ushqyr.Strike
         private RangeDirector _director;
         private GameObject _model;
         private int _generation = -1;
+        private VehicleRunningGear _gear;
+        private Vector3 _lastPosition;
+        private bool _moved;
         private ParticleSystem _smoke;
         private Transform _scorch;
         private bool _shownDisabled;
@@ -471,12 +556,22 @@ namespace Ushqyr.Strike
                 _generation = t.Plan.Generation;
                 var paint = t.Plan.Class == TargetClass.Static ? RangeVehicles.Tan : t.Plan.Class == TargetClass.Moving ? RangeVehicles.Olive : new Color(0.5f, 0.45f, 0.34f);
                 _model = RangeVehicles.Build(t.Plan.Kind, transform, _layer, paint, Slot);
+                _gear = _model.GetComponent<VehicleRunningGear>();
+                _moved = false;
                 _shownDisabled = false;
             }
             // Active: on its lane. Disabled: the wreck veers off the road (clear of the convoy behind it).
             _director.ViewPose(Slot, time, out var p, out float yaw);
             // Sit on the slope: lean with the ground rather than staying level across it.
             transform.SetPositionAndRotation(p, Quaternion.FromToRotation(Vector3.up, _director.GroundNormal(p)) * Quaternion.Euler(0f, yaw, 0f));
+            // Wheels turn and tracks run by the distance actually driven (a wreck being pushed aside does neither).
+            if (t.Active && _moved && _gear != null)
+            {
+                float driven = Vector3.Dot(p - _lastPosition, transform.forward);
+                if (Mathf.Abs(driven) < 3f) _gear.Advance(driven);
+            }
+            _lastPosition = p;
+            _moved = t.Active;
             bool disabled = !t.Active;
             if (disabled != _shownDisabled) ShowDisabled(disabled);
         }

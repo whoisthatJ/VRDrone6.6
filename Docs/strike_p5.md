@@ -64,6 +64,9 @@ Road vehicles never meet:
 - **Wrecks** roll off to the side they are on (also when hit in a turn), at most three steps (19.5 m) along the
   road, with the way there checked every metre and against a wreck that is still rolling. In a stress test (a road
   vehicle hit every 2-5 s) 13 of 408 found no free spot and sank.
+- **No reversing**: evasive vehicles drive, stop or crawl (30 % speed); they never back up.
+- **Running gear** (`VehicleRunningGear`): every wheel and track road wheel is its own object and turns by the
+  distance driven; track cleats slide along the top and bottom runs. Wrecks and parked targets stand still.
 - The radar antenna sweeps round its mast (it was tumbling about its forward axis).
 - Checked numerically over 12 rounds: no position jumps (top speed 11.6 m/s), turn rate at most 77 deg/s.
 
@@ -119,7 +122,7 @@ The whole scene was reworked after it still read as flat and empty:
 | | Static | Moving | Evasive |
 |---|---|---|---|
 | Points | 100 | 200 | 300 |
-| Movement | none | road ping-pong, convoys of 3, 10–40 km/h | stop-go, reversing, zig-zag, smoke |
+| Movement | none | lane loop, convoys of 3, 10–40 km/h | stop-go, crawling, zig-zag, smoke |
 
 - Streak multiplier ×1.1 per hit without a crash, max ×2. Speed bonus 1 % per m/s over 8 m/s, max 25 %.
 - A slow contact is a "bump": no score, counts as a crash, streak reset.

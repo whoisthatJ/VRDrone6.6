@@ -163,7 +163,7 @@ namespace Ushqyr.Strike
             fwd = fwd.sqrMagnitude > 1e-6f ? fwd.normalized : Vector3.forward;
             Vector3 right = new Vector3(fwd.z, 0f, -fwd.x);
             position += right * lat;
-            // Facing: the way round the loop the group drives (a reversing evasive target backs up, nose first stays).
+            // Facing: the way round the loop the group drives (vehicles always drive nose first).
             Vector3 face = (fwd * dAlong + right * dLat) * plan.Direction;
             position.y = layout.Height(position.x, position.z);
             yaw = Mathf.Atan2(face.x, face.z) * Mathf.Rad2Deg;
@@ -233,7 +233,7 @@ namespace Ushqyr.Strike
         /// <summary>Driving distance round the lane loop of a section (m; the turns count at their slowed pace).</summary>
         public static float LoopLength(float sectionLength) => 2f * sectionLength + 2f * TurnLength / TurnSlow;
 
-        /// <summary>Distance driven by an evasive target: segments of driving, stopping and reversing.</summary>
+        /// <summary>Distance driven by an evasive target: segments of driving, stopping and crawling.</summary>
         public static float EvasiveDistance(in TargetPlan plan, float elapsed, out float speedNow)
         {
             float d = 0f;
@@ -253,16 +253,16 @@ namespace Ushqyr.Strike
             return d;
         }
 
-        /// <summary>Speed in evasive segment <paramref name="k"/>: drive (60 %), stop (25 %), reverse (15 %).</summary>
+        /// <summary>Speed in evasive segment <paramref name="k"/>: drive (60 %), stop (25 %), crawl (15 %). Never backwards.</summary>
         public static float SegmentSpeed(in TargetPlan plan, int k)
         {
             float r = StrikeRandom.Value(plan.Seed, (uint)k, 17u);
             if (r < 0.6f) return plan.Speed;
             if (r < 0.85f) return 0f;
-            return -0.6f * plan.Speed;
+            return 0.3f * plan.Speed;
         }
 
-        /// <summary>Evasive targets pop smoke at the start of some stopped or reversing segments.</summary>
+        /// <summary>Evasive targets pop smoke at the start of some stopped segments.</summary>
         public static bool SmokeStartsIn(in TargetPlan plan, int k) =>
             plan.Class == TargetClass.Evasive && SegmentSpeed(plan, k) <= 0f && StrikeRandom.Value(plan.Seed, (uint)k, 29u) < 0.5f;
 

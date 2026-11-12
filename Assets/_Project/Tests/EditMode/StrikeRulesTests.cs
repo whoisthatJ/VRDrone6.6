@@ -150,13 +150,14 @@ namespace Ushqyr.Tests
         }
 
         [Test]
-        public void Evasive_StopsReversesAndPopsSmoke()
+        public void Evasive_StopsCrawlsAndPopsSmoke_NeverReverses()
         {
             var plan = new TargetPlan { Class = TargetClass.Evasive, Speed = 8f, Seed = 77u, Direction = 1 };
             var speeds = Enumerable.Range(0, 200).Select(k => TargetMotion.SegmentSpeed(plan, k)).ToList();
             Assert.IsTrue(speeds.Any(v => v > 0f));
             Assert.IsTrue(speeds.Any(v => v == 0f));
-            Assert.IsTrue(speeds.Any(v => v < 0f));
+            Assert.IsTrue(speeds.Any(v => v > 0f && v < plan.Speed), "crawls");
+            Assert.IsFalse(speeds.Any(v => v < 0f), "never drives backwards");
             Assert.IsTrue(Enumerable.Range(0, 200).Any(k => TargetMotion.SmokeStartsIn(plan, k)));
         }
 

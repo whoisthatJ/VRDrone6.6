@@ -10,7 +10,7 @@ namespace Ushqyr.Strike
         Static = 0,
         /// <summary>Driving a dirt road at 10-40 km/h, alone or in a convoy (200 pts).</summary>
         Moving = 1,
-        /// <summary>Stop-go, reversing, zig-zag and smoke screens (300 pts).</summary>
+        /// <summary>Stop-go, crawling, zig-zag and smoke screens (300 pts).</summary>
         Evasive = 2,
     }
 

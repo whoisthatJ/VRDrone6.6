@@ -113,30 +113,78 @@ namespace Ushqyr.Strike
             }
         }
 
-        /// <summary>A wheel: tyre, hub and a few bolts, axis along X.</summary>
-        public void Wheel(Vector3 centre, float radius, float width, float side)
+        /// <summary>A wheel that turns: where it sits, its size, which side its hub faces, and whether it is a track's road wheel.</summary>
+        public struct WheelSpec
         {
-            Vector3 half = Vector3.right * (width * 0.5f);
-            Cylinder(Slot.Rubber, centre - half, centre + half, radius, 18);
-            Vector3 face = centre + Vector3.right * (side * width * 0.5f);
-            Cylinder(Slot.Metal, face, face + Vector3.right * (side * 0.05f), radius * 0.55f, 12);
-            Cylinder(Slot.Dark, face + Vector3.right * (side * 0.05f), face + Vector3.right * (side * 0.11f), radius * 0.18f, 8);
-            // Wheel nuts round the hub and chunky tread blocks round the tyre.
-            for (int i = 0; i < 6; i++)
-            {
-                float a = i * Mathf.PI / 3f;
-                Vector3 p = face + new Vector3(side * 0.05f, Mathf.Sin(a), Mathf.Cos(a)) * 1f;
-                p = face + Vector3.right * (side * 0.05f) + new Vector3(0f, Mathf.Sin(a), Mathf.Cos(a)) * radius * 0.36f;
-                Cylinder(Slot.Dark, p, p + Vector3.right * (side * 0.035f), radius * 0.05f, 5);
-            }
-            const int blocks = 14;
-            for (int i = 0; i < blocks; i++)
-            {
-                float a = i * Mathf.PI * 2f / blocks;
-                Vector3 radial = new Vector3(0f, Mathf.Sin(a), Mathf.Cos(a));
-                Box(Slot.Rubber, centre + radial * (radius + 0.012f), new Vector3(width * 0.96f, 0.045f, radius * 0.2f), 0.008f, Quaternion.LookRotation(Vector3.Cross(Vector3.right, radial), radial));
-            }
+            public Vector3 Centre;
+            public float Radius, Width, Side;
+            public bool Road;
         }
+
+        /// <summary>The wheels of the model: built as separate objects so they can turn.</summary>
+        public readonly List<WheelSpec> Wheels = new List<WheelSpec>();
+        /// <summary>Track cleats on the top and bottom runs: separate, so the tracks can run (null if no tracks).</summary>
+        public VehicleKit TopCleats, BottomCleats;
+        /// <summary>Spacing of the track cleats (m): the runs slide by up to this much and wrap.</summary>
+        public const float CleatPitch = 0.24f;
+
+        /// <summary>A wheel: tyre, hub and a few bolts, axis along X.</summary>
+        public void Wheel(Vector3 centre, float radius, float width, float side) =>
+            Wheels.Add(new WheelSpec { Centre = centre, Radius = radius, Width = width, Side = side });
+
+        /// <summary>The mesh of one wheel about its own centre: submeshes rubber, metal, dark (see <see cref="WheelSlots"/>).</summary>
+        public static Mesh WheelMesh(WheelSpec w)
+        {
+            var k = new VehicleKit();
+            Vector3 centre = Vector3.zero;
+            float radius = w.Radius, width = w.Width, side = w.Side;
+            if (w.Road)
+            {
+                // A track's road wheel: a rubber-tyred disc with a steel hub and five bolts.
+                k.Cylinder(Slot.Dark, centre - Vector3.right * 0.06f * side, centre + Vector3.right * 0.06f * side, radius, 16);
+                k.Cylinder(Slot.Metal, centre + Vector3.right * 0.06f * side, centre + Vector3.right * 0.1f * side, radius * 0.45f, 10);
+                for (int i = 0; i < 5; i++)
+                {
+                    float a = i * Mathf.PI * 2f / 5f;
+                    Vector3 p = centre + Vector3.right * (0.1f * side) + new Vector3(0f, Mathf.Sin(a), Mathf.Cos(a)) * radius * 0.3f;
+                    k.Cylinder(Slot.Dark, p, p + Vector3.right * (side * 0.03f), radius * 0.07f, 5);
+                }
+                k.Box(Slot.Metal, centre + Vector3.right * (0.065f * side), new Vector3(0.012f, radius * 1.6f, radius * 0.16f), 0f); // a spoke, so the turning shows
+            }
+            else
+            {
+                Vector3 half = Vector3.right * (width * 0.5f);
+                k.Cylinder(Slot.Rubber, centre - half, centre + half, radius, 18);
+                Vector3 face = centre + Vector3.right * (side * width * 0.5f);
+                k.Cylinder(Slot.Metal, face, face + Vector3.right * (side * 0.05f), radius * 0.55f, 12);
+                k.Cylinder(Slot.Dark, face + Vector3.right * (side * 0.05f), face + Vector3.right * (side * 0.11f), radius * 0.18f, 8);
+                // Wheel nuts round the hub and chunky tread blocks round the tyre.
+                for (int i = 0; i < 6; i++)
+                {
+                    float a = i * Mathf.PI / 3f;
+                    Vector3 p = face + Vector3.right * (side * 0.05f) + new Vector3(0f, Mathf.Sin(a), Mathf.Cos(a)) * radius * 0.36f;
+                    k.Cylinder(Slot.Dark, p, p + Vector3.right * (side * 0.035f), radius * 0.05f, 5);
+                }
+                const int blocks = 14;
+                for (int i = 0; i < blocks; i++)
+                {
+                    float a = i * Mathf.PI * 2f / blocks;
+                    Vector3 radial = new Vector3(0f, Mathf.Sin(a), Mathf.Cos(a));
+                    k.Box(Slot.Rubber, centre + radial * (radius + 0.012f), new Vector3(width * 0.96f, 0.045f, radius * 0.2f), 0.008f, Quaternion.LookRotation(Vector3.Cross(Vector3.right, radial), radial));
+                }
+            }
+            var parts = k.Build("Wheel");
+            var combine = new List<CombineInstance>();
+            foreach (var slot in WheelSlots)
+                combine.Add(new CombineInstance { mesh = parts[(int)slot] != null ? parts[(int)slot] : new Mesh(), transform = Matrix4x4.identity });
+            var mesh = new Mesh { name = w.Road ? $"Road Wheel {w.Radius:F2} {(w.Side > 0f ? "R" : "L")}" : $"Wheel {w.Radius:F2} {(w.Side > 0f ? "R" : "L")}" };
+            mesh.CombineMeshes(combine.ToArray(), false, false);
+            mesh.RecalculateBounds();
+            return mesh;
+        }
+
+        /// <summary>The material slots of a wheel mesh's submeshes, in order.</summary>
+        public static readonly Slot[] WheelSlots = { Slot.Rubber, Slot.Metal, Slot.Dark };
 
         /// <summary>A track run along Z: belt, road wheels, drive sprocket and idler, return rollers.</summary>
         public void Track(float x, float length, float height, float width, int roadWheels)
@@ -150,20 +198,20 @@ namespace Ushqyr.Strike
             float endR = (height - 0.06f) * 0.5f;
             Cylinder(Slot.Rubber, new Vector3(x, endR, z0 - 0.15f) - hx, new Vector3(x, endR, z0 - 0.15f) + hx, endR, 16);
             Cylinder(Slot.Rubber, new Vector3(x, endR + 0.12f, z1 + 0.15f) - hx, new Vector3(x, endR + 0.12f, z1 + 0.15f) + hx, endR - 0.05f, 16);
-            // Cleats across the top and bottom runs.
-            for (float z = z0; z <= z1; z += 0.24f)
+            // Cleats across the top and bottom runs: separate parts that slide as the track runs.
+            TopCleats ??= new VehicleKit();
+            BottomCleats ??= new VehicleKit();
+            for (float z = z0; z <= z1; z += CleatPitch)
             {
-                Box(Slot.Rubber, new Vector3(x, height - 0.005f, z), new Vector3(width * 1.02f, 0.035f, 0.11f), 0.008f);
-                Box(Slot.Rubber, new Vector3(x, 0.012f, z), new Vector3(width * 1.02f, 0.03f, 0.11f), 0.008f);
+                TopCleats.Box(Slot.Rubber, new Vector3(x, height - 0.005f, z), new Vector3(width * 1.02f, 0.035f, 0.11f), 0.008f);
+                BottomCleats.Box(Slot.Rubber, new Vector3(x, 0.012f, z), new Vector3(width * 1.02f, 0.03f, 0.11f), 0.008f);
             }
-            // Road wheels (dark rubber rims, steel hubs).
+            // Road wheels: they turn.
             float side = Mathf.Sign(x);
             for (int i = 0; i < roadWheels; i++)
             {
                 float z = Mathf.Lerp(z0 + wheelR * 0.5f, z1 - wheelR * 0.5f, roadWheels == 1 ? 0.5f : i / (float)(roadWheels - 1));
-                Vector3 c = new Vector3(x + side * (width * 0.5f + 0.02f), y, z);
-                Cylinder(Slot.Dark, c - Vector3.right * 0.06f * side, c + Vector3.right * 0.06f * side, wheelR, 16);
-                Cylinder(Slot.Metal, c + Vector3.right * 0.06f * side, c + Vector3.right * 0.1f * side, wheelR * 0.45f, 10);
+                Wheels.Add(new WheelSpec { Centre = new Vector3(x + side * (width * 0.5f + 0.02f), y, z), Radius = wheelR, Width = 0.12f, Side = side, Road = true });
             }
             // Sprocket (front), idler (rear), return rollers.
             Vector3 sp = new Vector3(x + side * (width * 0.5f + 0.02f), endR + 0.12f, z1 + 0.15f);
