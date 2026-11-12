@@ -43,7 +43,9 @@ SEGMENTS = [
     ]),
     ('online', 'Группа до 8 операторов', [
         ('ru', 'Группа до восьми операторов занимается вместе — через интернет или в классе по локальной сети. '
-               'Интерфейс на каза\u0301хском, русском и английском.'),  # the stress mark: without it the voice says кАзахском
+               'Языки интерфейса: казахский, русский и английский.'),
+        # Nominative on purpose: this voice stresses "на казахском" wrongly (first syllable; third with a stress
+        # mark), measured by vowel lengths; "казахский" comes out right.
     ]),
     ('outro', 'Multimedia Lab · SDU University', [
         NAME,

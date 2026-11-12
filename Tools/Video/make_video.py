@@ -2,6 +2,7 @@
 
 1. python Tools/Video/voice.py        -> Recordings/video/voice/*.wav + timing.json
 2. python Tools/Video/make_video.py   -> Docs/video/USHQYR_overview_ru.mp4 (1920x1080, 30 fps)
+   (it runs Tools/Video/music.py for the music bed)
 
 Footage is the frame sequences in Recordings/clips/<clip>/ (PitchClips, 30 fps).
 """
@@ -9,6 +10,7 @@ import glob
 import json
 import os
 import subprocess
+import sys
 import wave
 
 import imageio_ffmpeg
@@ -22,6 +24,7 @@ OUT_DIR = os.path.join(ROOT, 'Docs', 'video')
 FF = imageio_ffmpeg.get_ffmpeg_exe()
 W, H, FPS = 1920, 1080, 30
 LEAD, TAIL, FADE = 0.45, 0.45, 0.4      # silence before / after each line, and the cross-fade between shots (s)
+MUSIC_GAIN = 0.42                         # music level in the gaps; it drops to 40 % of that under the voice
 ACCENT = (255, 140, 38)
 BOLD = 'C:/Windows/Fonts/segoeuib.ttf'
 REGULAR = 'C:/Windows/Fonts/segoeui.ttf'
@@ -162,6 +165,19 @@ def main():
             data = np.frombuffer(wv.readframes(wv.getnframes()), dtype=np.int16)
         at = int((seg['start'] + LEAD) * rate)
         track[at:at + len(data)] = data
+    # Music bed (Tools/Video/music.py, synthesised for the exact length): quiet under the voice, fuller in the gaps.
+    subprocess.run([sys.executable, os.path.join(os.path.dirname(__file__), 'music.py'), f'{total:.2f}'], check=True)
+    with wave.open(os.path.join(VOICE, 'music.wav'), 'rb') as wv:
+        music = np.frombuffer(wv.readframes(wv.getnframes()), dtype=np.int16).astype(np.float64)
+    voice = track.astype(np.float64)
+    hop = rate // 50
+    level = np.sqrt((voice[:len(voice) // hop * hop].reshape(-1, hop) ** 2).mean(axis=1))
+    speaking = np.convolve((level > 250).astype(np.float64), np.ones(30) / 30, mode='same')      # ~0.6 s smoothing
+    duck = np.repeat(1.0 - 0.6 * np.clip(speaking * 1.5, 0, 1), hop)
+    m = min(len(music), len(duck), len(voice))
+    mixed = voice.copy()
+    mixed[:m] += music[:m] * duck[:m] * MUSIC_GAIN
+    track = np.clip(mixed, -32767, 32767).astype(np.int16)
     audio = os.path.join(VOICE, 'track.wav')
     with wave.open(audio, 'wb') as wv:
         wv.setnchannels(1)
