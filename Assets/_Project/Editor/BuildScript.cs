@@ -61,6 +61,7 @@ namespace Ushqyr.EditorTools
                 options = BuildOptions.None,
             };
 
+            ApplyIcon();
             BuildReport report = BuildPipeline.BuildPlayer(options);
             var summary = report.summary;
             string line = $"Build {summary.result}: {summary.outputPath} " +
@@ -76,6 +77,29 @@ namespace Ushqyr.EditorTools
 
             if (Application.isBatchMode)
                 EditorApplication.Exit(summary.result == BuildResult.Succeeded ? 0 : 1);
+        }
+
+        public const string IconPath = "Assets/_Project/Art/Icon/Ushqyr.png";
+
+        /// <summary>
+        /// Sets the game's icon (the 5" Race drone over the stadium, made by Tools/Icon/make_icon.py) for every build,
+        /// so the icon does not depend on what happens to be saved in the project settings.
+        /// </summary>
+        public static void ApplyIcon()
+        {
+            var importer = AssetImporter.GetAtPath(IconPath) as TextureImporter;
+            if (importer == null) return;
+            if (importer.mipmapEnabled || importer.textureCompression != TextureImporterCompression.Uncompressed || importer.npotScale != TextureImporterNPOTScale.None || !importer.alphaIsTransparency)
+            {
+                importer.mipmapEnabled = false;
+                importer.textureCompression = TextureImporterCompression.Uncompressed;
+                importer.npotScale = TextureImporterNPOTScale.None;
+                importer.alphaIsTransparency = true;
+                importer.SaveAndReimport();
+            }
+            var icon = AssetDatabase.LoadAssetAtPath<Texture2D>(IconPath);
+            if (icon == null) return;
+            PlayerSettings.SetIcons(UnityEditor.Build.NamedBuildTarget.Unknown, new[] { icon }, IconKind.Any);
         }
     }
 }
