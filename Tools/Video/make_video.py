@@ -1,7 +1,8 @@
 """Product video: game footage cut to the narration, with feature captions.
 
 1. python Tools/Video/voice.py        -> Recordings/video/voice/*.wav + timing.json
-2. python Tools/Video/make_video.py   -> Docs/video/USHQYR_overview_ru.mp4 (1920x1080, 30 fps)
+2. python Tools/Video/make_video.py      -> Docs/video/USHQYR_overview_ru.mp4 (1920x1080, 30 fps)
+   python Tools/Video/make_video.py kk   -> Docs/video/USHQYR_overview_ru_kkui.mp4 (footage with the Kazakh interface)
    (the music bed is Docs/video/music/<MUSIC_FILE>, a CC0 track: see CREDITS.md there)
 
 Footage is the frame sequences in Recordings/clips/<clip>/ (PitchClips, 30 fps).
@@ -18,7 +19,9 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
-CLIPS = os.path.join(ROOT, 'Recordings', 'clips')
+# 'kk' as the first argument: the same film over footage recorded with the interface in Kazakh (Recordings/clips_kk).
+VARIANT = sys.argv[1] if len(sys.argv) > 1 else ''
+CLIPS = os.path.join(ROOT, 'Recordings', 'clips_' + VARIANT if VARIANT else 'clips')
 VOICE = os.path.join(ROOT, 'Recordings', 'video', 'voice')
 OUT_DIR = os.path.join(ROOT, 'Docs', 'video')
 FF = imageio_ffmpeg.get_ffmpeg_exe()
@@ -217,7 +220,7 @@ def main():
         wv.setframerate(rate)
         wv.writeframes(track.tobytes())
 
-    out = os.path.join(OUT_DIR, 'USHQYR_overview_ru.mp4')
+    out = os.path.join(OUT_DIR, f'USHQYR_overview_ru_{VARIANT}ui.mp4' if VARIANT else 'USHQYR_overview_ru.mp4')
     ff = subprocess.Popen([FF, '-y', '-loglevel', 'error', '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-s', f'{W}x{H}', '-r', str(FPS), '-i', '-',
                            '-i', audio, '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-crf', '25', '-preset', 'slow',
                            '-c:a', 'aac', '-b:a', '160k', '-shortest', '-movflags', '+faststart', out], stdin=subprocess.PIPE)
