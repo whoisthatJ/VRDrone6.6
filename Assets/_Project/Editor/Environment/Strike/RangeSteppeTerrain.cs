@@ -18,7 +18,7 @@ namespace Ushqyr.EditorTools.Range
     public static class RangeSteppeTerrain
     {
         private const string Dir = "Assets/_Project/Art/Strike";
-        private const int HeightRes = 1025, SplatRes = 2048, DetailRes = 512;
+        private const int HeightRes = 1025, SplatRes = 2048, DetailRes = 1024;
         private const float BaseY = -30f, Span = 60f;
 
         /// <summary>
@@ -86,10 +86,10 @@ namespace Ushqyr.EditorTools.Range
             t.materialTemplate = TerrainMaterial();
             t.drawInstanced = true;
             t.heightmapPixelError = 3f;
-            t.basemapDistance = 400f;
-            t.detailObjectDistance = 120f;
+            t.basemapDistance = 2200f; // the low-res base map stripes the tiled layers at a distance
+            t.detailObjectDistance = 110f;
             t.detailObjectDensity = 1f;
-            t.shadowCastingMode = ShadowCastingMode.TwoSided;
+            t.shadowCastingMode = ShadowCastingMode.Off; // near-flat ground under a low sun: self-shadowing only makes stripes
             go.GetComponent<TerrainCollider>().terrainData = data;
 
             PowerLine(root, layer, layout);
@@ -183,13 +183,19 @@ namespace Ushqyr.EditorTools.Range
                 AssetDatabase.CreateAsset(l, path);
             }
             string tex = $"Assets/_Project/Art/Materials/Ground/{folder}/{folder}";
-            l.diffuseTexture = AssetDatabase.LoadAssetAtPath<Texture2D>(tex + "_Albedo.jpg");
-            l.normalMapTexture = AssetDatabase.LoadAssetAtPath<Texture2D>(tex + "_Normal.jpg");
+            // The mottled wild-grass photo is ~10 % brighter on one side: tiled, that shows as bands across the whole
+            // plain. T_Steppe_GrassWild is the same photo with the large-scale gradient divided out.
+            l.diffuseTexture = folder == "Grass_Mossy"
+                ? AssetDatabase.LoadAssetAtPath<Texture2D>(Dir + "/Terrain/T_Steppe_GrassWild.jpg")
+                : AssetDatabase.LoadAssetAtPath<Texture2D>(tex + "_Albedo.jpg");
+            // No normal map on the grass: its broad bumps repeat with the tile and, under a low sun, light up as a grid
+            // of bands across the whole plain. The grass itself gives the ground its relief.
+            l.normalMapTexture = folder.StartsWith("Grass") ? null : AssetDatabase.LoadAssetAtPath<Texture2D>(tex + "_Normal.jpg");
             l.tileSize = new Vector2(tile, tile);
             // JPGs have no alpha: the terrain shader would read it as full smoothness (a sky-blue glare). Remap it to matte.
             l.diffuseRemapMax = new Vector4(tint.r, tint.g, tint.b, 0.04f);
             l.diffuseRemapMin = Vector4.zero;
-            l.normalScale = 0.8f;
+            l.normalScale = 0.3f; // gentle: under a low sun a strong tiled normal map shows as bands
             // A matte mask map (metallic 0, occlusion 1, height 0.5, smoothness low): the shader then ignores the JPG's alpha.
             l.maskMapTexture = MatteMask();
             l.maskMapRemapMin = Vector4.zero;
@@ -224,9 +230,10 @@ namespace Ushqyr.EditorTools.Range
         {
             data.terrainLayers = new[]
             {
-                Layer("SteppeGreen", "Grass_Field", 5f, new Color(0.86f, 0.92f, 0.7f, 1f)),
-                Layer("SteppeDry", "Grass_Field", 6.5f, new Color(1.2f, 1.02f, 0.58f, 1f)), // straw-gold dry steppe
-                Layer("SteppeEarth", "Dirt_Field", 4f, new Color(0.82f, 0.78f, 0.7f, 1f)),
+                // Patchy wild grass with moss and bare specks, and dry straw-brown grass: real steppe, not a lawn.
+                Layer("SteppeGreen", "Grass_Field", 4.6f, new Color(1.22f, 1.0f, 0.74f, 1f)),
+                Layer("SteppeDry", "Grass_Mossy", 7.5f, new Color(1.14f, 1.0f, 0.68f, 1f)), // mottled wild grass, large so its repeat does not read as a grid from the air,
+                Layer("SteppeEarth", "Dirt_Field", 4f, new Color(0.7f, 0.66f, 0.58f, 1f)),
                 Layer("SteppeTrack", "Dirt_Field", 3f, new Color(0.98f, 0.97f, 0.9f, 1f)), // packed, dusty wheel tracks
             };
             var a = new float[SplatRes, SplatRes, 4];
@@ -237,11 +244,16 @@ namespace Ushqyr.EditorTools.Range
                     float big = Mathf.PerlinNoise(w.x / 160f + 5.3f, w.y / 160f + 2.1f);
                     float mid = Mathf.PerlinNoise(w.x / 45f + 1.7f, w.y / 45f + 8.2f);
                     float fine = Mathf.PerlinNoise(w.x / 9f + 3.1f, w.y / 9f + 4.4f);
-                    float green = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.3f, 0.7f, big * 0.8f + fine * 0.2f));
+                    // Green and dry grass drift into each other over several scales: wide soft fields, then streaks
+                    // and specks, never a clean boundary.
+                    float streak = Mathf.PerlinNoise(w.x / 34f + 9.4f, w.y / 41f + 3.8f);
+                    float speck = Mathf.PerlinNoise(w.x / 2.4f + 4.1f, w.y / 2.4f + 6.3f);
+                    float green = Mathf.Clamp01(Mathf.InverseLerp(0.2f, 0.8f, big * 0.5f + mid * 0.2f + streak * 0.15f + fine * 0.1f + speck * 0.05f));
+                    green = Mathf.Lerp(0.15f, 0.9f, green);
                     float dry = 1f - green;
                     // Bare patches with ragged, broken edges (a finer noise eats into them), not flat blobs.
                     float ragged = Mathf.PerlinNoise(w.x / 3f + 2.2f, w.y / 3f + 5.5f);
-                    float earth = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.56f, 0.86f, mid * 0.7f + ragged * 0.2f + fine * 0.1f)) * 0.75f;
+                    float earth = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.7f, 0.95f, mid * 0.6f + ragged * 0.25f + fine * 0.15f)) * 0.55f; // rare scuffs only
                     float track = 0f, extraDry = 0f;
                     float rd = roadDist[z, x];
                     if (rd < 18f)
@@ -261,7 +273,15 @@ namespace Ushqyr.EditorTools.Range
                     }
                     // Packed ground round the pads.
                     float dp = new Vector2(w.x, w.y - RangeSteppeBuilder.PadZ).magnitude;
-                    if (dp < 60f) track = Mathf.Max(track, Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(60f, 35f, dp)) * 0.85f);
+                    dp += (Mathf.PerlinNoise(w.x / 7f + 1.1f, w.y / 7f + 5.2f) - 0.5f) * 22f;
+                    if (dp < 62f)
+                    {
+                        // Trodden ground: packed earth with worn grass showing through, fading out raggedly.
+                        float camp = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(62f, 30f, dp));
+                        float worn = Mathf.PerlinNoise(w.x / 3.3f + 8.8f, w.y / 3.3f + 1.4f);
+                        track = Mathf.Max(track, camp * Mathf.Lerp(0.25f, 0.8f, worn));
+                        earth = Mathf.Max(earth, camp * 0.25f * (1f - worn));
+                    }
                     // Earth banks: bare earth where the sides are steep, grass on the crest, a little spill at the toes.
                     float mh = MoundHeight(w);
                     if (mh > 0.02f)
@@ -301,17 +321,25 @@ namespace Ushqyr.EditorTools.Range
             var grassTex = GrassTexture();
             var protos = new List<DetailPrototype>
             {
+                // Short dense grass that covers the ground.
                 new DetailPrototype
                 {
                     prototypeTexture = grassTex, renderMode = DetailRenderMode.Grass, usePrototypeMesh = false,
-                    minWidth = 0.5f, maxWidth = 0.9f, minHeight = 0.35f, maxHeight = 0.75f, noiseSpread = 0.4f,
-                    healthyColor = new Color(0.58f, 0.62f, 0.36f), dryColor = new Color(0.72f, 0.64f, 0.42f), useInstancing = false,
+                    minWidth = 0.45f, maxWidth = 0.8f, minHeight = 0.16f, maxHeight = 0.32f, noiseSpread = 0.25f,
+                    healthyColor = new Color(0.62f, 0.66f, 0.36f), dryColor = new Color(0.8f, 0.74f, 0.46f), useInstancing = false,
+                },
+                // Taller dry tufts standing out of it.
+                new DetailPrototype
+                {
+                    prototypeTexture = grassTex, renderMode = DetailRenderMode.GrassBillboard, usePrototypeMesh = false,
+                    minWidth = 0.5f, maxWidth = 0.9f, minHeight = 0.5f, maxHeight = 0.95f, noiseSpread = 0.5f,
+                    healthyColor = new Color(0.78f, 0.74f, 0.44f), dryColor = new Color(0.92f, 0.84f, 0.56f), useInstancing = false,
                 },
                 new DetailPrototype
                 {
-                    prototype = Prefab("P_Steppe_Bush", BushMesh(), MaterialLibrary.Get("M_Expo_Leaves")), renderMode = DetailRenderMode.VertexLit,
-                    usePrototypeMesh = true, useInstancing = true, minWidth = 0.7f, maxWidth = 1.5f, minHeight = 0.6f, maxHeight = 1.3f,
-                    healthyColor = Color.white, dryColor = new Color(0.85f, 0.8f, 0.6f),
+                    prototype = Prefab("P_Steppe_Bush", RangeSteppeDressing.ShrubMesh(11), RangeSteppeDressing.LeafMaterial()), renderMode = DetailRenderMode.VertexLit,
+                    usePrototypeMesh = true, useInstancing = true, minWidth = 0.8f, maxWidth = 1.6f, minHeight = 0.7f, maxHeight = 1.4f,
+                    healthyColor = Color.white, dryColor = new Color(0.9f, 0.86f, 0.7f),
                 },
                 new DetailPrototype
                 {
@@ -322,6 +350,7 @@ namespace Ushqyr.EditorTools.Range
             };
             data.detailPrototypes = protos.ToArray();
             var grass = new int[DetailRes, DetailRes];
+            var tall = new int[DetailRes, DetailRes];
             var bush = new int[DetailRes, DetailRes];
             var stone = new int[DetailRes, DetailRes];
             var rng = new System.Random(4411);
@@ -330,29 +359,34 @@ namespace Ushqyr.EditorTools.Range
                 {
                     var w = World(x, z, DetailRes);
                     float rd = roadDist[Mathf.Min(z * SplatRes / DetailRes, SplatRes - 1), Mathf.Min(x * SplatRes / DetailRes, SplatRes - 1)];
-                    // Tufts thin out towards the road along a ragged line (no hard edge), and grow in the middle strips.
+                    // Grass thins out towards the road along a ragged line (no hard edge), and grows in the middle strips.
                     float edgeN = Mathf.PerlinNoise(w.x / 6f + 11.3f, w.y / 6f + 2.9f);
                     float edge = 5f + (edgeN - 0.5f) * 2.6f;
                     float nearRoad = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(edge - 0.5f, edge + 3f, rd));
-                    if (rd < 1.2f || Mathf.Abs(rd - 2.4f) < 0.5f) nearRoad = Mathf.Max(nearRoad, 0.25f);
+                    if (rd < 1.2f || Mathf.Abs(rd - 2.4f) < 0.5f) nearRoad = Mathf.Max(nearRoad, 0.3f);
+                    double r = rng.NextDouble();
                     if (nearRoad <= 0.01f) continue;
                     float dp = new Vector2(w.x, w.y - RangeSteppeBuilder.PadZ).magnitude;
-                    if (dp < 45f) continue;
-                    if (NearSpot(layout, w, 9f)) continue;
-                    float mid = Mathf.PerlinNoise(w.x / 45f + 1.7f, w.y / 45f + 8.2f);
+                    dp += (Mathf.PerlinNoise(w.x / 7f + 1.1f, w.y / 7f + 5.2f) - 0.5f) * 22f; // a ragged edge to the trodden camp ground
+                    if (dp < 34f) continue;
+                    float pad = Mathf.InverseLerp(34f, 62f, dp);
+                    if (NearSpot(layout, w, 7f)) continue;
                     float clump = Mathf.PerlinNoise(w.x / 12f + 7.7f, w.y / 12f + 0.3f);
+                    float tuft = Mathf.PerlinNoise(w.x / 5f + 2.7f, w.y / 5f + 8.3f);
                     float mh = MoundHeight(w);
                     float bank = mh > 0.05f ? Mathf.Abs(MoundHeight(w + new Vector2(1f, 0f)) - mh) + Mathf.Abs(MoundHeight(w + new Vector2(0f, 1f)) - mh) : 0f;
                     float onBank = Mathf.Clamp01(1f - bank * 0.6f);
-                    if (mid < 0.66f || mh > 0.3f) grass[z, x] = Mathf.RoundToInt(Mathf.Lerp(2f, 9f, clump) * nearRoad * onBank);
-                    double r = rng.NextDouble();
+                    float cover = nearRoad * onBank * pad;
+                    grass[z, x] = Mathf.RoundToInt(Mathf.Lerp(2f, 5f, clump) * cover);
+                    if (tuft > 0.55f && r > 0.5) tall[z, x] = Mathf.RoundToInt(Mathf.Lerp(1f, 2.4f, Mathf.InverseLerp(0.55f, 0.85f, tuft)) * cover);
                     if (mh > 0.05f) continue;
-                    if (r < 0.0035 && rd > 20f) bush[z, x] = 1 + (clump > 0.6f ? 1 : 0);
-                    else if (r < 0.006 && rd > 12f) stone[z, x] = 1;
+                    if (r < 0.0012 && rd > 20f) bush[z, x] = 1 + (clump > 0.6f ? 1 : 0);
+                    else if (r < 0.002 && rd > 12f) stone[z, x] = 1;
                 }
             data.SetDetailLayer(0, 0, 0, grass);
-            data.SetDetailLayer(0, 0, 1, bush);
-            data.SetDetailLayer(0, 0, 2, stone);
+            data.SetDetailLayer(0, 0, 1, tall);
+            data.SetDetailLayer(0, 0, 2, bush);
+            data.SetDetailLayer(0, 0, 3, stone);
         }
 
         private static bool NearSpot(RangeLayout layout, Vector2 w, float r)
@@ -365,17 +399,17 @@ namespace Ushqyr.EditorTools.Range
         // Tufts of grass blades on a transparent background (bottom = ground).
         private static Texture2D GrassTexture()
         {
-            string path = Dir + "/Terrain/T_Steppe_Grass.png";
+            string path = Dir + "/Terrain/T_Steppe_Grass3.png";
             var existing = AssetDatabase.LoadAssetAtPath<Texture2D>(path);
             if (existing != null) return existing;
             const int w = 256, h = 256;
             var px = new Color32[w * h];
             var rng = new System.Random(77);
-            for (int b = 0; b < 46; b++)
+            for (int b = 0; b < 34; b++)
             {
                 float x0 = 20f + (float)rng.NextDouble() * (w - 40), lean = ((float)rng.NextDouble() - 0.5f) * 90f;
-                float height = h * (0.45f + 0.5f * (float)rng.NextDouble()), width = 3f + (float)rng.NextDouble() * 4f;
-                var col = Color.Lerp(new Color(0.75f, 0.8f, 0.45f), new Color(0.95f, 0.85f, 0.55f), (float)rng.NextDouble());
+                float height = h * (0.35f + 0.6f * (float)rng.NextDouble()), width = 1.6f + (float)rng.NextDouble() * 2.6f;
+                var col = Color.Lerp(new Color(0.8f, 0.86f, 0.62f), new Color(1f, 0.95f, 0.75f), (float)rng.NextDouble());
                 for (int y = 0; y < height; y++)
                 {
                     float f = y / height;
@@ -459,7 +493,6 @@ namespace Ushqyr.EditorTools.Range
             return m;
         }
 
-        private static Mesh BushMesh() => Blob("Steppe Bush", 11, 0.35f, new Vector3(0.6f, 0.45f, 0.6f), 5);
         private static Mesh StoneMesh() => Blob("Steppe Stone", 23, 0.25f, new Vector3(0.5f, 0.3f, 0.45f), 1);
 
         // ---------- a power line across the range ----------
@@ -543,9 +576,9 @@ namespace Ushqyr.EditorTools.Range
             var tone = Get<Tonemapping>();
             tone.mode.Override(TonemappingMode.ACES);
             var color = Get<ColorAdjustments>();
-            color.postExposure.Override(0.25f);
+            color.postExposure.Override(0.35f);
             color.contrast.Override(12f);
-            color.saturation.Override(-14f);
+            color.saturation.Override(-8f);
             color.colorFilter.Override(new Color(1f, 0.98f, 0.94f));
             var bloom = Get<Bloom>();
             bloom.intensity.Override(0.18f);

@@ -121,6 +121,21 @@ namespace Ushqyr.Strike
             Vector3 face = centre + Vector3.right * (side * width * 0.5f);
             Cylinder(Slot.Metal, face, face + Vector3.right * (side * 0.05f), radius * 0.55f, 12);
             Cylinder(Slot.Dark, face + Vector3.right * (side * 0.05f), face + Vector3.right * (side * 0.11f), radius * 0.18f, 8);
+            // Wheel nuts round the hub and chunky tread blocks round the tyre.
+            for (int i = 0; i < 6; i++)
+            {
+                float a = i * Mathf.PI / 3f;
+                Vector3 p = face + new Vector3(side * 0.05f, Mathf.Sin(a), Mathf.Cos(a)) * 1f;
+                p = face + Vector3.right * (side * 0.05f) + new Vector3(0f, Mathf.Sin(a), Mathf.Cos(a)) * radius * 0.36f;
+                Cylinder(Slot.Dark, p, p + Vector3.right * (side * 0.035f), radius * 0.05f, 5);
+            }
+            const int blocks = 14;
+            for (int i = 0; i < blocks; i++)
+            {
+                float a = i * Mathf.PI * 2f / blocks;
+                Vector3 radial = new Vector3(0f, Mathf.Sin(a), Mathf.Cos(a));
+                Box(Slot.Rubber, centre + radial * (radius + 0.012f), new Vector3(width * 0.96f, 0.045f, radius * 0.2f), 0.008f, Quaternion.LookRotation(Vector3.Cross(Vector3.right, radial), radial));
+            }
         }
 
         /// <summary>A track run along Z: belt, road wheels, drive sprocket and idler, return rollers.</summary>
@@ -135,6 +150,12 @@ namespace Ushqyr.Strike
             float endR = (height - 0.06f) * 0.5f;
             Cylinder(Slot.Rubber, new Vector3(x, endR, z0 - 0.15f) - hx, new Vector3(x, endR, z0 - 0.15f) + hx, endR, 16);
             Cylinder(Slot.Rubber, new Vector3(x, endR + 0.12f, z1 + 0.15f) - hx, new Vector3(x, endR + 0.12f, z1 + 0.15f) + hx, endR - 0.05f, 16);
+            // Cleats across the top and bottom runs.
+            for (float z = z0; z <= z1; z += 0.24f)
+            {
+                Box(Slot.Rubber, new Vector3(x, height - 0.005f, z), new Vector3(width * 1.02f, 0.035f, 0.11f), 0.008f);
+                Box(Slot.Rubber, new Vector3(x, 0.012f, z), new Vector3(width * 1.02f, 0.03f, 0.11f), 0.008f);
+            }
             // Road wheels (dark rubber rims, steel hubs).
             float side = Mathf.Sign(x);
             for (int i = 0; i < roadWheels; i++)

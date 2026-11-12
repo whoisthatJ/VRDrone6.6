@@ -69,6 +69,34 @@ Road vehicles never meet:
 - **Hits**: a flash and sparks, then flames under the smoke while the wreck burns.
 - Cost: 10.7 ms a frame in the editor in a round (Expo: 12.4 ms).
 
+## Visual pass (2026-11-12)
+
+The whole scene was reworked after it still read as flat and empty:
+
+- **Sky and light** (`RangeSteppeDressing.Skies`, `RangeLighting.Sky`): photographic skies for Day (low golden
+  sun), Overcast and Dusk. The sun direction, sun colour and horizon haze are measured from each sky, so light,
+  shadows and fog agree with the picture. Falls back to the procedural sky if the presets are missing.
+- **Ground**: an even grass layer and a mottled wild-grass layer (`T_Steppe_GrassWild`, the photo with its
+  large-scale gradient divided out: tiled as-is it showed as bands across the plain), olive and straw tints,
+  bare earth only as rare scuffs, trodden ground with a ragged edge round the camp. No normal maps on the grass
+  layers. The plane beyond the range uses the same grass (`T_Steppe_Plain`), so the range no longer reads as a
+  square.
+- **Grass**: short dense grass plus taller dry tufts (billboards), 1024 detail map, colours matched to the ground.
+- **Trees** (`RangeSteppeDressing.Trees`): nine shelter belts (two staggered rows with scrub) along the field
+  edges and inside the range, 26 lone trees and clumps, all 42 m+ from the roads and 38 m+ from the target
+  spots; trunk and crown colliders. `Horizon`: 26 tree lines of scanned-tree cards 0.8-1.4 km out on the plain.
+- **Camp** (`RangeSteppeCamp`): two ridge tents with poles and guy ropes, a braced timber watchtower with a
+  ladder and tin roof, sandbag walls by the pads and round the camp, crates on pallets, drums, jerrycans, a
+  generator with its cable, a guyed radio mast, a windsock, a table under an awning, a wire fence and two parked
+  vehicles (no hitboxes).
+- **Vehicles**: camouflage paint (`T_Strike_VehicleCamo`: seamless three-tone blotches, dust, chips, in tones of
+  the class colour), treaded tyres with wheel nuts, cleated tracks, and fittings per type: mudguards, spare track
+  links, tools, tow cable, exhaust, lamp housings, turret basket, smoke dischargers, gun sleeve, fume extractor
+  and recoil spade (artillery), trim vane, mirrors, stowage boxes and jerrycans (wheeled), grille bars, winch,
+  steps, door seams, mud flaps, hooped canvas and bed stakes (trucks), a curved lattice antenna (radar). Lamps
+  no longer glow. Hitboxes and footprints unchanged.
+- Cost: 11.1 ms a frame in the editor in a round (10.7 ms before the pass).
+
 ## Rules
 
 | | Static | Moving | Evasive |

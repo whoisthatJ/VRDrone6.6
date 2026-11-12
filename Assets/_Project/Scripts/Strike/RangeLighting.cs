@@ -11,12 +11,25 @@ namespace Ushqyr.Strike
     }
 
     /// <summary>
-    /// Strike Range lighting (P5): three realtime presets for the steppe — clear day, overcast, dusk. Sets the sun, the
-    /// procedural sky's tint and exposure, ambient and fog. Nothing is baked, so it switches live from the lobby.
+    /// Strike Range lighting (P5): three realtime presets for the steppe — clear day, overcast, dusk. Each has a
+    /// photographic sky (set up by the scene builder with the sun direction, sun colour and horizon haze measured from
+    /// it); without them it falls back to the procedural sky. Nothing is baked, so it switches live from the lobby.
     /// </summary>
     public sealed class RangeLighting : MonoBehaviour
     {
         public static RangeWeather Requested = RangeWeather.Day;
+
+        [System.Serializable]
+        public struct Sky
+        {
+            public Material Material;
+            public Quaternion SunRotation;
+            public Color SunColor, Haze;
+        }
+
+        [SerializeField] private Sky[] skies;
+
+        public void Configure(Sky[] presets) => skies = presets;
 
         private Light _sun;
         public RangeWeather Current { get; private set; }
@@ -48,6 +61,21 @@ namespace Ushqyr.Strike
                     fog = new Color(0.76f, 0.8f, 0.84f); fogStart = 180f; fogEnd = 2100f;
                     break;
             }
+            bool photo = skies != null && (int)w < skies.Length && skies[(int)w].Material != null;
+            if (photo)
+            {
+                // The sky's own sun and haze, so the light, the shadows and the horizon agree with the picture.
+                var s = skies[(int)w];
+                sky = s.Material;
+                RenderSettings.skybox = sky;
+                sunColor = s.SunColor;
+                fog = s.Haze;
+                var e = s.SunRotation.eulerAngles;
+                pitch = e.x; yaw = e.y;
+                // Photographic skies are exposed down so they keep their clouds; lift the light they give to match.
+                ambient *= 1.5f;
+                sunI *= 1.25f;
+            }
             if (_sun != null)
             {
                 _sun.color = sunColor;
@@ -55,7 +83,7 @@ namespace Ushqyr.Strike
                 _sun.shadowStrength = shadow;
                 _sun.transform.rotation = Quaternion.Euler(pitch, yaw, 0f);
             }
-            if (sky != null)
+            if (sky != null && !photo)
             {
                 if (sky.HasProperty("_SkyTint")) sky.SetColor("_SkyTint", skyTint);
                 if (sky.HasProperty("_Exposure")) sky.SetFloat("_Exposure", exposure);

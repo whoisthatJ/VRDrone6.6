@@ -48,8 +48,9 @@ namespace Ushqyr.EditorTools.Range
             // grass, bushes and stones.
             RangeSteppeTerrain.Build(root, layer, layout, Mounds);
             Hulks(root, layer, layout);
-            Tower(root, layer);
-            Tent(root, layer);
+            RangeSteppeCamp.Build(root, layer);
+            RangeSteppeDressing.Trees(root, layer, layout, Mounds);
+            RangeSteppeDressing.Horizon(root);
             EditorUtility.SetDirty(layout);
             AssetDatabase.SaveAssets();
 
@@ -57,7 +58,7 @@ namespace Ushqyr.EditorTools.Range
             sessionGo.transform.SetParent(root, false);
             var session = sessionGo.AddComponent<StrikeSession>();
             session.Configure(layout, lights, EffectMaterial("M_Strike_Smoke", RangeTargetView.NewSmokeMaterial()), EffectMaterial("M_Strike_Scorch", RangeTargetView.NewScorchMaterial()), VehicleMaterials(), EffectMaterial("M_Strike_Flash", RangeTargetView.NewFlashMaterial()));
-            sessionGo.AddComponent<RangeLighting>();
+            sessionGo.AddComponent<RangeLighting>().Configure(RangeSteppeDressing.Skies());
             WriteTrackJson(layout);
         }
 
@@ -107,8 +108,29 @@ namespace Ushqyr.EditorTools.Range
             go.transform.SetParent(root, false);
             go.AddComponent<MeshFilter>().sharedMesh = SaveMesh(mesh, "Steppe_Skirt");
             var r = go.AddComponent<MeshRenderer>();
-            r.sharedMaterial = MaterialLibrary.Get("M_Expo_Steppe");
+            r.sharedMaterial = PlainMaterial();
             r.shadowCastingMode = ShadowCastingMode.Off;
+        }
+
+        // The plain beyond the range: the terrain's own grass (both layers, tinted and mixed), so the edge does not show.
+        private static Material PlainMaterial()
+        {
+            const string path = "Assets/_Project/Art/Strike/M_Strike_Plain.mat";
+            var m = AssetDatabase.LoadAssetAtPath<Material>(path);
+            if (m == null)
+            {
+                m = new Material(Shader.Find("Universal Render Pipeline/Lit")) { name = "M_Strike_Plain" };
+                AssetDatabase.CreateAsset(m, path);
+            }
+            var tex = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/_Project/Art/Strike/Terrain/T_Steppe_Plain.jpg");
+            m.SetTexture("_BaseMap", tex);
+            m.mainTexture = tex;
+            m.SetTextureScale("_BaseMap", new Vector2(2.6f, 2.6f)); // UVs are metres / 12: one repeat every 4.6 m
+            m.SetColor("_BaseColor", Color.white);
+            m.SetFloat("_Smoothness", 0.04f);
+            m.SetFloat("_Metallic", 0f);
+            EditorUtility.SetDirty(m);
+            return m;
         }
 
         private static void Terrain(Transform root, int layer)
@@ -326,17 +348,24 @@ namespace Ushqyr.EditorTools.Range
             var mats = new Material[VehicleKit.Slots];
             // Paint: the plate's surface detail (normal map) under a clean colour; the per-vehicle tint is the paint.
             mats[(int)VehicleKit.Slot.Paint] = Copy("M_Strike_VehiclePaint", "M_Steel_Plate", Color.white, 0.18f, 0.05f);
-            // Weathering: a light, stained wall texture under the paint colour (dust and grime streaks).
-            var grime = GrimeTexture();
-            mats[(int)VehicleKit.Slot.Paint].SetTexture("_BaseMap", grime);
-            mats[(int)VehicleKit.Slot.Paint].mainTexture = grime;
-            mats[(int)VehicleKit.Slot.Paint].SetColor("_BaseColor", Color.white);
+            // Camouflage with dust and chips, in tones of whatever colour the vehicle is painted.
+            var camo = CamoTexture();
+            var paintMat = mats[(int)VehicleKit.Slot.Paint];
+            paintMat.SetTexture("_BaseMap", camo);
+            paintMat.mainTexture = camo;
+            paintMat.SetTextureScale("_BaseMap", new Vector2(0.42f, 0.42f)); // one repeat every ~3.6 m
+            paintMat.SetColor("_BaseColor", Color.white);
             mats[(int)VehicleKit.Slot.Rubber] = Copy("M_Strike_VehicleRubber", "M_Rubber_Black", new Color(0.32f, 0.3f, 0.28f), 0.12f);
             mats[(int)VehicleKit.Slot.Metal] = Copy("M_Strike_VehicleMetal", "M_Steel_Plate", new Color(0.62f, 0.62f, 0.6f), 0.35f, 0.5f);
             mats[(int)VehicleKit.Slot.Dark] = Copy("M_Strike_VehicleDark", "M_Plastic_Black", new Color(0.35f, 0.35f, 0.33f), 0.2f);
             mats[(int)VehicleKit.Slot.Glass] = Copy("M_Strike_VehicleGlass", "M_City_GlassBlue", new Color(0.12f, 0.15f, 0.17f), 0.92f, 0.2f);
             mats[(int)VehicleKit.Slot.Canvas] = Copy("M_Strike_VehicleCanvas", "M_Fabric_Canvas", new Color(0.62f, 0.6f, 0.45f), 0.08f);
-            mats[(int)VehicleKit.Slot.Light] = Copy("M_Strike_VehicleLight", "M_Lamp_Warm", new Color(1f, 0.95f, 0.85f), 0.9f);
+            mats[(int)VehicleKit.Slot.Light] = Copy("M_Strike_VehicleLight", "M_Lamp_Warm", new Color(0.9f, 0.86f, 0.74f), 0.9f);
+            // Lamp glass, not a floodlight: only a faint glow.
+            var lampGlass = mats[(int)VehicleKit.Slot.Light];
+            if (lampGlass.HasProperty("_EmissionColor")) lampGlass.SetColor("_EmissionColor", Color.black);
+            lampGlass.DisableKeyword("_EMISSION");
+            lampGlass.globalIlluminationFlags = MaterialGlobalIlluminationFlags.EmissiveIsBlack;
             AssetDatabase.SaveAssets();
             return mats;
         }
@@ -366,33 +395,60 @@ namespace Ushqyr.EditorTools.Range
         }
 
         /// <summary>
-        /// A light grey grime map for vehicle paint: the stained wall texture, made grey, centred on 0.85 brightness
-        /// with gentle contrast, so the paint keeps its colour with dust and streaks over it.
+        /// A seamless camouflage map for vehicle paint: big soft-edged blotches in three tones, a layer of dust, fine
+        /// grain and paint chips. Near white overall, so the paint colour multiplies through.
         /// </summary>
-        private static Texture2D GrimeTexture()
+        private static Texture2D CamoTexture()
         {
-            const string path = "Assets/_Project/Art/Strike/T_Strike_VehicleGrime.png";
+            const string path = "Assets/_Project/Art/Strike/T_Strike_VehicleCamo.png";
             var existing = AssetDatabase.LoadAssetAtPath<Texture2D>(path);
             if (existing != null) return existing;
-            var src = MaterialLibrary.Get("M_Concrete_Wall").GetTexture("_BaseMap");
             const int size = 1024;
-            var rt = RenderTexture.GetTemporary(size, size, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.sRGB);
-            Graphics.Blit(src, rt);
-            var prev = RenderTexture.active;
-            RenderTexture.active = rt;
-            var tex = new Texture2D(size, size, TextureFormat.RGB24, false);
-            tex.ReadPixels(new Rect(0, 0, size, size), 0, 0);
-            RenderTexture.active = prev;
-            RenderTexture.ReleaseTemporary(rt);
-            var px = tex.GetPixels();
-            float mean = 0f;
-            foreach (var c in px) mean += c.grayscale;
-            mean /= px.Length;
-            for (int i = 0; i < px.Length; i++)
+            // Value noise that wraps at 'period' cells, so the texture tiles.
+            float Hash(int x, int y, int seed)
             {
-                float g = Mathf.Clamp01(0.85f + (px[i].grayscale - mean) * 0.9f);
-                px[i] = new Color(g, g, g);
+                unchecked
+                {
+                    uint h = (uint)(x * 374761393 + y * 668265263 + seed * 1013904223);
+                    h = (h ^ (h >> 13)) * 1274126177u;
+                    return ((h ^ (h >> 16)) & 0xffff) / 65535f;
+                }
             }
+            float Noise(float u, float v, int period, int seed)
+            {
+                float x = u * period, y = v * period;
+                int x0 = Mathf.FloorToInt(x), y0 = Mathf.FloorToInt(y);
+                float fx = x - x0, fy = y - y0;
+                fx = fx * fx * (3f - 2f * fx); fy = fy * fy * (3f - 2f * fy);
+                int W(int i) => ((i % period) + period) % period;
+                float a = Hash(W(x0), W(y0), seed), b = Hash(W(x0 + 1), W(y0), seed), c = Hash(W(x0), W(y0 + 1), seed), d = Hash(W(x0 + 1), W(y0 + 1), seed);
+                return Mathf.Lerp(Mathf.Lerp(a, b, fx), Mathf.Lerp(c, d, fx), fy);
+            }
+            float Fbm(float u, float v, int period, int seed) =>
+                Noise(u, v, period, seed) * 0.55f + Noise(u, v, period * 2, seed + 1) * 0.28f + Noise(u, v, period * 4, seed + 2) * 0.17f;
+            var px = new Color[size * size];
+            Color baseTone = new Color(1f, 1f, 1f), dark = new Color(0.55f, 0.62f, 0.5f), brown = new Color(0.8f, 0.68f, 0.52f);
+            for (int y = 0; y < size; y++)
+                for (int x = 0; x < size; x++)
+                {
+                    float u = x / (float)size, v = y / (float)size;
+                    // Warp the lookup a little so the blotches have wavy outlines.
+                    float wu = u + (Noise(u, v, 8, 40) - 0.5f) * 0.06f, wv = v + (Noise(u, v, 8, 41) - 0.5f) * 0.06f;
+                    float n1 = Fbm(wu, wv, 4, 10), n2 = Fbm(wu, wv, 5, 20);
+                    Color c = baseTone;
+                    c = Color.Lerp(c, brown, Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.53f, 0.57f, n2)));
+                    c = Color.Lerp(c, dark, Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.55f, 0.59f, n1)));
+                    // Dust: pale, yellowish, in soft clouds; then fine grain.
+                    float dust = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.4f, 0.75f, Fbm(u, v, 6, 30)));
+                    c = Color.Lerp(c, new Color(0.95f, 0.9f, 0.76f), dust * 0.3f);
+                    c *= 0.9f + 0.14f * Noise(u, v, 96, 50) + 0.06f * Noise(u, v, 256, 51);
+                    // Paint chips: rare dark specks.
+                    float chip = Noise(u, v, 180, 60) * Noise(u, v, 47, 61);
+                    if (chip > 0.7f) c = Color.Lerp(c, new Color(0.42f, 0.38f, 0.33f), Mathf.InverseLerp(0.7f, 0.78f, chip));
+                    c.a = 1f;
+                    px[y * size + x] = c;
+                }
+            var tex = new Texture2D(size, size, TextureFormat.RGB24, false);
             tex.SetPixels(px);
             tex.Apply();
             File.WriteAllBytes(path, tex.EncodeToPNG());
@@ -414,30 +470,6 @@ namespace Ushqyr.EditorTools.Range
             m.SetColor("_BaseColor", new Color(0.32f, 0.24f, 0.18f));
             EditorUtility.SetDirty(m);
             return m;
-        }
-
-        // ---------- watchtower, tent ----------
-
-        private static void Tower(Transform root, int layer)
-        {
-            var steel = MaterialLibrary.Get("M_Steel_Rusty");
-            var wood = MaterialLibrary.Get("M_Wood_Planks");
-            float x = 70f, z = PadZ - 25f, y = Height(x, z);
-            foreach (float sx in new[] { -1.6f, 1.6f })
-                foreach (float sz in new[] { -1.6f, 1.6f })
-                    Box(root, "Watchtower Leg", new Vector3(x + sx, y + 4f, z + sz), new Vector3(0.25f, 8f, 0.25f), steel, layer);
-            Box(root, "Watchtower Deck", new Vector3(x, y + 8.1f, z), new Vector3(4.2f, 0.25f, 4.2f), wood, layer);
-            Box(root, "Watchtower Cabin", new Vector3(x, y + 9.4f, z), new Vector3(3.6f, 2.4f, 3.6f), wood, layer);
-            Box(root, "Watchtower Roof", new Vector3(x, y + 10.8f, z), new Vector3(4.6f, 0.3f, 4.6f), steel, layer);
-        }
-
-        private static void Tent(Transform root, int layer)
-        {
-            var canvas = MaterialLibrary.Get("M_Fabric_Canvas");
-            float x = -75f, z = PadZ - 22f, y = Height(x, z);
-            Box(root, "Command Tent", new Vector3(x, y + 1.25f, z), new Vector3(8f, 2.5f, 5f), canvas, layer);
-            foreach (float s in new[] { -1f, 1f })
-                Box(root, "Command Tent Roof", new Vector3(x, y + 3.05f, z + s * 1.3f), new Vector3(8.3f, 0.12f, 3.2f), canvas, layer, rot: Quaternion.Euler(s * 28f, 0f, 0f));
         }
 
         // ---------- lighting ----------

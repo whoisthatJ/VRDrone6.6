@@ -123,9 +123,28 @@ namespace Ushqyr.Strike
                     AddHitbox(root, new Vector3(0f, 3.8f, -1.2f), new Vector3(3.2f, 1.6f, 0.6f), slot, layer);
                     // The radar antenna turns: its own object.
                     var dishKit = new VehicleKit();
-                    dishKit.Box(VehicleKit.Slot.Metal, Vector3.zero, new Vector3(3.2f, 1.3f, 0.1f), 0.03f);
-                    for (int i = 0; i < 7; i++) dishKit.Box(VehicleKit.Slot.Dark, new Vector3(-1.4f + i * 0.47f, 0f, -0.07f), new Vector3(0.05f, 1.2f, 0.05f), 0.01f);
-                    dishKit.Box(VehicleKit.Slot.Metal, new Vector3(0f, 0f, 0.25f), new Vector3(0.5f, 0.4f, 0.4f), 0.05f);
+                    // A curved reflector of slats on a frame (it sweeps round the vertical axis), with a feed horn on a boom.
+                    const int panels = 9;
+                    for (int i = 0; i < panels; i++)
+                    {
+                        float t = (i - (panels - 1) * 0.5f) / ((panels - 1) * 0.5f);
+                        var c = new Vector3(t * 1.6f, 0f, -0.42f * t * t);
+                        var r = Quaternion.Euler(0f, -t * 28f, 0f);
+                        dishKit.Box(VehicleKit.Slot.Metal, c, new Vector3(0.05f, 1.35f, 0.06f), 0.01f, r);
+                        if (i == panels - 1) continue;
+                        float tn = (i + 1 - (panels - 1) * 0.5f) / ((panels - 1) * 0.5f), tm = (t + tn) * 0.5f;
+                        for (int s = 0; s < 9; s++)
+                            dishKit.Box(VehicleKit.Slot.Canvas, new Vector3(tm * 1.6f, -0.6f + s * 0.15f, -0.42f * tm * tm), new Vector3(0.4f, 0.09f, 0.015f), 0.003f, Quaternion.Euler(0f, -tm * 28f, 0f));
+                    }
+                    foreach (float y in new[] { -0.66f, 0.66f })
+                        for (int i = 0; i < panels - 1; i++)
+                        {
+                            float t0 = (i - (panels - 1) * 0.5f) / ((panels - 1) * 0.5f), t1 = (i + 1 - (panels - 1) * 0.5f) / ((panels - 1) * 0.5f);
+                            dishKit.Cylinder(VehicleKit.Slot.Metal, new Vector3(t0 * 1.6f, y, -0.42f * t0 * t0), new Vector3(t1 * 1.6f, y, -0.42f * t1 * t1), 0.025f, 5);
+                        }
+                    dishKit.Box(VehicleKit.Slot.Metal, new Vector3(0f, 0f, 0.22f), new Vector3(0.5f, 0.4f, 0.4f), 0.05f);
+                    dishKit.Cylinder(VehicleKit.Slot.Metal, new Vector3(0f, -0.6f, 0f), new Vector3(0f, -0.25f, -1.0f), 0.025f, 5);
+                    dishKit.Box(VehicleKit.Slot.Dark, new Vector3(0f, -0.2f, -1.05f), new Vector3(0.22f, 0.16f, 0.2f), 0.03f);
                     var dish = new GameObject("Radar") { layer = layer };
                     dish.transform.SetParent(root.transform, false);
                     dish.transform.SetLocalPositionAndRotation(new Vector3(0f, 3.9f, -1.2f), Quaternion.identity);
@@ -180,6 +199,7 @@ namespace Ushqyr.Strike
                     }
                     k.Box(D, new Vector3(0.9f, 1.66f, 0.9f), new Vector3(0.6f, 0.04f, 0.9f), 0.01f); // engine grille
                     k.Box(C, new Vector3(-0.4f, 1.85f, -2.5f), new Vector3(1.0f, 0.35f, 0.5f), 0.12f); // rolled tarp
+                    FitTracked(k, 1.73f, new Vector3(0.2f, 2.0f, 0.2f), new Vector3(1.45f, 0.55f, 1.7f), new Vector3(0.45f, 2.04f, 1.1f), 1.3f, 0.09f);
                     break;
                 }
                 case VehicleKind.Wheeled:
@@ -207,6 +227,7 @@ namespace Ushqyr.Strike
                     k.Cylinder(M, new Vector3(-0.9f, 2.1f, -2.8f), new Vector3(-0.9f, 4.0f, -3.0f), 0.012f, 4);
                     k.Box(D, new Vector3(0f, 1.3f, -3.36f), new Vector3(1.2f, 0.9f, 0.06f), 0.02f); // rear door
                     k.Box(C, new Vector3(0.6f, 2.18f, -2.3f), new Vector3(0.9f, 0.25f, 0.9f), 0.1f); // stowage net
+                    FitWheeled(k);
                     break;
                 }
                 case VehicleKind.Truck:
@@ -216,7 +237,18 @@ namespace Ushqyr.Strike
                     foreach (float sx in new[] { -1f, 1f }) k.Box(P, new Vector3(sx * 1.2f, 1.55f, -1.2f), new Vector3(0.06f, 0.5f, 4.2f), 0.02f);
                     k.Box(P, new Vector3(0f, 1.55f, -3.28f), new Vector3(2.45f, 0.5f, 0.06f), 0.02f);
                     k.Box(C, new Vector3(0f, 2.25f, -1.2f), new Vector3(2.4f, 1.0f, 4.15f), 0.35f);
-                    for (int i = 0; i < 4; i++) k.Box(D, new Vector3(0f, 2.76f, -2.9f + i * 1.15f), new Vector3(2.42f, 0.04f, 0.06f), 0.01f);
+                    for (int i = 0; i < 5; i++)
+                    {
+                        // Hoops showing through the canvas, and the lashing along its lower edge.
+                        float z = -3.1f + i * 0.95f;
+                        k.Box(C, new Vector3(0f, 2.3f, z), new Vector3(2.46f, 1.02f, 0.07f), 0.36f);
+                    }
+                    foreach (float sx in new[] { -1f, 1f })
+                    {
+                        k.Cylinder(D, new Vector3(sx * 1.23f, 1.84f, -3.2f), new Vector3(sx * 1.23f, 1.84f, 0.8f), 0.012f, 4, false);
+                        for (int i = 0; i < 6; i++) k.Box(P, new Vector3(sx * 1.235f, 1.55f, -3.0f + i * 0.72f), new Vector3(0.04f, 0.52f, 0.09f), 0.008f); // bed stakes
+                    }
+                    k.Box(D, new Vector3(0f, 2.2f, -3.3f), new Vector3(1.5f, 0.9f, 0.03f), 0.01f); // open back of the cover
                     break;
                 case VehicleKind.Artillery:
                 {
@@ -236,6 +268,11 @@ namespace Ushqyr.Strike
                     k.Cylinder(M, new Vector3(-0.8f, 2.5f, -2.0f), new Vector3(-0.8f, 4.2f, -2.2f), 0.012f, 4);
                     k.Box(D, new Vector3(0f, 1.6f, -3.05f), new Vector3(1.6f, 0.5f, 0.05f), 0.02f);
                     foreach (float sx in new[] { -1f, 1f }) k.Box(L, new Vector3(sx * 0.95f, 1.45f, 3.3f), new Vector3(0.18f, 0.12f, 0.05f), 0.02f);
+                    FitTracked(k, 1.45f, new Vector3(0f, 1.95f, -0.9f), new Vector3(2.3f, 1.05f, 2.9f), new Vector3(0f, 2.0f, 0.95f), 1.5f, 0.15f);
+                    // Fume extractor on the barrel and a recoil spade folded up at the back.
+                    k.Cylinder(M, new Vector3(0f, 2.0f, 2.25f), new Vector3(0f, 2.0f, 2.8f), 0.16f, 12);
+                    k.Box(M, new Vector3(0f, 0.75f, -3.25f), new Vector3(2.2f, 0.5f, 0.08f), 0.02f, Quaternion.Euler(20f, 0f, 0f));
+                    foreach (float sx in new[] { -1f, 1f }) k.Box(M, new Vector3(sx * 0.8f, 1.0f, -3.1f), new Vector3(0.12f, 0.12f, 0.5f), 0.02f);
                     break;
                 }
                 default:
@@ -281,6 +318,94 @@ namespace Ushqyr.Strike
             k.Box(M, new Vector3(0f, 0.85f, 3.45f), new Vector3(2.3f, 0.2f, 0.15f), 0.03f); // bumper
             k.Cylinder(M, new Vector3(-0.85f, 0.95f, 0.6f), new Vector3(-0.85f, 0.95f, 1.4f), 0.28f, 14); // fuel tank
             k.Cylinder(D, new Vector3(0.95f, 1.6f, 1.0f), new Vector3(0.95f, 2.6f, 1.0f), 0.06f, 8); // exhaust
+            for (int i = 0; i < 6; i++) k.Box(M, new Vector3(-0.45f + i * 0.18f, 1.25f, 3.445f), new Vector3(0.035f, 0.46f, 0.02f), 0.004f); // grille bars
+            k.Cylinder(M, new Vector3(-0.5f, 0.86f, 3.58f), new Vector3(0.5f, 0.86f, 3.58f), 0.09f, 10); // winch drum
+            foreach (float sx in new[] { -1f, 1f })
+            {
+                k.Box(D, new Vector3(sx * 0.85f, 1.25f, 3.4f), new Vector3(0.32f, 0.26f, 0.05f), 0.02f); // lamp housings
+                k.Box(M, new Vector3(sx * 1.2f, 0.75f, 1.75f), new Vector3(0.22f, 0.04f, 0.6f), 0.01f); // cab steps
+                k.Box(D, new Vector3(sx * 1.156f, 1.45f, 1.4f), new Vector3(0.012f, 0.9f, 0.025f), 0f); // door seams
+                k.Box(D, new Vector3(sx * 1.156f, 1.45f, 2.3f), new Vector3(0.012f, 0.9f, 0.025f), 0f);
+                k.Box(M, new Vector3(sx * 1.17f, 1.55f, 1.55f), new Vector3(0.03f, 0.04f, 0.16f), 0.01f); // door handles
+                k.Box(VehicleKit.Slot.Rubber, new Vector3(sx * 1.05f, 0.55f, -2.6f), new Vector3(0.42f, 0.6f, 0.03f), 0.005f); // mud flaps
+                k.Box(D, new Vector3(sx * 0.95f, 0.8f, 0.9f - sx * 0.2f), new Vector3(0.4f, 0.4f, 0.7f), 0.03f); // tool lockers
+                k.Box(P, new Vector3(sx * 1.08f, 1.08f, -1.27f), new Vector3(0.5f, 0.05f, 2.3f), 0.015f); // rear mudguards
+            }
+            k.Cylinder(P, new Vector3(0.3f, 2.43f, 1.7f), new Vector3(0.3f, 2.49f, 1.7f), 0.3f, 14); // roof hatch
+            k.Box(P, new Vector3(0f, 2.44f, 2.45f), new Vector3(2.1f, 0.05f, 0.25f), 0.015f); // sun visor
+        }
+
+        // Fittings shared by the tracked hulls: mudguards, spare links, tools, tow cable, exhaust, lamp guards, a
+        // turret basket, smoke dischargers and a sleeve on the gun.
+        private static void FitTracked(VehicleKit k, float deck, Vector3 turret, Vector3 turretSize, Vector3 gunRoot, float sleeve, float sleeveRadius)
+        {
+            const VehicleKit.Slot P = VehicleKit.Slot.Paint, R = VehicleKit.Slot.Rubber, M = VehicleKit.Slot.Metal, D = VehicleKit.Slot.Dark, C = VehicleKit.Slot.Canvas;
+            foreach (float sx in new[] { -1f, 1f })
+            {
+                k.Box(P, new Vector3(sx * 1.3f, 1.12f, 3.0f), new Vector3(0.6f, 0.04f, 0.9f), 0.01f, Quaternion.Euler(18f, 0f, 0f)); // front mudguards
+                k.Box(P, new Vector3(sx * 1.3f, 1.1f, -3.05f), new Vector3(0.6f, 0.04f, 0.7f), 0.01f, Quaternion.Euler(-14f, 0f, 0f));
+                k.Box(D, new Vector3(sx * 0.95f, deck - 0.26f, 3.13f), new Vector3(0.3f, 0.22f, 0.04f), 0.01f); // lamp housings
+                foreach (float o in new[] { -0.12f, 0.12f }) k.Cylinder(M, new Vector3(sx * 0.95f + o, deck - 0.38f, 3.16f), new Vector3(sx * 0.95f + o, deck - 0.14f, 3.16f), 0.01f, 4, false);
+                // Smoke dischargers on the turret cheeks.
+                for (int i = 0; i < 3; i++)
+                {
+                    Vector3 a = turret + new Vector3(sx * (turretSize.x * 0.5f + 0.06f), 0.05f + i * 0.02f, turretSize.z * 0.25f - i * 0.2f);
+                    k.Cylinder(M, a, a + new Vector3(sx * 0.12f, 0.16f, 0.28f), 0.055f, 8);
+                }
+                // Side skirt panel joints.
+                for (int i = 0; i < 4; i++) k.Box(D, new Vector3(sx * 1.545f, 1.1f, -2.2f + i * 1.45f), new Vector3(0.012f, 0.5f, 0.03f), 0f);
+            }
+            // Spare track links across the nose, a tow cable along the right side, tools on the left.
+            for (int i = 0; i < 5; i++) k.Box(R, new Vector3(-0.8f + i * 0.4f, deck - 0.42f, 3.02f), new Vector3(0.34f, 0.07f, 0.16f), 0.015f, Quaternion.Euler(-22f, 0f, 0f));
+            k.Cylinder(M, new Vector3(1.05f, deck + 0.03f, -2.2f), new Vector3(1.05f, deck + 0.03f, 2.2f), 0.022f, 5, false);
+            k.Cylinder(M, new Vector3(1.05f, deck + 0.03f, 2.2f), new Vector3(0.85f, deck + 0.03f, 2.45f), 0.022f, 5, false);
+            k.Cylinder(C, new Vector3(-1.05f, deck + 0.04f, -1.4f), new Vector3(-1.05f, deck + 0.04f, -0.2f), 0.022f, 6); // shovel shaft
+            k.Box(M, new Vector3(-1.05f, deck + 0.04f, 0f), new Vector3(0.2f, 0.02f, 0.3f), 0.006f);
+            k.Box(C, new Vector3(-1.05f, deck + 0.05f, 0.8f), new Vector3(0.1f, 0.08f, 0.8f), 0.01f); // unditching beam
+            // Exhaust with a grille and a heat shield.
+            k.Box(M, new Vector3(1.38f, deck - 0.2f, -1.9f), new Vector3(0.14f, 0.3f, 0.9f), 0.03f);
+            for (int i = 0; i < 5; i++) k.Box(D, new Vector3(1.455f, deck - 0.2f, -2.2f + i * 0.15f), new Vector3(0.01f, 0.22f, 0.05f), 0f);
+            // Turret basket with stowed kit, a hatch ring with a machine gun, lifting eyes.
+            float back = turret.z - turretSize.z * 0.5f;
+            foreach (float y in new[] { -0.12f, 0.12f })
+            {
+                k.Cylinder(M, turret + new Vector3(-turretSize.x * 0.45f, y, -turretSize.z * 0.5f - 0.45f), turret + new Vector3(turretSize.x * 0.45f, y, -turretSize.z * 0.5f - 0.45f), 0.015f, 4, false);
+                foreach (float sx in new[] { -1f, 1f })
+                    k.Cylinder(M, new Vector3(turret.x + sx * turretSize.x * 0.45f, turret.y + y, back), new Vector3(turret.x + sx * turretSize.x * 0.45f, turret.y + y, back - 0.45f), 0.015f, 4, false);
+            }
+            k.Box(C, new Vector3(turret.x, turret.y, back - 0.24f), new Vector3(turretSize.x * 0.8f, 0.3f, 0.36f), 0.1f);
+            float top = turret.y + turretSize.y * 0.5f;
+            k.Cylinder(M, new Vector3(turret.x - 0.3f, top, turret.z - 0.3f), new Vector3(turret.x - 0.3f, top + 0.1f, turret.z - 0.3f), 0.3f, 14);
+            k.Cylinder(D, new Vector3(turret.x - 0.3f, top + 0.1f, turret.z - 0.3f), new Vector3(turret.x - 0.3f, top + 0.13f, turret.z - 0.3f), 0.24f, 14);
+            k.Box(D, new Vector3(turret.x - 0.3f, top + 0.28f, turret.z + 0.05f), new Vector3(0.1f, 0.12f, 0.5f), 0.02f);
+            k.Cylinder(D, new Vector3(turret.x - 0.3f, top + 0.29f, turret.z + 0.3f), new Vector3(turret.x - 0.3f, top + 0.3f, turret.z + 1.05f), 0.025f, 6);
+            // Thermal sleeve on the gun.
+            k.Cylinder(M, gunRoot, gunRoot + new Vector3(0f, 0.02f, sleeve), sleeveRadius, 12);
+            foreach (float f in new[] { 0.3f, 0.65f, 1f }) k.Cylinder(D, gunRoot + new Vector3(0f, 0.02f * f, sleeve * f - 0.03f), gunRoot + new Vector3(0f, 0.02f * f, sleeve * f + 0.03f), sleeveRadius + 0.012f, 12);
+        }
+
+        private static void FitWheeled(VehicleKit k)
+        {
+            const VehicleKit.Slot P = VehicleKit.Slot.Paint, M = VehicleKit.Slot.Metal, D = VehicleKit.Slot.Dark, G = VehicleKit.Slot.Glass, C = VehicleKit.Slot.Canvas;
+            k.Box(P, new Vector3(0f, 1.0f, 3.62f), new Vector3(2.3f, 0.6f, 0.04f), 0.01f, Quaternion.Euler(62f, 0f, 0f)); // trim vane folded on the nose
+            foreach (float sx in new[] { -1f, 1f })
+            {
+                k.Box(D, new Vector3(sx * 0.9f, 1.55f, 3.2f), new Vector3(0.3f, 0.2f, 0.06f), 0.015f); // lamp housings
+                k.Cylinder(M, new Vector3(sx * 1.25f, 1.95f, 2.3f), new Vector3(sx * 1.55f, 2.15f, 2.4f), 0.015f, 4, false); // mirrors
+                k.Box(D, new Vector3(sx * 1.57f, 2.22f, 2.4f), new Vector3(0.04f, 0.26f, 0.16f), 0.01f);
+                k.Cylinder(M, new Vector3(sx * 1.36f, 1.0f, -3.0f), new Vector3(sx * 1.36f, 1.0f, -0.6f), 0.06f, 8); // exhaust / hand rail low on the side
+                for (int i = 0; i < 3; i++) k.Box(P, new Vector3(sx * 1.36f, 1.7f, -2.6f + i * 1.0f), new Vector3(0.1f, 0.3f, 0.7f), 0.03f); // stowage boxes
+                for (int i = 0; i < 4; i++) k.Cylinder(M, new Vector3(sx * 1.36f, 2.02f, -1.6f + i * 0.9f), new Vector3(sx * 1.36f, 2.12f, -1.6f + i * 0.9f), 0.02f, 5); // grab handles
+                // Smoke dischargers beside the weapon station.
+                for (int i = 0; i < 3; i++) k.Cylinder(M, new Vector3(0.4f + sx * 0.52f, 2.3f, 0.6f - i * 0.16f), new Vector3(0.4f + sx * 0.66f, 2.44f, 0.86f - i * 0.16f), 0.045f, 8);
+            }
+            foreach (float z in new[] { -2.2f, -0.8f }) k.Cylinder(D, new Vector3(-0.5f, 2.16f, z), new Vector3(-0.5f, 2.18f, z), 0.24f, 14); // hatch rims
+            k.Cylinder(C, new Vector3(0.9f, 2.14f, -1.6f), new Vector3(0.9f, 2.14f, -0.3f), 0.022f, 6); // shovel
+            k.Box(M, new Vector3(0.9f, 2.14f, -0.15f), new Vector3(0.2f, 0.02f, 0.3f), 0.006f);
+            k.Cylinder(M, new Vector3(0.9f, 2.1f, -2.9f), new Vector3(0.9f, 3.6f, -3.05f), 0.012f, 4);
+            foreach (float sx in new[] { -0.75f, 0.75f }) k.Box(P, new Vector3(sx, 1.25f, -3.42f), new Vector3(0.36f, 0.48f, 0.18f), 0.04f); // jerrycans on the tail
+            k.Box(G, new Vector3(0.15f, 2.38f, 0.87f), new Vector3(0.27f, 0.17f, 0.02f), 0.005f);
+            k.Cylinder(M, new Vector3(0.5f, 2.35f, 0.85f), new Vector3(0.5f, 2.37f, 1.5f), 0.075f, 10); // barrel jacket
         }
 
         private static GameObject Part(Transform parent, Mesh mesh, Vector3 c, Vector3 s, Quaternion r, Material m, MaterialPropertyBlock block, int layer)

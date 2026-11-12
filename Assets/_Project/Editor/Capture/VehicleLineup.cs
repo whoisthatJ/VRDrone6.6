@@ -94,6 +94,8 @@ namespace Ushqyr.EditorTools.Capture
                     ("ground_level", tp + side * 25f + Vector3.up * 2.2f, tp + Vector3.up * 1.2f, 50f),
                 };
                 var list = new System.Collections.Generic.List<(string, Vector3, Vector3, float)>(shots);
+                list.Add(("pads", new Vector3(22f, 7f, RangeSteppeBuilder.PadZ + 34f), new Vector3(0f, 2f, RangeSteppeBuilder.PadZ - 15f), 60f));
+                list.Add(("trees", new Vector3(-130f, 14f, 90f), new Vector3(-60f, 4f, 200f), 55f));
                 // Earthworks (known only right after a rebuild): a free-standing bank and a revetment.
                 foreach (var m in RangeSteppeBuilder.Mounds)
                 {
