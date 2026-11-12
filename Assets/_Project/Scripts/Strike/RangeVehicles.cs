@@ -158,7 +158,7 @@ namespace Ushqyr.Strike
                         g.AddComponent<MeshFilter>().sharedMesh = dm[i];
                         g.AddComponent<MeshRenderer>().sharedMaterial = MaterialFor((VehicleKit.Slot)i);
                     }
-                    dish.AddComponent<Ushqyr.Core.Spinner>();
+                    dish.AddComponent<Ushqyr.Core.Spinner>().Configure(Vector3.up, 7f); // sweeps round its mast
                     break;
             }
             return root;
@@ -475,7 +475,8 @@ namespace Ushqyr.Strike
             }
             // Active: on its lane. Disabled: the wreck veers off the road (clear of the convoy behind it).
             _director.ViewPose(Slot, time, out var p, out float yaw);
-            transform.SetPositionAndRotation(p, Quaternion.Euler(0f, yaw, 0f));
+            // Sit on the slope: lean with the ground rather than staying level across it.
+            transform.SetPositionAndRotation(p, Quaternion.FromToRotation(Vector3.up, _director.GroundNormal(p)) * Quaternion.Euler(0f, yaw, 0f));
             bool disabled = !t.Active;
             if (disabled != _shownDisabled) ShowDisabled(disabled);
         }

@@ -45,6 +45,17 @@ namespace Ushqyr.Strike
 
         /// <summary>Half the distance between the two lanes (m): lane centres 2.4 m either side of the road's centre.</summary>
         public const float LaneOffset = 2.4f;
+        /// <summary>Radius of the turn at each end of a section (m): a keyhole turn, swinging out and back round.</summary>
+        public const float TurnRadius = 5f;
+        /// <summary>Vehicles take the turns at this share of their speed.</summary>
+        public const float TurnSlow = 0.6f;
+        /// <summary>Over how long an evasive vehicle changes speed (s), and the length of one weave (m).</summary>
+        public const float EvasiveRamp = 1.4f, ZigZagLength = 30f;
+        // The keyhole: swing out by TurnSwing, round by pi + 2 TurnSwing, back by TurnSwing.
+        private static readonly float TurnSwing = Mathf.Acos((LaneOffset + TurnRadius) / (2f * TurnRadius));
+        /// <summary>Path length of one turn (m), and how far it reaches beyond the end of the section (m).</summary>
+        public static readonly float TurnLength = TurnRadius * (Mathf.PI + 4f * TurnSwing);
+        public static readonly float TurnExtent = 2f * TurnRadius * Mathf.Sin(TurnSwing) + TurnRadius;
         /// <summary>How far a hit vehicle veers off the road, beyond its lane (m), and how long that takes (s).</summary>
         public const float WreckOffset = 6.5f, WreckStep = 4.5f, WreckSeconds = 0.8f;
         /// <summary>Along-the-road steps a wreck may roll on (m) when the spot beside it is taken.</summary>
@@ -104,17 +115,15 @@ namespace Ushqyr.Strike
             u = plan.Start + plan.Direction * (plan.Speed * Mathf.Max(0f, time) - plan.Member * RangeDirector.ConvoyGap);
         }
 
-        // Pushes a loop point out from the loop's middle line (sideways on the legs, along the road in the turns) and
+        // Pushes a loop point out to the side of the road and
         // along the road.
         private static void Offset(float length, ref float along, ref float lat, float outward, float shift)
         {
             if (outward > 0f)
             {
-                float mid = Mathf.Clamp(along, 0f, length);
-                float r = Mathf.Sqrt(lat * lat + (along - mid) * (along - mid));
-                float scale = r > 1e-3f ? (r + outward) / r : 1f;
-                along = mid + (along - mid) * scale;
-                lat *= scale;
+                // Off to the side of the road, on the side it is already on: on the legs that is away from the
+                // other lane; in a turn it is away from the turn, not further down the road.
+                lat += (lat >= 0f ? 1f : -1f) * outward;
             }
             along += shift;
         }
@@ -134,14 +143,22 @@ namespace Ushqyr.Strike
             LoopParam(plan, time, out float u, out speed);
             Loop(plan.SectionLength, u, out float along, out float lat, out float dAlong, out float dLat, out float straight);
             Offset(plan.SectionLength, ref along, ref lat, outward, shift);
-            if (plan.Class == TargetClass.Evasive && Mathf.Abs(speed) > 0.5f)
+            if (plan.Class == TargetClass.Evasive)
             {
-                // Weave inside the lane on the straight legs (its section is its own, so it can use the road).
-                float phase = 2f * Mathf.PI * e / ZigZagPeriod + (plan.Seed & 0xFF) * 0.0245f;
+                // Weave inside the lane on the straight legs (its section is its own, so it can use the road). The
+                // weave follows the distance driven, so it stops and backs up with the vehicle and never jumps.
+                float phase = 2f * Mathf.PI * u / ZigZagLength + (plan.Seed & 0xFF) * 0.0245f;
                 lat += ZigZagAmplitude * straight * Mathf.Sin(phase);
-                dLat += ZigZagAmplitude * straight * 2f * Mathf.PI / ZigZagPeriod / Mathf.Max(1f, Mathf.Abs(speed)) * Mathf.Cos(phase);
+                dLat += ZigZagAmplitude * straight * 2f * Mathf.PI / ZigZagLength * Mathf.Cos(phase);
             }
-            road.Sample(plan.SectionStart + along, out position, out Vector3 fwd);
+            float d = plan.SectionStart + along;
+            road.Sample(d, out position, out Vector3 fwd);
+            // The road is a polyline: take its direction over a few metres, or the heading would snap at every point.
+            road.Sample(d - 3f, out Vector3 behind, out _);
+            road.Sample(d + 3f, out Vector3 ahead, out _);
+            Vector3 smooth = ahead - behind;
+            smooth.y = 0f;
+            if (smooth.sqrMagnitude > 1e-4f) fwd = smooth;
             fwd.y = 0f;
             fwd = fwd.sqrMagnitude > 1e-6f ? fwd.normalized : Vector3.forward;
             Vector3 right = new Vector3(fwd.z, 0f, -fwd.x);
@@ -154,42 +171,67 @@ namespace Ushqyr.Strike
         }
 
         /// <summary>
-        /// A point on the lane loop of a section <paramref name="length"/> long, at <paramref name="u"/> metres round it:
-        /// right lane out, a half circle, the other lane back, a half circle. Gives the distance along the road, the
-        /// sideways offset, their rates per metre of loop, and 1 on the straight legs / 0 in the turns.
+        /// A point on the lane loop of a section <paramref name="length"/> long, <paramref name="s"/> metres of driving
+        /// round it: right lane out, a keyhole turn, the other lane back, a keyhole turn. Turns are driven at
+        /// <see cref="TurnSlow"/> of the speed. Gives the distance along the road, the sideways offset, the heading
+        /// (per metre of path) and how far the point is into a straight leg (0 in the turns, easing to 1).
         /// </summary>
-        public static void Loop(float length, float u, out float along, out float lat, out float dAlong, out float dLat, out float straight)
+        public static void Loop(float length, float s, out float along, out float lat, out float dAlong, out float dLat, out float straight)
         {
-            float w = LaneOffset, arc = Mathf.PI * w;
-            float period = 2f * length + 2f * arc;
-            u %= period;
-            if (u < 0f) u += period;
-            straight = 1f;
-            if (u < length)
+            float w = LaneOffset, turn = TurnLength / TurnSlow;
+            float period = 2f * length + 2f * turn;
+            s %= period;
+            if (s < 0f) s += period;
+            float Ease(float q) => Mathf.SmoothStep(0f, 1f, Mathf.Min(q, length - q) / 12f);
+            if (s < length)
             {
-                along = u; lat = w; dAlong = 1f; dLat = 0f;
+                along = s; lat = w; dAlong = 1f; dLat = 0f; straight = Ease(s);
                 return;
             }
-            u -= length;
-            if (u < arc)
+            s -= length;
+            if (s < turn)
             {
-                float th = u / w;
-                along = length + w * Mathf.Sin(th); lat = w * Mathf.Cos(th); dAlong = Mathf.Cos(th); dLat = -Mathf.Sin(th); straight = 0f;
+                Keyhole(s * TurnSlow, out float x, out float y, out float hx, out float hy);
+                along = length + x; lat = y; dAlong = hx; dLat = hy; straight = 0f;
                 return;
             }
-            u -= arc;
-            if (u < length)
+            s -= turn;
+            if (s < length)
             {
-                along = length - u; lat = -w; dAlong = -1f; dLat = 0f;
+                along = length - s; lat = -w; dAlong = -1f; dLat = 0f; straight = Ease(s);
                 return;
             }
-            u -= length;
-            float t2 = u / w;
-            along = -w * Mathf.Sin(t2); lat = -w * Mathf.Cos(t2); dAlong = -Mathf.Cos(t2); dLat = Mathf.Sin(t2); straight = 0f;
+            s -= length;
+            Keyhole(s * TurnSlow, out float x2, out float y2, out float hx2, out float hy2);
+            along = -x2; lat = -y2; dAlong = -hx2; dLat = -hy2; straight = 0f;
         }
 
-        /// <summary>Length of the lane loop of a section (m).</summary>
-        public static float LoopLength(float sectionLength) => 2f * sectionLength + 2f * Mathf.PI * LaneOffset;
+        // The turn at the far end, from (0, +lane) heading out to (0, -lane) heading back, a metres along it: swing
+        // out to the side, come right round on the turn radius, swing back into the other lane.
+        private static void Keyhole(float a, out float x, out float y, out float hx, out float hy)
+        {
+            float r = TurnRadius, w = LaneOffset, phi = TurnSwing, h;
+            float a1 = r * phi, a2 = r * (Mathf.PI + 2f * phi);
+            if (a < a1)
+            {
+                h = a / r;
+                x = r * Mathf.Sin(h); y = w + r - r * Mathf.Cos(h);
+            }
+            else if (a < a1 + a2)
+            {
+                h = phi - (a - a1) / r;
+                x = 2f * r * Mathf.Sin(phi) - r * Mathf.Sin(h); y = r * Mathf.Cos(h);
+            }
+            else
+            {
+                h = -Mathf.PI - phi + (a - a1 - a2) / r;
+                x = r * Mathf.Sin(h); y = -(w + r) - r * Mathf.Cos(h);
+            }
+            hx = Mathf.Cos(h); hy = Mathf.Sin(h);
+        }
+
+        /// <summary>Driving distance round the lane loop of a section (m; the turns count at their slowed pace).</summary>
+        public static float LoopLength(float sectionLength) => 2f * sectionLength + 2f * TurnLength / TurnSlow;
 
         /// <summary>Distance driven by an evasive target: segments of driving, stopping and reversing.</summary>
         public static float EvasiveDistance(in TargetPlan plan, float elapsed, out float speedNow)
@@ -197,12 +239,16 @@ namespace Ushqyr.Strike
             float d = 0f;
             speedNow = 0f;
             int segments = Mathf.FloorToInt(elapsed / SegmentSeconds);
+            float from = 0f; // it pulls away from rest
             for (int k = 0; k <= segments; k++)
             {
+                // Each segment eases from the last one's speed to its own: no instant stops or starts.
                 float v = SegmentSpeed(plan, k);
                 float dt = k < segments ? SegmentSeconds : elapsed - segments * SegmentSeconds;
-                d += v * dt;
-                if (k == segments) speedNow = v;
+                float ramp = Mathf.Min(dt, EvasiveRamp);
+                d += from * ramp + (v - from) * ramp * ramp / (2f * EvasiveRamp) + v * Mathf.Max(0f, dt - EvasiveRamp);
+                if (k == segments) speedNow = Mathf.Lerp(from, v, Mathf.Clamp01(dt / EvasiveRamp));
+                from = v;
             }
             return d;
         }
@@ -261,7 +307,7 @@ namespace Ushqyr.Strike
         public const int ConvoySize = 3;
 
         /// <summary>Gap kept free between two groups' sections, besides the U-turns (m).</summary>
-        public const float SectionMargin = 12f;
+        public const float SectionMargin = 6f;
 
         private readonly RangeLayout _layout;
         /// <summary>Per road group (convoys first, then evasive targets): road, section start and length.</summary>
@@ -320,6 +366,14 @@ namespace Ushqyr.Strike
             TargetMotion.Pose(_layout, Targets[slot].Plan, time, out position, out yaw, out speed);
 
         /// <summary>Where the target is drawn: its pose while active, its wreck (off the road) while disabled.</summary>
+        /// <summary>The slope of the ground under a vehicle at <paramref name="p"/> (heights sampled 2 m either way).</summary>
+        public Vector3 GroundNormal(Vector3 p)
+        {
+            const float e = 2f;
+            float dx = _layout.Height(p.x + e, p.z) - _layout.Height(p.x - e, p.z), dz = _layout.Height(p.x, p.z + e) - _layout.Height(p.x, p.z - e);
+            return new Vector3(-dx, 2f * e, -dz).normalized;
+        }
+
         public void ViewPose(int slot, float time, out Vector3 position, out float yaw)
         {
             var t = Targets[slot];
@@ -347,6 +401,13 @@ namespace Ushqyr.Strike
                 if (o.Active) TargetMotion.Pose(_layout, o.Plan, t.DisabledAt, out op, out oy, out _);
                 else TargetMotion.WreckPose(_layout, o, float.MaxValue, out op, out oy);
                 others.Add((op, oy, RangeVehicles.Footprint(o.Plan.Kind)));
+                // A wreck hit a moment ago is still rolling to its spot: keep clear of the way it takes too.
+                if (!o.Active && !o.WreckSinks && o.Plan.Class != TargetClass.Static && t.DisabledAt - o.DisabledAt < TargetMotion.WreckSeconds)
+                    for (int i = 0; i < 8; i++)
+                    {
+                        TargetMotion.WreckPath(_layout, o.Plan, o.DisabledAt, o.WreckOut, o.WreckShift, i / 8f, out op, out oy);
+                        others.Add((op, oy, RangeVehicles.Footprint(o.Plan.Kind)));
+                    }
             }
             Vector2 ext = RangeVehicles.Footprint(t.Plan.Kind);
             float ahead = Mathf.Sign(TargetMotion.SectionPoint(t.Plan, t.DisabledAt + 0.1f).x - TargetMotion.SectionPoint(t.Plan, t.DisabledAt).x);
@@ -354,18 +415,23 @@ namespace Ushqyr.Strike
             // Live traffic in the same section, which the wreck must not touch while it rolls off.
             var live = new List<RangeTarget>();
             foreach (var o in Targets)
-                if (o != t && o.Active && o.Plan.Class != TargetClass.Static && o.Plan.Place == t.Plan.Place && Mathf.Abs(o.Plan.SectionStart - t.Plan.SectionStart) < 0.5f)
+                if (o != t && o.Plan.Class != TargetClass.Static && o.Plan.Place == t.Plan.Place && Mathf.Abs(o.Plan.SectionStart - t.Plan.SectionStart) < 0.5f)
                     live.Add(o);
             int bestHits = int.MaxValue;
-            for (int level = 0; level < 4; level++)
-                foreach (float steps in new[] { 0f, 1f, -1f, 2f, -2f, 3f, -3f, 4f, -4f, 5f, -5f, 6f, -6f })
+            for (int level = 0; level < 5; level++)
+                foreach (float steps in new[] { 0f, 1f, -1f, 2f, -2f, 3f, -3f }) // no further: a wreck does not dash down the road
                 {
                     float outward = TargetMotion.WreckOffset + level * TargetMotion.WreckStep, shift = steps * TargetMotion.WreckShiftStep * ahead;
                     Vector2 to = TargetMotion.SectionPoint(t.Plan, t.DisabledAt, outward, shift);
-                    float spare = SectionMargin + TargetMotion.LaneOffset - 4f;
+                    float spare = SectionMargin + TargetMotion.TurnExtent - 4f;
                     if (to.x < -spare || to.x > t.Plan.SectionLength + spare) continue;
                     // Never back onto the band the loop drives on (lanes and U-turns): later traffic would meet it there.
-                    if (Mathf.Abs(to.y) < TargetMotion.LaneOffset + 4.5f && to.x > -TargetMotion.LaneOffset - 4.5f && to.x < t.Plan.SectionLength + TargetMotion.LaneOffset + 4.5f) continue;
+                    bool inTurn = to.x < 0f || to.x > t.Plan.SectionLength;
+                    if (Mathf.Abs(to.y) < (inTurn ? TargetMotion.TurnRadius : TargetMotion.LaneOffset) + 4.5f
+                        && to.x > -TargetMotion.TurnExtent - 4.5f && to.x < t.Plan.SectionLength + TargetMotion.TurnExtent + 4.5f) continue;
+                    // Roads cross: never roll onto another road, where its traffic would drive into the wreck.
+                    TargetMotion.WreckPath(_layout, t.Plan, t.DisabledAt, outward, shift, 1f, out Vector3 rest, out _);
+                    if (NearOtherRoad(t.Plan.Place, rest, 13f)) continue;
                     int hits = PathHits(t, outward, shift, ext, others, live);
                     if (hits == 0)
                     {
@@ -388,15 +454,17 @@ namespace Ushqyr.Strike
         private int PathHits(RangeTarget t, float outward, float shift, Vector2 ext, List<(Vector3 p, float yaw, Vector2 ext)> others, List<RangeTarget> live)
         {
             int hits = 0;
-            for (int i = 0; i <= 12; i++)
+            const int samples = 40; // under a metre apart on the longest roll
+            for (int i = 0; i <= samples; i++)
             {
-                float f = i / 12f;
+                float f = i / (float)samples;
                 TargetMotion.WreckPath(_layout, t.Plan, t.DisabledAt, outward, shift, Mathf.SmoothStep(0f, 1f, f), out var p, out float y);
                 foreach (var o in others)
                     if (Footprints.Overlap(p, y, ext, o.p, o.yaw, o.ext, 0.3f)) hits++;
                 float when = t.DisabledAt + f * TargetMotion.WreckSeconds;
                 foreach (var o in live)
                 {
+                    if (!o.Active) continue; // not on the road right now (its line is checked below, for when it is back)
                     TargetMotion.Pose(_layout, o.Plan, when, out var lp, out float ly, out _);
                     if (Footprints.Overlap(p, y, ext, lp, ly, RangeVehicles.Footprint(o.Plan.Kind), 0.3f)) hits++;
                 }
@@ -404,7 +472,7 @@ namespace Ushqyr.Strike
             // Where it ends up, the traffic keeps passing for as long as the wreck lies there.
             TargetMotion.WreckPath(_layout, t.Plan, t.DisabledAt, outward, shift, 1f, out var end, out float endYaw);
             foreach (var o in live)
-                for (float w = TargetMotion.WreckSeconds; w <= StrikeRules.RespawnMax; w += 0.5f)
+                for (float w = TargetMotion.WreckSeconds; w <= StrikeRules.RespawnMax; w += 0.2f)
                 {
                     TargetMotion.Pose(_layout, o.Plan, t.DisabledAt + w, out var lp, out float ly, out _);
                     if (Footprints.Overlap(end, endYaw, ext, lp, ly, RangeVehicles.Footprint(o.Plan.Kind), 0.3f)) hits++;
@@ -434,12 +502,75 @@ namespace Ushqyr.Strike
                 }
                 order.Add((best, count[best]++));
             }
-            float margin = TargetMotion.LaneOffset + SectionMargin;
+            float margin = TargetMotion.TurnExtent + SectionMargin;
+            var crossings = Crossings();
             foreach (var (road, index) in order)
             {
                 float slice = _layout.Roads[road].Length / count[road];
-                _sections.Add((road, index * slice + margin, Mathf.Max(1f, slice - 2f * margin)));
+                float start = index * slice + margin, length = Mathf.Max(1f, slice - 2f * margin);
+                // Roads cross each other: a section (with its turns) stays off every crossing, keeping its longer side.
+                float reach = TargetMotion.TurnExtent + CrossingClearance;
+                foreach (var (r, at) in crossings)
+                {
+                    if (r != road || at < start - reach || at > start + length + reach) continue;
+                    float before = at - reach - start, after = start + length - (at + reach);
+                    if (before >= after) length = Mathf.Max(1f, before);
+                    else { start = at + reach; length = Mathf.Max(1f, after); }
+                }
+                _sections.Add((road, start, length));
             }
+        }
+
+        /// <summary>Clear distance kept between a section's loop and a road crossing (m): the other road's width and a vehicle.</summary>
+        public const float CrossingClearance = 14f;
+
+        private bool NearOtherRoad(int road, Vector3 p, float clearance)
+        {
+            for (int r = 0; r < _layout.Roads.Count; r++)
+            {
+                if (r == road) continue;
+                foreach (var q in _layout.Roads[r].Points)
+                    if ((q.x - p.x) * (q.x - p.x) + (q.z - p.z) * (q.z - p.z) < clearance * clearance) return true;
+            }
+            return false;
+        }
+
+        // Where the roads cross each other: (road, distance along it), for both roads of each crossing.
+        private List<(int road, float at)> Crossings()
+        {
+            var found = new List<(int, float)>();
+            for (int i = 0; i < _layout.Roads.Count; i++)
+                for (int j = i + 1; j < _layout.Roads.Count; j++)
+                {
+                    var a = _layout.Roads[i].Points;
+                    var b = _layout.Roads[j].Points;
+                    float da = 0f;
+                    for (int k = 0; k + 1 < a.Length; k++)
+                    {
+                        Vector2 a0 = new Vector2(a[k].x, a[k].z), a1 = new Vector2(a[k + 1].x, a[k + 1].z);
+                        float la = Vector2.Distance(a0, a1), db = 0f;
+                        for (int m = 0; m + 1 < b.Length; m++)
+                        {
+                            Vector2 b0 = new Vector2(b[m].x, b[m].z), b1 = new Vector2(b[m + 1].x, b[m + 1].z);
+                            float lb = Vector2.Distance(b0, b1);
+                            Vector2 r = a1 - a0, s = b1 - b0;
+                            float den = r.x * s.y - r.y * s.x;
+                            if (Mathf.Abs(den) > 1e-6f)
+                            {
+                                Vector2 q = b0 - a0;
+                                float t = (q.x * s.y - q.y * s.x) / den, u = (q.x * r.y - q.y * r.x) / den;
+                                if (t >= 0f && t <= 1f && u >= 0f && u <= 1f)
+                                {
+                                    found.Add((i, da + t * la));
+                                    found.Add((j, db + u * lb));
+                                }
+                            }
+                            db += lb;
+                        }
+                        da += la;
+                    }
+                }
+            return found;
         }
 
         private TargetPlan MakePlan(int slot, int generation, TargetClass cls, float spawnTime)

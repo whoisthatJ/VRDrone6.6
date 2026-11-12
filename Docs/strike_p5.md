@@ -40,15 +40,32 @@ Road vehicles never meet:
 
 - Each convoy and each evasive vehicle gets **its own section of road** (`RangeDirector.Sections`); no two groups
   ever share a stretch.
-- Inside its section a group drives a **lane loop**: out on the right lane, a U-turn, back on the other lane
+- Inside its section a group drives a **lane loop**: out on the right lane, a turn, back on the other lane
   (lane centres 2.4 m either side of the 10 m road). Convoy members keep 18 m along the loop, so they never pass
   through each other, and a convoy runs on the round clock, so a respawned member rejoins its line.
 - A hit vehicle's **wreck rolls off the road** (0.8 s) to a spot the director picks: beside its lane, further out
   or a little along the road, clear of other wrecks and of the traffic passing while it rolls and while it lies
-  there. Deterministic (hits arrive in the same order on every PC). If no spot is free (1 in ~2 000 hits in
-  tests) the wreck burns out and sinks instead.
+  there. Deterministic (hits arrive in the same order on every PC). If no spot is free the wreck burns out and
+  sinks instead.
 - `StrikeTrafficTests`: full rounds on the real layout with random hits, respawns and wrecks, every 0.1 s, every
   pair of vehicles checked with oriented footprints (Normal and Hard, 8 seeds each): no overlaps.
+
+### Movement (2026-11-12, second pass)
+
+- **Turns**: the U-turn at each end of a section is a keyhole on a 5 m radius (swing out, round, swing back into
+  the other lane) driven at 60 % speed; it was a 2.4 m pivot. Sections keep `TurnExtent` + 6 m from their ends.
+- **Heading** follows the road's direction over 6 m, not the polyline segment (it snapped every 5 m).
+- **Evasive vehicles** ease between speeds over 1.4 s (they stopped and started instantly) and weave by distance
+  driven, fading in and out along each leg (the weave used to switch off, and the vehicle jump sideways, when it
+  stopped).
+- **Slopes**: vehicles lean with the ground (`RangeDirector.GroundNormal`).
+- **Roads cross** (roads 2 and 3): sections and their turns keep 14 m clear of every crossing, and wrecks never
+  roll within 13 m of another road.
+- **Wrecks** roll off to the side they are on (also when hit in a turn), at most three steps (19.5 m) along the
+  road, with the way there checked every metre and against a wreck that is still rolling. In a stress test (a road
+  vehicle hit every 2-5 s) 13 of 408 found no free spot and sank.
+- The radar antenna sweeps round its mast (it was tumbling about its forward axis).
+- Checked numerically over 12 rounds: no position jumps (top speed 11.6 m/s), turn rate at most 77 deg/s.
 
 ## Look (2026-11-12, after the FPV strike-sim references)
 

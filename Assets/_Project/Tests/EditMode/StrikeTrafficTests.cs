@@ -85,14 +85,25 @@ namespace Ushqyr.Tests
             {
                 var a = d.Sections[i];
                 float roadLength = layout.Roads[a.road].Length;
-                Assert.GreaterOrEqual(a.start - TargetMotion.LaneOffset, 0f, $"section {i} starts on its road");
-                Assert.LessOrEqual(a.start + a.length + TargetMotion.LaneOffset, roadLength, $"section {i} ends on its road");
+                Assert.GreaterOrEqual(a.start - TargetMotion.TurnExtent, 0f, $"section {i} starts on its road");
+                Assert.LessOrEqual(a.start + a.length + TargetMotion.TurnExtent, roadLength, $"section {i} ends on its road");
                 Assert.Greater(a.length, RangeDirector.ConvoyGap * RangeDirector.ConvoySize * 2f, $"section {i} fits a convoy");
+                // Roads cross: no other road may pass through this section's loop (lanes and turns).
+                for (int other = 0; other < layout.Roads.Count; other++)
+                {
+                    if (other == a.road) continue;
+                    foreach (var p in layout.Roads[other].Points)
+                        for (float dd = a.start - TargetMotion.TurnExtent; dd <= a.start + a.length + TargetMotion.TurnExtent; dd += 4f)
+                        {
+                            layout.Roads[a.road].Sample(dd, out var q, out _);
+                            Assert.Greater(new Vector2(p.x - q.x, p.z - q.z).magnitude, 9f, $"section {i} runs through road {other}");
+                        }
+                }
                 for (int j = i + 1; j < d.Sections.Count; j++)
                 {
                     var b = d.Sections[j];
                     if (a.road != b.road) continue;
-                    bool apart = a.start + a.length + 2f * TargetMotion.LaneOffset <= b.start || b.start + b.length + 2f * TargetMotion.LaneOffset <= a.start;
+                    bool apart = a.start + a.length + 2f * TargetMotion.TurnExtent <= b.start || b.start + b.length + 2f * TargetMotion.TurnExtent <= a.start;
                     Assert.IsTrue(apart, $"sections {i} and {j} on road {a.road} overlap");
                 }
             }
