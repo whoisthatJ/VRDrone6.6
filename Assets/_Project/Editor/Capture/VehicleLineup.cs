@@ -93,7 +93,18 @@ namespace Ushqyr.EditorTools.Capture
                     ("range_wide", new Vector3(0f, 45f, RangeSteppeBuilder.PadZ - 10f), new Vector3(0f, 0f, 0f), 60f),
                     ("ground_level", tp + side * 25f + Vector3.up * 2.2f, tp + Vector3.up * 1.2f, 50f),
                 };
-                foreach (var (name, pos, look, fov) in shots)
+                var list = new System.Collections.Generic.List<(string, Vector3, Vector3, float)>(shots);
+                // Earthworks (known only right after a rebuild): a free-standing bank and a revetment.
+                foreach (var m in RangeSteppeBuilder.Mounds)
+                {
+                    bool bank = m.Seed >= 1000;
+                    if (list.Exists(s => s.Item1 == (bank ? "berm" : "revetment"))) continue;
+                    var c = new Vector3(m.Centre.x, RangeSteppeBuilder.Height(m.Centre.x, m.Centre.y), m.Centre.y);
+                    float yr = (m.Yaw + 60f) * Mathf.Deg2Rad;
+                    var off = new Vector3(Mathf.Sin(yr), 0f, Mathf.Cos(yr));
+                    list.Add((bank ? "berm" : "revetment", c + off * 26f + Vector3.up * 7f, c + Vector3.up * 0.8f, 50f));
+                }
+                foreach (var (name, pos, look, fov) in list)
                 {
                     var p = pos;
                     p.y = Mathf.Max(p.y, RangeSteppeBuilder.Height(p.x, p.z) + 1.5f);

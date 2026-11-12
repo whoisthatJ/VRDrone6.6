@@ -41,10 +41,12 @@ namespace Ushqyr.EditorTools.Range
             Skirt(root, layer);
             layout.Pads = Pads(root, layer, out var lights);
             layout.Roads = Roads(root, layer, layout);
+            Mounds.Clear();
             layout.Spots = Spots(root, layer, layout);
-            // The ground: a terrain on the same height function, with layers, grass, bushes, stones, ruts.
-            RangeSteppeTerrain.Build(root, layer, layout);
-            Berms(root, layer, layout);
+            Berms(layout);
+            // The ground: a terrain on the same height function plus the earthworks, with layers, field roads,
+            // grass, bushes and stones.
+            RangeSteppeTerrain.Build(root, layer, layout, Mounds);
             Hulks(root, layer, layout);
             Tower(root, layer);
             Tent(root, layer);
@@ -195,7 +197,6 @@ namespace Ushqyr.EditorTools.Range
                 new[] { new Vector2(260f, -470f), new Vector2(360f, -240f), new Vector2(300f, -40f), new Vector2(430f, 200f), new Vector2(380f, 520f) },
             };
             var roads = new List<RangeRoad>();
-            var dirt = MaterialLibrary.Get("M_Dirt_Field");
             for (int r = 0; r < controls.Length; r++)
             {
                 var pts = new List<Vector3>();
@@ -215,7 +216,7 @@ namespace Ushqyr.EditorTools.Range
                 var last = c[c.Length - 1];
                 pts.Add(new Vector3(last.x, Height(last.x, last.y), last.y));
                 roads.Add(new RangeRoad { Points = pts.ToArray() });
-                Ribbon(root, $"Dirt Road {r + 1}", pts, 10f, dirt, layer); // two lanes (TargetMotion.LaneOffset)
+                // No mesh: the road is painted into the terrain (RangeSteppeTerrain), two lanes (TargetMotion.LaneOffset).
             }
             return roads;
         }
@@ -226,52 +227,12 @@ namespace Ushqyr.EditorTools.Range
             return 0.5f * (2f * p1 + (p2 - p0) * t + (2f * p0 - 5f * p1 + 4f * p2 - p3) * t2 + (3f * p1 - p0 - 3f * p2 + p3) * t3);
         }
 
-        private static void Ribbon(Transform root, string name, List<Vector3> pts, float width, Material mat, int layer)
-        {
-            var v = new List<Vector3>();
-            var uv = new List<Vector2>();
-            var t = new List<int>();
-            float along = 0f;
-            for (int i = 0; i < pts.Count; i++)
-            {
-                Vector3 f = pts[Mathf.Min(i + 1, pts.Count - 1)] - pts[Mathf.Max(i - 1, 0)];
-                f.y = 0f;
-                Vector3 right = new Vector3(f.z, 0f, -f.x).normalized * (width * 0.5f);
-                if (i > 0) along += Vector3.Distance(pts[i - 1], pts[i]);
-                foreach (float s in new[] { -1f, 1f })
-                {
-                    Vector3 p = pts[i] + right * s;
-                    p.y = Height(p.x, p.z) + 0.06f;
-                    v.Add(p);
-                    uv.Add(new Vector2(s * 0.5f + 0.5f, along / width));
-                }
-                if (i > 0)
-                {
-                    int b = v.Count - 4;
-                    t.AddRange(new[] { b, b + 2, b + 1, b + 1, b + 2, b + 3 });
-                }
-            }
-            var mesh = new Mesh { name = name, indexFormat = IndexFormat.UInt32 };
-            mesh.SetVertices(v);
-            mesh.SetUVs(0, uv);
-            mesh.SetTriangles(t, 0);
-            mesh.RecalculateNormals();
-            mesh.RecalculateTangents();
-            var go = new GameObject(name) { layer = layer, isStatic = true };
-            go.transform.SetParent(root, false);
-            go.AddComponent<MeshFilter>().sharedMesh = SaveMesh(mesh, name.Replace(" ", "_"));
-            var mr = go.AddComponent<MeshRenderer>();
-            mr.sharedMaterial = mat;
-            mr.shadowCastingMode = ShadowCastingMode.Off;
-        }
-
         // ---------- static spots, revetments, berms, hulks ----------
 
         private static StaticSpot[] Spots(Transform root, int layer, RangeLayout layout)
         {
             var rng = new System.Random(5511);
             var spots = new List<StaticSpot>();
-            var earth = BermMaterial();
             Vector3 pads = new Vector3(0f, 0f, PadZ);
             int guard = 0;
             while (spots.Count < 26 && guard++ < 5000)
@@ -287,54 +248,54 @@ namespace Ushqyr.EditorTools.Range
                 bool revet = spots.Count % 3 == 0;
                 var spot = new StaticSpot { Position = new Vector3(x, Height(x, z), z), Yaw = yaw, Revetment = revet };
                 spots.Add(spot);
-                if (revet) Revetment(root, spot, earth, layer);
+                if (revet) Revetment(spot);
             }
             return spots.ToArray();
         }
 
-        // A U of earth berms round a static spot, open to the front.
-        private static void Revetment(Transform root, StaticSpot s, Material earth, int layer)
+        /// <summary>Earthworks sculpted into the terrain (berms and revetments), filled while building.</summary>
+        public static readonly List<RangeSteppeTerrain.Mound> Mounds = new List<RangeSteppeTerrain.Mound>();
+
+        // A U of earth banks round a static spot, open to the front.
+        private static void Revetment(StaticSpot s)
         {
             var rot = Quaternion.Euler(0f, s.Yaw, 0f);
-            void Mound(Vector3 local, Vector3 size, float yaw)
+            int seed = Mounds.Count * 31 + 7;
+            void Bank(Vector3 local, float halfLen, float halfWid, float height, float yaw)
             {
                 Vector3 p = s.Position + rot * local;
-                p.y = Height(p.x, p.z);
-                Berm(root, "Revetment", p, size, s.Yaw + yaw, earth, layer);
+                Mounds.Add(new RangeSteppeTerrain.Mound { Centre = new Vector2(p.x, p.z), Yaw = s.Yaw + yaw, HalfLength = halfLen, HalfWidth = halfWid, Height = height, Seed = seed++ });
             }
-            Mound(new Vector3(0f, 0f, -6.5f), new Vector3(10f, 2.4f, 3.5f), 0f);
-            Mound(new Vector3(-4.8f, 0f, 0f), new Vector3(3.2f, 2.2f, 11f), 0f);
-            Mound(new Vector3(4.8f, 0f, 0f), new Vector3(3.2f, 2.2f, 11f), 0f);
+            Bank(new Vector3(0f, 0f, -8f), 7.5f, 2.8f, 2.3f, 90f);
+            Bank(new Vector3(-6f, 0f, -1f), 7f, 2.6f, 2.1f, 0f);
+            Bank(new Vector3(6f, 0f, -1f), 7f, 2.6f, 2.1f, 0f);
         }
 
-        private static void Berms(Transform root, int layer, RangeLayout layout)
+        // Long low earth banks across the range, clear of the roads (and the wrecks rolled off them) and the spots.
+        private static void Berms(RangeLayout layout)
         {
             var rng = new System.Random(7341);
-            var earth = BermMaterial();
             int made = 0, guard = 0;
-            while (made < 22 && guard++ < 3000)
+            while (made < 22 && guard++ < 4000)
             {
                 float x = (float)(rng.NextDouble() * 2 - 1) * 560f, z = (float)(rng.NextDouble() * 2 - 1) * 560f;
-                if (Vector2.Distance(new Vector2(x, z), new Vector2(0f, PadZ)) < 120f || NearRoad(layout, x, z, 24f) || NearSpot(layout, x, z, 16f)) continue;
-                var size = new Vector3(14f + (float)rng.NextDouble() * 20f, 1.6f + (float)rng.NextDouble() * 1.6f, 4f + (float)rng.NextDouble() * 3f);
-                Berm(root, $"Berm {made}", new Vector3(x, Height(x, z), z), size, (float)rng.NextDouble() * 180f, earth, layer);
+                float halfLen = 8f + (float)rng.NextDouble() * 11f, halfWid = 3f + (float)rng.NextDouble() * 2f;
+                float height = 1.4f + (float)rng.NextDouble() * 1.6f, yaw = (float)rng.NextDouble() * 180f;
+                if (Vector2.Distance(new Vector2(x, z), new Vector2(0f, PadZ)) < 120f) continue;
+                // Check the whole bank, not just its middle.
+                var along = new Vector2(Mathf.Sin(yaw * Mathf.Deg2Rad), Mathf.Cos(yaw * Mathf.Deg2Rad));
+                bool bad = false;
+                for (int i = -2; i <= 2 && !bad; i++)
+                {
+                    var p = new Vector2(x, z) + along * (halfLen * i / 2f);
+                    if (NearRoad(layout, p.x, p.y, 30f + halfWid) || NearSpot(layout, p.x, p.y, 16f + halfWid)) bad = true;
+                }
+                foreach (var m in Mounds)
+                    if (Vector2.Distance(m.Centre, new Vector2(x, z)) < m.HalfLength + halfLen + 6f) bad = true;
+                if (bad) continue;
+                Mounds.Add(new RangeSteppeTerrain.Mound { Centre = new Vector2(x, z), Yaw = yaw, HalfLength = halfLen, HalfWidth = halfWid, Height = height, Seed = 1000 + made });
                 made++;
             }
-        }
-
-        private static void Berm(Transform root, string name, Vector3 ground, Vector3 size, float yaw, Material mat, int layer)
-        {
-            var go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            go.name = name;
-            go.layer = layer;
-            go.isStatic = true;
-            go.transform.SetParent(root, false);
-            go.transform.SetPositionAndRotation(ground + Vector3.up * (size.y * 0.25f), Quaternion.Euler(0f, yaw, 0f));
-            go.transform.localScale = new Vector3(size.x, size.y, size.z);
-            Object.DestroyImmediate(go.GetComponent<Collider>());
-            var mc = go.AddComponent<MeshCollider>();
-            mc.convex = true;
-            go.GetComponent<MeshRenderer>().sharedMaterial = mat;
         }
 
         /// <summary>
@@ -388,7 +349,7 @@ namespace Ushqyr.EditorTools.Range
             while (made < 7 && guard++ < 2000)
             {
                 float x = (float)(rng.NextDouble() * 2 - 1) * 520f, z = (float)(rng.NextDouble() * 2 - 1) * 500f;
-                if (Vector2.Distance(new Vector2(x, z), new Vector2(0f, PadZ)) < 150f || NearRoad(layout, x, z, 24f) || NearSpot(layout, x, z, 20f)) continue;
+                if (Vector2.Distance(new Vector2(x, z), new Vector2(0f, PadZ)) < 150f || NearRoad(layout, x, z, 24f) || NearSpot(layout, x, z, 20f) || NearMound(x, z, 6f)) continue;
                 var kind = (VehicleKind)(made % 5);
                 var go = RangeVehicles.Build(kind, root, layer, new Color(0.12f, 0.1f, 0.09f));
                 go.name = "Hulk " + kind;
@@ -438,21 +399,6 @@ namespace Ushqyr.EditorTools.Range
             Object.DestroyImmediate(tex);
             AssetDatabase.ImportAsset(path);
             return AssetDatabase.LoadAssetAtPath<Texture2D>(path);
-        }
-
-        // Earthworks: churned dirt with some grass, not dark soil.
-        private static Material BermMaterial()
-        {
-            const string path = "Assets/_Project/Art/Strike/M_Strike_Berm.mat";
-            var m = AssetDatabase.LoadAssetAtPath<Material>(path);
-            if (m == null)
-            {
-                m = new Material(MaterialLibrary.Get("M_Dirt_Field")) { name = "M_Strike_Berm" };
-                AssetDatabase.CreateAsset(m, path);
-            }
-            m.SetColor("_BaseColor", new Color(0.82f, 0.78f, 0.62f));
-            EditorUtility.SetDirty(m);
-            return m;
         }
 
         // Burnt-out paint for the old hulks.
@@ -529,6 +475,13 @@ namespace Ushqyr.EditorTools.Range
             foreach (var road in layout.Roads)
                 foreach (var p in road.Points)
                     if ((p.x - x) * (p.x - x) + (p.z - z) * (p.z - z) < r * r) return true;
+            return false;
+        }
+
+        private static bool NearMound(float x, float z, float r)
+        {
+            foreach (var m in Mounds)
+                if (Vector2.Distance(m.Centre, new Vector2(x, z)) < m.HalfLength + r) return true;
             return false;
         }
 

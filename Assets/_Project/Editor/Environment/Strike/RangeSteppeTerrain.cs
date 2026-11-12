@@ -11,18 +11,64 @@ namespace Ushqyr.EditorTools.Range
 {
     /// <summary>
     /// The Strike Range ground (references: FPV strike sims): a Unity terrain on the same height function as the
-    /// layout (so physics, bots and targets are unchanged), four blended layers (green grass, dry grass, bare earth,
-    /// gravel by the roads), grass tufts, bushes and stones as detail, wheel ruts on the dirt roads, a power line and a
-    /// muted post-processing look.
+    /// layout (so bots and targets are unchanged) with the earth banks sculpted in, four blended layers (green grass,
+    /// dry grass, bare earth, packed dusty track), field roads painted in (wheel tracks, a grassy middle, ragged
+    /// dusty edges), grass tufts, bushes and stones as detail, a power line and a muted post-processing look.
     /// </summary>
     public static class RangeSteppeTerrain
     {
         private const string Dir = "Assets/_Project/Art/Strike";
-        private const int HeightRes = 513, SplatRes = 1024, DetailRes = 512;
+        private const int HeightRes = 1025, SplatRes = 2048, DetailRes = 512;
         private const float BaseY = -30f, Span = 60f;
 
-        public static void Build(Transform root, int layer, RangeLayout layout)
+        /// <summary>
+        /// An earth bank sculpted into the terrain: a long low ridge with a soft crest and toes, a slightly wandering
+        /// line, uneven width and height and rounded ends.
+        /// </summary>
+        public struct Mound
         {
+            public Vector2 Centre;
+            public float Yaw, HalfLength, HalfWidth, Height;
+            public int Seed;
+
+            public float Reach => Mathf.Max(HalfLength, HalfWidth * 1.3f) + 2f;
+
+            public float HeightAt(Vector2 w)
+            {
+                Vector2 d = w - Centre;
+                if (d.sqrMagnitude > Reach * Reach) return 0f;
+                float yr = Yaw * Mathf.Deg2Rad;
+                var along = new Vector2(Mathf.Sin(yr), Mathf.Cos(yr));
+                float u = Vector2.Dot(d, along), v = d.x * along.y - d.y * along.x;
+                float e = Mathf.Abs(u) / HalfLength;
+                if (e >= 1f) return 0f;
+                float s = Seed * 0.731f;
+                v -= (Mathf.PerlinNoise(s + u / 9f, s * 0.5f) - 0.5f) * 1.6f;
+                float hw = HalfWidth * (0.8f + 0.4f * Mathf.PerlinNoise(u / 7f + s, s * 1.3f + 4f));
+                float ht = Height * (0.82f + 0.36f * Mathf.PerlinNoise(u / 11f + s * 2f, 3.1f));
+                float end = Mathf.Max(0f, e - 0.5f) / 0.5f;
+                float round = Mathf.Sqrt(Mathf.Max(0f, 1f - end * end));
+                hw *= Mathf.Max(round, 0.001f);
+                ht *= round; // height falls with width: no fin at the tips
+                float t = Mathf.Clamp01(1f - Mathf.Abs(v) / hw);
+                float prof = t * t * (3f - 2f * t);
+                float lumps = 1f + 0.12f * (Mathf.PerlinNoise(w.x / 2.7f + s, w.y / 2.7f) - 0.5f);
+                return ht * prof * lumps;
+            }
+        }
+
+        private static IList<Mound> _mounds = new Mound[0];
+
+        private static float MoundHeight(Vector2 w)
+        {
+            float h = 0f;
+            foreach (var m in _mounds) h = Mathf.Max(h, m.HeightAt(w));
+            return h;
+        }
+
+        public static void Build(Transform root, int layer, RangeLayout layout, IList<Mound> mounds)
+        {
+            _mounds = mounds ?? new Mound[0];
             Directory.CreateDirectory(Dir + "/Terrain");
             var roadDist = RoadDistance(layout);
             var data = TerrainDataAsset();
@@ -39,14 +85,13 @@ namespace Ushqyr.EditorTools.Range
             var t = go.GetComponent<Terrain>();
             t.materialTemplate = TerrainMaterial();
             t.drawInstanced = true;
-            t.heightmapPixelError = 4f;
+            t.heightmapPixelError = 3f;
             t.basemapDistance = 400f;
             t.detailObjectDistance = 120f;
             t.detailObjectDensity = 1f;
             t.shadowCastingMode = ShadowCastingMode.TwoSided;
             go.GetComponent<TerrainCollider>().terrainData = data;
 
-            Ruts(root, layer, layout);
             PowerLine(root, layer, layout);
             Post(root);
         }
@@ -69,6 +114,11 @@ namespace Ushqyr.EditorTools.Range
             data.SetDetailScatterMode(DetailScatterMode.InstanceCountMode);
             data.SetDetailResolution(DetailRes, 16);
             data.size = new Vector3(RangeSteppeBuilder.TerrainSize, Span, RangeSteppeBuilder.TerrainSize);
+            // A light breeze: small, slow sway and no colour pulsing (0.5 grey is neutral in the grass shader).
+            data.wavingGrassStrength = 0.12f;
+            data.wavingGrassSpeed = 0.18f;
+            data.wavingGrassAmount = 0.1f;
+            data.wavingGrassTint = new Color(0.5f, 0.5f, 0.5f, 1f);
             return data;
         }
 
@@ -85,31 +135,36 @@ namespace Ushqyr.EditorTools.Range
                 for (int x = 0; x < HeightRes; x++)
                 {
                     var w = World(x, z, HeightRes);
-                    h[z, x] = Mathf.Clamp01((RangeSteppeBuilder.Height(w.x, w.y) - BaseY) / Span);
+                    h[z, x] = Mathf.Clamp01((RangeSteppeBuilder.Height(w.x, w.y) + MoundHeight(w) - BaseY) / Span);
                 }
             data.SetHeights(0, 0, h);
         }
 
         // ---------- distance to the roads (for gravel, ruts and keeping detail off the roads) ----------
 
+        // Distance from each splat texel to the nearest road centreline (segments, not just points), up to 18 m.
         private static float[,] RoadDistance(RangeLayout layout)
         {
             var d = new float[SplatRes, SplatRes];
             for (int z = 0; z < SplatRes; z++)
                 for (int x = 0; x < SplatRes; x++) d[z, x] = 999f;
             float cell = RangeSteppeBuilder.TerrainSize / (SplatRes - 1), half = RangeSteppeBuilder.TerrainSize * 0.5f;
-            const float reach = 14f;
-            int r = Mathf.CeilToInt(reach / cell);
+            const float reach = 18f;
             foreach (var road in layout.Roads)
-                for (int i = 0; i < road.Points.Length; i++)
+                for (int i = 0; i + 1 < road.Points.Length; i++)
                 {
-                    Vector3 p = road.Points[i];
-                    int cx = Mathf.RoundToInt((p.x + half) / cell), cz = Mathf.RoundToInt((p.z + half) / cell);
-                    for (int z = cz - r; z <= cz + r; z++)
-                        for (int x = cx - r; x <= cx + r; x++)
+                    var a = new Vector2(road.Points[i].x, road.Points[i].z);
+                    var b = new Vector2(road.Points[i + 1].x, road.Points[i + 1].z);
+                    Vector2 ab = b - a;
+                    float len2 = Mathf.Max(ab.sqrMagnitude, 1e-4f);
+                    int x0 = Mathf.FloorToInt((Mathf.Min(a.x, b.x) - reach + half) / cell), x1 = Mathf.CeilToInt((Mathf.Max(a.x, b.x) + reach + half) / cell);
+                    int z0 = Mathf.FloorToInt((Mathf.Min(a.y, b.y) - reach + half) / cell), z1 = Mathf.CeilToInt((Mathf.Max(a.y, b.y) + reach + half) / cell);
+                    for (int z = Mathf.Max(z0, 0); z <= Mathf.Min(z1, SplatRes - 1); z++)
+                        for (int x = Mathf.Max(x0, 0); x <= Mathf.Min(x1, SplatRes - 1); x++)
                         {
-                            if (x < 0 || z < 0 || x >= SplatRes || z >= SplatRes) continue;
-                            float dist = new Vector2(x * cell - half - p.x, z * cell - half - p.z).magnitude;
+                            var p = new Vector2(x * cell - half, z * cell - half);
+                            float t = Mathf.Clamp01(Vector2.Dot(p - a, ab) / len2);
+                            float dist = (p - (a + ab * t)).magnitude;
                             if (dist < d[z, x]) d[z, x] = dist;
                         }
                 }
@@ -172,7 +227,7 @@ namespace Ushqyr.EditorTools.Range
                 Layer("SteppeGreen", "Grass_Field", 5f, new Color(0.86f, 0.92f, 0.7f, 1f)),
                 Layer("SteppeDry", "Grass_Field", 6.5f, new Color(1.2f, 1.02f, 0.58f, 1f)), // straw-gold dry steppe
                 Layer("SteppeEarth", "Dirt_Field", 4f, new Color(0.82f, 0.78f, 0.7f, 1f)),
-                Layer("SteppeGravel", "Gravel", 3f, new Color(0.9f, 0.88f, 0.82f, 1f)),
+                Layer("SteppeTrack", "Dirt_Field", 3f, new Color(0.98f, 0.97f, 0.9f, 1f)), // packed, dusty wheel tracks
             };
             var a = new float[SplatRes, SplatRes, 4];
             for (int z = 0; z < SplatRes; z++)
@@ -184,23 +239,50 @@ namespace Ushqyr.EditorTools.Range
                     float fine = Mathf.PerlinNoise(w.x / 9f + 3.1f, w.y / 9f + 4.4f);
                     float green = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.3f, 0.7f, big * 0.8f + fine * 0.2f));
                     float dry = 1f - green;
-                    float earth = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.6f, 0.82f, mid * 0.85f + fine * 0.15f)) * 0.85f;
-                    float gravel = 0f;
+                    // Bare patches with ragged, broken edges (a finer noise eats into them), not flat blobs.
+                    float ragged = Mathf.PerlinNoise(w.x / 3f + 2.2f, w.y / 3f + 5.5f);
+                    float earth = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.56f, 0.86f, mid * 0.7f + ragged * 0.2f + fine * 0.1f)) * 0.75f;
+                    float track = 0f, extraDry = 0f;
                     float rd = roadDist[z, x];
-                    earth = Mathf.Max(earth, Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(12f, 5.5f, rd)) * 0.9f);
-                    // Road edges: dusty earth (gravel there read as kerbs); gravel only round the pads.
+                    if (rd < 18f)
+                    {
+                        // A field road: a ragged edge that wanders in and out, packed wheel tracks, grass down the
+                        // middle of each lane and between the lanes, dust spilling into the grass at the sides.
+                        float n1 = Mathf.PerlinNoise(w.x / 6f + 11.3f, w.y / 6f + 2.9f), n2 = Mathf.PerlinNoise(w.x / 2.2f + 0.7f, w.y / 2.2f + 9.1f);
+                        float patch = Mathf.PerlinNoise(w.x / 4f + 6.6f, w.y / 4f + 1.2f);
+                        float edge = 5f + (n1 - 0.5f) * 2.6f + (n2 - 0.5f) * 0.9f;
+                        float road = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(edge + 1.6f, edge - 0.8f, rd));
+                        float wheels = Mathf.Max(Mathf.Exp(-Sq((rd - 1.5f) / 0.7f)), Mathf.Exp(-Sq((rd - 3.3f) / 0.7f))) * 0.85f;
+                        float middle = Mathf.Max(Mathf.Exp(-Sq(rd / 0.6f)), Mathf.Exp(-Sq((rd - 2.4f) / 0.4f))) * Mathf.Lerp(0.25f, 1f, patch);
+                        track = road * Mathf.Clamp01(0.5f + wheels * 0.45f - middle * 0.7f);
+                        extraDry = road * middle * 0.8f;
+                        float dust = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(edge + 4f + n2 * 4f, edge, rd)) * Mathf.Lerp(0.2f, 0.75f, patch);
+                        earth = Mathf.Max(earth * (1f - road), Mathf.Max(dust * (1f - road), road * 0.3f * (1f - wheels)));
+                    }
+                    // Packed ground round the pads.
                     float dp = new Vector2(w.x, w.y - RangeSteppeBuilder.PadZ).magnitude;
-                    if (dp < 60f) gravel = Mathf.Max(gravel, Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(60f, 35f, dp)) * 0.85f);
-                    float rest = Mathf.Clamp01(1f - earth - gravel);
-                    float g = green * rest, dr = dry * rest;
-                    float sum = g + dr + earth + gravel;
+                    if (dp < 60f) track = Mathf.Max(track, Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(60f, 35f, dp)) * 0.85f);
+                    // Earth banks: bare earth where the sides are steep, grass on the crest, a little spill at the toes.
+                    float mh = MoundHeight(w);
+                    if (mh > 0.02f)
+                    {
+                        float slope = Mathf.Max(Mathf.Abs(MoundHeight(w + new Vector2(0.5f, 0f)) - mh), Mathf.Abs(MoundHeight(w + new Vector2(0f, 0.5f)) - mh)) / 0.5f;
+                        float patch = Mathf.PerlinNoise(w.x / 2.5f + 3.3f, w.y / 2.5f + 7.7f);
+                        earth = Mathf.Max(earth, Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.45f, 1.1f, slope)) * Mathf.Lerp(0.1f, 0.65f, patch));
+                        earth = Mathf.Max(earth, Mathf.Clamp01(1f - mh / 0.3f) * patch * 0.35f);
+                    }
+                    float rest = Mathf.Clamp01(1f - earth - track);
+                    float g = green * rest, dr = dry * rest + extraDry;
+                    float sum = g + dr + earth + track;
                     a[z, x, 0] = g / sum;
                     a[z, x, 1] = dr / sum;
                     a[z, x, 2] = earth / sum;
-                    a[z, x, 3] = gravel / sum;
+                    a[z, x, 3] = track / sum;
                 }
             data.SetAlphamaps(0, 0, a);
         }
+
+        private static float Sq(float v) => v * v;
 
         private static Material TerrainMaterial()
         {
@@ -248,14 +330,23 @@ namespace Ushqyr.EditorTools.Range
                 {
                     var w = World(x, z, DetailRes);
                     float rd = roadDist[Mathf.Min(z * SplatRes / DetailRes, SplatRes - 1), Mathf.Min(x * SplatRes / DetailRes, SplatRes - 1)];
-                    if (rd < 7f) continue;
+                    // Tufts thin out towards the road along a ragged line (no hard edge), and grow in the middle strips.
+                    float edgeN = Mathf.PerlinNoise(w.x / 6f + 11.3f, w.y / 6f + 2.9f);
+                    float edge = 5f + (edgeN - 0.5f) * 2.6f;
+                    float nearRoad = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(edge - 0.5f, edge + 3f, rd));
+                    if (rd < 1.2f || Mathf.Abs(rd - 2.4f) < 0.5f) nearRoad = Mathf.Max(nearRoad, 0.25f);
+                    if (nearRoad <= 0.01f) continue;
                     float dp = new Vector2(w.x, w.y - RangeSteppeBuilder.PadZ).magnitude;
                     if (dp < 45f) continue;
                     if (NearSpot(layout, w, 9f)) continue;
                     float mid = Mathf.PerlinNoise(w.x / 45f + 1.7f, w.y / 45f + 8.2f);
                     float clump = Mathf.PerlinNoise(w.x / 12f + 7.7f, w.y / 12f + 0.3f);
-                    if (mid < 0.66f) grass[z, x] = Mathf.RoundToInt(Mathf.Lerp(2f, 9f, clump));
+                    float mh = MoundHeight(w);
+                    float bank = mh > 0.05f ? Mathf.Abs(MoundHeight(w + new Vector2(1f, 0f)) - mh) + Mathf.Abs(MoundHeight(w + new Vector2(0f, 1f)) - mh) : 0f;
+                    float onBank = Mathf.Clamp01(1f - bank * 0.6f);
+                    if (mid < 0.66f || mh > 0.3f) grass[z, x] = Mathf.RoundToInt(Mathf.Lerp(2f, 9f, clump) * nearRoad * onBank);
                     double r = rng.NextDouble();
+                    if (mh > 0.05f) continue;
                     if (r < 0.0035 && rd > 20f) bush[z, x] = 1 + (clump > 0.6f ? 1 : 0);
                     else if (r < 0.006 && rd > 12f) stone[z, x] = 1;
                 }
@@ -370,69 +461,6 @@ namespace Ushqyr.EditorTools.Range
 
         private static Mesh BushMesh() => Blob("Steppe Bush", 11, 0.35f, new Vector3(0.6f, 0.45f, 0.6f), 5);
         private static Mesh StoneMesh() => Blob("Steppe Stone", 23, 0.25f, new Vector3(0.5f, 0.3f, 0.45f), 1);
-
-        // ---------- wheel ruts on the dirt roads ----------
-
-        private static void Ruts(Transform root, int layer, RangeLayout layout)
-        {
-            string path = Dir + "/M_Strike_Ruts.mat";
-            var mat = AssetDatabase.LoadAssetAtPath<Material>(path);
-            if (mat == null)
-            {
-                mat = new Material(MaterialLibrary.Get("M_Dirt_Field")) { name = "M_Strike_Ruts" };
-                AssetDatabase.CreateAsset(mat, path);
-            }
-            mat.SetColor("_BaseColor", new Color(0.93f, 0.88f, 0.83f));
-            EditorUtility.SetDirty(mat);
-            int r = 0;
-            foreach (var road in layout.Roads)
-            {
-                // Two lanes, two wheel tracks each.
-                foreach (float off in new[] { -3.3f, -1.5f, 1.5f, 3.3f })
-                {
-                    var v = new List<Vector3>();
-                    var t = new List<int>();
-                    var uv = new List<Vector2>();
-                    float along = 0f;
-                    for (int i = 0; i < road.Points.Length; i++)
-                    {
-                        Vector3 f = road.Points[Mathf.Min(i + 1, road.Points.Length - 1)] - road.Points[Mathf.Max(i - 1, 0)];
-                        f.y = 0f;
-                        Vector3 right = new Vector3(f.z, 0f, -f.x).normalized;
-                        if (i > 0) along += Vector3.Distance(road.Points[i - 1], road.Points[i]);
-                        foreach (float s in new[] { -0.17f, 0.17f })
-                        {
-                            Vector3 p = road.Points[i] + right * (off + s);
-                            p.y = RangeSteppeBuilder.Height(p.x, p.z) + 0.08f;
-                            v.Add(p);
-                            uv.Add(new Vector2(s > 0 ? 0.25f : 0f, along / 4f));
-                        }
-                        if (i > 0)
-                        {
-                            int b = v.Count - 4;
-                            t.AddRange(new[] { b, b + 2, b + 1, b + 1, b + 2, b + 3 });
-                        }
-                    }
-                    var mesh = new Mesh { name = $"Ruts {r}", indexFormat = IndexFormat.UInt32 };
-                    mesh.SetVertices(v);
-                    mesh.SetUVs(0, uv);
-                    mesh.SetTriangles(t, 0);
-                    mesh.RecalculateNormals();
-                    mesh.RecalculateTangents();
-                    string meshPath = $"{Dir}/Meshes/Steppe_Ruts_{r}.asset";
-                    var existing = AssetDatabase.LoadAssetAtPath<Mesh>(meshPath);
-                    if (existing != null) { EditorUtility.CopySerialized(mesh, existing); mesh = existing; }
-                    else AssetDatabase.CreateAsset(mesh, meshPath);
-                    var go = new GameObject($"Wheel Ruts {r}") { layer = layer, isStatic = true };
-                    go.transform.SetParent(root, false);
-                    go.AddComponent<MeshFilter>().sharedMesh = mesh;
-                    var mr = go.AddComponent<MeshRenderer>();
-                    mr.sharedMaterial = mat;
-                    mr.shadowCastingMode = ShadowCastingMode.Off;
-                    r++;
-                }
-            }
-        }
 
         // ---------- a power line across the range ----------
 

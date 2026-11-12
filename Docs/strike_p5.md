@@ -27,10 +27,10 @@ Rebuild the scene with `TrackSceneBuilder.Build("steppe")` (or *Ushqyr > Builder
 
 ## The range
 
-- Terrain: a 1.4 km mesh (5 m cells) of low Perlin hills, flattened round the pads and settling to a flat skirt that
+- Terrain: a 1.4 km Unity terrain of low Perlin hills, flattened round the pads and settling to a flat skirt that
   runs to the horizon under the fog. The playable area is 1.2 × 1.2 km.
 - Four dirt roads (Catmull-Rom, 5 m points) that the moving and evasive targets drive.
-- 26 static spots 150–700 m from the pads (a third with U-shaped earth revetments), 22 berms, 7 old hulks (no hitboxes),
+- 26 static spots 150–700 m from the pads (a third with U-shaped earth revetments), 22 earth banks, 7 old hulks (no hitboxes),
   a watchtower and a command tent by the pads.
 - Three concrete pads 24 m apart at the south edge, each with a red / yellow / green light tree for the 3-2-1 countdown.
 
@@ -57,8 +57,15 @@ Road vehicles never meet:
   weathered paint (a grime map under the paint colour). Still fictional designs, no insignia. One mesh per
   material, cached per kind.
 - **Ground** (`RangeSteppeTerrain`): a Unity terrain on the layout's height function, layers of green grass,
-  straw-gold dry grass, bare earth and gravel by the pads, grass tufts, bushes and stones, dusty road edges and
-  wheel ruts, a power line, muted post-processing (ACES, -14 % saturation, light vignette) and more haze.
+  straw-gold dry grass, bare earth and packed dusty track, grass tufts, bushes and stones, a power line, muted
+  post-processing (ACES, -14 % saturation, light vignette) and more haze. Grass sways in a light breeze (small,
+  slow, no colour pulsing).
+- **Field roads** are painted into the terrain (no road mesh): a ragged edge that wanders in and out, packed wheel
+  tracks, grass down the middle of each lane, dust spilling into the grass at the sides, tufts thinning out
+  towards the road.
+- **Earth banks** (berms and the U-shaped revetments) are sculpted into the terrain (`RangeSteppeTerrain.Mound`):
+  long ridges with a soft crest, wandering line, uneven width and height, rounded ends; grass on the crest, bare
+  earth on the steep sides. Whole banks stay 30 m+ from the roads (clear of rolled-off wrecks).
 - **Hits**: a flash and sparks, then flames under the smoke while the wreck burns.
 - Cost: 10.7 ms a frame in the editor in a round (Expo: 12.4 ms).
 
