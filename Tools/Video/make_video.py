@@ -69,8 +69,15 @@ def caption_card(text):
     return card
 
 
-def title_card(sub, icon_path):
-    """The name, with the game icon and a line under it (intro and outro)."""
+def logo(path, height):
+    im = Image.open(path).convert('RGBA')
+    box = im.getbbox()
+    im = im.crop(box) if box else im
+    return im.resize((max(1, round(im.width * height / im.height)), height), Image.LANCZOS)
+
+
+def title_card(sub, icon_path, logos=()):
+    """The name, with the game icon and a line under it (intro), or the makers' logos (outro)."""
     card = Image.new('RGBA', (W, H), (0, 0, 0, 0))
     d = ImageDraw.Draw(card)
     big, small = ImageFont.truetype(BOLD, 190), ImageFont.truetype(REGULAR, 56)
@@ -78,12 +85,25 @@ def title_card(sub, icon_path):
     name = 'USHQYR'
     nw = int(big.getlength(name))
     x = (W - (300 + 60 + nw)) // 2
-    y = 360
+    y = 150 if logos else 360
     card.alpha_composite(icon, (x, y))
     d.text((x + 360, y + 10), name, font=big, fill=(255, 255, 255, 255))
     sw = int(small.getlength(sub))
     d.rectangle([(W - sw) // 2 - 40, y + 356, (W + sw) // 2 + 40, y + 362], fill=ACCENT + (255,))
-    d.text(((W - sw) // 2, y + 384), sub, font=small, fill=(235, 236, 240, 255))
+    if not logos:
+        d.text(((W - sw) // 2, y + 384), sub, font=small, fill=(235, 236, 240, 255))
+        return card
+    # The makers' logos side by side under the line, the same height, with their names in small type below.
+    marks = [logo(p, 210) for p, _ in logos]
+    gap = 150
+    width = sum(m.width for m in marks) + gap * (len(marks) - 1)
+    lx = (W - width) // 2
+    tiny = ImageFont.truetype(REGULAR, 34)
+    for m, (_, label) in zip(marks, logos):
+        card.alpha_composite(m, (lx, y + 400))
+        lw = int(tiny.getlength(label))
+        d.text((lx + (m.width - lw) // 2, y + 624), label, font=tiny, fill=(215, 217, 224, 255))
+        lx += m.width + gap
     return card
 
 
@@ -109,7 +129,7 @@ def main():
     segments = []
     t = 0.0
     for seg in timing:
-        length = LEAD + seg['seconds'] + TAIL
+        length = LEAD + seg['seconds'] + TAIL + (2.6 if seg['id'] == 'outro' else 0.0)  # hold the closing card so the logos can be read
         shots = []
         st = t
         for clip, first, share, speed in SHOTS[seg['id']]:
@@ -121,7 +141,11 @@ def main():
     total = t
     shots = [s for seg in segments for s in seg['shots']]
     intro_card = title_card('Тренажёр операторов БПЛА', icon)
-    outro_card = title_card('Multimedia Lab · SDU University', icon)
+    logos_dir = os.path.join(ROOT, 'Docs', 'pitch', 'logos')
+    outro_card = title_card('Multimedia Lab · SDU University', icon, logos=[
+        (os.path.join(logos_dir, 'multimedia_lab_white.png'), 'Multimedia Lab'),
+        (os.path.join(logos_dir, 'sdu_university.png'), 'SDU University'),
+    ])
 
     def shot_frame(shot, now):
         local = max(0.0, now - shot['start'])
