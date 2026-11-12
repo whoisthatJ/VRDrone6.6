@@ -1,6 +1,6 @@
 # USHQYR — обзорный ролик (русская озвучка), 1:18
 
-Файл: `USHQYR_overview_ru.mp4`. Сборка: `python Tools/Video/voice.py`, затем `python Tools/Video/make_video.py`. Фоновая музыка синтезируется скриптом `Tools/Video/music.py` (своя, без сторонних треков).
+Файл: `USHQYR_overview_ru.mp4`. Сборка: `python Tools/Video/voice.py`, затем `python Tools/Video/make_video.py`. Фоновая музыка: Singularity (calm), vitalezzz, CC0, см. `music/CREDITS.md`.
 Диктор — ru-RU-DmitryNeural, слово «Ұшқыр» произносит казахский голос kk-KZ-DauletNeural (Microsoft, через edge-tts).
 
 | Время | Кадры | Текст |

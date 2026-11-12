@@ -2,7 +2,7 @@
 
 1. python Tools/Video/voice.py        -> Recordings/video/voice/*.wav + timing.json
 2. python Tools/Video/make_video.py   -> Docs/video/USHQYR_overview_ru.mp4 (1920x1080, 30 fps)
-   (it runs Tools/Video/music.py for the music bed)
+   (the music bed is Docs/video/music/<MUSIC_FILE>, a CC0 track: see CREDITS.md there)
 
 Footage is the frame sequences in Recordings/clips/<clip>/ (PitchClips, 30 fps).
 """
@@ -24,6 +24,7 @@ OUT_DIR = os.path.join(ROOT, 'Docs', 'video')
 FF = imageio_ffmpeg.get_ffmpeg_exe()
 W, H, FPS = 1920, 1080, 30
 LEAD, TAIL, FADE = 0.45, 0.45, 0.4      # silence before / after each line, and the cross-fade between shots (s)
+MUSIC_FILE = 'singularity_calm.mp3'       # CC0, see Docs/video/music/CREDITS.md
 MUSIC_GAIN = 0.42                         # music level in the gaps; it drops to 40 % of that under the voice
 ACCENT = (255, 140, 38)
 BOLD = 'C:/Windows/Fonts/segoeuib.ttf'
@@ -123,6 +124,38 @@ def ramp(t, start, end, fade=0.35):
     return max(0.0, min(1.0, (t - start) / fade, (end - t) / fade))
 
 
+def music_bed(seconds, rate):
+    """The licensed track as mono samples at the narration's level scale: starts where the music is already
+    established, evened to a steady loudness, faded in and out."""
+    src = os.path.join(ROOT, 'Docs', 'video', 'music', MUSIC_FILE)
+    wav = os.path.join(VOICE, 'music_src.wav')
+    subprocess.run([FF, '-y', '-loglevel', 'error', '-i', src, '-ar', str(rate), '-ac', '1', wav], check=True)
+    with wave.open(wav, 'rb') as wv:
+        x = np.frombuffer(wv.readframes(wv.getnframes()), dtype=np.int16).astype(np.float64)
+    os.remove(wav)
+    hop = rate // 10
+    level = np.sqrt((x[:len(x) // hop * hop].reshape(-1, hop) ** 2).mean(axis=1))
+    # Skip a quiet lead-in: begin a second before the track first comes within 8 dB of its usual level.
+    usual = np.median(level[level > level.max() * 0.05])
+    first = int(np.argmax(level > usual * 0.4))
+    start = max(0, first * hop - rate)
+    n = int(seconds * rate)
+    x = x[start:start + n]
+    if len(x) < n:
+        x = np.concatenate([x, np.zeros(n - len(x))])
+    # Slow levelling (3 s window) so a build-up in the track does not swamp the voice later on.
+    win = rate * 3
+    c = np.concatenate([[0.0], np.cumsum(x ** 2)])
+    lo, hi = np.clip(np.arange(n) - win // 2, 0, n), np.clip(np.arange(n) + win // 2, 0, n)
+    power = (c[hi] - c[lo]) / np.maximum(hi - lo, 1)
+    slow = np.sqrt(np.maximum(power, 1e-6))
+    target = 32768 * 10 ** (-16 / 20)
+    gain = np.clip(target / np.maximum(slow, target * 0.05), 0.3, 3.0)
+    x = x * gain
+    t = np.arange(n) / rate
+    return x * np.minimum(1.0, t / 1.5) * np.minimum(1.0, (seconds - t) / 3.5)
+
+
 def main():
     os.makedirs(OUT_DIR, exist_ok=True)
     timing = json.load(open(os.path.join(VOICE, 'timing.json'), encoding='utf-8'))
@@ -165,10 +198,9 @@ def main():
             data = np.frombuffer(wv.readframes(wv.getnframes()), dtype=np.int16)
         at = int((seg['start'] + LEAD) * rate)
         track[at:at + len(data)] = data
-    # Music bed (Tools/Video/music.py, synthesised for the exact length): quiet under the voice, fuller in the gaps.
-    subprocess.run([sys.executable, os.path.join(os.path.dirname(__file__), 'music.py'), f'{total:.2f}'], check=True)
-    with wave.open(os.path.join(VOICE, 'music.wav'), 'rb') as wv:
-        music = np.frombuffer(wv.readframes(wv.getnframes()), dtype=np.int16).astype(np.float64)
+    # Music bed: the track in Docs/video/music (see CREDITS.md there), cut to length; quiet under the voice,
+    # fuller in the gaps.
+    music = music_bed(total, rate)
     voice = track.astype(np.float64)
     hop = rate // 50
     level = np.sqrt((voice[:len(voice) // hop * hop].reshape(-1, hop) ** 2).mean(axis=1))
