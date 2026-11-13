@@ -4,7 +4,10 @@
 ; Installs per user (no administrator rights needed); an administrator can choose "all users" in the wizard.
 
 #define AppName "Ushqyr"
-#define AppVersion "1.0"
+#ifndef AppVersion
+  ; Version.txt at the repository root, the same number as the game build.
+  #define AppVersion Trim(FileRead(FileOpen(AddBackslash(SourcePath) + "..\..\Version.txt")))
+#endif
 #define AppPublisher "Multimedia Lab, SDU University"
 #define AppExe "Ushqyr.exe"
 #define BuildDir "..\..\Builds\Windows_Fullscreen"

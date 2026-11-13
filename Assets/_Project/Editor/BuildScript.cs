@@ -10,6 +10,9 @@ namespace Ushqyr.EditorTools
     {
         public const string ApkPath = "Builds/Ushqyr.apk";
         public const string WindowsPath = "Builds/Windows/Ushqyr.exe";
+        public const string MacPath = "Builds/macOS/Ushqyr.app";
+        /// <summary>The game's version, one line ("1.4"): what every build and the installer are stamped with.</summary>
+        public const string VersionPath = "Version.txt";
         public const string ResultPath = "Builds/build-result.txt";
 
         /// <summary>Starts the build on the next editor tick so a remote caller (MCP eval) returns immediately; poll <see cref="ResultPath"/>.</summary>
@@ -39,6 +42,59 @@ namespace Ushqyr.EditorTools
             Build(exePath, BuildTarget.StandaloneWindows64, BuildTargetGroup.Standalone);
         }
 
+        /// <summary>
+        /// The macOS player (Intel and Apple Silicon in one app) into <paramref name="appPath"/>; fullscreen at the
+        /// display's resolution, like the Windows one. Built from Windows it is not code-signed.
+        /// </summary>
+        [MenuItem("Ushqyr/Build/Build macOS")]
+        public static void BuildMac() => BuildMacTo(MacPath);
+
+        public static void BuildMacTo(string appPath)
+        {
+            PlayerSettings.fullScreenMode = FullScreenMode.FullScreenWindow;
+            PlayerSettings.defaultIsNativeResolution = true;
+            PlayerSettings.resizableWindow = true;
+            UnityEditor.OSXStandalone.UserBuildSettings.architecture = UnityEditor.Build.OSArchitecture.x64ARM64;
+            Build(appPath, BuildTarget.StandaloneOSX, BuildTargetGroup.Standalone);
+        }
+
+        // ---------- version ----------
+
+        /// <summary>The current version, from <see cref="VersionPath"/> (1.0 if there is none yet).</summary>
+        public static string Version
+        {
+            get
+            {
+                string v = File.Exists(VersionPath) ? File.ReadAllText(VersionPath).Trim() : "";
+                return string.IsNullOrEmpty(v) ? "1.0" : v;
+            }
+        }
+
+        /// <summary>
+        /// Moves the version on by one (1.0 -> 1.1 -> ... -> 1.9 -> 1.10) and stamps it into the player settings.
+        /// Call once per build request, before the builds of that request, so all of them carry the same number.
+        /// </summary>
+        [MenuItem("Ushqyr/Build/Bump Version")]
+        public static string BumpVersion()
+        {
+            var parts = Version.Split('.');
+            int major = int.Parse(parts[0]), minor = parts.Length > 1 ? int.Parse(parts[1]) : 0;
+            string next = $"{major}.{minor + 1}";
+            File.WriteAllText(VersionPath, next + "\n");
+            StampVersion();
+            return next;
+        }
+
+        /// <summary>Puts <see cref="Version"/> into the player settings (Application.version, the macOS bundle).</summary>
+        public static void StampVersion()
+        {
+            string v = Version;
+            PlayerSettings.bundleVersion = v;
+            PlayerSettings.macOS.buildNumber = v;
+            PlayerSettings.SetApplicationIdentifier(UnityEditor.Build.NamedBuildTarget.Standalone, "kz.sdu.multimedialab.ushqyr");
+            AssetDatabase.SaveAssets();
+        }
+
         /// <summary>Like <see cref="BuildQuestDeferred"/>, for the Windows player.</summary>
         public static string BuildWindowsDeferred()
         {
@@ -62,9 +118,10 @@ namespace Ushqyr.EditorTools
             };
 
             ApplyIcon();
+            StampVersion();
             BuildReport report = BuildPipeline.BuildPlayer(options);
             var summary = report.summary;
-            string line = $"Build {summary.result}: {summary.outputPath} " +
+            string line = $"Build {summary.result} v{Version}: {summary.outputPath} " +
                           $"({summary.totalSize / (1024 * 1024)} MB, {summary.totalErrors} errors, {summary.totalWarnings} warnings, {summary.totalTime:mm\\:ss})";
             Debug.Log("[Ushqyr] " + line);
 
