@@ -20,7 +20,8 @@
         "Unity.Localization",
         "Ushqyr.EditorTools",
         "Ushqyr.AI",
-        "Ushqyr.Strike"
+        "Ushqyr.Strike",
+        "Ushqyr.Bench"
     ],
     "includePlatforms": [
         "Editor"

@@ -2202,6 +2202,70 @@ MonoBehaviour:
     m_Localized: WIND {0:0} m/s
     m_Metadata:
       m_Items: []
+  - m_Id: 5670604344651776
+    m_Localized: AI Bench
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5670604399177728
+    m_Localized: TRAINING
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5670604399177729
+    m_Localized: COMPETITION
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5670604399177730
+    m_Localized: 'Gates: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5670604399177731
+    m_Localized: 'Time: {0} s'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5670604399177732
+    m_Localized: last gate {0} s
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5670604399177733
+    m_Localized: placeholder model, not calibrated
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5670604399177734
+    m_Localized: 'Onboard camera: what the program receives'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5670604399177735
+    m_Localized: Waiting for a program on port {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5670604399177736
+    m_Localized: Program connected, waiting for the start
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5670604399177737
+    m_Localized: Attempt running
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5670604399177738
+    m_Localized: 'Attempt over: the program finished'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5670604399177739
+    m_Localized: 'Attempt over: time limit'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5670604399177740
+    m_Localized: 'Attempt over: the program disconnected'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5670604399177741
+    m_Localized: 'Attempt over: the drone stopped moving'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5670604399177742
+    m_Localized: Attempt over
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

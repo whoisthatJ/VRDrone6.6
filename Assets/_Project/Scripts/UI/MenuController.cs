@@ -86,8 +86,15 @@ namespace Ushqyr.UI
             UiKit.Button(p, L.T("Track editor"), new Vector2(Margin, y), new Vector2(half, 90f), ShowEditorHome);
             UiKit.Button(p, L.T("Input diagnostics"), new Vector2(Margin + half + 30f, y), new Vector2(half, 90f), () => { CommitIfDirty(); GameFlow.Diagnostics(); });
             y -= 120f;
-            UiKit.Button(p, L.T("Quit"), new Vector2(Margin, y), new Vector2(half, 90f), GameFlow.Quit);
-            UiKit.Button(p, L.T("Online"), new Vector2(Margin + half + 30f, y), new Vector2(half, 90f), ShowOnline);
+            float third = (ContentWidth - 60f) / 3f;
+            UiKit.Button(p, L.T("Quit"), new Vector2(Margin, y), new Vector2(third, 90f), GameFlow.Quit);
+            UiKit.Button(p, L.T("Online"), new Vector2(Margin + third + 30f, y), new Vector2(third, 90f), ShowOnline);
+            // AI Bench: a program flies the drone (training mode, the public demo track).
+            UiKit.Button(p, L.T("AI Bench"), new Vector2(Margin + 2f * (third + 30f), y), new Vector2(third, 90f), () =>
+            {
+                CommitIfDirty();
+                Ushqyr.Bench.BenchLauncher.Launch("H1_Oval");
+            });
 
             UiKit.Label(p, L.T("Mouse, keyboard or gamepad. In flight: V switches the camera, Esc returns here."),
                 new Vector2(Margin, -(Height - 100f)), new Vector2(ContentWidth - 260f, 60f), 26f, TextAlignmentOptions.MidlineLeft, UiKit.DimTextColor);

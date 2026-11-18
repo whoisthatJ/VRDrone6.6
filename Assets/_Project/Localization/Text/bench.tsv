@@ -1,0 +1,17 @@
+# AI Bench: menu entry and the HUD of a bench run. The Kazakh column needs a native review. Columns: English (key) <TAB> Kazakh <TAB> Russian
+AI Bench	AI Bench	AI Bench
+TRAINING	ЖАТТЫҒУ	ТРЕНИРОВКА
+COMPETITION	ЖАРЫС	СОРЕВНОВАНИЕ
+Gates: {0}	Қақпалар: {0}	Ворота: {0}
+Time: {0} s	Уақыт: {0} с	Время: {0} с
+last gate {0} s	соңғы қақпа {0} с	последние ворота {0} с
+placeholder model, not calibrated	уақытша модель, калибрленбеген	временная модель, не откалибрована
+Onboard camera: what the program receives	Борттық камера: бағдарлама алатын кескін	Бортовая камера: что получает программа
+Waiting for a program on port {0}	Бағдарлама күтілуде, порт {0}	Ожидание программы на порту {0}
+Program connected, waiting for the start	Бағдарлама қосылды, старт күтілуде	Программа подключена, ожидание старта
+Attempt running	Әрекет жүріп жатыр	Попытка идет
+Attempt over: the program finished	Әрекет аяқталды: бағдарлама жұмысын бітірді	Попытка окончена: программа завершила работу
+Attempt over: time limit	Әрекет аяқталды: уақыт шегі	Попытка окончена: лимит времени
+Attempt over: the program disconnected	Әрекет аяқталды: бағдарлама ажырап қалды	Попытка окончена: программа отключилась
+Attempt over: the drone stopped moving	Әрекет аяқталды: дрон қозғалмай қалды	Попытка окончена: дрон перестал двигаться
+Attempt over	Әрекет аяқталды	Попытка окончена

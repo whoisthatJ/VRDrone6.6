@@ -1,0 +1,519 @@
+using System;
+using System.Collections.Generic;
+using NUnit.Framework;
+using Ushqyr.Bench;
+using Ushqyr.Flight;
+using UnityEditor;
+using UnityEngine;
+
+namespace Ushqyr.Tests
+{
+    /// <summary>AI Bench B1: gate geometry, referee rules, RC link, sensors, protocol headers, track file.</summary>
+    public sealed class BenchTests
+    {
+        // ---------- gate ----------
+
+        [Test]
+        public void StandardGate_HasTheDimensionsOfTheTask()
+        {
+            Assert.AreEqual(2.5f, GateGeometry.Outer, 1e-6f);
+            Assert.AreEqual(1.95f, GateGeometry.Opening, 1e-6f);
+            Assert.AreEqual(0.275f, GateGeometry.Bar, 1e-6f);
+            Assert.AreEqual(1.25f, GateGeometry.CentreHeight, 1e-6f);
+        }
+
+        [Test]
+        public void GatePrefab_MeasuresWhatTheStandardSays()
+        {
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_Project/Bench/Prefabs/Gate_Standard_250.prefab");
+            Assert.IsNotNull(prefab, "run Ushqyr > Bench > Build Everything");
+            var outer = new Bounds(new Vector3(0f, 1.25f, 0f), Vector3.zero);
+            float openLeft = float.MinValue, openRight = float.MaxValue, openBottom = float.MinValue, openTop = float.MaxValue;
+            foreach (var c in prefab.GetComponentsInChildren<BoxCollider>())
+            {
+                Vector3 centre = c.transform.localPosition, size = c.transform.localScale;
+                var b = new Bounds(centre, size);
+                outer.Encapsulate(b);
+                // Each bar limits the opening from its own side.
+                if (c.name == "Left") openLeft = b.max.x;
+                if (c.name == "Right") openRight = b.min.x;
+                if (c.name == "Bottom") openBottom = b.max.y;
+                if (c.name == "Top") openTop = b.min.y;
+            }
+            Assert.AreEqual(2.5f, outer.size.x, 1e-4f, "outer width");
+            Assert.AreEqual(2.5f, outer.size.y, 1e-4f, "outer height");
+            Assert.AreEqual(0f, outer.min.y, 1e-4f, "stands on the floor");
+            Assert.AreEqual(1.95f, openRight - openLeft, 1e-4f, "opening width");
+            Assert.AreEqual(1.95f, openTop - openBottom, 1e-4f, "opening height");
+            Assert.AreEqual(0f, (openRight + openLeft) * 0.5f, 1e-4f, "opening centred sideways");
+            Assert.AreEqual(1.25f, (openTop + openBottom) * 0.5f, 1e-4f, "opening centred in height");
+            Assert.IsNotNull(prefab.GetComponent<BenchGate>());
+        }
+
+        // ---------- referee ----------
+
+        private static Referee OneGate(bool frontOnly = false) =>
+            new Referee(new[] { RefereeGate.At("A", new Vec3(0f, 1.25f, 0f), Quat.Identity, frontOnly) });
+
+        /// <summary>Flies a straight line in 1 cm physics steps.</summary>
+        private static double Fly(Referee r, Vec3 from, Vec3 to, double t0 = 0)
+        {
+            float length = (to - from).Magnitude;
+            int steps = Math.Max(1, (int)(length / 0.01f));
+            Vec3 prev = from;
+            for (int i = 1; i <= steps; i++)
+            {
+                Vec3 p = Vec3.Lerp(from, to, (float)i / steps);
+                r.Step(prev, p, t0 + (i - 1) * 0.001, t0 + i * 0.001);
+                prev = p;
+            }
+            return t0 + steps * 0.001;
+        }
+
+        [Test]
+        public void Referee_ThroughTheOpening_Scores()
+        {
+            var r = OneGate();
+            r.Reset(new Vec3(0f, 1.25f, -3f));
+            Fly(r, new Vec3(0f, 1.25f, -3f), new Vec3(0.5f, 1.6f, 3f));
+            Assert.AreEqual(1, r.Points);
+            Assert.AreEqual(GateEventKind.Scored, r.Events[0].Kind);
+            Assert.AreEqual(0.300, r.Events[0].Time, 0.002, "time stamp is the moment of crossing the plane");
+        }
+
+        [Test]
+        public void Referee_FromTheBack_ScoresWhenAnyDirectionIsAllowed_AndNotWhenFrontOnly()
+        {
+            var any = OneGate();
+            any.Reset(new Vec3(0f, 1.25f, 3f));
+            Fly(any, new Vec3(0f, 1.25f, 3f), new Vec3(0f, 1.25f, -3f));
+            Assert.AreEqual(1, any.Points);
+
+            var front = OneGate(true);
+            front.Reset(new Vec3(0f, 1.25f, 3f));
+            Fly(front, new Vec3(0f, 1.25f, 3f), new Vec3(0f, 1.25f, -3f));
+            Assert.AreEqual(0, front.Points);
+            Assert.AreEqual(GateEventKind.WrongDirection, front.Events[0].Kind);
+        }
+
+        [Test]
+        public void Referee_PokingInAndBackingOut_IsNotAPass()
+        {
+            var r = OneGate();
+            r.Reset(new Vec3(0f, 1.25f, -2f));
+            double t = Fly(r, new Vec3(0f, 1.25f, -2f), new Vec3(0f, 1.25f, 0.25f));
+            Fly(r, new Vec3(0f, 1.25f, 0.25f), new Vec3(0f, 1.25f, -2f), t);
+            Assert.AreEqual(0, r.Points);
+            Assert.AreEqual(0, r.Events.Count);
+        }
+
+        [Test]
+        public void Referee_FlyingAround_IsNotAPass()
+        {
+            var r = OneGate();
+            r.Reset(new Vec3(3f, 1.25f, -2f));
+            Fly(r, new Vec3(3f, 1.25f, -2f), new Vec3(3f, 1.25f, 2f));
+            Assert.AreEqual(0, r.Points);
+            // Over the top as well.
+            Fly(r, new Vec3(0f, 3.5f, 2f), new Vec3(0f, 3.5f, -2f));
+            Assert.AreEqual(0, r.Points);
+        }
+
+        [Test]
+        public void Referee_ThroughTheFrameBar_IsNotAPass()
+        {
+            // 1.0 m to the side of the centre is inside the frame bar (the opening ends at 0.975 m).
+            var r = OneGate();
+            r.Reset(new Vec3(1.0f, 1.25f, -2f));
+            Fly(r, new Vec3(1.0f, 1.25f, -2f), new Vec3(1.0f, 1.25f, 2f));
+            Assert.AreEqual(0, r.Points);
+
+            var edge = OneGate();
+            edge.Reset(new Vec3(0.97f, 1.25f, -2f));
+            Fly(edge, new Vec3(0.97f, 1.25f, -2f), new Vec3(0.97f, 1.25f, 2f));
+            Assert.AreEqual(1, edge.Points, "just inside the opening counts");
+        }
+
+        [Test]
+        public void Referee_AroundThenBackThroughTheOpening_ScoresOnce()
+        {
+            var r = OneGate();
+            r.Reset(new Vec3(3f, 1.25f, -2f));
+            double t = Fly(r, new Vec3(3f, 1.25f, -2f), new Vec3(3f, 1.25f, 2f));
+            t = Fly(r, new Vec3(3f, 1.25f, 2f), new Vec3(0f, 1.25f, 2f), t);
+            Fly(r, new Vec3(0f, 1.25f, 2f), new Vec3(0f, 1.25f, -2f), t);
+            Assert.AreEqual(1, r.Points);
+        }
+
+        [Test]
+        public void Referee_FastPass_IsNotMissed()
+        {
+            // 30 m/s with 1 ms steps: 3 cm per step; and one giant step across the whole gate.
+            var r = OneGate();
+            r.Reset(new Vec3(0f, 1.25f, -5f));
+            r.Step(new Vec3(0f, 1.25f, -5f), new Vec3(0f, 1.25f, 5f), 0, 0.001);
+            Assert.AreEqual(1, r.Points);
+        }
+
+        private static Referee SixGates()
+        {
+            var gates = new List<RefereeGate>();
+            for (int i = 0; i < 6; i++) gates.Add(RefereeGate.At("G" + (i + 1), new Vec3(i * 10f, 1.25f, 0f), Quat.Identity));
+            return new Referee(gates);
+        }
+
+        [Test]
+        public void Referee_RepeatScoresOnlyAfterFourOtherGates()
+        {
+            var r = SixGates();
+            r.Reset(new Vec3(0f, 1.25f, -2f));
+            double t = 0;
+            float side = -1f; // the drone is at z = 2 * side; all six gates share the plane z = 0
+            void Through(int gate)
+            {
+                float x = gate * 10f;
+                t = Fly(r, new Vec3(x, 1.25f, 2f * side), new Vec3(x, 1.25f, -2f * side), t + 0.01);
+                side = -side;
+            }
+
+            Through(0);
+            Assert.AreEqual(1, r.Points);
+            Through(0);
+            Assert.AreEqual(1, r.Points, "straight back through the same gate");
+            Assert.AreEqual(GateEventKind.RepeatIgnored, r.Events[1].Kind);
+            Assert.AreEqual(0, r.Events[1].OthersSince);
+
+            Through(1); Through(2); Through(3);
+            Assert.AreEqual(4, r.Points);
+            Through(0);
+            Assert.AreEqual(4, r.Points, "only 3 other gates since");
+            Assert.AreEqual(3, r.Events[r.Events.Count - 1].OthersSince);
+            Through(4);
+            Assert.AreEqual(5, r.Points);
+            Through(0);
+            Assert.AreEqual(6, r.Points, "4 other gates since: counts again");
+        }
+
+        [Test]
+        public void Referee_TieBreakTimeIsTheLastScoredGate()
+        {
+            var r = SixGates();
+            r.Reset(new Vec3(0f, 1.25f, -2f));
+            double t = Fly(r, new Vec3(0f, 1.25f, -2f), new Vec3(0f, 1.25f, 2f), 5.0);
+            Assert.AreEqual(5.2, r.LastScoreTime, 0.002);
+            // A repeat afterwards doesn't move the time.
+            Fly(r, new Vec3(0f, 1.25f, 2f), new Vec3(0f, 1.25f, -2f), t + 3.0);
+            Assert.AreEqual(5.2, r.LastScoreTime, 0.002);
+        }
+
+        // ---------- RC link ----------
+
+        private static int[] Rc(int roll = 1500, int pitch = 1500, int throttle = 1000, int yaw = 1500, int aux1 = 1000, int aux2 = 1000) =>
+            new[] { roll, pitch, throttle, yaw, aux1, aux2 };
+
+        [Test]
+        public void RcLink_AppliesTheDelay()
+        {
+            var link = new RcLink(new RcLinkSettings { RateHz = 100f, Latency = 0.030f, FailsafeTime = 0.5f });
+            link.Send(0.0, Rc(roll: 2000));
+            Assert.AreEqual(0f, link.Sample(0.029).Roll, 1e-6f, "not there yet");
+            Assert.AreEqual(1f, link.Sample(0.030).Roll, 1e-6f);
+        }
+
+        [Test]
+        public void RcLink_MapsChannelsLikeATransmitter()
+        {
+            var link = new RcLink(new RcLinkSettings { RateHz = 100f, Latency = 0f, FailsafeTime = 0.5f });
+            link.Send(0.0, new[] { 1750, 1250, 1500, 2000, 1000, 2000 });
+            PilotInput p = link.Sample(0.0);
+            Assert.AreEqual(0.5f, p.Roll, 1e-6f);
+            Assert.AreEqual(-0.5f, p.Pitch, 1e-6f);
+            Assert.AreEqual(0.5f, p.Throttle, 1e-6f);
+            Assert.AreEqual(1f, p.Yaw, 1e-6f);
+            Assert.AreEqual(FlightMode.Acro, p.Mode);
+            Assert.AreEqual(FlightMode.Angle, RcLink.ModeOf(1000));
+            Assert.AreEqual(FlightMode.Horizon, RcLink.ModeOf(1500));
+        }
+
+        [Test]
+        public void RcLink_ClampsOutOfRangeValues()
+        {
+            var link = new RcLink(new RcLinkSettings { RateHz = 100f, Latency = 0f, FailsafeTime = 0.5f });
+            link.Send(0.0, new[] { 99999, -5, 2500, 0 });
+            PilotInput p = link.Sample(0.0);
+            Assert.AreEqual(1f, p.Roll, 1e-6f);
+            Assert.AreEqual(-1f, p.Pitch, 1e-6f);
+            Assert.AreEqual(1f, p.Throttle, 1e-6f);
+            Assert.AreEqual(-1f, p.Yaw, 1e-6f);
+        }
+
+        [Test]
+        public void RcLink_ArmsOnlyWithThrottleLow_OnTheSwitchGoingHigh()
+        {
+            var link = new RcLink(new RcLinkSettings { RateHz = 100f, Latency = 0f, FailsafeTime = 0.5f });
+            link.Send(0.00, Rc(throttle: 1500, aux1: 2000));
+            Assert.IsFalse(link.Sample(0.00).Arm, "throttle up: refuses to arm");
+            link.Send(0.01, Rc(throttle: 1000, aux1: 2000));
+            Assert.IsFalse(link.Sample(0.01).Arm, "switch was already high: needs a new flip");
+            link.Send(0.02, Rc(throttle: 1000, aux1: 1000));
+            link.Sample(0.02);
+            link.Send(0.03, Rc(throttle: 1000, aux1: 2000));
+            Assert.IsTrue(link.Sample(0.03).Arm);
+            link.Send(0.04, Rc(throttle: 1800, aux1: 2000));
+            Assert.IsTrue(link.Sample(0.04).Arm, "stays armed with throttle up");
+            link.Send(0.05, Rc(throttle: 1800, aux1: 1000));
+            Assert.IsFalse(link.Sample(0.05).Arm);
+        }
+
+        [Test]
+        public void RcLink_FailsafeCutsTheMotors()
+        {
+            var link = new RcLink(new RcLinkSettings { RateHz = 100f, Latency = 0f, FailsafeTime = 0.5f });
+            link.Send(0.00, Rc());
+            link.Sample(0.0);
+            link.Send(0.01, Rc(throttle: 1000, aux1: 2000));
+            link.Send(0.02, Rc(throttle: 1700, aux1: 2000));
+            Assert.IsTrue(link.Sample(0.02).Arm);
+            Assert.IsFalse(link.Failsafe);
+            PilotInput lost = link.Sample(0.53);
+            Assert.IsTrue(link.Failsafe);
+            Assert.IsFalse(lost.Arm);
+            Assert.AreEqual(0f, lost.Throttle);
+            // The link comes back with the switch still high: stays disarmed until it is flipped again.
+            link.Send(0.60, Rc(throttle: 1000, aux1: 2000));
+            Assert.IsFalse(link.Sample(0.60).Arm);
+        }
+
+        [Test]
+        public void RcLink_DropsPacketsAboveTheLinkRate()
+        {
+            var link = new RcLink(new RcLinkSettings { RateHz = 100f, Latency = 0f, FailsafeTime = 0.5f });
+            Assert.IsTrue(link.Send(0.000, Rc()));
+            Assert.IsFalse(link.Send(0.004, Rc(roll: 2000)));
+            Assert.IsTrue(link.Send(0.010, Rc()));
+            Assert.AreEqual(1, link.PacketsDropped);
+        }
+
+        // ---------- sensors ----------
+
+        [Test]
+        public void Imu_AtRest_ReadsGravityUp_InTheBodyFrame()
+        {
+            var settings = ImuSettings.Default;
+            settings.GyroNoise = settings.AccelNoise = settings.GyroBias = settings.AccelBias = 0f;
+            var imu = new ImuModel(settings, 1);
+            QuadState s = QuadState.AtRest(Vec3.Zero, Quat.Identity);
+            ImuSample o = imu.Read(s, s, 0.001f, 9.81f);
+            Assert.AreEqual(0f, o.Ax, 1e-4f);
+            Assert.AreEqual(0f, o.Ay, 1e-4f);
+            Assert.AreEqual(9.81f, o.Az, 1e-4f);
+        }
+
+        [Test]
+        public void Imu_AxesFollowTheDocumentedFrame()
+        {
+            var settings = ImuSettings.Default;
+            settings.GyroNoise = settings.AccelNoise = settings.GyroBias = settings.AccelBias = 0f;
+            var imu = new ImuModel(settings, 1);
+            QuadState a = QuadState.AtRest(Vec3.Zero, Quat.Identity);
+            QuadState b = a;
+            // Simulator axes: X pitch (nose down +), Y yaw (right +), Z roll (left +).
+            b.AngularVelocity = new Vec3(1f, 2f, 3f);
+            // Accelerating forward (+Z in the simulator) at 2 m/s².
+            b.Velocity = new Vec3(0f, 0f, 0.002f);
+            ImuSample o = imu.Read(a, b, 0.001f, 9.81f);
+            Assert.AreEqual(-3f, o.Gx, 1e-5f, "roll right is positive");
+            Assert.AreEqual(1f, o.Gy, 1e-5f, "nose down is positive");
+            Assert.AreEqual(-2f, o.Gz, 1e-5f, "yaw left is positive");
+            Assert.AreEqual(2f, o.Ax, 1e-3f, "x is forward");
+        }
+
+        [Test]
+        public void SensorNoise_SameSeedSameNumbers_DifferentSeedDifferentNumbers()
+        {
+            QuadState s = QuadState.AtRest(Vec3.Zero, Quat.Identity);
+            var a = new ImuModel(ImuSettings.Default, 7);
+            var b = new ImuModel(ImuSettings.Default, 7);
+            var c = new ImuModel(ImuSettings.Default, 8);
+            bool differs = false;
+            for (int i = 0; i < 50; i++)
+            {
+                ImuSample x = a.Read(s, s, 0.001f, 9.81f), y = b.Read(s, s, 0.001f, 9.81f), z = c.Read(s, s, 0.001f, 9.81f);
+                Assert.AreEqual(x.Gx, y.Gx);
+                Assert.AreEqual(x.Az, y.Az);
+                differs |= x.Gx != z.Gx;
+            }
+            Assert.IsTrue(differs);
+        }
+
+        [Test]
+        public void Tof_ReportsOutOfRange()
+        {
+            var tof = new TofModel(TofSettings.Default, 1);
+            Assert.AreEqual(1.25f, tof.Read(1.25f, out bool ok), 0.08f);
+            Assert.IsTrue(ok);
+            tof.Read(6f, out ok);
+            Assert.IsFalse(ok, "beyond 4 m");
+            tof.Read(-1f, out ok);
+            Assert.IsFalse(ok, "nothing below");
+            tof.Read(0.01f, out ok);
+            Assert.IsFalse(ok, "closer than the minimum");
+        }
+
+        [Test]
+        public void AnalogVideo_FlipsRows_KeepsColour_AndIsRepeatable()
+        {
+            const int w = 32, h = 8;
+            var src = new Unity.Collections.NativeArray<byte>(w * h * 3, Unity.Collections.Allocator.Persistent);
+            var clean = new Unity.Collections.NativeArray<byte>(src.Length, Unity.Collections.Allocator.Persistent);
+            var a = new Unity.Collections.NativeArray<byte>(src.Length, Unity.Collections.Allocator.Persistent);
+            var b = new Unity.Collections.NativeArray<byte>(src.Length, Unity.Collections.Allocator.Persistent);
+            var c = new Unity.Collections.NativeArray<byte>(src.Length, Unity.Collections.Allocator.Persistent);
+            // Bottom row (first in the source) magenta, everything else grey.
+            for (int i = 0; i < src.Length; i += 3)
+            {
+                bool bottom = i < w * 3;
+                src[i] = bottom ? (byte)255 : (byte)90; src[i + 1] = bottom ? (byte)0 : (byte)90; src[i + 2] = bottom ? (byte)200 : (byte)90;
+            }
+            new AnalogVideo(AnalogVideoSettings.Clean, 1).Process(src, clean, w, h, 0);
+            int last = (h - 1) * w * 3 + 15 * 3;
+            Assert.AreEqual(255, clean[last]);
+            Assert.AreEqual(0, clean[last + 1]);
+            Assert.AreEqual(90, clean[15 * 3], "top row of the output is the grey part");
+
+            new AnalogVideo(AnalogVideoSettings.Default, 5).Process(src, a, w, h, 3);
+            new AnalogVideo(AnalogVideoSettings.Default, 5).Process(src, b, w, h, 3);
+            new AnalogVideo(AnalogVideoSettings.Default, 5).Process(src, c, w, h, 4);
+            CollectionAssert.AreEqual(a.ToArray(), b.ToArray(), "same seed and frame: the same picture");
+            CollectionAssert.AreNotEqual(a.ToArray(), c.ToArray(), "the noise changes from frame to frame");
+            CollectionAssert.AreNotEqual(a.ToArray(), clean.ToArray());
+            // Still clearly magenta in the middle of the magenta row.
+            Assert.Greater(a[last], 200);
+            Assert.Less(a[last + 1], 60);
+            Assert.Greater(a[last + 2], 140);
+            src.Dispose(); clean.Dispose(); a.Dispose(); b.Dispose(); c.Dispose();
+        }
+
+        // ---------- protocol ----------
+
+        [Test]
+        public void MsgPack_RoundTrip()
+        {
+            var w = new MsgPackWriter();
+            w.Map(6).Key("a").Int(5).Key("b").Int(-70000).Key("c").Double(1.5).Key("d").Str("сәлем").Key("e").Bool(true)
+                .Key("f").Array(3).Int(1000).Int(2000).Nil();
+            var seg = w.Segment;
+            var map = (Dictionary<string, object>)MsgPackReader.Decode(seg.Array, 0, seg.Count);
+            Assert.AreEqual(5L, map["a"]);
+            Assert.AreEqual(-70000L, map["b"]);
+            Assert.AreEqual(1.5, map["c"]);
+            Assert.AreEqual("сәлем", map["d"]);
+            Assert.AreEqual(true, map["e"]);
+            var list = (List<object>)map["f"];
+            Assert.AreEqual(2000L, list[1]);
+            Assert.IsNull(list[2]);
+        }
+
+        [Test]
+        public void MsgPack_RandomBytes_OnlyEverThrowFormatException()
+        {
+            var rng = new System.Random(12345);
+            var buf = new byte[64];
+            for (int i = 0; i < 20000; i++)
+            {
+                int n = rng.Next(1, buf.Length);
+                rng.NextBytes(buf);
+                try { MsgPackReader.Decode(buf, 0, n); }
+                catch (FormatException) { }
+            }
+            // Deep nesting and huge declared sizes are refused, not followed.
+            var deep = new byte[40];
+            for (int i = 0; i < deep.Length; i++) deep[i] = 0x91;
+            Assert.Throws<FormatException>(() => MsgPackReader.Decode(deep, 0, deep.Length));
+            Assert.Throws<FormatException>(() => MsgPackReader.Decode(new byte[] { 0xdd, 0x7f, 0xff, 0xff, 0xff }, 0, 5));
+            Assert.Throws<FormatException>(() => MsgPackReader.Decode(new byte[] { 0xdb, 0x7f, 0xff, 0xff, 0xff }, 0, 5));
+        }
+
+        [Test]
+        public void Channels_RejectAnythingThatIsNotAFiniteNumber()
+        {
+            var into = new List<int>();
+            var ok = new Dictionary<string, object> { ["rc"] = new List<object> { 1500L, 1200.4, 99999L, -3L } };
+            Assert.IsTrue(BenchMessages.Channels(ok, "rc", into));
+            CollectionAssert.AreEqual(new[] { 1500, 1200, 2000, 1000 }, into);
+            Assert.IsFalse(BenchMessages.Channels(new Dictionary<string, object> { ["rc"] = new List<object> { 1500L, double.NaN } }, "rc", into));
+            Assert.IsFalse(BenchMessages.Channels(new Dictionary<string, object> { ["rc"] = new List<object> { "1500" } }, "rc", into));
+            Assert.IsFalse(BenchMessages.Channels(new Dictionary<string, object> { ["rc"] = "x" }, "rc", into));
+            Assert.IsFalse(BenchMessages.Channels(new Dictionary<string, object>(), "rc", into));
+        }
+
+        [Test]
+        public void CompetitionMode_AllowsOnlyTheFourMessages()
+        {
+            Assert.IsTrue(BenchProtocol.AllowedInCompetition(BenchProtocol.Hello));
+            Assert.IsTrue(BenchProtocol.AllowedInCompetition(BenchProtocol.Start));
+            Assert.IsTrue(BenchProtocol.AllowedInCompetition(BenchProtocol.Step));
+            Assert.IsTrue(BenchProtocol.AllowedInCompetition(BenchProtocol.Done));
+            Assert.IsFalse(BenchProtocol.AllowedInCompetition(BenchProtocol.Reset));
+            Assert.IsFalse(BenchProtocol.AllowedInCompetition(BenchProtocol.Ping));
+            for (int t = 7; t < 256; t++) Assert.IsFalse(BenchProtocol.AllowedInCompetition((byte)t));
+        }
+
+        // ---------- track file ----------
+
+        [Test]
+        public void H1Oval_IsAValidTrack_WithEveryNextGateInView()
+        {
+            string path = "Assets/StreamingAssets/Bench/Tracks/H1_Oval.benchtrack.json";
+            Assert.IsTrue(System.IO.File.Exists(path), "run Ushqyr > Bench > Build Everything");
+            BenchTrack t = BenchTrack.Parse(System.IO.File.ReadAllText(path));
+            Assert.AreEqual("H1_Oval", t.id);
+            Assert.AreEqual("hall", t.venue);
+            Assert.AreEqual(6, t.gates.Count);
+            Assert.AreEqual(64, t.Hash.Length);
+            Assert.GreaterOrEqual(t.gates.Count, t.rules.repeat_window + 1, "fewer gates than the repeat window + 1 would stall scoring");
+
+            for (int i = 0; i < t.gates.Count; i++)
+            {
+                TrackGate g = t.gates[i], next = t.gates[(i + 1) % t.gates.Count];
+                Vector3 p = BenchTrack.V(g.position), q = BenchTrack.V(next.position);
+                // Inside the hall with room to the walls.
+                Assert.Less(Mathf.Abs(p.x), 20f - 2.5f);
+                Assert.Less(Mathf.Abs(p.z), 10f - 1.5f);
+                Assert.Greater(Vector3.Distance(p, q), 5f, "gates too close");
+                // Leaving gate i along its axis, the next gate is within the camera's half field of view (60°)
+                // and is approached within 45° of its own axis.
+                Vector3 forward = Quaternion.Euler(0f, g.yaw, 0f) * Vector3.forward;
+                Vector3 nextForward = Quaternion.Euler(0f, next.yaw, 0f) * Vector3.forward;
+                Assert.Less(Vector3.Angle(forward, q - p), 55f, $"{next.id} not in view from {g.id}");
+                Assert.Less(Vector3.Angle(nextForward, q - p), 45f, $"{next.id} approached too obliquely");
+            }
+        }
+
+        [Test]
+        public void TrackFile_RefusesBrokenInput()
+        {
+            Assert.Throws<FormatException>(() => BenchTrack.Parse("{\"schema\":1,\"gates\":[]}"));
+            Assert.Throws<FormatException>(() => BenchTrack.Parse("{\"schema\":99,\"gates\":[{\"id\":\"a\",\"position\":[0,0,0]}]}"));
+            Assert.Throws<FormatException>(() => BenchTrack.Parse(
+                "{\"schema\":1,\"start\":{\"position\":[0,0,0]},\"gates\":[{\"id\":\"a\",\"position\":[0,0,0]},{\"id\":\"a\",\"position\":[1,0,0]}]}"));
+        }
+
+        [Test]
+        public void Rules_DefaultsAreTheDocumentedOnes_AndFilesOverrideThem()
+        {
+            BenchRules d = BenchRules.Parse(null);
+            Assert.AreEqual("training", d.mode);
+            Assert.AreEqual(640, d.camera_width);
+            Assert.AreEqual(480, d.camera_height);
+            Assert.AreEqual(30f, d.camera_fps);
+            Assert.AreEqual(4, d.repeat_window);
+            Assert.AreEqual(120f, d.time_limit);
+            Assert.IsFalse(d.Competition);
+            BenchRules c = BenchRules.Parse("{\"mode\":\"competition\",\"rc_latency_ms\":40}");
+            Assert.IsTrue(c.Competition);
+            Assert.AreEqual(40f, c.rc_latency_ms);
+            Assert.AreEqual(640, c.camera_width, "untouched fields keep their defaults");
+        }
+    }
+}

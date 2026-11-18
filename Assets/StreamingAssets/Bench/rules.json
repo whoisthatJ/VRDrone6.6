@@ -1,0 +1,23 @@
+{
+    "mode": "training",
+    "control_hz": 100.0,
+    "rc_latency_ms": 10.0,
+    "rc_failsafe_ms": 500.0,
+    "camera_width": 640,
+    "camera_height": 480,
+    "camera_fps": 30.0,
+    "camera_hfov": 120.0,
+    "camera_tilt": 20.0,
+    "camera_latency_ms": 30.0,
+    "camera_analog": true,
+    "imu_hz": 500.0,
+    "tof_hz": 50.0,
+    "battery_hz": 10.0,
+    "time_limit": 120.0,
+    "repeat_window": 4,
+    "stuck_time": 10.0,
+    "seed": 1,
+    "pace_realtime": true,
+    "port": 5757,
+    "token": ""
+}

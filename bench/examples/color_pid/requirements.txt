@@ -1,0 +1,2 @@
+ushqyr-bench
+opencv-python>=4.5

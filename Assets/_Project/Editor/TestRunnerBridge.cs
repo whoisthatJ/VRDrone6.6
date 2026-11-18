@@ -18,7 +18,12 @@ namespace Ushqyr.EditorTools
         [MenuItem("Ushqyr/Tests/Run EditMode Tests")]
         public static string RunEditMode() => RunEditMode("Ushqyr.Tests.EditMode");
 
-        public static string RunEditMode(string assemblyName)
+        /// <summary>Only the tests whose full name matches <paramref name="nameRegex"/> (e.g. "BenchTests").</summary>
+        public static string RunEditModeMatching(string nameRegex) => RunEditMode("Ushqyr.Tests.EditMode", nameRegex);
+
+        public static string RunEditMode(string assemblyName) => RunEditMode(assemblyName, null);
+
+        public static string RunEditMode(string assemblyName, string nameRegex)
         {
             var api = ScriptableObject.CreateInstance<TestRunnerApi>();
             var collector = new Collector();
@@ -26,6 +31,7 @@ namespace Ushqyr.EditorTools
             try
             {
                 var filter = new Filter { testMode = TestMode.EditMode, assemblyNames = new[] { assemblyName } };
+                if (!string.IsNullOrEmpty(nameRegex)) filter.groupNames = new[] { nameRegex };
                 api.Execute(new ExecutionSettings(filter) { runSynchronously = true });
             }
             finally

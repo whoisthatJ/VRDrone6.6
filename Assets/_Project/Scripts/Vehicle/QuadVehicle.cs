@@ -113,6 +113,32 @@ namespace Ushqyr.Vehicle
 
         public void Respawn() => Respawn(true);
 
+        // ---------- stepped from outside (AI Bench) ----------
+
+        /// <summary>
+        /// True: the quad no longer advances with the frame clock. Something else calls <see cref="StepExternal"/> once
+        /// per physics step (the AI Bench session, which keeps its own simulator clock) with the same flight
+        /// controller, flight model and collision sweep as in normal play.
+        /// </summary>
+        public bool ExternalStepping { get; set; }
+
+        public float FixedStep => _env.FixedStep;
+        public float Gravity => _env.Gravity;
+
+        /// <summary>One physics step with <paramref name="pilot"/> as the input. Only with <see cref="ExternalStepping"/>.</summary>
+        public void StepExternal(in PilotInput pilot)
+        {
+            LastInput = pilot;
+            QuadState prev = _state;
+            QuadSimulator.Step(ref _state, pilot, _profile, _env, _env.FixedStep);
+            _collision.AfterStep(ref _state, prev, _env.FixedStep);
+            // A stepped quad never "crashes and respawns": it stays where it fell (the hook already stopped it).
+            _collision.Crashed = false;
+        }
+
+        /// <summary>Puts the Transform exactly on the simulated pose (no interpolation).</summary>
+        public void SyncPose() => ApplyPose(1f);
+
         private void Respawn(bool disarm)
         {
             LastRespawnDisarmed = disarm;
@@ -130,6 +156,12 @@ namespace Ushqyr.Vehicle
 
         private void Update()
         {
+            if (ExternalStepping)
+            {
+                ApplyPose(1f);
+                return;
+            }
+
             PilotInput pilot = default;
             if (input != null)
             {

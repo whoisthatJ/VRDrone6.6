@@ -1,0 +1,25 @@
+{
+    "name": "Ushqyr.Bench",
+    "rootNamespace": "Ushqyr.Bench",
+    "references": [
+        "Ushqyr.Flight",
+        "Ushqyr.Input",
+        "Ushqyr.Vehicle",
+        "Ushqyr.Core",
+        "Unity.TextMeshPro",
+        "Unity.RenderPipelines.Core.Runtime",
+        "Unity.RenderPipelines.Universal.Runtime",
+        "Unity.InputSystem",
+        "Unity.Burst",
+        "Unity.Collections"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -89,3 +89,19 @@ Branch `track-expo-phase3` (from `feature/track-garage` @ 146f5c7). Unity 6000.6
 | Tests | `GeoTests`, `SphereDistrictTests` (geometry, petals, corridor, courses, free flight), `ContentTests` (catalogue), `OnlineTests` (leaderboard files) |
 | Referenced by | `CatalogBuilder` (3 menu entries), `OnlineLeaderboards.Tracks` + `Online/Leaderboards/lap-expo-astana.lb`, `lap-expo-pro.lb`, `TrackSceneBuilder.Environments`, `EnvironmentBuilder`, `TrackSceneController` (`FlightArea` for `expo`), `SceneShots`, local leaderboard and ghosts (keyed by track id) |
 | Mode | Faithful (owner's E0 decision), not Inspired |
+
+
+## AI Bench orientation (B0, 2026-11-18)
+Branch `track-expo-phase3`. The game is called **Ushqyr** (the AI Bench plan still says GateRush; see decision D12 there).
+
+| Area | What AI Bench builds on |
+|---|---|
+| Flight model and controller | `Scripts/Flight/QuadSimulator.Step` (pure C#, no engine types): sticks → rates / angle loop → rate PID → mixer → motor lag → forces → integration. Fixed step 1 ms (`PhysicsSettings.FixedStep`). Deterministic: the whole state is `QuadState`. |
+| How input reaches the physics | `PilotInputSource` → `QuadVehicle.Update` → `QuadSimulator.Advance` (frame-time accumulator) with `CollisionHook` (sphere sweep per sub-step). For AI Bench `QuadVehicle.ExternalStepping` + `StepExternal` replace the accumulator; everything else is shared. |
+| Battery | `BatteryModel` (open-circuit curve, I·R sag, thrust scale), state inside `QuadState`. |
+| Whoop | `QuadProfile.Whoop65` (catalogue id `whoop65`), garage preset `QuadPresets.Whoop65` for the model (`QuadModelBuilder`). No organiser data yet (`Docs/reference/whoop/` is empty). |
+| Tracks and gates | Race tracks are spline routes with obstacle kits (`Scripts/Track`, `Scripts/Race/Gate`, `GateCrossing`). AI Bench uses its own track file and gate (`BenchTrack`, `BenchGate`, `Referee`), because the standard gate, free-order scoring and hidden tracks don't fit the lap-race system. |
+| Bot core (oracle pilot candidate) | `Scripts/AI`: `LinePlanner`, `TrajectoryFollower`, `RateInverse`, `BotRun` (Phase 3). Reusable for the B3 oracle pilot. |
+| Builds | `BuildScript` (Windows, macOS, Quest), version in `Version.txt`. No build profiles yet for Team Kit / Bench Server (B6). |
+| Quality, input, localisation | `GraphicsQuality` presets; Input System + HID radio; Unity Localization with TSV sheets (`Localization/Text/*.tsv`, `L.T`), AI Bench strings in `bench.tsv`. |
+| Tests | EditMode only, run inside the open editor through `TestRunnerBridge`; AI Bench adds `BenchTests`. Python tests under `bench/sdk/python/tests` (pytest). |
