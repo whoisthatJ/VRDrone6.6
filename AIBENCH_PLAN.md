@@ -405,3 +405,20 @@ After B1, B2 and B3 can run in parallel. B4 waits for data. B5 can start any tim
 | Label-overlay check script | Done: `ushqyr-bench dataset-check <folder> --draw 100` |
 | 2-pixel projection test | Done as a box-against-painted-outline check (D44): 228 of 230 boxes within 2 px (99.1%), 1268 of 1268 visible corners on their gate, on a 200-image dataset |
 | Tests | 57 `BenchTests` (355 EditMode in all), 12 SDK tests, 10 runner tests |
+
+### Sample solution, second version (19 November 2026)
+The first `color_pid` ("turn left, take the biggest blob") fell below the acceptance bar once the lens, the analog link
+and the new tracks arrived. Rewritten around four ideas: follow one gate by its direction in the world; measure by
+angles from the box's width and top edge (the floor reflects the LEDs); remember where the last four gates stood by
+dead reckoning and prefer gates that are not among them (the repeat rule makes a small circuit worthless); step
+round obstacles with the LiDAR.
+
+| Track | Before | After (5 seeds) |
+|---|---|---|
+| `H1_Oval` | 5 of 5, 24 to 37 s | 5 of 5, 25.5 to 25.8 s |
+| `H2_Eight` | 4 of 5, 64 to 107 s | 5 of 5, 43 to 57 s |
+| `P1_Columns` | 4 of 5, 42 to 66 s | 4 of 5, 51 to 53 s |
+
+14 of 15 runs complete a lap (93%), which meets the plan's acceptance line for the sample (at least 90% over these
+three tracks and five seeds). The one failure is on `P1_Columns` seed 5: the next gate, 18 m away in the dim light,
+is not picked up after the second gate, and the drone wanders. Measured in the editor in training mode, sync time.
