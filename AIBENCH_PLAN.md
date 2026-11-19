@@ -470,3 +470,27 @@ Decisions taken here:
   the solution first so the simulator can still write the attempt folder.
 
 **Still open in B6:** Linux Team Kit build; a Linux server with a GPU.
+
+### B7: batch runner (20 November 2026)
+`ushqyr-bench batch --submissions ... --tracks ... --out ...` (`bench/runner/src/ushqyr_bench_runner/batch.py`).
+
+| Item | State |
+|---|---|
+| Every team x track x attempt, same seeds for every team | Done |
+| Simulator with no screen, hardened container, isolated network, timeouts, logs, video, signed manifest, teardown | Done (the B6 sandbox, per job) |
+| Retries only infrastructure failures | Done (`--retries`, default 2) |
+| Resume after an interruption | Done (`batch_state.json`) |
+| Parallel workers | Done (`--workers`) |
+| One `results.csv` and `results.json`, plus `leaderboard.csv` | Done |
+| Hidden tracks from a folder outside the build | Done: mounted read-only into the simulator's container only |
+
+**Tested for real** on the development PC: 3 solutions (the sample, the hover template, the hostile one) plus one
+team with a missing image, on 2 tracks taken from an outside folder, 2 workers, signed with a test key. 6 of 6
+possible attempts flown in 516 s; all six folders verify (checksums and signature); the sample scored 28 and 20, the
+missing team was reported and did not stop the run; a second start flew nothing again.
+
+**Not done:** the acceptance run itself, 20 solutions on 3 tracks. With fakes in place of Docker it is a unit test
+(60 jobs into one file). For real it is about 60 x 4 minutes = 4 hours on this PC and has not been run.
+
+Note: a track file carries its own `time_limit`, and that one is used; the rules file's value did not shorten the
+test attempts.

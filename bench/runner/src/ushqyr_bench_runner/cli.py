@@ -9,6 +9,7 @@
     ushqyr-bench dataset-check <dataset folder> [--draw 100]
     ushqyr-bench build-images [--build Builds/BenchServer]     (Docker: the simulator image and the solutions' base image)
     ushqyr-bench submit-check <solution folder or image.tar> [--track H1_Oval] [--seed 1] [--out results]
+    ushqyr-bench batch --submissions submissions.yaml --tracks tracks.yaml --out results [--rules rules.json] [--key key.file]
 """
 from __future__ import annotations
 
@@ -237,6 +238,27 @@ def cmd_submit_check(args: argparse.Namespace) -> int:
     return 0 if ok else 1
 
 
+def cmd_batch(args: argparse.Namespace) -> int:
+    """Every team on every track, unattended; one results file."""
+    from . import batch, sandbox
+
+    limits = sandbox.Limits(memory=args.memory, cpus=args.cpus, wall_seconds=args.wall)
+    try:
+        submissions = batch.load_submissions(Path(args.submissions))
+        plan = batch.load_plan(Path(args.tracks))
+        sandbox.require_engine()
+        if not sandbox.image_exists(sandbox.SERVER_IMAGE):
+            raise sandbox.SandboxError(f"the simulator image {sandbox.SERVER_IMAGE} is not built yet: run `ushqyr-bench build-images`")
+        sim_gpu = args.sim_gpu == "on" or (args.sim_gpu == "auto" and sandbox.wsl_gpu())
+        summary = batch.run(submissions, plan, Path(args.out), limits, rules=Path(args.rules) if args.rules else None,
+                            key=Path(args.key) if args.key else None, workers=args.workers, retries=args.retries,
+                            graphics=args.graphics, video=False if args.no_video else None, sim_gpu=sim_gpu)
+    except (batch.BatchError, sandbox.SandboxError, OSError, ValueError) as e:
+        print("error:", e)
+        return 2
+    return 0 if summary["flown"] == summary["jobs"] else 1
+
+
 def main(argv: Optional[List[str]] = None) -> int:
     parser = argparse.ArgumentParser(
         prog="ushqyr-bench", description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
@@ -318,6 +340,22 @@ def main(argv: Optional[List[str]] = None) -> int:
                    help="graphics preset of the simulator (default: the build's own with a GPU, Low without)")
     p.add_argument("--video", action="store_true", help="record the trackside video even without a GPU")
     p.set_defaults(run=cmd_submit_check)
+
+    p = sub.add_parser("batch", help="Docker: every solution on every track, into one results file")
+    p.add_argument("--submissions", required=True, help="YAML or JSON: team and image, archive or folder")
+    p.add_argument("--tracks", required=True, help="YAML or JSON: tracks, attempts, seed, folder of hidden tracks")
+    p.add_argument("--out", required=True)
+    p.add_argument("--rules", help="rules file (default: the one in the simulator image)")
+    p.add_argument("--key", help="signing key file")
+    p.add_argument("--workers", type=int, default=1, help="attempts flown at the same time")
+    p.add_argument("--retries", type=int, default=2, help="extra tries after an infrastructure failure")
+    p.add_argument("--memory", default="4g")
+    p.add_argument("--cpus", type=float, default=4.0)
+    p.add_argument("--wall", type=float, default=1800.0, help="real seconds allowed for one attempt")
+    p.add_argument("--sim-gpu", default="auto", choices=["auto", "on", "off"])
+    p.add_argument("--graphics", choices=["Low", "Medium", "High", "Ultra"], help="one preset for every team")
+    p.add_argument("--no-video", action="store_true", help="no trackside video (faster without a GPU)")
+    p.set_defaults(run=cmd_batch)
 
     args = parser.parse_args(argv)
     return int(args.run(args))

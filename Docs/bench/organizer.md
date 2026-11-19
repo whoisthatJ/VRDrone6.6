@@ -281,6 +281,64 @@ truth). Run it with `submit-check --logs`: every line must say `blocked`.
 bridge node and its messages. A ROS 2 solution is an ordinary submission: its container runs the bridge and the team's
 nodes together, and the simulator sees one client. Topics, parameters and timing are in `Docs/bench/ru/ros2.md`.
 
+## The batch run (B7)
+
+Every team's solution on every track, unattended, into one results file.
+
+```
+ushqyr-bench batch --submissions submissions.yaml --tracks tracks.yaml --out results
+                   [--rules rules.json] [--key key.file] [--workers 2] [--graphics High]
+```
+
+`submissions.yaml` (JSON works too). One of `image`, `archive`, `folder` per team; paths are relative to the file:
+
+```yaml
+- team: Alpha
+  image: alpha-solution:latest     # an image already in Docker
+- team: Beta
+  archive: beta.tar                # a `docker save` file
+- team: Gamma
+  folder: ./gamma                  # a folder with a Dockerfile
+```
+
+`tracks.yaml`:
+
+```yaml
+tracks: [Q1, Q2, Q3]     # ids
+folder: /srv/hidden      # where Q1.benchtrack.json ... live; leave out for the public tracks in the build
+attempts: 2              # per team and track
+seed: 1                  # attempt n of every team flies with seed + n - 1
+```
+
+The folder of hidden tracks is mounted read-only into the simulator's container only. The solution's container never
+sees it, and in competition mode the handshake does not name the track.
+
+What the run does:
+
+- Builds or loads every team's image first and checks its size. A team without a usable image is reported and the
+  others go on.
+- Flies track by track, attempt by attempt, team by team. Every team meets the same seed on the same track.
+- **Retries only infrastructure failures** (Docker errors, the simulator producing no result): `--retries`, default 2.
+  A solution that crashes, hangs or never connects is not retried: the simulator writes that as the attempt's result.
+- **Can be stopped and started again.** `results/batch_state.json` records every finished job; the same command
+  continues with what is left.
+- `--workers N` flies N attempts at once. They share the processor and the video card, so on a small machine more
+  workers do not mean more speed; in sync mode the scores do not depend on it.
+
+What it writes into `--out`:
+
+| File | What it is |
+|---|---|
+| `results.csv` | Every attempt: team, track, attempt, points, time, status, hashes |
+| `results.json` | The same, plus the leaderboard and the list of problems (teams without an image, jobs not flown) |
+| `leaderboard.csv` | Rank, team, points, time: each team's best attempt per track, added over the tracks |
+| `attempts/<team>__<track>__aNN/` | The attempt folder (logs, videos, manifest, signature) and, beside it, `solution.log`: what the solution printed |
+| `batch_state.json` | Progress, for resuming |
+
+The exit code is 0 when every job has a result, 1 when some do not, 2 when the run could not start.
+
+Use one `--graphics` preset for the whole qualification: the preset changes the camera picture.
+
 ## Not in B2
 
 - The scan of a Bench Server build for ground-truth code and hidden tracks comes with that build (B6).
