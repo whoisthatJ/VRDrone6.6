@@ -118,8 +118,12 @@ namespace Ushqyr.Bench
         public int CameraWidth => _rules.camera_width;
         public int CameraHeight => _rules.camera_height;
         /// <summary>True when the drone flies a measured model of the organisers' whoop; false for the placeholder.</summary>
-        public bool DroneCalibrated => false;
-        public string DroneName => "Whoop v0";
+        public bool DroneCalibrated => _drone != null;
+        public string DroneName => _drone != null ? _drone.Name : "Whoop v0";
+        /// <summary>"ai_mission" (the organisers' whoop) or "ai_core" (a team's drone from its config).</summary>
+        public string DroneClass => _drone != null ? "ai_core" : "ai_mission";
+        private DroneConfig _drone;
+        private bool _tofFitted = true;
 
         /// <summary>False until the track is built and the API port is open.</summary>
         public bool Ready { get; private set; }
@@ -135,6 +139,15 @@ namespace Ushqyr.Bench
                 _track = ReplayMode ? BenchLauncher.LoadReplayTrack()
                     : EditMode ? BenchTrack.Parse(File.ReadAllText(BenchLauncher.EditPath)) : BenchLauncher.LoadTrack(defaultTrack);
                 _signingKey = BenchLauncher.SigningKey();
+                _drone = ReplayMode || EditMode ? null : BenchLauncher.LoadDrone();
+                if (_drone != null)
+                {
+                    // The team's file decides the camera's mounting and which sensors exist at all.
+                    _rules.camera_tilt = _drone.CameraTiltDeg;
+                    _rules.camera_hfov = _drone.CameraHfovDeg;
+                    _rules.lidar = _rules.lidar && _drone.Has("lidar");
+                    _tofFitted = _drone.Has("tof");
+                }
             }
             catch (Exception e)
             {
@@ -162,6 +175,16 @@ namespace Ushqyr.Bench
                 Status = "replay";
                 return;
             }
+#if !USHQYR_BENCH_SERVER
+            if (BenchLauncher.Dataset.HasValue && !_rules.Competition)
+            {
+                // Dataset mode: no API and no attempt; the generator moves the camera and writes images and labels.
+                Status = "dataset";
+                Dataset = gameObject.AddComponent<BenchDataset>();
+                Dataset.Run(this, BenchLauncher.Dataset.Value);
+                return;
+            }
+#endif
             bool video = _rules.video == "on" || (_rules.video != "off" && _rules.Competition);
             _ffmpeg = video ? BenchLauncher.FindFfmpeg() : null;
             if (video && _ffmpeg == null) Debug.LogWarning("[Bench] no ffmpeg found: attempts are recorded without video");
@@ -204,9 +227,10 @@ namespace Ushqyr.Bench
                 refGates.Add(RefereeGate.At(g.id, CollisionHook.FromUnity(gate.OpeningCentre), CollisionHook.FromUnity(gate.transform.rotation),
                     g.direction == "front"));
             }
-            BuildProps(_track, gatesRoot, gatePrefab);
+            BuildProps(_track.props, gatesRoot, gatePrefab);
             var lights = FindAnyObjectByType<BenchVenueLights>();
             if (lights != null) lights.Apply(_track.lighting);
+            _flown = _track;
             int window = _track.rules != null && _track.rules.repeat_window >= 0 ? _track.rules.repeat_window : _rules.repeat_window;
             _referee = new Referee(refGates, window);
             _timeLimit = _track.rules != null && _track.rules.time_limit > 0f ? _track.rules.time_limit : _rules.time_limit;
@@ -215,13 +239,114 @@ namespace Ushqyr.Bench
         }
 
         /// <summary>Coloured panels and boxes of the track file: solid, painted or glowing.</summary>
-        public static void BuildProps(BenchTrack track, Transform parent, BenchGate gatePrefab)
+        public static void BuildProps(BenchTrack track, Transform parent, BenchGate gatePrefab) => BuildProps(track.props, parent, gatePrefab);
+
+#if !USHQYR_BENCH_SERVER
+        // ---------- dataset ----------
+
+        /// <summary>The dataset generator at work in this scene, or null.</summary>
+        public BenchDataset Dataset { get; private set; }
+        private bool _datasetReported;
+        public Transform CameraTransform => _camera.transform;
+        public float CameraFocal => _camera.FocalPixels;
+        public float CameraDistortion => _camera.Distortion;
+
+        /// <summary>Colour that marks gate <paramref name="index"/> in the flat-colour render.</summary>
+        private static Color32 IdColour(int index) => new Color32((byte)(40 + 24 * (index % 8)), (byte)(40 + 24 * (index / 8)), 255, 255);
+
+        /// <summary>
+        /// One dataset image from the drone's current pose, through the same lens and video link as a run
+        /// (rows top-down), and the matching mask: 0 = no gate, n = gate number n (1-based) in track order.
+        /// </summary>
+        public void RenderDatasetFrame(long index, float signal, float gain, byte[] frame, byte[] mask)
         {
-            if (track.props == null) return;
+            quad.SyncPose();
+            int w = _rules.camera_width, h = _rules.camera_height;
+            if (!_processed.IsCreated || _processed.Length != w * h * 3)
+            {
+                if (_processed.IsCreated) _processed.Dispose();
+                _processed = new Unity.Collections.NativeArray<byte>(w * h * 3, Unity.Collections.Allocator.Persistent);
+            }
+            Unity.Collections.NativeArray<byte> raw = _camera.Capture();
+            _video.Process(raw, _processed, _camera.LensMap, w, h, index, signal, gain);
+            _processed.CopyTo(frame);
+
+            // The same view with the lights out and every gate glowing in its own colour.
+            var lights = FindAnyObjectByType<BenchVenueLights>();
+            if (lights != null) lights.Dark(true);
+            for (int i = 0; i < _gates.Count; i++) _gates[i].Paint(IdColour(i));
+            raw = _camera.Capture();
+            Unity.Collections.NativeArray<int> map = _camera.LensMap;
+            for (int p = 0; p < mask.Length; p++)
+            {
+                int s = map[p];
+                int r = raw[s], g = raw[s + 1], b = raw[s + 2];
+                int col = Mathf.RoundToInt((r - 40) / 24f), row = Mathf.RoundToInt((g - 40) / 24f);
+                bool gate = b > 235 && col >= 0 && col < 8 && row >= 0 && Mathf.Abs(r - (40 + 24 * col)) <= 9 && Mathf.Abs(g - (40 + 24 * row)) <= 9
+                            && row * 8 + col < _gates.Count;
+                mask[p] = gate ? (byte)(row * 8 + col + 1) : (byte)0;
+            }
+            foreach (BenchGate g in _gates) g.Unpaint();
+            if (lights != null) lights.Dark(false);
+        }
+#endif
+
+        // ---------- randomisation ----------
+
+        private BenchTrack _flown;
+        private Transform _clutter;
+        private float _noise = 1f;
+
+        /// <summary>The track as it stands in the scene right now: the file's track, or this attempt's variation of it.</summary>
+        public BenchTrack FlownTrack => _flown ?? _track;
+
+        /// <summary>
+        /// Puts a drawn variation into the scene: gates and pad moved, LEDs, lights, surfaces, clutter, video noise.
+        /// The referee is rebuilt for the gates' new places.
+        /// </summary>
+        public void ApplyVariation(SceneVariation v)
+        {
+            _flown = v.Track;
+            var refGates = new List<RefereeGate>();
+            for (int i = 0; i < _gates.Count; i++)
+            {
+                TrackGate g = v.Track.gates[i];
+                BenchGate gate = _gates[i];
+                gate.transform.SetPositionAndRotation(BenchTrack.V(g.position), Quaternion.Euler(0f, g.yaw, 0f));
+                gate.SetLed(BenchTrack.LedColor(g.led), g.led.brightness, g.led.mode == "blink");
+                refGates.Add(RefereeGate.At(g.id, CollisionHook.FromUnity(gate.OpeningCentre), CollisionHook.FromUnity(gate.transform.rotation),
+                    g.direction == "front"));
+            }
+            _referee = new Referee(refGates, _referee.RepeatWindow);
+            spawn.SetPositionAndRotation(BenchTrack.V(v.Track.start.position) + Vector3.up * (quad.BaseCollisionRadius + 0.002f),
+                Quaternion.Euler(0f, v.Track.start.yaw, 0f));
+
+            if (_clutter != null) Destroy(_clutter.gameObject);
+            _clutter = new GameObject("Clutter").transform;
+            _clutter.SetParent(gatesRoot, false);
+            BuildProps(v.Clutter, _clutter, gatePrefab);
+            var lights = FindAnyObjectByType<BenchVenueLights>();
+            if (lights != null) lights.Vary(_track.lighting, v.Light, v.LightColour, v.LightYaw);
+            var look = FindAnyObjectByType<BenchVenueLook>();
+            if (look != null) look.Apply(v.FloorMaterial, v.WallMaterial);
+            _noise = v.Noise;
+            Physics.SyncTransforms();
+        }
+
+        /// <summary>This attempt's variation of the track, from the rules' randomisation profile and the seed.</summary>
+        public SceneVariation DrawVariation(string profile, long seed)
+        {
+            var look = FindAnyObjectByType<BenchVenueLook>();
+            return TrackRandomizer.Draw(_track, RandomizationProfile.Get(profile), seed, look != null ? look.FloorChoices : 1, look != null ? look.WallChoices : 1);
+        }
+
+        public static void BuildProps(List<TrackProp> list, Transform parent, BenchGate gatePrefab)
+        {
+            if (list == null) return;
             Renderer led = null;
             foreach (Renderer r in gatePrefab.GetComponentsInChildren<Renderer>(true))
                 if (r.name.StartsWith("LED")) { led = r; break; }
-            foreach (TrackProp p in track.props)
+            foreach (TrackProp p in list)
             {
                 var go = GameObject.CreatePrimitive(PrimitiveType.Cube);
                 go.name = "Prop " + p.id;
@@ -242,9 +367,9 @@ namespace Ushqyr.Bench
 
         private void SetupDrone()
         {
-            QuadProfile profile = QuadProfile.Whoop65;
+            QuadProfile profile = _drone != null ? _drone.ToProfile() : QuadProfile.Whoop65;
             var collision = CollisionSettings.Default;
-            collision.Radius = 0.045f;
+            collision.Radius = _drone != null ? _drone.CollisionRadius : 0.045f;
             collision.TrackGeometry = solidLayers;
             // A ducted whoop bounces off things; it is never "destroyed and respawned" in an attempt.
             collision.CrashSpeed = 1e6f;
@@ -258,17 +383,54 @@ namespace Ushqyr.Bench
             spawn.SetPositionAndRotation(BenchTrack.V(_track.start.position) + Vector3.up * (collision.Radius + 0.002f),
                 Quaternion.Euler(0f, _track.start.yaw, 0f));
 
-            var model = QuadModelBuilder.Build(QuadPresets.Whoop65, modelMaterials, quad.transform, quadLayer);
-            foreach (var t in model.Root.GetComponentsInChildren<Transform>(true)) t.gameObject.layer = quadLayer;
             var props = quad.GetComponent<PropVisuals>();
-            if (props != null) props.Configure(model.Props, model.BlurDiscs);
+            if (_drone == null)
+            {
+                var model = QuadModelBuilder.Build(QuadPresets.Whoop65, modelMaterials, quad.transform, quadLayer);
+                foreach (var t in model.Root.GetComponentsInChildren<Transform>(true)) t.gameObject.layer = quadLayer;
+                if (props != null) props.Configure(model.Props, model.BlurDiscs);
+            }
+            else BuildConfigDrone(profile, props);
 
             var camGo = new GameObject("FPV Sensor");
             camGo.transform.SetParent(quad.transform, false);
-            camGo.transform.localPosition = new Vector3(0f, 0.012f, 0.028f);
+            camGo.transform.localPosition = _drone != null ? new Vector3(0f, _drone.HeightMm * 0.00025f, _drone.LengthMm * 0.0003f) : new Vector3(0f, 0.012f, 0.028f);
             _camera = camGo.AddComponent<BenchCameraSensor>();
             _camera.Setup(_rules.camera_width, _rules.camera_height, _rules.camera_hfov, _rules.camera_tilt, 1 << quadLayer,
                 _rules.camera_distortion);
+        }
+
+        /// <summary>The team drone as declared: a box of its size, four arms, four propellers. Plain shapes, true scale.</summary>
+        private void BuildConfigDrone(in QuadProfile profile, PropVisuals props)
+        {
+            float w = _drone.WidthMm * 0.001f, l = _drone.LengthMm * 0.001f, h = _drone.HeightMm * 0.001f;
+            float prop = _drone.PropDiameterIn * 0.0254f;
+            var root = new GameObject("Drone: " + _drone.Name).transform;
+            root.SetParent(quad.transform, false);
+            Transform Part(PrimitiveType type, string name, Vector3 pos, Vector3 scale, Quaternion rot, Material mat)
+            {
+                var go = GameObject.CreatePrimitive(type);
+                Destroy(go.GetComponent<Collider>());
+                go.name = name;
+                go.layer = quadLayer;
+                go.transform.SetParent(root, false);
+                go.transform.localPosition = pos;
+                go.transform.localRotation = rot;
+                go.transform.localScale = scale;
+                if (mat != null) go.GetComponent<Renderer>().sharedMaterial = mat;
+                return go.transform;
+            }
+            Part(PrimitiveType.Cube, "Body", Vector3.zero, new Vector3(w * 0.4f, h * 0.7f, l * 0.6f), Quaternion.identity, modelMaterials.Carbon);
+            var blades = new Transform[4];
+            for (int i = 0; i < 4; i++)
+            {
+                Vec3 m = Mixer.MotorPosition(i, profile.ArmX, profile.ArmZ);
+                var at = new Vector3(m.x, 0f, m.z);
+                Part(PrimitiveType.Cube, "Arm " + i, at * 0.5f, new Vector3(0.012f, 0.006f, at.magnitude), Quaternion.LookRotation(at.normalized), modelMaterials.Carbon);
+                Part(PrimitiveType.Cylinder, "Motor " + i, at + Vector3.up * (h * 0.15f), new Vector3(prop * 0.3f, h * 0.2f, prop * 0.3f), Quaternion.identity, modelMaterials.Bell);
+                blades[i] = Part(PrimitiveType.Cylinder, "Prop " + i, at + Vector3.up * (h * 0.36f), new Vector3(prop, 0.0015f, prop), Quaternion.identity, modelMaterials.Prop);
+            }
+            if (props != null) props.Configure(blades, new Renderer[0]);
         }
 
         private void SetupClock()
@@ -311,7 +473,7 @@ namespace Ushqyr.Bench
             imu.RateHz = 1f / (_imuEvery * _dt);
             _imu = new ImuModel(imu, seed);
             _tof = new TofModel(TofSettings.Default, seed);
-            _video = new AnalogVideo(_rules.camera_analog ? AnalogVideoSettings.Default : AnalogVideoSettings.Clean, seed);
+            _video = new AnalogVideo(_rules.camera_analog ? AnalogVideoSettings.Default.Scaled(_noise) : AnalogVideoSettings.Clean, seed);
             _batteryNoise = BenchRandom.For(seed, "battery");
             while (_framesInFlight.Count > 0) _framePool.Push(_framesInFlight.Dequeue().Pixels);
             _imuBatch.Clear();
@@ -325,6 +487,14 @@ namespace Ushqyr.Bench
 
         private void Update()
         {
+#if !USHQYR_BENCH_SERVER
+            if (Dataset != null && Dataset.Finished && !_datasetReported)
+            {
+                _datasetReported = true;
+                BenchLauncher.DatasetDone();
+                if (BenchLauncher.ExitWhenDone) Application.Quit(Dataset.Error == null ? 0 : 1);
+            }
+#endif
             if (!Ready) return;
             if (_server.Connection != _connection || !_server.Connected) ConnectionChanged();
             Lifecycle();
@@ -415,7 +585,8 @@ namespace Ushqyr.Bench
                 mode = _rules.Competition ? "competition" : "training", seed = seed, time_mode = _rules.Realtime ? "realtime" : "sync",
                 build = Application.version + "+" + Application.buildGUID,
                 rules_hash = _rules.Hash(), drone = DroneName, drone_calibrated = DroneCalibrated,
-                drone_config_hash = BenchHash.Sha256(FormattableString.Invariant(
+                // A team drone is identified by its file; the built-in whoop by the numbers that define it.
+                drone_config_hash = _drone != null ? _drone.Hash : BenchHash.Sha256(FormattableString.Invariant(
                     $"{DroneName}|{p.Mass}|{p.Motors.MaxThrustPerMotor}|{p.ArmX}|{p.ArmZ}|{p.Battery.Cells}|{p.Battery.CapacityMah}")),
                 solution_digest = BenchLauncher.SolutionDigest, gates_total = _gates.Count,
             };
@@ -423,7 +594,9 @@ namespace Ushqyr.Bench
             {
                 bool film = _ffmpeg != null && trackside != null;
                 if (film) trackside.Setup(_rules.trackside_width, _rules.trackside_height);
-                _recorder = new BenchRecorder(BenchLauncher.OutputFolder, info, _track.Json, _referee.RepeatWindow, _signingKey, _ffmpeg,
+                // The attempt folder gets the track as it was flown (with this attempt's variation), for the replay.
+                string flown = _flown != null && _flown != _track ? _flown.ToJson() + "\n" : _track.Json;
+                _recorder = new BenchRecorder(BenchLauncher.OutputFolder, info, flown, _referee.RepeatWindow, _signingKey, _ffmpeg,
                     _rules.camera_width, _rules.camera_height, _rules.camera_fps, film ? _rules.trackside_width : 0, _rules.trackside_height);
             }
             catch (Exception e)
@@ -528,7 +701,7 @@ namespace Ushqyr.Bench
                 .Key("control_hz").Double(1.0 / (_stepsPerControl * (double)_dt))
                 .Key("time_limit").Double(_timeLimit)
                 .Key("drone").Map(3)
-                    .Key("class").Str("ai_mission")
+                    .Key("class").Str(DroneClass)
                     .Key("name").Str(DroneName)
                     .Key("calibrated").Bool(DroneCalibrated)
                 .Key("rc").Map(4)
@@ -578,8 +751,10 @@ namespace Ushqyr.Bench
         {
             // A restart in training: the unfinished attempt before it is closed as "invalid" and doesn't count.
             if (State == AttemptState.Running) End("invalid");
+            if (RandomizationProfile.Get(_rules.randomization).Any) ApplyVariation(DrawVariation(_rules.randomization, seed));
             ResetWorld(seed);
             StartRecorder(seed);
+            if (_rules.randomization != "none") _recorder?.Note(0, "randomization", _rules.randomization + ", seed " + seed.ToString(System.Globalization.CultureInfo.InvariantCulture));
             _recorder?.Note(0, "start", "start signal");
             State = AttemptState.Running;
             Status = "running";
@@ -766,6 +941,7 @@ namespace Ushqyr.Bench
 
         private void ReadTof()
         {
+            if (!_tofFitted) return;
             Transform t = quad.transform;
             float truth = Physics.Raycast(t.position, -t.up, out RaycastHit hit, TofSettings.Default.MaxRange + 1f, solidLayers, QueryTriggerInteraction.Ignore)
                 ? hit.distance : -1f;

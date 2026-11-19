@@ -1,0 +1,25 @@
+{
+    "max_width_mm": 300.0,
+    "max_length_mm": 300.0,
+    "max_height_mm": 180.0,
+    "min_mass_g": 25.0,
+    "max_mass_g": 1500.0,
+    "max_thrust_to_weight": 8.0,
+    "min_thrust_to_weight": 1.5,
+    "max_cells": 6,
+    "max_capacity_mah": 2200.0,
+    "min_motor_time_constant_ms": 10.0,
+    "max_rate_deg_s": 1000.0,
+    "max_angle_deg": 70.0,
+    "min_camera_tilt_deg": 0.0,
+    "max_camera_tilt_deg": 60.0,
+    "min_camera_hfov_deg": 60.0,
+    "max_camera_hfov_deg": 150.0,
+    "sensors": [
+        "camera",
+        "imu",
+        "tof",
+        "lidar",
+        "battery"
+    ]
+}

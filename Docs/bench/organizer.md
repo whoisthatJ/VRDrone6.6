@@ -1,4 +1,4 @@
-# AI Bench: organiser guide (B3)
+# AI Bench: organiser guide (B5)
 
 How to run an attempt in competition mode, what the simulator writes, and how to check it. Team-facing material is in
 `ru/quickstart.md` and `protocol.md`.
@@ -28,6 +28,9 @@ Then start the team's program. One launch is one attempt.
 | `-bench-replay <attempt folder>` | Open the judge replay of an attempt |
 | `-bench-edit <name or file>` | Open the track editor on a track |
 | `-bench-generate <venue> <seed> <difficulty> <file>` | Write a random track to a file and quit (venue `hall` or `parking`, difficulty 1 to 3) |
+| `-bench-drone <drone.yaml>` | Fly a team's own drone (class AI CORE) instead of the whoop |
+| `-bench-limits <class_limits.json>` | The limits of the AI CORE class (default: the file next to the tracks) |
+| `-bench-dataset <folder>` | Make a labelled dataset instead of running an attempt; with `-bench-dataset-count`, `-bench-dataset-seed`, `-bench-dataset-profile`, `-bench-dataset-masks`. Training mode only |
 
 In the editor the same options are read from `UserSettings/bench-args.txt`, one option or value per line.
 
@@ -45,6 +48,7 @@ their defaults are in `StreamingAssets/Bench/rules.json`. Those added in B3:
 | `camera_auto_exposure` | true | |
 | `video_range` | 80 | Distance in metres at which the analog video is at its worst |
 | `lidar`, `lidar_hz` | true, 10 | |
+| `randomization` | `none` | `mild` or `strong`: each attempt varies the scene from its seed (see "Randomisation") |
 
 ## Tracks and venues
 
@@ -78,6 +82,70 @@ later dataset camera paths), is compiled out of the server build, and has no con
 **Random tracks.** The editor's "Random track" (seed, level 1 to 3), or from the command line:
 `Ushqyr.exe -bench-generate parking 4217 3 D:\private\HID_p_4217.benchtrack.json`. The same seed gives the same
 track, and every generated track passes the checks. Test-fly it in the editor before using it.
+
+## Team drones (AI CORE)
+
+A team declares its drone in a `drone.yaml`: size, mass, motor thrust and lag, propellers, battery, controller limits,
+camera tilt and field of view, and which sensors it carries. An example with comments is
+`bench/examples/drones/example_3inch.yaml`; the shape of the file is in `bench/schemas/drone.schema.json`.
+
+- The class limits are yours: `StreamingAssets/Bench/class_limits.json` (or `-bench-limits`). Defaults: at most
+  300 × 300 × 180 mm (the task's limit), 25 to 1500 g, thrust-to-weight 1.5 to 8, up to 6 cells and 2200 mAh,
+  rates up to 1000 deg/s, camera tilt 0 to 60°, field of view 60 to 150°, sensors from
+  `camera, imu, tof, lidar, battery`.
+- A team checks its file with `ushqyr-bench validate-drone drone.yaml [--limits class_limits.json]`. The simulator
+  runs the same checks when it loads the file and refuses a drone that fails, with the reasons in plain words.
+- Mass, thrust, motor lag, battery and limits are taken as declared. Inertia, drag and controller gains are computed
+  from size and mass, so a team cannot declare itself an unphysical drone through them.
+- The drone flies as a box of its declared size with a collision sphere to match. A sensor that is not declared is not
+  sent. The SHA-256 of the file is the `drone_config_hash` of every result.
+- The file is plain YAML: nested keys by indentation, numbers, text, and lists in one line `[a, b, c]`.
+
+The organisers' whoop (class AI MISSION) is still the placeholder model; its calibration waits for measurements.
+
+## Randomisation
+
+`randomization` in the rules file makes every attempt vary the scene from its seed. The same seed gives every team
+the same variation, and a variation never breaks the track's checks.
+
+| | `mild` | `strong` |
+|---|---|---|
+| Gates | shifted up to 10 cm, turned up to 3° | 25 cm, 8° |
+| Start pad | 15 cm, 5° | 30 cm, 10° |
+| Light level and colour | 0.8 to 1.2, slightly warm or cool | 0.45 to 1.6, clearly warm or cool, direction changed |
+| LED brightness | 75 to 100% | 45 to 100% |
+| Video noise | 0.8 to 1.3 times | 0.5 to 2.5 times |
+| Floor and wall materials | unchanged | one of five each |
+| Clutter along the walls | none | up to 8 coloured boxes and panels, some glowing |
+
+The attempt folder holds the track as it was flown, so the replay shows the gates where they stood.
+
+## Datasets
+
+Teams train detectors on labelled images made by the simulator itself. In the app: **T**, then **Dataset** next to a
+track (500 images into the results folder). From the command line:
+
+```
+ushqyr-bench dataset --sim Ushqyr.exe --track H1_Oval --out data/h1 --count 2000 --seed 7 --masks
+ushqyr-bench dataset-check data/h1 --draw 100
+```
+
+- **Images** come through the same camera as a run: lens, exposure and the analog link, with the strength of the
+  link's effects, the exposure and a motion blur varied per image.
+- **Camera poses**: 70% along the oracle pilot's flight with random offsets, 30% anywhere in the venue.
+- **Scene**: the `strong` randomisation above, redrawn every 25 images, plus random LED colours.
+- **Labels** for every gate in view: a box; the four corners of the opening on the face towards the camera
+  (top-left, top-right, bottom-right, bottom-left as seen) with visibility 0 = outside the picture, 1 = hidden,
+  2 = visible; `occluded` and `truncated` flags; distance.
+- **Formats**: YOLO (`images/`, `labels/`, `data.yaml`; box plus keypoints, the "pose" layout) and COCO
+  (`annotations/instances_{train,val,test}.json`). Split 80 / 10 / 10 from the seed.
+- **Masks** (`--masks`): one PNG per image, 0 = no gate, n = the n-th gate of the track.
+- **Label check**: every image is rendered a second time with the lights out and each gate glowing in its own
+  colour. The box of each gate that is wholly in view must match the outline of its painted pixels within 2 px, and
+  each visible corner must lie on its gate. The counts are in `dataset.json`; `dataset-check` fails below 98%.
+  `--draw` writes labelled pictures (and the masks beside them) into `check/` for a look by eye.
+
+Dataset mode does not exist in competition mode or in the server build.
 
 ## Hidden tracks
 

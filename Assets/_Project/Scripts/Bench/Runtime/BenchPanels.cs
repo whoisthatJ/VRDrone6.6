@@ -243,9 +243,11 @@ namespace Ushqyr.Bench
                 string path = t.Path;
                 BenchUi.Text(_root, t.Name, 30f, y + 3f, 330f, 30f, 21f, t.Public ? Color.white : new Color(0.75f, 0.95f, 1f));
                 BenchUi.Text(_root, L.T(t.Venue) + "   " + L.F("{0} gates", t.Gates) + (t.Public ? "" : "   " + L.T("mine")), 370f, y + 5f, 250f, 28f, 18f, BenchUi.Dim);
-                BenchUi.Button(_root, L.T("Fly"), 640f, y, 100f, 32f, () => BenchLauncher.Launch(path), 19f);
+                BenchUi.Button(_root, L.T("Fly"), 560f, y, 90f, 32f, () => BenchLauncher.Launch(path), 19f);
 #if !USHQYR_BENCH_SERVER
-                BenchUi.Button(_root, L.T("Edit"), 750f, y, 120f, 32f, () => BenchLauncher.Edit(path), 19f);
+                BenchUi.Button(_root, L.T("Edit"), 656f, y, 100f, 32f, () => BenchLauncher.Edit(path), 19f);
+                // 500 labelled images of this track's gates, into the results folder.
+                BenchUi.Button(_root, L.T("Dataset"), 762f, y, 110f, 32f, () => BenchLauncher.MakeDataset(path, 500, 1), 19f);
 #endif
                 y += 38f;
             }

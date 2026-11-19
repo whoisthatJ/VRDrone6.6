@@ -126,3 +126,85 @@ def test_hidden_tracks_are_found_in_a_build(tmp_path):
     assert len(leaks) == 3
     assert main(["check-build", str(clean), "--hidden", str(hidden)]) == 1
     assert main(["check-build", str(clean), "--hidden", str(tmp_path / "empty")]) == 2
+
+
+EXAMPLE_DRONE = Path(__file__).resolve().parents[2] / "examples" / "drones" / "example_3inch.yaml"
+
+
+def test_validate_drone_accepts_the_example_and_names_what_is_wrong(tmp_path, capsys):
+    from ushqyr_bench_runner import drone
+
+    text = EXAMPLE_DRONE.read_text(encoding="utf-8")
+    assert drone.validate(text) == []
+    assert main(["validate-drone", str(EXAMPLE_DRONE)]) == 0
+    assert drone.config_hash(text) in capsys.readouterr().out
+
+    def errors(old: str, new: str) -> str:
+        assert old in text
+        return "; ".join(drone.validate(text.replace(old, new)))
+
+    assert "width = 340 mm: allowed 30 to 300" in errors("size_mm: [170, 170, 55]", "size_mm: [340, 170, 55]")
+    assert "thrust-to-weight" in errors("max_thrust_g: 420", "max_thrust_g: 900")
+    assert "battery.cells" in errors("cells: 4", "cells: 8")
+    assert "not in the catalogue" in errors("[camera, imu, tof, lidar, battery]", "[camera, imu, gps]")
+    assert "camera is required" in errors("[camera, imu, tof, lidar, battery]", "[imu, tof]")
+    assert "unknown key" in errors("mass_g: 240", "mass_g: 240\nturbo: 9")
+    assert "mass_g: missing" in errors("mass_g: 240", "weight: 240")
+
+    bad = tmp_path / "bad.yaml"
+    bad.write_text(text.replace("cells: 4", "cells: 8"), encoding="utf-8")
+    assert main(["validate-drone", str(bad)]) == 1
+    tight = tmp_path / "limits.json"
+    tight.write_text('{"max_thrust_to_weight": 5}', encoding="utf-8")
+    assert main(["validate-drone", str(EXAMPLE_DRONE), "--limits", str(tight)]) == 1
+
+
+def make_dataset(folder: Path) -> Path:
+    """A two-image dataset laid out the way the simulator writes it."""
+    width, height = 640, 480
+    for split in ("train", "val", "test"):
+        for sub in ("images", "labels"):
+            (folder / sub / split).mkdir(parents=True)
+    (folder / "annotations").mkdir()
+    box = [100.0, 120.0, 200.0, 160.0]
+    keypoints = [120.0, 140.0, 2, 280.0, 140.0, 2, 280.0, 260.0, 1, 0, 0, 0]
+    yolo = "0 0.312500 0.416667 0.312500 0.333333 0.187500 0.291667 2 0.437500 0.291667 2 0.437500 0.541667 1 0.000000 0.000000 0\n"
+    for split, names in (("train", ["000000", "000001"]), ("val", []), ("test", [])):
+        images, annotations = [], []
+        for n, name in enumerate(names):
+            (folder / "images" / split / f"{name}.jpg").write_bytes(b"not really a jpeg")
+            (folder / "labels" / split / f"{name}.txt").write_text(yolo if n == 0 else "", encoding="utf-8")
+            images.append({"id": n + 1, "file_name": f"images/{split}/{name}.jpg", "width": width, "height": height})
+            if n == 0:
+                annotations.append({"id": 1, "image_id": 1, "category_id": 1, "iscrowd": 0, "bbox": box, "area": 32000.0,
+                                    "keypoints": keypoints, "num_keypoints": 3})
+        (folder / "annotations" / f"instances_{split}.json").write_text(
+            json.dumps({"images": images, "annotations": annotations, "categories": [{"id": 1, "name": "gate"}]}), encoding="utf-8")
+    meta = {"images": 2, "train": 2, "val": 0, "test": 0, "gates_labelled": 1, "width": width, "height": height, "masks": False,
+            "label_check": {"boxes_checked": 1, "boxes_within_2px": 1, "corners_checked": 2, "corners_on_gate": 2}}
+    (folder / "dataset.json").write_text(json.dumps(meta), encoding="utf-8")
+    return folder
+
+
+def test_dataset_check_accepts_a_consistent_dataset_and_finds_what_is_broken(tmp_path):
+    from ushqyr_bench_runner import dataset
+
+    folder = make_dataset(tmp_path / "d")
+    problems, summary = dataset.check(folder)
+    assert problems == [] and summary["images"] == 2 and summary["gates"] == 1
+    assert main(["dataset-check", str(folder)]) == 0
+
+    (folder / "labels" / "train" / "000000.txt").write_text("", encoding="utf-8")
+    assert any("YOLO labels but" in p for p in dataset.check(folder)[0])
+
+    folder = make_dataset(tmp_path / "e")
+    (folder / "images" / "train" / "000001.jpg").unlink()
+    assert any("missing image" in p for p in dataset.check(folder)[0])
+
+    folder = make_dataset(tmp_path / "f")
+    meta = json.loads((folder / "dataset.json").read_text())
+    meta["label_check"]["boxes_within_2px"] = 0
+    (folder / "dataset.json").write_text(json.dumps(meta))
+    assert any("label check" in p for p in dataset.check(folder)[0])
+    assert main(["dataset-check", str(folder)]) == 1
+    assert dataset.check(tmp_path / "nothing")[0] == ["no dataset.json: the dataset is not finished"]

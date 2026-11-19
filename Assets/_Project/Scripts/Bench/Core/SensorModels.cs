@@ -212,6 +212,18 @@ namespace Ushqyr.Bench
         };
 
         public static AnalogVideoSettings Clean => default;
+
+        /// <summary>The same link with all its effects stronger or weaker by <paramref name="factor"/>.</summary>
+        public AnalogVideoSettings Scaled(float factor)
+        {
+            AnalogVideoSettings s = this;
+            s.LumaNoise *= factor;
+            s.ChromaNoise *= factor;
+            s.LineJitterChance *= factor;
+            s.TearChance *= factor;
+            s.HueDriftDegrees *= Math.Min(2f, factor);
+            return s;
+        }
     }
 
     /// <summary>

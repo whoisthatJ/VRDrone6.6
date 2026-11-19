@@ -13,6 +13,7 @@ dependencies = []
 
 [project.optional-dependencies]
 resim = ["ushqyr-bench"]
+drone = ["pyyaml>=5.4"]
 dev = ["pytest>=7", "ruff>=0.4"]
 
 [project.scripts]
@@ -26,7 +27,7 @@ testpaths = ["tests"]
 pythonpath = ["src", "../sdk/python/src"]
 
 [tool.ruff]
-line-length = 130
+line-length = 140
 target-version = "py39"
 
 [tool.ruff.lint]

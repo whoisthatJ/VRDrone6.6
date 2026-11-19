@@ -693,6 +693,173 @@ namespace Ushqyr.Tests
             Assert.AreEqual(r.LapTime, again.LapTime, "the oracle run is repeatable");
         }
 
+        // ---------- B4: team drone (AI CORE) ----------
+
+        private static string ExampleDrone() => System.IO.File.ReadAllText("bench/examples/drones/example_3inch.yaml");
+
+        [Test]
+        public void MiniYaml_ReadsNestedKeysListsAndComments()
+        {
+            var d = MiniYaml.Parse("a: 1.5   # a comment\nname: \"Team #1\"\nb:\n  c: [1, 2, 3]\n  d: true\n  e:\n    f: text\ng: -2\n");
+            Assert.AreEqual(1.5, d["a"]);
+            Assert.AreEqual("Team #1", d["name"]);
+            var b = (Dictionary<string, object>)d["b"];
+            Assert.AreEqual(3, ((List<object>)b["c"]).Count);
+            Assert.AreEqual(true, b["d"]);
+            Assert.AreEqual("text", ((Dictionary<string, object>)b["e"])["f"]);
+            Assert.AreEqual(-2.0, d["g"]);
+            Assert.Throws<FormatException>(() => MiniYaml.Parse("a: 1\na: 2\n"));
+            Assert.Throws<FormatException>(() => MiniYaml.Parse("list:\n  - one\n"));
+            Assert.Throws<FormatException>(() => MiniYaml.Parse("just words\n"));
+        }
+
+        [Test]
+        public void DroneFile_ExampleIsAccepted_AndGivesASensibleDrone()
+        {
+            DroneConfig c = DroneConfig.Parse(ExampleDrone(), new DroneLimits());
+            Assert.IsEmpty(c.Errors, string.Join("; ", c.Errors));
+            Assert.AreEqual("Example 3 inch", c.Name);
+            Assert.AreEqual(64, c.Hash.Length);
+            Assert.IsTrue(c.Has("lidar") && c.Has("tof"));
+            Assert.AreEqual(7.0f, c.ThrustToWeight, 0.01f);
+
+            QuadProfile p = c.ToProfile();
+            Assert.AreEqual(0.24f, p.Mass, 1e-4f);
+            Assert.AreEqual(0.42f * 9.81f, p.Motors.MaxThrustPerMotor, 1e-3f);
+            Assert.AreEqual(4, p.Battery.Cells);
+            Assert.AreEqual(50f, p.AngleMode.MaxAngleDeg);
+            float hover = MotorModel.HoverCommand(p.Motors, p.Mass * 9.81f);
+            Assert.That(hover, Is.InRange(0.2f, 0.45f), "hover throttle");
+            Assert.That(p.Inertia.x, Is.InRange(1e-4f, 2e-3f));
+            Assert.Greater(p.Inertia.y, p.Inertia.x, "yaw is the heaviest axis of a flat drone");
+        }
+
+        [Test]
+        public void DroneFile_DerivedDrone_HoversAndFollowsTheSticksWithoutOscillating()
+        {
+            QuadProfile p = DroneConfig.Parse(ExampleDrone(), new DroneLimits()).ToProfile();
+            QuadState s = QuadState.AtRest(new Vec3(0f, 10f, 0f), Quat.Identity);
+            float hover = MotorModel.HoverCommand(p.Motors, p.Mass * 9.81f);
+            // Two seconds of hover, then a 20 degree pitch command in Angle mode.
+            for (int i = 0; i < 2000; i++) QuadSimulator.Step(ref s, new PilotInput { Throttle = hover, Arm = true, Mode = FlightMode.Angle }, p, 0.001f);
+            Assert.AreEqual(10f, s.Position.y, 1.0f, "holds its height on the hover throttle");
+            float stick = 20f / p.AngleMode.MaxAngleDeg, last = 0f, swing = 0f;
+            for (int i = 0; i < 1500; i++)
+            {
+                QuadSimulator.Step(ref s, new PilotInput { Throttle = hover, Pitch = stick, Arm = true, Mode = FlightMode.Angle }, p, 0.001f);
+                float angle = -Mathf.Asin(Mathf.Clamp(s.Forward.y, -1f, 1f)) * Mathf.Rad2Deg;
+                if (i > 1000) swing = Mathf.Max(swing, Mathf.Abs(angle - last));
+                last = angle;
+            }
+            Assert.AreEqual(20f, last, 2.5f, "settles on the commanded tilt");
+            Assert.Less(swing, 0.05f, "and is steady there (no oscillation)");
+        }
+
+        [Test]
+        public void DroneFile_LimitsAreEnforced_WithReadableMessages()
+        {
+            var limits = new DroneLimits();
+            string Errors(string from, string to) => string.Join("; ", DroneConfig.Parse(ExampleDrone().Replace(from, to), limits).Errors);
+
+            StringAssert.Contains("width = 340 mm: allowed 30 to 300", Errors("size_mm: [170, 170, 55]", "size_mm: [340, 170, 55]"));
+            StringAssert.Contains("height", Errors("size_mm: [170, 170, 55]", "size_mm: [170, 170, 200]"));
+            StringAssert.Contains("thrust-to-weight", Errors("max_thrust_g: 420", "max_thrust_g: 900"));
+            StringAssert.Contains("thrust-to-weight", Errors("max_thrust_g: 420", "max_thrust_g: 70"));
+            StringAssert.Contains("battery.cells", Errors("cells: 4", "cells: 8"));
+            StringAssert.Contains("not in the catalogue", Errors("[camera, imu, tof, lidar, battery]", "[camera, imu, gps]"));
+            StringAssert.Contains("camera is required", Errors("[camera, imu, tof, lidar, battery]", "[imu, tof]"));
+            StringAssert.Contains("unknown key", Errors("mass_g: 240", "mass_g: 240\nturbo: 9"));
+            StringAssert.Contains("mass_g: missing", Errors("mass_g: 240", "weight: 240"));
+            StringAssert.Contains("camera.tilt_deg", Errors("tilt_deg: 25", "tilt_deg: 80"));
+            StringAssert.Contains("inside the declared size", Errors("arm_x_mm: 55", "arm_x_mm: 120"));
+
+            // The organisers' file can tighten the class.
+            var tight = DroneLimits.Parse("{\"max_thrust_to_weight\":5}");
+            StringAssert.Contains("thrust-to-weight", string.Join("; ", DroneConfig.Parse(ExampleDrone(), tight).Errors));
+            Assert.AreEqual(300f, tight.max_width_mm, "untouched limits keep their defaults");
+        }
+
+        [Test]
+        public void DroneFile_SameTextSameHash_AnyEditChangesIt()
+        {
+            var limits = new DroneLimits();
+            Assert.AreEqual(DroneConfig.Parse(ExampleDrone(), limits).Hash, DroneConfig.Parse(ExampleDrone(), limits).Hash);
+            Assert.AreNotEqual(DroneConfig.Parse(ExampleDrone(), limits).Hash, DroneConfig.Parse(ExampleDrone().Replace("mass_g: 240", "mass_g: 241"), limits).Hash);
+        }
+
+        // ---------- B5: randomisation and dataset labels ----------
+
+        [Test]
+        public void LensProjection_IsTheLensMapTheOtherWayRound()
+        {
+            // A point is projected to a pixel; the lens map says which source-render pixel that output pixel shows;
+            // that source pixel must look along the same direction as the point.
+            const int w = 640, h = 480;
+            const float k1 = 0.18f;
+            float f = AnalogVideo.LensFocal(w, 120f, k1);
+            AnalogVideo.LensSourceExtent(w, h, f, k1, out float hx, out float hy);
+            int sw = Mathf.CeilToInt(hx * f) * 2, sh = Mathf.CeilToInt(hy * f) * 2;
+            var map = new Unity.Collections.NativeArray<int>(w * h, Unity.Collections.Allocator.Persistent);
+            AnalogVideo.BuildLensMap(map, w, h, sw, sh, f, k1);
+            foreach (var p in new[] { new Vector3(0f, 0f, 5f), new Vector3(2f, 1f, 4f), new Vector3(-3f, -1.5f, 3f), new Vector3(4.5f, 2.2f, 3f) })
+            {
+                Assert.IsTrue(LensProjection.Project(p, f, w * 0.5f, h * 0.5f, k1, out Vector2 px));
+                int u = Mathf.FloorToInt(px.x), v = Mathf.FloorToInt(px.y);
+                Assert.That(u, Is.InRange(0, w - 1));
+                Assert.That(v, Is.InRange(0, h - 1));
+                int offset = map[v * w + u] / 3, sx = offset % sw, syBottomUp = offset / sw;
+                // The source render is a plain perspective picture, bottom row first.
+                float xu = (sx + 0.5f - sw * 0.5f) / (sw * 0.5f / hx), yu = (sh - 1 - syBottomUp + 0.5f - sh * 0.5f) / (sh * 0.5f / hy);
+                Assert.AreEqual(p.x / p.z, xu, 0.02f, "horizontal direction");
+                Assert.AreEqual(-p.y / p.z, yu, 0.02f, "vertical direction");
+            }
+            Assert.IsFalse(LensProjection.Project(new Vector3(0f, 0f, -1f), f, 320f, 240f, k1, out _), "behind the camera");
+            map.Dispose();
+        }
+
+        [Test]
+        public void Randomizer_SameSeedSameScene_AndTheTrackStaysFlyable()
+        {
+            BenchTrack oval = Oval();
+            string before = oval.ToJson();
+            foreach (string profile in new[] { "mild", "strong" })
+                for (long seed = 1; seed <= 12; seed++)
+                {
+                    RandomizationProfile p = RandomizationProfile.Get(profile);
+                    SceneVariation a = TrackRandomizer.Draw(oval, p, seed, 5, 5), b = TrackRandomizer.Draw(oval, p, seed, 5, 5);
+                    Assert.AreEqual(a.Track.ToJson(), b.Track.ToJson(), "same seed, same variation");
+                    Assert.AreEqual(a.Light, b.Light);
+                    Assert.AreEqual(a.Clutter.Count, b.Clutter.Count);
+                    Assert.IsFalse(TrackValidator.HasErrors(TrackValidator.Validate(a.Track)), $"{profile} seed {seed}: " + string.Join("; ", TrackValidator.Validate(a.Track)));
+                    for (int i = 0; i < oval.gates.Count; i++)
+                    {
+                        Assert.LessOrEqual(Mathf.Abs(a.Track.gates[i].position[0] - oval.gates[i].position[0]), p.GateShift + 1e-4f);
+                        Assert.LessOrEqual(Mathf.Abs(Mathf.DeltaAngle(a.Track.gates[i].yaw, oval.gates[i].yaw)), p.GateTurn + 1e-3f);
+                        Assert.AreEqual(oval.gates[i].led.color, a.Track.gates[i].led.color, "a run keeps the LED colours");
+                    }
+                    Assert.That(a.Light, Is.InRange(p.LightMin, p.LightMax));
+                    foreach (TrackProp c in a.Clutter)
+                        foreach (TrackGate g in a.Track.gates)
+                            Assert.Greater(Vector2.Distance(TrackValidator.Flat(c.position), TrackValidator.Flat(g.position)), 2.9f, "clutter keeps clear of the gates");
+                }
+            Assert.AreEqual(before, oval.ToJson(), "the track itself is never changed");
+            Assert.AreNotEqual(TrackRandomizer.Draw(oval, RandomizationProfile.Get("mild"), 1).Track.ToJson(),
+                TrackRandomizer.Draw(oval, RandomizationProfile.Get("mild"), 2).Track.ToJson());
+            SceneVariation none = TrackRandomizer.Draw(oval, RandomizationProfile.Get("none"), 5);
+            Assert.AreEqual(1f, none.Light);
+            Assert.AreEqual(oval.gates[0].position[0], none.Track.gates[0].position[0]);
+            Assert.AreEqual(8, RandomizationProfile.Get("strong").Clutter);
+            Assert.IsFalse(RandomizationProfile.Get("anything else").Any);
+        }
+
+        [Test]
+        public void Randomizer_VariedTrack_IsStillFlownByTheOracle()
+        {
+            SceneVariation v = TrackRandomizer.Draw(Oval(), RandomizationProfile.Get("strong"), 3, 5, 5);
+            OracleResult r = BenchOracle.Fly(v.Track, 0, 60f);
+            Assert.IsTrue(r.Lap, $"{r.Points} points");
+        }
+
         // ---------- results, manifest, leaderboard ----------
 
         private static string TempFolder()

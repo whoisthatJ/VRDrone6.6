@@ -120,6 +120,18 @@ namespace Ushqyr.Bench
                 return;
             }
 #endif
+#if !USHQYR_BENCH_SERVER
+            if (session.Dataset != null)
+            {
+                _title.text = "AI BENCH  ·  " + L.T("DATASET") + "  ·  " + session.Track.id;
+                _gates.text = session.Dataset.Done + " / " + session.Dataset.Total;
+                _time.text = "";
+                _status.text = session.Dataset.Error ?? (session.Dataset.Finished ? L.T("Dataset ready") : L.T("Making images and labels"));
+                _drone.text = session.Dataset.Summary;
+                if (session.LastFrame == null) _previewFrame.SetActive(false);
+                return;
+            }
+#endif
             if (session.ReplayMode)
             {
                 if (session.Track == null) return;

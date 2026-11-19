@@ -8,6 +8,7 @@
     "compute_delay_ms": 0.0,
     "time_mode": "sync",
     "lidar_hz": 10.0,
+    "randomization": "none",
     "lidar": true,
     "camera_width": 640,
     "camera_height": 480,

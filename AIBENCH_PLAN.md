@@ -79,6 +79,14 @@ Items marked ❓ are my defaults; the organisers must confirm them (§16). Every
 | D36 | **The oracle pilot is new code** (`BenchOracle`: waypoints before and after each gate, velocity control through Angle-mode sticks), not the Phase 3 bot core | The bot core follows baked racing lines on spline routes; gate lists in free order need none of it |
 | D37 | **Public tracks keep the plan's names and gate counts**, and a track file may carry `props` (solid coloured panels and boxes) for `X1_Mixed`'s distractors | Plan §4 |
 | D38 | **Hidden-track protection = never shipping the file, plus a check** (`ushqyr-bench check-build`) that a build or kit folder contains no hidden track, its id or its gate data. **The private folder itself is the owner's choice, still open** | D8 with a test |
+| D39 | **`drone.yaml` is read by the simulator itself** with a small parser for plain YAML (nested keys, numbers, text, one-line lists), and checked there against `class_limits.json`. `ushqyr-bench validate-drone` (PyYAML) repeats the checks for teams; the simulator's verdict is the one that counts | No YAML library in the build; the check can't be skipped by not running a tool |
+| D40 | **What a team may declare and what is computed.** Declared: size, mass, per-motor thrust, motor time constant, motor positions, propeller, battery, rates, max angle, camera tilt and field of view, sensor list. Computed from size and mass: inertia, drag, controller gains (scaled from the 5" race quad's tuning by control authority). Default limits: thrust-to-weight 1.5 to 8, up to 6 cells, mass 25 to 1500 g, in `class_limits.json` | A team can't tune itself an unphysical drone through inertia or drag; every number that matters for fairness has a limit the organisers own |
+| D41 | **Team drone visual and collider:** a box of the declared size with four arms and propellers; collision sphere of 0.4 × the larger of width and length | "Collider and visual box from the declared size"; the flight model uses a sphere for every drone |
+| D42 | **Randomisation is a rules setting** (`randomization`: none / mild / strong) driven by the attempt's seed; it also provides D10's "seeded start-pose and gate-pose jitter, identical for every team". A nudge that would break the track's checks is not applied to that gate. Runs keep the LED colours; datasets also vary them | One mechanism for training variety, fair competition jitter and datasets |
+| D43 | **Dataset keypoints are 3D points**: the opening's corners on the gate face towards the camera, ordered as seen. Visibility 0 / 1 / 2 as in COCO | Usable for pose estimation (PnP), not only detection |
+| D44 | **Label check = second render with the lights out and gates painted in ID colours.** A gate wholly in view must have its box within 2 px of the painted outline on every side; visible corners must lie on the gate. (The plan's "corners against the ID mask" fails by construction on near gates, where the corner sits between two visible gate surfaces.) | A check of the projection against what the renderer really drew |
+| D45 | **Masks are instance-id PNGs**, not COCO polygons | Simple to read; conversion is one line for whoever needs polygons |
+| D46 | **`dataset` is a simulator mode** (`-bench-dataset`), and `ushqyr-bench dataset` only starts it; the in-app button makes 500 images | The camera pipeline exists once |
 
 ## 3. Architecture
 ```
@@ -376,3 +384,24 @@ After B1, B2 and B3 can run in parallel. B4 waits for data. B5 can start any tim
 | Hidden-track workflow | Done as a procedure plus `ushqyr-bench check-build`; the private folder is not chosen (owner's decision) |
 | Sample solution on the new sensors | `H1_Oval` 5 of 5 laps, `H2_Eight` 4 of 5, `P1_Columns` 4 of 5 (5 seeds each). Below the 90% acceptance bar on two tracks: to be improved before B8 |
 | Tests | 49 `BenchTests`, 12 SDK tests, 8 runner tests |
+
+### B4 (19 November 2026): drones, the part that needs no organiser data
+| Item | State |
+|---|---|
+| Whoop v1 from the organisers' data | **Not started: the data has not arrived** (`Docs/reference/whoop/` is empty). v0 stays, marked `calibrated=false` |
+| AI CORE: `drone.yaml`, JSON Schema, class limits file | Done (`bench/examples/drones/example_3inch.yaml`, `bench/schemas/drone.schema.json`, `StreamingAssets/Bench/class_limits.json`) |
+| `ushqyr-bench validate-drone` | Done; same checks as the simulator, tested on both sides |
+| Config hash in results | Done (SHA-256 of the file) |
+| Collider and visual box from the declared size | Done |
+| Flight | The example drone (240 g, thrust-to-weight 7) is stable in tests (hover, 20° step without oscillation) and flew the oval with the unchanged sample: 5 gates in 60 s, the sample being tuned for the whoop |
+
+### B5 (19 November 2026): datasets and randomisation
+| Item | State |
+|---|---|
+| Randomisation of light, background and noise, usable in normal runs | Done: `randomization` in the rules; the sample flew 5 of 5 laps under `mild`, identical for a repeated seed |
+| Dataset generator: boxes, corner keypoints, optional masks | Done |
+| YOLO and COCO output, splits, seed | Done; `dataset-check` confirms the two formats agree |
+| In-app screen | A "Dataset" button per track in the track list (500 images); options only from the command line |
+| Label-overlay check script | Done: `ushqyr-bench dataset-check <folder> --draw 100` |
+| 2-pixel projection test | Done as a box-against-painted-outline check (D44): 228 of 230 boxes within 2 px (99.1%), 1268 of 1268 visible corners on their gate, on a 200-image dataset |
+| Tests | 57 `BenchTests` (355 EditMode in all), 12 SDK tests, 10 runner tests |

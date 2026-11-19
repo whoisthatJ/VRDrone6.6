@@ -123,6 +123,8 @@ namespace Ushqyr.Vehicle
         public bool ExternalStepping { get; set; }
 
         public float FixedStep => _env.FixedStep;
+        /// <summary>Collision sphere radius in use (m).</summary>
+        public float BaseCollisionRadius => _collision.Settings.Radius;
         public float Gravity => _env.Gravity;
 
         /// <summary>One physics step with <paramref name="pilot"/> as the input. Only with <see cref="ExternalStepping"/>.</summary>

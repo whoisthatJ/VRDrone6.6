@@ -49,6 +49,10 @@ namespace Ushqyr.EditorTools.Bench
             int trackLayer = LayerMask.NameToLayer(Builders.TrackSceneBuilder.TrackLayerName);
 
             Material frameMat = LitMaterial(FrameMaterialPath, new Color(0.035f, 0.036f, 0.04f), 0.25f, Color.black);
+            // Emission stays black, but the keyword is on: the dataset tool paints gates in flat colours through it.
+            frameMat.EnableKeyword("_EMISSION");
+            frameMat.globalIlluminationFlags = MaterialGlobalIlluminationFlags.RealtimeEmissive;
+            EditorUtility.SetDirty(frameMat);
             Material ledMat = LitMaterial(LedMaterialPath, Color.white, 0.1f, Color.white);
 
             const float outer = GateGeometry.Outer, open = GateGeometry.Opening, bar = GateGeometry.Bar, depth = GateGeometry.Depth;
@@ -148,6 +152,8 @@ namespace Ushqyr.EditorTools.Bench
                 written.Add(path);
             }
             if (!File.Exists(RulesPath)) File.WriteAllText(RulesPath, JsonUtility.ToJson(new BenchRules(), true) + "\n");
+            string limits = Path.Combine(Path.GetDirectoryName(RulesPath), "class_limits.json");
+            if (!File.Exists(limits)) File.WriteAllText(limits, JsonUtility.ToJson(new DroneLimits(), true) + "\n");
             AssetDatabase.Refresh();
             return string.Join(", ", written);
         }
@@ -368,6 +374,27 @@ namespace Ushqyr.EditorTools.Bench
             if (venueId == "parking") BuildParking(hall, trackLayer, venue);
             else BuildHall(hall, trackLayer);
             BuildLighting(venueId);
+            var floors = new List<Renderer>();
+            var walls = new List<Renderer>();
+            foreach (Transform child in hall)
+            {
+                if (child.name == "Floor") floors.Add(child.GetComponent<Renderer>());
+                else if (child.name.StartsWith("Wall ")) walls.Add(child.GetComponent<Renderer>());
+            }
+            Material[] Mats(params string[] names)
+            {
+                var list = new List<Material>();
+                foreach (string n in names)
+                {
+                    Material m = MaterialLibrary.Get(n);
+                    if (m != null) list.Add(m);
+                }
+                return list.ToArray();
+            }
+            string ownFloor = venueId == "parking" ? "M_Asphalt_PitLane" : "M_Concrete_PaintedFloor", ownWall = venueId == "parking" ? "M_Concrete_Blocks" : "M_Concrete_Wall";
+            new GameObject("Venue Look").AddComponent<BenchVenueLook>().Configure(floors.ToArray(), walls.ToArray(),
+                Mats(ownFloor, "M_Concrete_HangarFloor", "M_Wood_Planks", "M_Rubber_Mat", venueId == "parking" ? "M_Concrete_PaintedFloor" : "M_Asphalt_PitLane"),
+                Mats(ownWall, "M_Brick_Factory", "M_Steel_Corrugated", "M_Wood_Plywood", venueId == "parking" ? "M_Concrete_Wall" : "M_Concrete_Blocks"));
 
             // Camera for the window (spectators); the program's camera is created on the drone at runtime.
             var camGo = new GameObject("Spectator Camera") { tag = "MainCamera" };

@@ -25,6 +25,41 @@ namespace Ushqyr.Bench
             ambientGround = RenderSettings.ambientGroundColor;
         }
 
+        /// <summary>A drawn variation on top of the track's lighting variant: level, colour and direction of the main light.</summary>
+        public void Vary(string variant, float level, Color colour, float yaw)
+        {
+            Apply(variant);
+            if (main != null)
+            {
+                main.intensity *= level;
+                main.color *= colour;
+                Vector3 e = main.transform.eulerAngles;
+                main.transform.rotation = Quaternion.Euler(e.x, yaw, 0f);
+            }
+            if (bounce != null) bounce.intensity *= level;
+            RenderSettings.ambientSkyColor *= colour * level;
+            RenderSettings.ambientEquatorColor *= colour * level;
+            RenderSettings.ambientGroundColor *= colour * level;
+        }
+
+        private Color _sky, _equator, _ground;
+
+        /// <summary>All light off (and back on): only things that shine by themselves stay visible.</summary>
+        public void Dark(bool dark)
+        {
+            if (main != null) main.enabled = !dark;
+            if (bounce != null) bounce.enabled = !dark;
+            if (dark)
+            {
+                _sky = RenderSettings.ambientSkyColor; _equator = RenderSettings.ambientEquatorColor; _ground = RenderSettings.ambientGroundColor;
+                RenderSettings.ambientSkyColor = RenderSettings.ambientEquatorColor = RenderSettings.ambientGroundColor = Color.black;
+            }
+            else
+            {
+                RenderSettings.ambientSkyColor = _sky; RenderSettings.ambientEquatorColor = _equator; RenderSettings.ambientGroundColor = _ground;
+            }
+        }
+
         public void Apply(string variant)
         {
             float level = 1f;

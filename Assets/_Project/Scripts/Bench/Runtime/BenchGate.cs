@@ -37,6 +37,29 @@ namespace Ushqyr.Bench
             Apply(1f);
         }
 
+        /// <summary>
+        /// Paints the whole gate in one flat colour that owes nothing to the lights (dataset masks);
+        /// <see cref="Unpaint"/> brings its own look back.
+        /// </summary>
+        public void Paint(Color32 colour)
+        {
+            _block ??= new MaterialPropertyBlock();
+            _block.SetColor(BaseColor, Color.black);
+            // SetColor takes the colour as seen on screen and converts it itself.
+            _block.SetColor(EmissionColor, (Color)colour);
+            if (leds != null)
+                foreach (var r in leds) if (r != null) r.SetPropertyBlock(_block);
+            if (frame != null)
+                foreach (var r in frame) if (r != null) r.SetPropertyBlock(_block);
+        }
+
+        public void Unpaint()
+        {
+            if (frame != null)
+                foreach (var r in frame) if (r != null) r.SetPropertyBlock(null);
+            Apply(1f);
+        }
+
         /// <summary>Blinking follows simulator time, so the camera picture is the same on every run.</summary>
         public void Tick(double simTime)
         {

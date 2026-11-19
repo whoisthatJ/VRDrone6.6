@@ -1,0 +1,39 @@
+# A team drone for the AI CORE class. Check it with:  ushqyr-bench validate-drone example_3inch.yaml
+# Fly it with:                                         Ushqyr.exe -bench -bench-drone example_3inch.yaml
+#
+# Plain YAML only: nested keys by indentation (spaces), numbers, text, and lists in one line [a, b, c].
+schema: 1
+class: ai_core
+name: Example 3 inch
+
+size_mm: [170, 170, 55]        # width, length, height; the class limit is 300 x 300 x 180
+mass_g: 240                    # ready to fly, with battery
+
+motors:
+  count: 4
+  max_thrust_g: 420            # static thrust of ONE motor with your prop and battery
+  time_constant_ms: 35         # how fast the motor follows the command (63% of a step)
+  arm_x_mm: 55                 # motor position from the centre, sideways and forwards
+  arm_z_mm: 55
+
+props:
+  diameter_in: 3
+  pitch_in: 3
+
+battery:
+  cells: 4
+  capacity_mah: 850
+  internal_resistance_mohm: 32 # whole pack; leave out to have it estimated
+  max_current_a: 55            # at full throttle on all motors; leave out to have it estimated
+
+controller:
+  roll_rate_deg_s: 600         # rate at full stick in Acro
+  pitch_rate_deg_s: 600
+  yaw_rate_deg_s: 450
+  max_angle_deg: 50            # tilt at full stick in Angle mode
+
+camera:
+  tilt_deg: 25                 # upward tilt
+  hfov_deg: 120                # horizontal field of view, edge to edge
+
+sensors: [camera, imu, tof, lidar, battery]

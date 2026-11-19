@@ -149,6 +149,12 @@ namespace Ushqyr.Bench
         /// <summary>"sync": the simulator advances one step per command. "realtime": it runs with the wall clock.</summary>
         public string time_mode = "sync";
         public float lidar_hz = 10f;
+        /// <summary>
+        /// How much each attempt varies the scene from its seed: "none", "mild" or "strong" (gate and start poses,
+        /// LED brightness, lights, video noise; "strong" also changes surfaces and adds clutter). The same seed gives
+        /// every team the same variation.
+        /// </summary>
+        public string randomization = "none";
         public bool lidar = true;
         public int camera_width = 640;
         public int camera_height = 480;

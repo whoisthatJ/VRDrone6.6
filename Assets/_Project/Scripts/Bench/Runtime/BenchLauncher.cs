@@ -105,6 +105,77 @@ namespace Ushqyr.Bench
 
         public static bool LoopbackOnly => !HasFlag("-bench-listen-all");
 
+#if !USHQYR_BENCH_SERVER
+        private static BenchDataset.Options? _dataset;
+
+        /// <summary>
+        /// A dataset to make instead of running an attempt: <c>-bench-dataset &lt;folder&gt;</c> with
+        /// <c>-bench-dataset-count</c> (500), <c>-bench-dataset-seed</c> (1), <c>-bench-dataset-profile</c> (strong) and
+        /// <c>-bench-dataset-masks</c>; or set from the track list.
+        /// </summary>
+        public static BenchDataset.Options? Dataset
+        {
+            get
+            {
+                if (_dataset.HasValue || Arg("-bench-dataset") == null || _datasetCleared) return _dataset;
+                return new BenchDataset.Options
+                {
+                    Folder = Arg("-bench-dataset"),
+                    Count = int.TryParse(Arg("-bench-dataset-count"), out int n) && n > 0 ? n : 500,
+                    Seed = long.TryParse(Arg("-bench-dataset-seed"), out long s) ? s : 1,
+                    Profile = Arg("-bench-dataset-profile") ?? "strong",
+                    Masks = HasFlag("-bench-dataset-masks"),
+                };
+            }
+        }
+        private static bool _datasetCleared;
+
+        /// <summary>Opens a track's venue and makes a dataset from it (the track list's button).</summary>
+        public static void MakeDataset(string track, int count, long seed)
+        {
+            string path = ResolveTrack(track);
+            BenchTrack t = BenchTrack.Parse(File.ReadAllText(path));
+            _dataset = new BenchDataset.Options
+            {
+                Folder = Path.Combine(OutputFolder, "datasets", $"{t.id}_{seed}"), Count = count, Seed = seed, Profile = "strong", Masks = true,
+            };
+            ChosenTrack = path;
+            ReplayFolder = null;
+            EditPath = null;
+            _editCleared = true;
+            SceneManager.LoadScene(SceneFor(t));
+        }
+
+        public static void DatasetDone()
+        {
+            _dataset = null;
+            _datasetCleared = true;
+        }
+#endif
+
+        /// <summary><c>-bench-drone &lt;drone.yaml&gt;</c>: fly a team's own drone (class AI CORE) instead of the whoop.</summary>
+        public static string DronePath => Arg("-bench-drone");
+        public static string DefaultLimitsPath => Path.Combine(Application.streamingAssetsPath, "Bench", "class_limits.json");
+
+        /// <summary>The class limits: <c>-bench-limits &lt;file&gt;</c>, or the file next to the tracks, or the built-in defaults.</summary>
+        public static DroneLimits LoadLimits()
+        {
+            string path = Arg("-bench-limits") ?? DefaultLimitsPath;
+            if (Arg("-bench-limits") != null && !File.Exists(path)) throw new FileNotFoundException($"limits file not found: {path}");
+            return DroneLimits.Parse(File.Exists(path) ? File.ReadAllText(path) : null);
+        }
+
+        /// <summary>The team drone of this run, checked against the limits; null when the whoop flies.</summary>
+        public static DroneConfig LoadDrone()
+        {
+            string path = DronePath;
+            if (string.IsNullOrEmpty(path)) return null;
+            if (!File.Exists(path)) throw new FileNotFoundException($"drone file not found: {path}");
+            DroneConfig c = DroneConfig.Parse(File.ReadAllText(path), LoadLimits());
+            if (c.Errors.Count > 0) throw new FormatException("the drone file is not accepted: " + string.Join("; ", c.Errors));
+            return c;
+        }
+
         /// <summary><c>-bench-team</c>: the team this attempt belongs to (results, folder name).</summary>
         public static string Team => Arg("-bench-team") ?? "local";
         /// <summary><c>-bench-attempt</c>: the attempt's number on this track.</summary>
@@ -175,7 +246,7 @@ namespace Ushqyr.Bench
                 Application.Quit(code);
                 return;
             }
-            if (Application.isEditor || !(HasFlag("-bench") || Arg("-bench-replay") != null || Arg("-bench-edit") != null)) return;
+            if (Application.isEditor || !(HasFlag("-bench") || Arg("-bench-replay") != null || Arg("-bench-edit") != null || Arg("-bench-dataset") != null)) return;
             try
             {
                 AppBootstrap.FirstSceneOverride = Arg("-bench-replay") != null ? SceneFor(LoadReplayTrack())

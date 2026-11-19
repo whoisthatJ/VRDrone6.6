@@ -68,7 +68,7 @@ and the connection is closed. The mode is decided by the simulator; nothing the 
 | `time_mode` | `"sync"` or `"realtime"` (see "Realtime mode") |
 | `control_hz` | Steps per second of simulator time (default 100): one `STEP` advances `1 / control_hz` |
 | `time_limit` | Attempt time limit in seconds |
-| `drone` | `class` (`"ai_mission"`), `name`, `calibrated` (false = placeholder model) |
+| `drone` | `class` (`"ai_mission"`: the organisers' whoop; `"ai_core"`: a team's drone from its file), `name`, `calibrated` (false = the whoop's placeholder model) |
 | `rc` | `channels` (16), `rate_hz`, `latency_ms`, `failsafe_ms` |
 | `sensors.camera` | `width`, `height`, `fps`, `format` (`"rgb8"`), `hfov_deg` (edge to edge), `tilt_deg` (upward tilt), `latency_ms`, intrinsics `fx`, `fy`, `cx`, `cy` in pixels, `distortion` (`model: "radial_k1"`, `k1`), `mount` (position in the body frame, metres) |
 | `sensors.lidar` | `rate_hz`, `rays`, `min_m`, `max_m`, `angle_step_deg`. Absent when the drone has no LiDAR |

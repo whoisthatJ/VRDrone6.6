@@ -4,6 +4,9 @@
     ushqyr-bench resim <attempt folder>              (needs the simulator running in training mode on the same track)
     ushqyr-bench leaderboard <results folder> [--track ID] [--csv results.csv] [--board leaderboard.csv] [--semicolon]
     ushqyr-bench check-build <build or kit folder> --hidden <folder with the hidden tracks>
+    ushqyr-bench validate-drone <drone.yaml> [--limits class_limits.json]
+    ushqyr-bench dataset --sim Ushqyr.exe --track H1_Oval --out <folder> [--count 500] [--seed 1] [--masks]
+    ushqyr-bench dataset-check <dataset folder> [--draw 100]
 """
 from __future__ import annotations
 
@@ -97,6 +100,53 @@ def cmd_check_build(args: argparse.Namespace) -> int:
     return 1 if leaks else 0
 
 
+def cmd_validate_drone(args: argparse.Namespace) -> int:
+    """Checks a team drone file against the class limits, the way the simulator will."""
+    from . import drone
+
+    text = Path(args.file).read_text(encoding="utf-8")
+    errors = drone.validate(text, drone.load_limits(Path(args.limits) if args.limits else None))
+    if errors:
+        print(f"NOT accepted: {len(errors)} problem(s)")
+        for e in errors:
+            print("  - " + e)
+        return 1
+    print("accepted")
+    print("  config hash: " + drone.config_hash(text))
+    return 0
+
+
+def cmd_dataset(args: argparse.Namespace) -> int:
+    """Starts the simulator in dataset mode and waits for the dataset."""
+    from . import dataset
+
+    code = dataset.make(Path(args.sim), args.track, Path(args.out), args.count, args.seed, args.profile, args.masks, args.timeout)
+    if code != 0 or not (Path(args.out) / "dataset.json").is_file():
+        print(f"the simulator did not finish the dataset (exit code {code})")
+        return 1
+    return cmd_dataset_check(argparse.Namespace(folder=args.out, draw=0))
+
+
+def cmd_dataset_check(args: argparse.Namespace) -> int:
+    from . import dataset
+
+    folder = Path(args.folder)
+    problems, summary = dataset.check(folder)
+    if summary:
+        print(f"{summary['images']} images, {summary['gates']} labelled gates")
+        print(f"label check by the simulator: {summary['boxes_within_2px']} of {summary['boxes_checked']} boxes within 2 px of "
+              f"the painted outline, {summary['corners_on_gate']} of {summary['corners_checked']} visible corners on their gate")
+    for p in problems:
+        print("  PROBLEM: " + p)
+    if args.draw:
+        try:
+            print(f"{args.draw} labelled pictures to look at: {dataset.draw(folder, args.draw)}")
+        except ImportError:
+            print("drawing needs opencv: pip install opencv-python")
+    print("consistent" if not problems else f"{len(problems)} problem(s)")
+    return 1 if problems else 0
+
+
 def main(argv: Optional[List[str]] = None) -> int:
     parser = argparse.ArgumentParser(
         prog="ushqyr-bench", description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
@@ -129,6 +179,27 @@ def main(argv: Optional[List[str]] = None) -> int:
     p.add_argument("build")
     p.add_argument("--hidden", required=True, help="the private folder with the hidden *.benchtrack.json files")
     p.set_defaults(run=cmd_check_build)
+
+    p = sub.add_parser("validate-drone", help="check a team drone file (class AI CORE) against the class limits")
+    p.add_argument("file")
+    p.add_argument("--limits", help="the organisers' class_limits.json (default: the simulator's built-in limits)")
+    p.set_defaults(run=cmd_validate_drone)
+
+    p = sub.add_parser("dataset", help="make a labelled gate dataset (YOLO and COCO) with the simulator")
+    p.add_argument("--sim", required=True, help="path to the simulator (Ushqyr.exe)")
+    p.add_argument("--track", default="H1_Oval", help="a public track's name or a track file")
+    p.add_argument("--out", required=True)
+    p.add_argument("--count", type=int, default=500)
+    p.add_argument("--seed", type=int, default=1)
+    p.add_argument("--profile", default="strong", choices=["none", "mild", "strong"], help="how much the scene varies")
+    p.add_argument("--masks", action="store_true", help="also write a mask per image: which pixels belong to which gate")
+    p.add_argument("--timeout", type=float, default=3600.0)
+    p.set_defaults(run=cmd_dataset)
+
+    p = sub.add_parser("dataset-check", help="check a dataset's files against each other; draw labels over pictures")
+    p.add_argument("folder")
+    p.add_argument("--draw", type=int, default=0, help="draw the labels over this many random pictures (needs opencv)")
+    p.set_defaults(run=cmd_dataset_check)
 
     args = parser.parse_args(argv)
     return int(args.run(args))

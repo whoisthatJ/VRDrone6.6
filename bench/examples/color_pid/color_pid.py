@@ -103,7 +103,8 @@ class ColorPid:
         self.max_angle = math.radians(max_angle_deg)
 
         self.detector = GateDetector()
-        self.altitude = Pid(kp=0.9, ki=0.5, kd=0.45, limit=0.35, integral_limit=0.4)
+        # The integral finds the hover throttle by itself, so the same code flies drones of different weight.
+        self.altitude = Pid(kp=0.9, ki=0.5, kd=0.45, limit=0.5, integral_limit=0.9)
         self.yaw = Pid(kp=1.5, ki=0.0, kd=0.12, limit=0.75, integral_limit=0.0)
 
         self.state = "arm"

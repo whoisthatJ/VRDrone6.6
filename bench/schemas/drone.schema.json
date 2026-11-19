@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushqyr.example/bench/drone.schema.json",
+  "title": "Ushqyr AI Bench: team drone (class AI CORE)",
+  "description": "Shape of drone.yaml. The numeric limits of the class are in class_limits.json and are checked by ushqyr-bench validate-drone and by the simulator.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "name", "size_mm", "mass_g", "motors", "battery", "sensors"],
+  "properties": {
+    "schema": { "const": 1 },
+    "class": { "const": "ai_core" },
+    "name": { "type": "string", "minLength": 1, "maxLength": 40 },
+    "size_mm": {
+      "description": "Width, length, height in millimetres.",
+      "type": "array", "items": { "type": "number", "exclusiveMinimum": 0 }, "minItems": 3, "maxItems": 3
+    },
+    "mass_g": { "type": "number", "exclusiveMinimum": 0 },
+    "motors": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["max_thrust_g"],
+      "properties": {
+        "count": { "const": 4 },
+        "max_thrust_g": { "description": "Static thrust of one motor.", "type": "number", "exclusiveMinimum": 0 },
+        "time_constant_ms": { "type": "number", "exclusiveMinimum": 0 },
+        "arm_x_mm": { "type": "number", "minimum": 0 },
+        "arm_z_mm": { "type": "number", "minimum": 0 }
+      }
+    },
+    "props": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "diameter_in": { "type": "number", "exclusiveMinimum": 0 },
+        "pitch_in": { "type": "number", "exclusiveMinimum": 0 }
+      }
+    },
+    "battery": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["cells", "capacity_mah"],
+      "properties": {
+        "cells": { "type": "integer", "minimum": 1 },
+        "capacity_mah": { "type": "number", "exclusiveMinimum": 0 },
+        "internal_resistance_mohm": { "type": "number", "minimum": 0 },
+        "max_current_a": { "type": "number", "minimum": 0 }
+      }
+    },
+    "controller": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "roll_rate_deg_s": { "type": "number", "exclusiveMinimum": 0 },
+        "pitch_rate_deg_s": { "type": "number", "exclusiveMinimum": 0 },
+        "yaw_rate_deg_s": { "type": "number", "exclusiveMinimum": 0 },
+        "max_angle_deg": { "type": "number", "exclusiveMinimum": 0 }
+      }
+    },
+    "camera": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "tilt_deg": { "type": "number" },
+        "hfov_deg": { "type": "number", "exclusiveMinimum": 0 }
+      }
+    },
+    "sensors": {
+      "type": "array",
+      "items": { "enum": ["camera", "imu", "tof", "lidar", "battery"] },
+      "contains": { "const": "camera" },
+      "uniqueItems": true
+    }
+  }
+}
