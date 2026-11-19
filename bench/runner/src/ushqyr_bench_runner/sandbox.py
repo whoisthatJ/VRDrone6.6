@@ -35,6 +35,7 @@ class Limits:
     cpus: float = 4.0
     pids: int = 256
     tmp: str = "256m"
+    shm: str = "256m"
     image_bytes: int = 8 * 1024**3
     build_seconds: float = 1800.0
     wall_seconds: float = 1800.0
@@ -100,6 +101,13 @@ def build_base(bench_root: Path) -> None:
     docker("build", "-t", BASE_IMAGE, "-f", str(bench_root / "docker" / "base" / "Dockerfile"), str(bench_root), timeout=3600)
 
 
+def build_ros2(bench_root: Path, distro: str) -> str:
+    tag = f"ushqyr-bench-ros2:{distro}"
+    docker("build", "-t", tag, "--build-arg", f"ROS_DISTRO={distro}", "-f", str(bench_root / "docker" / "ros2" / "Dockerfile"),
+           str(bench_root), timeout=3600)
+    return tag
+
+
 def build_server(bench_root: Path, build_folder: Path) -> None:
     if not (build_folder / "UshqyrBench.x86_64").is_file():
         raise SandboxError(f"no Bench Server build in {build_folder} (Unity menu: Ushqyr/Build/Build Bench Server (Linux))")
@@ -108,14 +116,19 @@ def build_server(bench_root: Path, build_folder: Path) -> None:
            timeout=3600)
 
 
-def build_solution(folder: Path, limits: Limits) -> Tuple[str, int]:
+def build_solution(folder: Path, limits: Limits, build_args: Optional[List[str]] = None) -> Tuple[str, int]:
     """Builds the solution's image from its Dockerfile. Returns (tag, size in bytes)."""
     if not (folder / "Dockerfile").is_file():
         raise SandboxError(f"{folder} has no Dockerfile (start from bench/template)")
-    if not image_exists(BASE_IMAGE):
-        raise SandboxError(f"the base image {BASE_IMAGE} is not built yet: run `ushqyr-bench build-images`")
+    for line in (folder / "Dockerfile").read_text(encoding="utf-8", errors="replace").splitlines():
+        words = line.split()
+        ours = len(words) >= 2 and words[0].upper() == "FROM" and words[1].startswith("ushqyr-bench-") and "$" not in words[1]
+        if ours and not image_exists(words[1]):
+            hint = "build-images --ros2 " + words[1].split(":")[-1] if "ros2" in words[1] else "build-images"
+            raise SandboxError(f"the base image {words[1]} is not built yet: run `ushqyr-bench {hint}`")
     tag = "ushqyr-solution-" + secrets.token_hex(4)
-    docker("build", "-t", tag, str(folder), timeout=limits.build_seconds)
+    extra = [x for arg in build_args or [] for x in ("--build-arg", arg)]
+    docker("build", "-t", tag, *extra, str(folder), timeout=limits.build_seconds)
     return tag, image_size(tag)
 
 
@@ -136,7 +149,8 @@ def solution_args(limits: Limits, network: str, token: str, port: int) -> List[s
         "--cap-drop", "ALL", "--security-opt", "no-new-privileges",
         "--user", "10001:10001",
         "--pids-limit", str(limits.pids), "--memory", limits.memory, "--memory-swap", limits.memory, "--cpus", str(limits.cpus),
-        "--ipc", "none",
+        # Its own shared memory (ROS 2's middleware uses it between nodes), shared with nobody.
+        "--ipc", "private", "--shm-size", limits.shm,
         "-e", f"USHQYR_BENCH_HOST={SIM_ALIAS}", "-e", f"USHQYR_BENCH_PORT={port}", "-e", f"USHQYR_BENCH_TOKEN={token}",
         "-e", "HOME=/tmp",
     ]
@@ -197,9 +211,12 @@ def run_attempt(image: str, out: Path, track: str, seed: int = 1, team: str = "c
             time.sleep(2.0)
         else:
             outcome.notes.append(f"the attempt was stopped after {limits.wall_seconds:.0f} s of real time")
+            # Stop the solution; the simulator sees the lost connection, ends the attempt and writes its files.
+            docker("kill", sol, check=False, timeout=60)
+            docker("wait", sim, check=False, timeout=180)
         # The simulator ends the attempt; the solution gets a moment to notice and exit by itself.
         try:
-            p = docker("wait", sol, timeout=15, check=False)
+            p = docker("wait", sol, timeout=30, check=False)
             outcome.solution_exit = int(p.stdout.strip()) if p.stdout.strip().lstrip("-").isdigit() else None
         except SandboxError:
             outcome.notes.append("the solution did not exit when the attempt ended (it was stopped)")

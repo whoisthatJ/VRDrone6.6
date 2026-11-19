@@ -13,7 +13,6 @@ import sys
 import time
 
 from color_pid import ColorPid
-
 from ushqyr_bench import Sim
 
 

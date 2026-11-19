@@ -22,7 +22,6 @@ from typing import List, Optional, Tuple
 
 import cv2
 import numpy as np
-
 from ushqyr_bench import RC, Observation, Sim
 
 

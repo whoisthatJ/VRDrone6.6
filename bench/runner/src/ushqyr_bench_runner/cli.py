@@ -162,7 +162,11 @@ def cmd_build_images(args: argparse.Namespace) -> int:
         sandbox.require_engine()
         print(f"building {sandbox.BASE_IMAGE} ...")
         sandbox.build_base(root)
-        if args.base_only:
+        for distro in args.ros2 or []:
+            print(f"building ushqyr-bench-ros2:{distro} ...")
+            sandbox.build_ros2(root, distro)
+        if args.base_only or args.ros2:
+            print("done")
             return 0
         build = Path(args.build) if args.build else root.parent / "Builds" / "BenchServer"
         print(f"building {sandbox.SERVER_IMAGE} from {build} ...")
@@ -185,7 +189,7 @@ def cmd_submit_check(args: argparse.Namespace) -> int:
         sandbox.require_engine()
         if source.is_dir():
             print(f"building the image from {source} ...")
-            image, size = sandbox.build_solution(source, limits)
+            image, size = sandbox.build_solution(source, limits, args.build_arg)
             built = True
         else:
             image = sandbox.load_solution(source)
@@ -225,7 +229,10 @@ def cmd_submit_check(args: argparse.Namespace) -> int:
     print(f"result: {r['status']}, {r['points']} point(s), time {r['time']:.2f} s, simulator time {r['sim_time']:.2f} s")
     print(f"attempt folder: {o.folder}  (files: {state}{', ' + detail if detail else ''})")
     print(f"the solution exited with code {o.solution_exit}")
-    ok = state in (attempt.VERIFIED, attempt.CHECKSUMS_ONLY) and r["status"] != "error" and not o.notes
+    flew = r["sim_time"] > 0.0
+    if not flew:
+        print("the solution never started the attempt (it did not connect, or crashed first): see --logs")
+    ok = state in (attempt.VERIFIED, attempt.CHECKSUMS_ONLY) and r["status"] != "error" and not o.notes and flew
     print("OK: the solution runs under the server's conditions" if ok else "FAILED")
     return 0 if ok else 1
 
@@ -288,6 +295,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     p.add_argument("--build", help="folder of the Linux Bench Server build (default: Builds/BenchServer)")
     p.add_argument("--bench", help="the bench/ folder (default: next to this tool)")
     p.add_argument("--base-only", action="store_true", help="only the base image for solutions")
+    p.add_argument("--ros2", action="append", metavar="DISTRO", help="also the ROS 2 base image (humble, jazzy); skips the simulator")
     p.set_defaults(run=cmd_build_images)
 
     p = sub.add_parser("submit-check", help="Docker: build a solution and fly one competition attempt, as the server will")
@@ -303,6 +311,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     p.add_argument("--wall", type=float, default=1800.0, help="real seconds allowed for the attempt")
     p.add_argument("--gpu", action="store_true", help="give the solution the GPU")
     p.add_argument("--logs", action="store_true", help="print what the solution printed")
+    p.add_argument("--build-arg", action="append", metavar="NAME=VALUE", help="passed to `docker build`")
     p.add_argument("--sim-gpu", default="auto", choices=["auto", "on", "off"],
                    help="let the simulator draw on the video card (auto: yes on Docker Desktop for Windows)")
     p.add_argument("--graphics", choices=["Low", "Medium", "High", "Ultra"],

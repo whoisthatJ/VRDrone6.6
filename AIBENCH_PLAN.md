@@ -445,3 +445,28 @@ the server, D47); image size and resource limits are the plan's defaults, not th
 **Found on the way:** the camera picture depends on the graphics preset (render scale, shadows, anti-aliasing), and
 the preset is each player's own setting. For a fair qualification the server must fix one preset for everyone, and
 teams should train at that preset. Not decided yet.
+
+### B6, second part: ROS 2 bridge (20 November 2026)
+| Item | State |
+|---|---|
+| Messages | `bench/ros2/ushqyr_msgs`: `RcChannels` (16 channels, microseconds), `AttemptStatus` |
+| Bridge | `bench/ros2/ushqyr_ros2_bridge`: a Python node on the SDK (D6). Camera image and info, IMU, range, laser scan, battery, `/clock`, status, the handshake as JSON; RC in as `RcChannels` or `sensor_msgs/Joy` |
+| Images | `ushqyr-bench-ros2:jazzy` (2.5 GB) and `:humble` (2.05 GB); `ushqyr-bench build-images --ros2 <version>` |
+| Sample as a ROS 2 node | `bench/examples/color_pid_ros2`: the same pilot fed from topics |
+| Test in the sandbox, `H1_Oval`, seed 1, 120 s limit | Jazzy 27 points (280 s of real time); Humble 26 points (544 s); the plain script scores 28 |
+
+Decisions taken here:
+- **Sync mode over ROS 2:** each step the bridge publishes the sensors and waits up to `sync_wait` (0.2 s of real time)
+  for a new RC message; none in time means a step without a packet. This makes a ROS 2 run depend slightly on the
+  machine's speed, unlike a run through the SDK. The points differ by one or two gates for that reason.
+- **The attempt starts on the first RC message**, so a node has time to load its model.
+- **Camera info** carries the simulator's own distortion model (`ushqyr_radial_k1`), not `plumb_bob`: the simulator's
+  formula goes from the distorted picture to the straight one, and the two are not the same function.
+- **Lyrical** is not built: the organisers have not said which versions they need (question 15).
+- **Package names stay `ushqyr_*`**, like the SDK (the plan said `gaterush_*`).
+- The solution's container now has its own 256 MB of shared memory (`--ipc private`), which ROS 2's middleware uses
+  between nodes; it is shared with nobody.
+- `submit-check` now fails a solution that never starts the attempt, and when the real-time limit runs out it stops
+  the solution first so the simulator can still write the attempt folder.
+
+**Still open in B6:** Linux Team Kit build; a Linux server with a GPU.

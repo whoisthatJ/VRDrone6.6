@@ -267,13 +267,19 @@ must run every team at the same preset. It writes the attempt folder to
 | File system read-only, 256 MB of `/tmp` in memory | `--read-only --tmpfs /tmp` |
 | No capabilities, no privilege gain, not root | `--cap-drop ALL --security-opt no-new-privileges --user 10001:10001` |
 | Memory 4 GB (no swap), 4 processors, 256 processes | `--memory --memory-swap --cpus --pids-limit` |
-| Nothing of the host mounted, no shared memory with other containers | no `-v`; `--ipc none` |
+| Nothing of the host mounted; shared memory of its own only (256 MB) | no `-v`; `--ipc private --shm-size` |
 
 The limits are the plan's defaults (`sandbox.Limits`); the real ones are the organisers' decision.
 
 `bench/runner/tests/hostile` is a solution that tries to get out (internet, DNS, the host, writing into the image,
 reading `/results`, becoming root, the Docker socket, 400 processes, other ports of the simulator, asking for ground
 truth). Run it with `submit-check --logs`: every line must say `blocked`.
+
+### ROS 2
+
+`ushqyr-bench build-images --ros2 jazzy` (or `humble`) builds the base image for ROS 2 solutions: ROS 2, the SDK, the
+bridge node and its messages. A ROS 2 solution is an ordinary submission: its container runs the bridge and the team's
+nodes together, and the simulator sees one client. Topics, parameters and timing are in `Docs/bench/ru/ros2.md`.
 
 ## Not in B2
 

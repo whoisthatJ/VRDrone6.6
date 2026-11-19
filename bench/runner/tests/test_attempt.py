@@ -217,10 +217,15 @@ def test_solution_container_is_locked_down():
     joined = " ".join(args)
     assert "--network net-x" in joined
     for must in ("--read-only", "--cap-drop ALL", "no-new-privileges", "--user 10001:10001", "--pids-limit 256",
-                 "--memory 4g", "--memory-swap 4g", "--ipc none"):
+                 "--memory 4g", "--memory-swap 4g", "--ipc private"):
         assert must in joined, must
     # Nothing of the host is mounted, and the host's network is never used.
     assert "-v" not in args and "--volume" not in args and "--mount" not in args
     assert "host" not in joined.replace("USHQYR_BENCH_HOST", "")
     assert "--privileged" not in args and "--gpus" not in args
     assert "USHQYR_BENCH_TOKEN=tok" in joined
+
+
+def test_ros2_example_carries_the_same_pilot():
+    examples = Path(__file__).resolve().parents[2] / "examples"
+    assert (examples / "color_pid_ros2" / "color_pid.py").read_bytes() == (examples / "color_pid" / "color_pid.py").read_bytes()
