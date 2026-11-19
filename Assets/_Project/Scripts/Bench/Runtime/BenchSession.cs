@@ -31,6 +31,27 @@ namespace Ushqyr.Bench
         [SerializeField] private int quadLayer = 9;
         [Tooltip("Track loaded when nothing was chosen on the command line (file name in StreamingAssets/Bench/Tracks).")]
         [SerializeField] private string defaultTrack = "H1_Oval";
+        [Tooltip("Optional: the camera that films the trackside video.")]
+        [SerializeField] private BenchTracksideCamera trackside;
+
+        // Recording and the attempt's life cycle. Wall-clock time is used only for the timeouts on the program,
+        // never inside the simulation.
+        private BenchRecorder _recorder;
+        private int _eventsLogged, _impactsSeen;
+        private bool _failsafeWas, _rcOk, _attemptOver;
+        private ImuSample _lastImu;
+        private float _wallStart, _lastStepWall;
+        private byte[] _signingKey;
+        private string _ffmpeg;
+
+        /// <summary>The finished attempt's result, once its files are written.</summary>
+        public AttemptResult LastResult { get; private set; }
+        /// <summary>The attempt folder being written or last written; null when not recording.</summary>
+        public string AttemptFolder => _recorder != null ? _recorder.Folder : null;
+        public bool WritingFiles => _recorder != null && _recorder.Finishing;
+        public IReadOnlyList<BenchGate> Gates => _gates;
+        /// <summary>True when the scene shows a recorded attempt instead of running one (judge replay).</summary>
+        public bool ReplayMode { get; private set; }
 
         private BenchRules _rules;
         private BenchTrack _track;
@@ -102,7 +123,9 @@ namespace Ushqyr.Bench
             try
             {
                 _rules = BenchLauncher.LoadRules();
-                _track = BenchLauncher.LoadTrack(defaultTrack);
+                ReplayMode = !string.IsNullOrEmpty(BenchLauncher.ReplayFolder);
+                _track = ReplayMode ? BenchLauncher.LoadReplayTrack() : BenchLauncher.LoadTrack(defaultTrack);
+                _signingKey = BenchLauncher.SigningKey();
             }
             catch (Exception e)
             {
@@ -116,6 +139,16 @@ namespace Ushqyr.Bench
             SetupDrone();
             SetupClock();
             ResetWorld(_rules.seed);
+            if (ReplayMode)
+            {
+                // The replay component drives the drone from the recorded trajectory; no API, no attempt.
+                Status = "replay";
+                return;
+            }
+            bool video = _rules.video == "on" || (_rules.video != "off" && _rules.Competition);
+            _ffmpeg = video ? BenchLauncher.FindFfmpeg() : null;
+            if (video && _ffmpeg == null) Debug.LogWarning("[Bench] no ffmpeg found: attempts are recorded without video");
+            _wallStart = Time.realtimeSinceStartup;
 
             try
             {
@@ -233,6 +266,7 @@ namespace Ushqyr.Bench
         {
             if (!Ready) return;
             if (_server.Connection != _connection || !_server.Connected) ConnectionChanged();
+            Lifecycle();
 
             // Sync mode paced to real time: simulator time may not run ahead of the wall clock.
             // While frames are being recorded at a fixed rate, one window frame is exactly one frame of simulator time.
@@ -265,9 +299,80 @@ namespace Ushqyr.Bench
             }
         }
 
+        /// <summary>Competition timeouts on the program, the finished result, and quitting after a server run.</summary>
+        private void Lifecycle()
+        {
+            float now = Time.realtimeSinceStartup;
+            if (_rules.Competition && !_attemptOver)
+            {
+                if (State == AttemptState.Waiting && _rules.connect_timeout > 0f && now - _wallStart > _rules.connect_timeout)
+                    EndWithoutStart("timeout", "the program did not connect and start in time");
+                else if (State == AttemptState.Running && _rules.step_timeout > 0f && now - _lastStepWall > _rules.step_timeout)
+                {
+                    End("timeout");
+                    _server.Close("step timeout");
+                }
+            }
+            if (_recorder != null && _recorder.Finished && LastResult != _recorder.Result)
+            {
+                LastResult = _recorder.Result;
+                Debug.Log($"[Bench] attempt files written: {_recorder.Folder}");
+            }
+            if (BenchLauncher.ExitWhenDone && State == AttemptState.Ended && (_recorder == null || _recorder.Finished)) Application.Quit(0);
+        }
+
+        private bool Recording => _rules.record == "on" || (_rules.record != "off" && (_rules.Competition || BenchLauncher.OutputGiven));
+
+        private void StartRecorder(long seed)
+        {
+            _recorder = null;
+            if (!Recording) return;
+            ref readonly QuadProfile p = ref quad.Profile;
+            var info = new AttemptResult
+            {
+                team = BenchLauncher.Team, track_id = _track.id, track_hash = _track.Hash, attempt = BenchLauncher.Attempt,
+                mode = _rules.Competition ? "competition" : "training", seed = seed,
+                build = Application.version + "+" + Application.buildGUID,
+                rules_hash = _rules.Hash(), drone = DroneName, drone_calibrated = DroneCalibrated,
+                drone_config_hash = BenchHash.Sha256(FormattableString.Invariant(
+                    $"{DroneName}|{p.Mass}|{p.Motors.MaxThrustPerMotor}|{p.ArmX}|{p.ArmZ}|{p.Battery.Cells}|{p.Battery.CapacityMah}")),
+                solution_digest = BenchLauncher.SolutionDigest, gates_total = _gates.Count,
+            };
+            try
+            {
+                bool film = _ffmpeg != null && trackside != null;
+                if (film) trackside.Setup(_rules.trackside_width, _rules.trackside_height);
+                _recorder = new BenchRecorder(BenchLauncher.OutputFolder, info, _track.Json, _referee.RepeatWindow, _signingKey, _ffmpeg,
+                    _rules.camera_width, _rules.camera_height, _rules.camera_fps, film ? _rules.trackside_width : 0, _rules.trackside_height);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("[Bench] can't record the attempt: " + e.Message);
+                _recorder = null;
+            }
+            _eventsLogged = 0;
+            _impactsSeen = quad.ImpactCount;
+            _failsafeWas = false;
+        }
+
+        /// <summary>The attempt is over before it began (competition): still a result, with zero points.</summary>
+        private void EndWithoutStart(string status, string why)
+        {
+            if (_attemptOver) return;
+            StartRecorder(_rules.seed);
+            State = AttemptState.Ended;
+            Status = status;
+            _attemptOver = true;
+            Debug.Log($"[Bench] attempt ended before the start: {status} ({why})");
+            if (_recorder == null) return;
+            _recorder.Note(0, "end", status + ": " + why);
+            _recorder.Finish(0, 0, 0, status, 0);
+        }
+
         private void ConnectionChanged()
         {
             bool had = _helloDone;
+            if (had && _rules.Competition && State == AttemptState.Waiting) EndWithoutStart("disconnected", "the program left before the start");
             _connection = _server.Connection;
             _helloDone = false;
             _hasHeld = false;
@@ -318,6 +423,7 @@ namespace Ushqyr.Bench
 
         private void Hello(Dictionary<string, object> h)
         {
+            if (_rules.Competition && _attemptOver) { Refuse("attempt_over", "this attempt is over"); return; }
             if (BenchMessages.Long(h, "proto", -1) != BenchProtocol.Version) { Refuse("protocol", $"this simulator speaks protocol {BenchProtocol.Version}"); return; }
             if (!string.IsNullOrEmpty(_rules.token) && BenchMessages.Str(h, "token", "") != _rules.token) { Refuse("token", "wrong token"); return; }
             _wantTruth = !_rules.Competition && BenchMessages.Bool(h, "truth", false);
@@ -330,7 +436,10 @@ namespace Ushqyr.Bench
 
             float f = _camera.FocalPixels;
             _header.Reset();
-            _header.Map(9)
+            // Training tells which track is loaded (tools check it); in competition the track stays unnamed.
+            _header.Map(_rules.Competition ? 9 : 10);
+            if (!_rules.Competition) _header.Key("track").Map(2).Key("id").Str(_track.id).Key("hash").Str(_track.Hash);
+            _header
                 .Key("proto").Int(BenchProtocol.Version)
                 .Key("mode").Str(_rules.Competition ? "competition" : "training")
                 .Key("sim").Str(Application.version)
@@ -376,11 +485,16 @@ namespace Ushqyr.Bench
 
         private void Begin(long seed)
         {
+            // A restart in training: the unfinished attempt before it is closed as "invalid" and doesn't count.
+            if (State == AttemptState.Running) End("invalid");
             ResetWorld(seed);
+            StartRecorder(seed);
+            _recorder?.Note(0, "start", "start signal");
             State = AttemptState.Running;
             Status = "running";
             _startedOnce = true;
             _paceCredit = 0;
+            _lastStepWall = Time.realtimeSinceStartup;
             // The first observation carries a picture taken at the start signal, with no delay.
             CaptureFrame();
             DeliverFrames(force: true);
@@ -394,6 +508,12 @@ namespace Ushqyr.Bench
             if (State != AttemptState.Running) return;
             State = AttemptState.Ended;
             Status = status;
+            _attemptOver = true;
+            if (_recorder != null)
+            {
+                _recorder.Note(SimTime, "end", status);
+                _recorder.Finish(Points, LastScoreTime, SimTime, status, _referee.Events.Count);
+            }
             Debug.Log($"[Bench] attempt ended: {status}, points {Points}, time {LastScoreTime:F3} s (drone {DroneName}, calibrated={DroneCalibrated})");
         }
 
@@ -405,7 +525,9 @@ namespace Ushqyr.Bench
                 return;
             }
             // A packet with anything but finite numbers is dropped whole; the link then sees a missing packet.
-            if (BenchMessages.Channels(h, "rc", _channels)) _link.Send(SimTime, _channels);
+            _lastStepWall = Time.realtimeSinceStartup;
+            _rcOk = BenchMessages.Channels(h, "rc", _channels);
+            if (_rcOk) _link.Send(SimTime, _channels);
 
             for (int i = 0; i < _stepsPerControl; i++)
             {
@@ -415,7 +537,11 @@ namespace Ushqyr.Bench
                 _tick++;
                 ref readonly QuadState after = ref quad.State;
                 _referee.Step(before.Position, after.Position, (_tick - 1) * (double)_dt, SimTime);
-                if (_tick % _imuEvery == 0) _imuBatch.Add(_imu.Read(before, after, _dt, quad.Gravity));
+                if (_tick % _imuEvery == 0)
+                {
+                    _lastImu = _imu.Read(before, after, _dt, quad.Gravity);
+                    _imuBatch.Add(_lastImu);
+                }
             }
             quad.SyncPose();
 
@@ -425,12 +551,37 @@ namespace Ushqyr.Bench
             {
                 foreach (var g in _gates) g.Tick(SimTime);
                 CaptureFrame();
+                if (_recorder != null && _recorder.Trackside)
+                {
+                    byte[] film = trackside.Capture(quad.transform.position, SimTime);
+                    _recorder.TracksideFrame(film, film.Length);
+                }
             }
             DeliverFrames(force: false);
+            Record();
 
             if (SimTime >= _timeLimit) End("time_limit");
             else if (_rules.stuck_time > 0f) CheckStuck();
             SendObservation();
+        }
+
+        /// <summary>This step's line in the logs, and any events since the last one.</summary>
+        private void Record()
+        {
+            if (_recorder == null) return;
+            _recorder.Step(_tick, SimTime, _rcOk ? _channels : null, quad.State.Armed, _link.Failsafe, _lastImu, _tofRange, _tofValid,
+                _batteryVoltage, _cameraFrames - 1, quad.State);
+            for (; _eventsLogged < _referee.Events.Count; _eventsLogged++) _recorder.Gate(_referee.Events[_eventsLogged]);
+            if (quad.ImpactCount != _impactsSeen)
+            {
+                _impactsSeen = quad.ImpactCount;
+                _recorder.Note(SimTime, "collision", FormattableString.Invariant($"impact {quad.LastImpactSpeed:F1} m/s"));
+            }
+            if (_link.Failsafe != _failsafeWas)
+            {
+                _failsafeWas = _link.Failsafe;
+                _recorder.Note(SimTime, _failsafeWas ? "failsafe" : "failsafe_end", _failsafeWas ? "no RC packet in time: motors cut" : "RC packets again");
+            }
         }
 
         private void CheckStuck()
@@ -482,6 +633,7 @@ namespace Ushqyr.Bench
             _video.Process(raw, _processed, _rules.camera_width, _rules.camera_height, _cameraFrames);
             byte[] pixels = _framePool.Count > 0 ? _framePool.Pop() : new byte[raw.Length];
             _processed.CopyTo(pixels);
+            _recorder?.OnboardFrame(pixels, pixels.Length);
             CaptureMs += (captured - CaptureMs) * 0.05f;
             VideoMs += ((float)_watch.Elapsed.TotalMilliseconds - captured - VideoMs) * 0.05f;
             _framesInFlight.Enqueue(new Frame { Time = SimTime, Seq = _cameraFrames, Pixels = pixels });

@@ -263,6 +263,22 @@ namespace Ushqyr.EditorTools.Bench
             sso.FindProperty("defaultTrack").stringValue = "H1_Oval";
             Builders.GarageSceneBuilder.AssignModelMaterials(sso.FindProperty("modelMaterials"));
             sso.ApplyModifiedPropertiesWithoutUndo();
+            // Trackside video: four positions along the long walls and one high overview.
+            var filmGo = new GameObject("Trackside Camera");
+            var film = filmGo.AddComponent<BenchTracksideCamera>();
+            float fx = HallLength * 0.5f - 1.2f, fz = HallWidth * 0.5f - 0.8f;
+            var filmPositions = new[]
+            {
+                new Vector3(-fx * 0.55f, 2.6f, -fz), new Vector3(fx * 0.55f, 2.6f, -fz),
+                new Vector3(-fx * 0.55f, 2.6f, fz), new Vector3(fx * 0.55f, 2.6f, fz),
+                new Vector3(fx, 3.2f, 0f), new Vector3(-fx, 3.2f, 0f),
+            };
+            film.SetPositions(filmPositions);
+            EditorUtility.SetDirty(film);
+            var fso = new SerializedObject(session);
+            fso.FindProperty("trackside").objectReferenceValue = film;
+            fso.ApplyModifiedPropertiesWithoutUndo();
+
             benchGo.AddComponent<BenchHud>().Configure(session);
             EditorUtility.SetDirty(benchGo.GetComponent<BenchHud>());
             var hso = new SerializedObject(benchGo.GetComponent<BenchHud>());
@@ -273,6 +289,9 @@ namespace Ushqyr.EditorTools.Bench
             cso.FindProperty("target").objectReferenceValue = drone.transform;
             cso.FindProperty("overviewPosition").vector3Value = new Vector3(0f, HallHeight - 0.9f, -HallWidth * 0.5f + 0.4f);
             cso.FindProperty("overviewLookAt").vector3Value = new Vector3(0f, 0f, -1.5f);
+            var spots = cso.FindProperty("tracksidePositions");
+            spots.arraySize = filmPositions.Length;
+            for (int i = 0; i < filmPositions.Length; i++) spots.GetArrayElementAtIndex(i).vector3Value = filmPositions[i];
             cso.ApplyModifiedPropertiesWithoutUndo();
 
             EditorSceneManager.SaveScene(scene, HallScenePath);

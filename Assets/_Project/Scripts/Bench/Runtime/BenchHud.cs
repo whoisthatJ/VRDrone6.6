@@ -21,12 +21,18 @@ namespace Ushqyr.Bench
         private int _shownPoints = -1;
         private string _shownStatus;
         private float _nextTimeText;
+        private BenchLeaderboardPanel _board;
+        private BenchReplay _replay;
+        private Transform _canvas;
+        private GameObject _previewFrame;
 
         public void Configure(BenchSession s) => session = s;
 
         private void Start()
         {
-            var canvasGo = new GameObject("Bench HUD", typeof(Canvas), typeof(CanvasScaler));
+            var canvasGo = new GameObject("Bench HUD", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
+            BenchUi.EnsureEventSystem();
+            _canvas = canvasGo.transform;
             canvasGo.transform.SetParent(transform, false);
             var canvas = canvasGo.GetComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
@@ -44,6 +50,7 @@ namespace Ushqyr.Bench
             _drone = Text(panel, new Vector2(24f, -210f), new Vector2(560f, 30f), 20f, new Color(0.62f, 0.66f, 0.72f));
 
             var frame = Panel(canvasGo.transform, new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(-30f, 30f), new Vector2(496f, 410f));
+            _previewFrame = frame.gameObject;
             _previewCaption = Text(frame, new Vector2(8f, -6f), new Vector2(480f, 30f), 20f, new Color(0.8f, 0.84f, 0.9f));
             var img = new GameObject("Preview", typeof(RectTransform), typeof(RawImage));
             var rt = (RectTransform)img.transform;
@@ -56,6 +63,10 @@ namespace Ushqyr.Bench
             _preview.raycastTarget = false;
             // Frames are stored with the top row first; textures start at the bottom.
             _preview.uvRect = new Rect(0f, 1f, 1f, -1f);
+
+            // The leaderboard (Tab) and, when an attempt folder is being shown, the judge replay.
+            _board = gameObject.AddComponent<BenchLeaderboardPanel>();
+            BenchUi.Button(panel, L.T("Leaderboard (Tab)"), 400f, 12f, 190f, 34f, () => _board.Toggle(), 17f);
 
             L.Changed += Refresh;
             Refresh();
@@ -83,9 +94,31 @@ namespace Ushqyr.Bench
                 _status.text = session.LoadError;
                 return;
             }
+            if (session.ReplayMode)
+            {
+                if (session.Track == null) return;
+                if (_replay == null)
+                {
+                    _replay = gameObject.AddComponent<BenchReplay>();
+                    _replay.Build(_canvas, session);
+                    _board.Build(_canvas, session);
+                    _previewFrame.SetActive(false);
+                    _title.text = "AI BENCH  ·  " + L.T("REPLAY") + "  ·  " + session.Track.id;
+                    _status.text = L.T("Space: play / pause    C: camera    arrows: step");
+                    _drone.text = System.IO.Path.GetFileName(BenchLauncher.ReplayFolder.TrimEnd('/', '\\'));
+                }
+                _gates.text = L.F("Gates: {0}", _replay.CurrentPoints);
+                _time.text = L.F("Time: {0} s", BenchUi.Seconds(_replay.CurrentTime));
+                return;
+            }
             if (!session.Ready) return;
+            if (!_boardBuilt)
+            {
+                _boardBuilt = true;
+                _board.Build(_canvas, session);
+            }
 
-            string status = session.State + "|" + session.Status + "|" + session.ProgramConnected;
+            string status = session.State + "|" + session.Status + "|" + session.ProgramConnected + "|" + session.WritingFiles;
             if (status != _shownStatus)
             {
                 _shownStatus = status;
@@ -121,8 +154,11 @@ namespace Ushqyr.Bench
             }
         }
 
+        private bool _boardBuilt;
+
         private string StatusText()
         {
+            if (session.WritingFiles) return L.T("Attempt over: writing logs and video");
             if (!session.ProgramConnected) return L.F("Waiting for a program on port {0}", session.Port);
             switch (session.State)
             {

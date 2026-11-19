@@ -255,11 +255,14 @@ class Sim:
         self._started = True
         return self._observation()
 
-    def step(self, rc: RC | _RawRC) -> Observation:
-        """Sends one RC packet; the simulator advances one control period (1 / control_hz) and answers."""
+    def step(self, rc: RC | _RawRC | None) -> Observation:
+        """Sends one RC packet; the simulator advances one control period (1 / control_hz) and answers.
+
+        `None` advances the simulation without a packet, as if this one was lost on the way.
+        """
         if not self._started:
             raise BenchError("not_started", "call reset() first")
-        _send(self._sock, STEP, {"rc": rc.channels()})
+        _send(self._sock, STEP, {} if rc is None else {"rc": rc.channels()})
         return self._observation()
 
     def done(self) -> Observation:

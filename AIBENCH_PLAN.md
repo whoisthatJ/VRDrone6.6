@@ -62,6 +62,13 @@ Items marked ❓ are my defaults; the organisers must confirm them (§16). Every
 | D19 | **Training-only conveniences in the protocol:** `truth` (true position, velocity and score in every observation) and `pace=false` (run as fast as the computer allows). Both are ignored in competition mode, and ground truth is compiled out with `USHQYR_BENCH_SERVER` | Debugging and faster training; the mode gate stays in the simulator |
 | D20 | **Gate LED and scoring feedback:** gates never change appearance when passed (that would be score feedback through the camera). The gate counter exists only in the spectator HUD | D11 |
 | D21 | **Protocol frame:** `u32 length, u8 type, u32 header length, MessagePack header, raw payload`; own minimal MessagePack reader with depth, size and count limits (no third-party C# dependency). Inbound frames ≤ 16 KiB | D5 confirmed by the B0 measurement below |
+| D22 | **One simulator launch = one attempt in competition mode.** The program has `connect_timeout` (60 s) to connect and start and `step_timeout` (10 s) per step, in real time; these are the only uses of the wall clock and they sit outside the simulation. A program that leaves or sends a forbidden message ends the attempt as `disconnected`, keeping the points it had | Simple to reason about and to batch; a second attempt can't be sneaked in |
+| D23 | **When attempts are recorded:** always in competition; in training only with `-bench-out` (or `record: "on"`). A training attempt cut short by a reset is closed as `invalid` | Learning runs reset thousands of times and must not fill the disk |
+| D24 | **Signing:** `manifest.sig` = HMAC-SHA256 of `manifest.json` with the bytes of a key file given by `-bench-key` / `USHQYR_BENCH_KEY_FILE`. No default location and no key in the project: without a key attempts carry checksums only and say so (`signed: false`). **Where the real key and the hidden tracks live is the owner's decision, still open** | A checksum alone can be recomputed by whoever edits a log; the key can't |
+| D25 | **Video:** raw frames piped to an external `ffmpeg` (found by option, environment, `StreamingAssets/Bench`, or PATH; not bundled yet, licence check at B6). `onboard.mp4` holds the frames at the moment they are taken, which are the frames the program gets 30 ms later. `trackside.mp4` cuts between fixed positions that follow the drone. `judge.mp4` is made after the attempt by ffmpeg: trackside + onboard in the corner + subtitles with the clock, running score and each decision | No video code inside the simulation loop beyond a pipe write; fixed frame rate in simulator time |
+| D26 | **`telemetry.csv` holds all 16 channels of every packet**, and `truth.csv` the pose per control step, so `resim` and the replay need nothing else. The "replay file" `replay.grreplay` is an index of those files | One source of truth per fact |
+| D27 | **Leaderboard counting:** a team's line for a track is its best counted attempt (the rules will say how many attempts are allowed); the overall board adds one line per track | D10, made concrete |
+| D28 | **Leak test compares what the program received with the judges' `truth.csv` of the same attempt**: key whitelist, equal values, and correlation after removing linear trends (clocks excluded; the ToF sensor follows the height by design) | "Coordinates can't be obtained through the API" as a runnable check |
 
 ## 3. Architecture
 ```
@@ -329,3 +336,18 @@ After B1, B2 and B3 can run in parallel. B4 waits for data. B5 can start any tim
 | Sample `color_pid` | Done: **full lap in 10 of 10 runs** (seeds 1–10), about 24.3 s per lap; the same seed twice gives an identical result |
 | Gate counter and timer on screen, Russian quickstart | Done; `Docs/bench/ru/quickstart.md` |
 | Tests | 29 EditMode tests (`BenchTests`), 10 Python tests (`bench/sdk/python/tests`) |
+
+### B2 (19 November 2026): referee, competition mode, logs
+| Item | State |
+|---|---|
+| Referee rules with tests (partial entry, from the back, repeat too early, around, through the frame, fast pass, tie-break time) | Done in B1, unchanged |
+| Attempt life cycle and statuses (`finished`, `time_limit`, `timeout`, `disconnected`, `stuck`, `invalid`), rules file | Done |
+| Competition mode | Done: message whitelist, one attempt per launch, timeouts, no ground truth; no manual control exists in AI Bench at all |
+| Leak tests | Done: `bench/runner/leak_test.py` passes against a live competition run (200 hostile connections survived; strongest link between anything received and a true coordinate r = 0.68, an accelerometer axis against tilt). **Build scan moved to B6**, with the Bench Server build |
+| Per-attempt folder, SHA-256 manifest, HMAC signature | Done; the simulator's folder verifies with the Python tool, and every kind of edit is caught in tests on both sides |
+| `ushqyr-bench verify`, `resim`, `leaderboard` | Done; `resim` reproduced a recorded attempt exactly (4 points, 16.394792 s) |
+| Onboard, trackside and judge video | Done (needs ffmpeg on the machine) |
+| In-app leaderboard with CSV export (`,` or `;`) | Done (Tab) |
+| Judge replay viewer | Done: integrity state, timeline, decisions with reasons, five cameras |
+| Tests | 37 `BenchTests` (335 EditMode in all), 10 SDK tests, 7 runner tests |
+| Not verified | The competition options were exercised in the editor (through `UserSettings/bench-args.txt`), not yet from a built exe |

@@ -259,6 +259,7 @@ def main() -> None:
     parser.add_argument("--port", type=int, default=None, help="simulator port (default: USHQYR_BENCH_PORT or 5757)")
     parser.add_argument("--seed", type=int, default=None, help="training mode: seed of the sensor noise")
     parser.add_argument("--points", type=int, default=0, help="training mode: stop after this many scored gates")
+    parser.add_argument("--seconds", type=float, default=0.0, help="stop after this much simulator time")
     parser.add_argument("--show", action="store_true", help="show the camera picture with the detection")
     parser.add_argument("--wait", type=float, default=60.0, help="seconds to wait for the simulator to start")
     args = parser.parse_args()
@@ -278,6 +279,9 @@ def main() -> None:
                 if args.points and points >= args.points:
                     obs = sim.done()
                     break
+            if args.seconds and obs.t >= args.seconds and sim.running:
+                obs = sim.done()
+                break
             if args.show and obs.camera.new and obs.camera.image is not None:
                 cv2.imshow("color_pid", pilot.debug_image(obs.camera.image))
                 cv2.waitKey(1)

@@ -26,13 +26,63 @@ namespace Ushqyr.Bench
 
         public static bool LoopbackOnly => !HasFlag("-bench-listen-all");
 
+        /// <summary><c>-bench-team</c>: the team this attempt belongs to (results, folder name).</summary>
+        public static string Team => Arg("-bench-team") ?? "local";
+        /// <summary><c>-bench-attempt</c>: the attempt's number on this track.</summary>
+        public static int Attempt => int.TryParse(Arg("-bench-attempt"), out int n) && n > 0 ? n : 1;
+        /// <summary><c>-bench-solution</c>: digest of the team's container image, written into the result.</summary>
+        public static string SolutionDigest => Arg("-bench-solution") ?? "";
+        /// <summary><c>-bench-exit</c>: quit when the attempt is over and its files are written (server runs).</summary>
+        public static bool ExitWhenDone => HasFlag("-bench-exit");
+        /// <summary><c>-bench-out</c> was given: record attempts in training mode too.</summary>
+        public static bool OutputGiven => Arg("-bench-out") != null;
+        /// <summary><c>-bench-replay &lt;attempt folder&gt;</c>, or set from the leaderboard: open the judge replay instead of a run.</summary>
+        public static string ReplayFolder { get => _replay ?? Arg("-bench-replay"); set => _replay = value; }
+        private static string _replay;
+
+        /// <summary>Where attempt folders go: <c>-bench-out</c>, or "BenchResults" in the user's data folder.</summary>
+        public static string OutputFolder => Arg("-bench-out") ?? Path.Combine(Application.persistentDataPath, "BenchResults");
+
+        /// <summary>
+        /// The organisers' signing key: the bytes of the file named by <c>-bench-key</c> or USHQYR_BENCH_KEY_FILE.
+        /// It lives outside the project and outside every build; without it attempts carry checksums but no signature.
+        /// </summary>
+        public static byte[] SigningKey()
+        {
+            string path = Arg("-bench-key") ?? Environment.GetEnvironmentVariable("USHQYR_BENCH_KEY_FILE");
+            if (string.IsNullOrEmpty(path)) return null;
+            if (!File.Exists(path)) throw new FileNotFoundException($"signing key file not found: {path}");
+            byte[] key = File.ReadAllBytes(path);
+            if (key.Length < 16) throw new FormatException("the signing key must be at least 16 bytes");
+            return key;
+        }
+
+        /// <summary>ffmpeg for the videos: <c>-bench-ffmpeg</c>, USHQYR_FFMPEG, next to the tracks, or on the PATH. Null if none.</summary>
+        public static string FindFfmpeg()
+        {
+            string exe = Application.platform == RuntimePlatform.WindowsPlayer || Application.platform == RuntimePlatform.WindowsEditor ? "ffmpeg.exe" : "ffmpeg";
+            foreach (string candidate in new[] { Arg("-bench-ffmpeg"), Environment.GetEnvironmentVariable("USHQYR_FFMPEG"),
+                         Path.Combine(Application.streamingAssetsPath, "Bench", exe) })
+                if (!string.IsNullOrEmpty(candidate) && File.Exists(candidate)) return candidate;
+            foreach (string dir in (Environment.GetEnvironmentVariable("PATH") ?? "").Split(Path.PathSeparator))
+            {
+                try
+                {
+                    string p = Path.Combine(dir.Trim(), exe);
+                    if (File.Exists(p)) return p;
+                }
+                catch (ArgumentException) { }
+            }
+            return null;
+        }
+
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void FromCommandLine()
         {
-            if (Application.isEditor || !HasFlag("-bench")) return;
+            if (Application.isEditor || !(HasFlag("-bench") || Arg("-bench-replay") != null)) return;
             try
             {
-                AppBootstrap.FirstSceneOverride = SceneFor(LoadTrack("H1_Oval"));
+                AppBootstrap.FirstSceneOverride = Arg("-bench-replay") != null ? SceneFor(LoadReplayTrack()) : SceneFor(LoadTrack("H1_Oval"));
             }
             catch (Exception e)
             {
@@ -44,10 +94,26 @@ namespace Ushqyr.Bench
         public static void Launch(string track)
         {
             ChosenTrack = track;
+            ReplayFolder = null;
             SceneManager.LoadScene(SceneFor(LoadTrack(track)));
         }
 
         public static string SceneFor(BenchTrack track) => track.venue == "parking" ? "Bench_Parking" : "Bench_Hall";
+
+        /// <summary>The track an attempt folder was flown on (its own copy of the file).</summary>
+        public static BenchTrack LoadReplayTrack()
+        {
+            string path = Path.Combine(ReplayFolder, "track.benchtrack.json");
+            if (!File.Exists(path)) throw new FileNotFoundException($"not an attempt folder (no track file): {ReplayFolder}");
+            return BenchTrack.Parse(File.ReadAllText(path));
+        }
+
+        /// <summary>Opens the judge replay of an attempt folder.</summary>
+        public static void Replay(string folder)
+        {
+            ReplayFolder = folder;
+            SceneManager.LoadScene(SceneFor(LoadReplayTrack()));
+        }
 
         public static BenchTrack LoadTrack(string fallback)
         {
@@ -71,12 +137,31 @@ namespace Ushqyr.Bench
             return rules;
         }
 
+        private static string[] _args;
+
+        /// <summary>
+        /// The command line. In the editor, where there is none, the options are read from
+        /// UserSettings/bench-args.txt (one option or value per line), so every mode can be tried in Play mode.
+        /// </summary>
+        private static string[] Args()
+        {
+            if (_args != null && !Application.isEditor) return _args;
+            _args = Environment.GetCommandLineArgs();
+            if (Application.isEditor)
+            {
+                string file = Path.Combine(Application.dataPath, "..", "UserSettings", "bench-args.txt");
+                _args = File.Exists(file) ? Array.FindAll(File.ReadAllLines(file), l => l.Trim().Length > 0) : new string[0];
+                for (int i = 0; i < _args.Length; i++) _args[i] = _args[i].Trim();
+            }
+            return _args;
+        }
+
         private static bool HasFlag(string name) =>
-            Array.Exists(Environment.GetCommandLineArgs(), a => string.Equals(a, name, StringComparison.OrdinalIgnoreCase));
+            Array.Exists(Args(), a => string.Equals(a, name, StringComparison.OrdinalIgnoreCase));
 
         private static string Arg(string name)
         {
-            string[] args = Environment.GetCommandLineArgs();
+            string[] args = Args();
             for (int i = 0; i < args.Length - 1; i++)
                 if (string.Equals(args[i], name, StringComparison.OrdinalIgnoreCase)) return args[i + 1];
             return null;

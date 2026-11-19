@@ -13,6 +13,7 @@ import sys
 import time
 
 from color_pid import ColorPid
+
 from ushqyr_bench import Sim
 
 
@@ -48,7 +49,8 @@ def main() -> None:
         points, score_time, speed, _ = fly(seed, args.gates, args.limit, args.host, args.port)
         ok = points >= args.gates
         laps += ok
-        print(f"seed {seed:3d}: {points} gate(s), last at {score_time:6.2f} s  {'LAP' if ok else 'no lap'}  ({speed:.1f}x real time)")
+        lap = "LAP" if ok else "no lap"
+        print(f"seed {seed:3d}: {points} gate(s), last at {score_time:6.2f} s  {lap}  ({speed:.1f}x real time)")
     print(f"full lap in {laps} of {args.runs} runs")
 
     same = True

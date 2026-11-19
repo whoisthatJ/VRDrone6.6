@@ -2263,6 +2263,114 @@ MonoBehaviour:
     m_Key: Attempt over
     m_Metadata:
       m_Items: []
+  - m_Id: 5800611037573120
+    m_Key: REPLAY
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5800611087904768
+    m_Key: LEADERBOARD
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5800611087904769
+    m_Key: Leaderboard (Tab)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5800611087904770
+    m_Key: All tracks
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5800611087904771
+    m_Key: Track {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5800611087904772
+    m_Key: Export CSV
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5800611087904773
+    m_Key: Export CSV ( ; )
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5800611087904774
+    m_Key: Team
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5800611087904775
+    m_Key: Points
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5800611087904776
+    m_Key: Time, s
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5800611087904777
+    m_Key: No recorded attempts yet.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5800611087904778
+    m_Key: Latest attempts
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5800611087904779
+    m_Key: Replay
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5800611092099072
+    m_Key: 'Saved: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5800611092099073
+    m_Key: VERIFIED
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5800611092099074
+    m_Key: CHECKSUMS ONLY
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5800611092099075
+    m_Key: NO MANIFEST
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5800611092099076
+    m_Key: MODIFIED
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5800611092099077
+    m_Key: Scoring decisions (click to jump)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5800611092099078
+    m_Key: 'Space: play / pause    C: camera    arrows: step'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5800611092099079
+    m_Key: Pause
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5800611092099080
+    m_Key: Play
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5800611092099081
+    m_Key: Overview
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5800611092099082
+    m_Key: Onboard
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5800611092099083
+    m_Key: Trackside
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5800611092099084
+    m_Key: Free
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5800611092099085
+    m_Key: 'Attempt over: writing logs and video'
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

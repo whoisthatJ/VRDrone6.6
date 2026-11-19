@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ushqyr-bench-runner"
+version = "0.1.0"
+description = "Organiser tools for Ushqyr AI Bench: verify attempt folders, re-simulate, build leaderboards"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+dependencies = []
+
+[project.optional-dependencies]
+resim = ["ushqyr-bench"]
+dev = ["pytest>=7", "ruff>=0.4"]
+
+[project.scripts]
+ushqyr-bench = "ushqyr_bench_runner.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src", "../sdk/python/src"]
+
+[tool.ruff]
+line-length = 130
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]
+ignore = ["UP006", "UP007", "UP035", "UP045"]

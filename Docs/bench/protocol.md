@@ -1,7 +1,7 @@
 # Ushqyr AI Bench: wire protocol, version 1
 
 The Python SDK (`bench/sdk/python`) speaks this protocol. It is written down so that a client can be written in any
-language. Status: B1 (demo). Sync mode only; realtime mode, LiDAR and competition extras come with later milestones
+language. Status: B2. Sync mode only; realtime mode and LiDAR come with later milestones
 and will raise the version number only if an existing message changes.
 
 ## Transport
@@ -63,6 +63,7 @@ and the connection is closed. The mode is decided by the simulator; nothing the 
 |---|---|
 | `proto` | `1` |
 | `mode` | `"training"` or `"competition"` |
+| `track` | Training only: `id` and `hash` of the loaded track file. Never sent in competition mode |
 | `sim` | Simulator version |
 | `time_mode` | `"sync"` |
 | `control_hz` | Steps per second of simulator time (default 100): one `STEP` advances `1 / control_hz` |
@@ -95,7 +96,8 @@ the sensor noise. In competition mode `START` is accepted once per connection.
 | 6–15 | spare | ignored |
 
 Values outside 1000–2000 are clamped; missing channels are centred (throttle and AUX low). An array holding anything
-but finite numbers is dropped as a whole, which the link sees as a lost packet.
+but finite numbers is dropped as a whole, which the link sees as a lost packet. A `STEP` without `rc` advances the
+simulation without a packet (the same lost packet, on purpose).
 
 The simulator sends the packet through the link model (constant delay `latency_ms`; no packet for `failsafe_ms` cuts the
 motors until AUX1 is switched off and on again), advances exactly one control period with the same flight controller and
@@ -143,7 +145,15 @@ The program says it has finished. The attempt ends with status `finished`.
 ### ERROR
 
 Header: `code` and `message`. Codes: `hello_first`, `protocol`, `token`, `not_allowed`, `already_started`,
-`unknown_message`. The connection is closed after an `ERROR`.
+`attempt_over`, `unknown_message`. The connection is closed after an `ERROR`.
+
+## Competition mode
+
+One simulator launch is one attempt. The program must connect and send `START` within `connect_timeout` seconds
+(default 60) and answer every observation within `step_timeout` seconds (default 10) of real time; otherwise the
+attempt ends with status `timeout`. A program that leaves or is refused ends it with `disconnected`. After the
+attempt, `HELLO` is answered with `attempt_over`. `status` values a program can see: `running`, `finished`,
+`time_limit`, `stuck`.
 
 ## Determinism
 

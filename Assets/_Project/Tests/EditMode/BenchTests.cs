@@ -459,6 +459,142 @@ namespace Ushqyr.Tests
             for (int t = 7; t < 256; t++) Assert.IsFalse(BenchProtocol.AllowedInCompetition((byte)t));
         }
 
+        // ---------- results, manifest, leaderboard ----------
+
+        private static string TempFolder()
+        {
+            string dir = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "ushqyr_bench_test_" + Guid.NewGuid().ToString("N"));
+            System.IO.Directory.CreateDirectory(dir);
+            return dir;
+        }
+
+        private static readonly byte[] Key = System.Text.Encoding.ASCII.GetBytes("a test key of 32 bytes..........");
+
+        [Test]
+        public void Manifest_VerifiesUntouchedFolder_AndCatchesEveryKindOfEdit()
+        {
+            string dir = TempFolder();
+            try
+            {
+                System.IO.File.WriteAllText(System.IO.Path.Combine(dir, "result.json"), "{\"points\":3}");
+                System.IO.File.WriteAllText(System.IO.Path.Combine(dir, "events.csv"), "t,type\n1.0,gate\n");
+                var result = new AttemptResult { team = "A", track_hash = "abc", seed = 7 };
+                AttemptManifest.Write(dir, result, Key);
+
+                Assert.AreEqual(ManifestState.Verified, AttemptManifest.Verify(dir, Key, out _));
+                Assert.AreEqual(ManifestState.ChecksumsOnly, AttemptManifest.Verify(dir, null, out _), "no key here: checksums only");
+                Assert.AreEqual(ManifestState.Modified, AttemptManifest.Verify(dir, System.Text.Encoding.ASCII.GetBytes("another key of 32 bytes........."), out _));
+
+                // A changed score.
+                System.IO.File.WriteAllText(System.IO.Path.Combine(dir, "result.json"), "{\"points\":9}");
+                Assert.AreEqual(ManifestState.Modified, AttemptManifest.Verify(dir, Key, out string detail));
+                StringAssert.Contains("result.json", detail);
+
+                // A changed score with the manifest rewritten to match, but without the key: the signature gives it away.
+                AttemptManifest.Write(dir, result, null);
+                System.IO.File.WriteAllText(System.IO.Path.Combine(dir, AttemptManifest.SignatureName), new string('0', 64));
+                Assert.AreEqual(ManifestState.Modified, AttemptManifest.Verify(dir, Key, out _));
+
+                // An added file, a removed file.
+                AttemptManifest.Write(dir, result, Key);
+                System.IO.File.WriteAllText(System.IO.Path.Combine(dir, "extra.txt"), "x");
+                Assert.AreEqual(ManifestState.Modified, AttemptManifest.Verify(dir, Key, out _));
+                System.IO.File.Delete(System.IO.Path.Combine(dir, "extra.txt"));
+                System.IO.File.Delete(System.IO.Path.Combine(dir, "events.csv"));
+                Assert.AreEqual(ManifestState.Modified, AttemptManifest.Verify(dir, Key, out _));
+
+                // A signed attempt whose signature was simply deleted.
+                System.IO.File.WriteAllText(System.IO.Path.Combine(dir, "events.csv"), "t,type\n1.0,gate\n");
+                AttemptManifest.Write(dir, result, Key);
+                System.IO.File.Delete(System.IO.Path.Combine(dir, AttemptManifest.SignatureName));
+                Assert.AreEqual(ManifestState.Modified, AttemptManifest.Verify(dir, Key, out _));
+            }
+            finally { System.IO.Directory.Delete(dir, true); }
+        }
+
+        [Test]
+        public void Manifest_MissingIsReported()
+        {
+            string dir = TempFolder();
+            try { Assert.AreEqual(ManifestState.Missing, AttemptManifest.Verify(dir, Key, out _)); }
+            finally { System.IO.Directory.Delete(dir, true); }
+        }
+
+        private static AttemptResult Res(string team, string track, int points, double time, string status = "finished", int attempt = 1) =>
+            new AttemptResult { team = team, track_id = track, points = points, time = time, status = status, attempt = attempt };
+
+        [Test]
+        public void Leaderboard_MorePointsFirst_ThenLessTime()
+        {
+            var rows = Leaderboard.Rank(new[] { Res("B", "T1", 5, 30.0), Res("A", "T1", 5, 28.5), Res("C", "T1", 6, 80.0) }, "T1");
+            Assert.AreEqual("C", rows[0].Team);
+            Assert.AreEqual("A", rows[1].Team);
+            Assert.AreEqual("B", rows[2].Team);
+            Assert.AreEqual(new[] { 1, 2, 3 }, new[] { rows[0].Rank, rows[1].Rank, rows[2].Rank });
+        }
+
+        [Test]
+        public void Leaderboard_BestAttemptPerTrack_InvalidRunsDontCount_OverallAddsTracks()
+        {
+            var results = new[]
+            {
+                Res("A", "T1", 3, 20.0, attempt: 1), Res("A", "T1", 5, 40.0, attempt: 2), Res("A", "T2", 4, 25.0),
+                Res("B", "T1", 6, 50.0), Res("B", "T2", 9, 10.0, status: "invalid"), Res("B", "T2", 2, 12.0, attempt: 2),
+            };
+            var t1 = Leaderboard.Rank(results, "T1");
+            Assert.AreEqual("B", t1[0].Team);
+            Assert.AreEqual(5, t1[1].Points, "A's better attempt on T1");
+
+            var overall = Leaderboard.Rank(results, null);
+            Assert.AreEqual("A", overall[0].Team);
+            Assert.AreEqual(9, overall[0].Points);
+            Assert.AreEqual(65.0, overall[0].Time, 1e-9);
+            Assert.AreEqual(8, overall[1].Points, "the invalid 9-point run is not counted");
+        }
+
+        [Test]
+        public void Leaderboard_EqualPointsAndTime_ShareARank()
+        {
+            var rows = Leaderboard.Rank(new[] { Res("A", "T", 4, 10.0), Res("B", "T", 4, 10.0), Res("C", "T", 1, 5.0) }, "T");
+            Assert.AreEqual(1, rows[0].Rank);
+            Assert.AreEqual(1, rows[1].Rank);
+            Assert.AreEqual(3, rows[2].Rank);
+        }
+
+        [Test]
+        public void Csv_QuotesWhatNeedsQuoting_AndDefusesFormulas()
+        {
+            var r = Res("Team \"Қыран\", SDU", "H1_Oval", 6, 24.528);
+            r.date_utc = "2026-11-19T10:00:00Z";
+            string csv = Leaderboard.ToCsv(new[] { r, Res("=cmd()", "T", 1, 1.5) });
+            string[] lines = csv.Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+            Assert.AreEqual(Leaderboard.CsvHeader, lines[0]);
+            StringAssert.StartsWith("\"Team \"\"Қыран\"\", SDU\",H1_Oval,1,6,24.528,finished,2026-11-19T10:00:00Z", lines[1]);
+            StringAssert.StartsWith("'=cmd(),", lines[2]);
+
+            string semi = Leaderboard.ToCsv(new[] { r }, ';');
+            StringAssert.Contains(";6;24,528;finished;", semi);
+            StringAssert.StartsWith("team;track;attempt", semi);
+        }
+
+        [Test]
+        public void RulesHash_IgnoresTokenAndPort_ButNotTheRules()
+        {
+            BenchRules a = BenchRules.Parse(null), b = BenchRules.Parse("{\"token\":\"secret\",\"port\":6000}"), c = BenchRules.Parse("{\"rc_latency_ms\":40}");
+            Assert.AreEqual(a.Hash(), b.Hash());
+            Assert.AreNotEqual(a.Hash(), c.Hash());
+            Assert.AreEqual("secret", b.token, "hashing must not change the rules");
+        }
+
+        [Test]
+        public void ScoringReasons_SayWhy()
+        {
+            var e = new GateEvent { Kind = GateEventKind.RepeatIgnored, OthersSince = 2 };
+            Assert.AreEqual("repeat ignored: only 2 other gates since (needs 4)", GateEventText.Reason(e, 4));
+            e.OthersSince = 1;
+            StringAssert.Contains("1 other gate since", GateEventText.Reason(e, 4));
+        }
+
         // ---------- track file ----------
 
         [Test]

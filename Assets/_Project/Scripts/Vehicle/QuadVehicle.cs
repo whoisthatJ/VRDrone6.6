@@ -136,6 +136,18 @@ namespace Ushqyr.Vehicle
             _collision.Crashed = false;
         }
 
+        /// <summary>Places the quad at a pose, at rest (replaying a recorded flight). Only with <see cref="ExternalStepping"/>.</summary>
+        public void Teleport(Vector3 position, Quaternion rotation)
+        {
+            _state.Position = CollisionHook.FromUnity(position);
+            _state.Orientation = CollisionHook.FromUnity(rotation);
+            _state.Velocity = Vec3.Zero;
+            _state.AngularVelocity = Vec3.Zero;
+            _collision.PrevPosition = _state.Position;
+            _collision.PrevOrientation = _state.Orientation;
+            ApplyPose(1f);
+        }
+
         /// <summary>Puts the Transform exactly on the simulated pose (no interpolation).</summary>
         public void SyncPose() => ApplyPose(1f);
 

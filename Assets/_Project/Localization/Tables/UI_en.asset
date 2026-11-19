@@ -2266,6 +2266,114 @@ MonoBehaviour:
     m_Localized: Attempt over
     m_Metadata:
       m_Items: []
+  - m_Id: 5800611037573120
+    m_Localized: REPLAY
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5800611087904768
+    m_Localized: LEADERBOARD
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5800611087904769
+    m_Localized: Leaderboard (Tab)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5800611087904770
+    m_Localized: All tracks
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5800611087904771
+    m_Localized: Track {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5800611087904772
+    m_Localized: Export CSV
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5800611087904773
+    m_Localized: Export CSV ( ; )
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5800611087904774
+    m_Localized: Team
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5800611087904775
+    m_Localized: Points
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5800611087904776
+    m_Localized: Time, s
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5800611087904777
+    m_Localized: No recorded attempts yet.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5800611087904778
+    m_Localized: Latest attempts
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5800611087904779
+    m_Localized: Replay
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5800611092099072
+    m_Localized: 'Saved: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5800611092099073
+    m_Localized: VERIFIED
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5800611092099074
+    m_Localized: CHECKSUMS ONLY
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5800611092099075
+    m_Localized: NO MANIFEST
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5800611092099076
+    m_Localized: MODIFIED
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5800611092099077
+    m_Localized: Scoring decisions (click to jump)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5800611092099078
+    m_Localized: 'Space: play / pause    C: camera    arrows: step'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5800611092099079
+    m_Localized: Pause
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5800611092099080
+    m_Localized: Play
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5800611092099081
+    m_Localized: Overview
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5800611092099082
+    m_Localized: Onboard
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5800611092099083
+    m_Localized: Trackside
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5800611092099084
+    m_Localized: Free
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5800611092099085
+    m_Localized: 'Attempt over: writing logs and video'
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

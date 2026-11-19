@@ -68,6 +68,8 @@ namespace Ushqyr.Bench
 
         /// <summary>SHA-256 of the file's bytes, set by <see cref="Parse"/>.</summary>
         [NonSerialized] public string Hash;
+        /// <summary>The file's text as read, set by <see cref="Parse"/> (copied into every attempt folder).</summary>
+        [NonSerialized] public string Json;
 
         public static BenchTrack Parse(string json)
         {
@@ -88,6 +90,7 @@ namespace Ushqyr.Bench
                 foreach (byte b in sha.ComputeHash(Encoding.UTF8.GetBytes(json))) sb.Append(b.ToString("x2"));
                 t.Hash = sb.ToString();
             }
+            t.Json = json;
             return t;
         }
 
@@ -137,6 +140,16 @@ namespace Ushqyr.Bench
         public long seed = 1;
         /// <summary>Sync mode only: don't run faster than real time, so the flight looks normal on screen.</summary>
         public bool pace_realtime = true;
+        /// <summary>Attempt folders with logs: "on", "off" or "auto" (always in competition; in training when an output folder is given).</summary>
+        public string record = "auto";
+        /// <summary>Onboard, trackside and judge video: "on", "off" or "auto" (competition only). Needs ffmpeg.</summary>
+        public string video = "auto";
+        public int trackside_width = 1280;
+        public int trackside_height = 720;
+        /// <summary>Competition: the program must connect and start within this many seconds of real time.</summary>
+        public float connect_timeout = 60f;
+        /// <summary>Competition: the longest the program may take to answer one step, in seconds of real time.</summary>
+        public float step_timeout = 10f;
         public int port = 5757;
         /// <summary>The program must present this token; empty = no check.</summary>
         public string token = "";
@@ -153,6 +166,18 @@ namespace Ushqyr.Bench
         }
 
         public bool Competition => string.Equals(mode, "competition", StringComparison.OrdinalIgnoreCase);
+
+        /// <summary>
+        /// Hash of everything that shapes an attempt. The token and the port are left out: they are not rules, and the
+        /// token must never reach a log.
+        /// </summary>
+        public string Hash()
+        {
+            var copy = JsonUtility.FromJson<BenchRules>(JsonUtility.ToJson(this));
+            copy.token = "";
+            copy.port = 0;
+            return BenchHash.Sha256(JsonUtility.ToJson(copy));
+        }
     }
 
     /// <summary>Message numbers and limits of protocol version 1 (Docs/bench/protocol.md).</summary>
