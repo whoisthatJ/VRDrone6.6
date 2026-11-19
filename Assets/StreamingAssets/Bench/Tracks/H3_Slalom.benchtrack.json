@@ -1,0 +1,129 @@
+{
+    "schema": 1,
+    "id": "H3_Slalom",
+    "name": "Hall Slalom",
+    "author": "Ushqyr",
+    "difficulty": "medium",
+    "venue": "hall",
+    "lighting": "default",
+    "start": {
+        "position": [
+            -17.0,
+            0.0,
+            -5.0
+        ],
+        "yaw": 90.0
+    },
+    "gates": [
+        {
+            "id": "G1",
+            "position": [
+                -12.0,
+                0.0,
+                -5.0
+            ],
+            "yaw": 90.0,
+            "led": {
+                "color": "#FF00C8",
+                "brightness": 1.0,
+                "mode": "solid"
+            },
+            "direction": "any"
+        },
+        {
+            "id": "G2",
+            "position": [
+                -6.0,
+                0.0,
+                -2.0
+            ],
+            "yaw": 90.0,
+            "led": {
+                "color": "#FF00C8",
+                "brightness": 1.0,
+                "mode": "solid"
+            },
+            "direction": "any"
+        },
+        {
+            "id": "G3",
+            "position": [
+                0.0,
+                0.0,
+                -6.0
+            ],
+            "yaw": 90.0,
+            "led": {
+                "color": "#FF00C8",
+                "brightness": 1.0,
+                "mode": "solid"
+            },
+            "direction": "any"
+        },
+        {
+            "id": "G4",
+            "position": [
+                6.0,
+                0.0,
+                -2.5
+            ],
+            "yaw": 90.0,
+            "led": {
+                "color": "#FF00C8",
+                "brightness": 1.0,
+                "mode": "solid"
+            },
+            "direction": "any"
+        },
+        {
+            "id": "G5",
+            "position": [
+                13.0,
+                0.0,
+                1.5
+            ],
+            "yaw": 0.0,
+            "led": {
+                "color": "#FF00C8",
+                "brightness": 1.0,
+                "mode": "solid"
+            },
+            "direction": "any"
+        },
+        {
+            "id": "G6",
+            "position": [
+                6.0,
+                0.0,
+                6.0
+            ],
+            "yaw": -90.0,
+            "led": {
+                "color": "#FF00C8",
+                "brightness": 1.0,
+                "mode": "solid"
+            },
+            "direction": "any"
+        },
+        {
+            "id": "G7",
+            "position": [
+                -8.0,
+                0.0,
+                5.5
+            ],
+            "yaw": -90.0,
+            "led": {
+                "color": "#FF00C8",
+                "brightness": 1.0,
+                "mode": "solid"
+            },
+            "direction": "any"
+        }
+    ],
+    "props": [],
+    "rules": {
+        "repeat_window": 4,
+        "time_limit": 120.0
+    }
+}

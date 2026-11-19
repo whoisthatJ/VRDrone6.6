@@ -97,6 +97,7 @@ class ColorPid:
         self.fx, self.fy = float(cam["fx"]), float(cam["fy"])
         self.cx0, self.cy0 = float(cam["cx"]), float(cam["cy"])
         self.tilt = math.radians(float(cam["tilt_deg"]))
+        self.k1 = float(cam.get("distortion", {}).get("k1", 0.0))
         self.dt = 1.0 / float(info["control_hz"])
         self.cruise_pitch = cruise_pitch
         self.max_angle = math.radians(max_angle_deg)
@@ -146,11 +147,20 @@ class ColorPid:
         out /= max(0.8, math.cos(self.pitch_angle))
         return max(0.0, min(1.0, out))
 
+    def _ray(self, u: float, v: float) -> Tuple[float, float]:
+        """A pixel as tangents of the true angles (right, down): the lens model of the handshake, x_u = x_d (1 + k1 r²)."""
+        xd, yd = (u - self.cx0) / self.fx, (v - self.cy0) / self.fy
+        scale = 1.0 + self.k1 * (xd * xd + yd * yd)
+        return xd * scale, yd * scale
+
     def _aim(self, d: Detection) -> Tuple[float, float, float]:
         """Bearing to the gate (rad, + right), its elevation above the horizon (rad) and its distance (m)."""
-        bearing = math.atan2(d.cx - self.cx0, self.fx)
-        elevation = math.atan2(self.cy0 - d.cy, self.fy) + self.tilt - self.pitch_angle
-        distance = self.fx * self.GATE_WIDTH / max(d.width, 1.0)
+        x, y = self._ray(d.cx, d.cy)
+        bearing = math.atan(x)
+        elevation = math.atan(-y) + self.tilt - self.pitch_angle
+        left, _ = self._ray(d.cx - d.width / 2.0, d.cy)
+        right, _ = self._ray(d.cx + d.width / 2.0, d.cy)
+        distance = self.GATE_WIDTH / max(right - left, 1e-3)
         return bearing, elevation, distance
 
     def _update_sight_rate(self, frame_time: float) -> None:
@@ -164,7 +174,7 @@ class ColorPid:
             self.last_bearing = None
             self.sight_rate *= 0.8
             return
-        bearing = math.atan2(d.cx - self.cx0, self.fx)
+        bearing = math.atan(self._ray(d.cx, d.cy)[0])
         frame_dt = frame_time - self.last_frame_time
         if self.last_bearing is not None and 0.0 < frame_dt < 0.2:
             rate = (bearing - self.last_bearing) / frame_dt + self.yaw_rate

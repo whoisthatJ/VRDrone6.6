@@ -1,0 +1,159 @@
+{
+    "schema": 1,
+    "id": "P2_Maze",
+    "name": "Parking Maze",
+    "author": "Ushqyr",
+    "difficulty": "hard",
+    "venue": "parking",
+    "lighting": "default",
+    "start": {
+        "position": [
+            -26.0,
+            0.0,
+            -8.0
+        ],
+        "yaw": 90.0
+    },
+    "gates": [
+        {
+            "id": "G1",
+            "position": [
+                -20.0,
+                0.0,
+                -8.0
+            ],
+            "yaw": 90.0,
+            "led": {
+                "color": "#FF00C8",
+                "brightness": 1.0,
+                "mode": "solid"
+            },
+            "direction": "any"
+        },
+        {
+            "id": "G2",
+            "position": [
+                -12.0,
+                0.0,
+                0.0
+            ],
+            "yaw": 0.0,
+            "led": {
+                "color": "#FF00C8",
+                "brightness": 1.0,
+                "mode": "solid"
+            },
+            "direction": "any"
+        },
+        {
+            "id": "G3",
+            "position": [
+                -4.0,
+                0.0,
+                8.0
+            ],
+            "yaw": 90.0,
+            "led": {
+                "color": "#FF00C8",
+                "brightness": 1.0,
+                "mode": "solid"
+            },
+            "direction": "any"
+        },
+        {
+            "id": "G4",
+            "position": [
+                4.0,
+                0.0,
+                0.0
+            ],
+            "yaw": 180.0,
+            "led": {
+                "color": "#FF00C8",
+                "brightness": 1.0,
+                "mode": "solid"
+            },
+            "direction": "any"
+        },
+        {
+            "id": "G5",
+            "position": [
+                12.0,
+                0.0,
+                -8.0
+            ],
+            "yaw": 90.0,
+            "led": {
+                "color": "#FF00C8",
+                "brightness": 1.0,
+                "mode": "solid"
+            },
+            "direction": "any"
+        },
+        {
+            "id": "G6",
+            "position": [
+                20.0,
+                0.0,
+                0.0
+            ],
+            "yaw": 0.0,
+            "led": {
+                "color": "#FF00C8",
+                "brightness": 1.0,
+                "mode": "solid"
+            },
+            "direction": "any"
+        },
+        {
+            "id": "G7",
+            "position": [
+                12.0,
+                0.0,
+                8.0
+            ],
+            "yaw": -90.0,
+            "led": {
+                "color": "#FF00C8",
+                "brightness": 1.0,
+                "mode": "solid"
+            },
+            "direction": "any"
+        },
+        {
+            "id": "G8",
+            "position": [
+                -12.0,
+                0.0,
+                8.0
+            ],
+            "yaw": -90.0,
+            "led": {
+                "color": "#FF00C8",
+                "brightness": 1.0,
+                "mode": "solid"
+            },
+            "direction": "any"
+        },
+        {
+            "id": "G9",
+            "position": [
+                -20.0,
+                0.0,
+                0.0
+            ],
+            "yaw": 180.0,
+            "led": {
+                "color": "#FF00C8",
+                "brightness": 1.0,
+                "mode": "solid"
+            },
+            "direction": "any"
+        }
+    ],
+    "props": [],
+    "rules": {
+        "repeat_window": 4,
+        "time_limit": 120.0
+    }
+}

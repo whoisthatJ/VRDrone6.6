@@ -25,6 +25,8 @@ namespace Ushqyr.Bench
         /// <summary>finished, time_limit, timeout, disconnected, stuck or invalid.</summary>
         public string status = "";
         public string mode = "";
+        /// <summary>"sync" (repeatable) or "realtime".</summary>
+        public string time_mode = "sync";
         public long seed;
         public string date_utc = "";
         public string build = "";

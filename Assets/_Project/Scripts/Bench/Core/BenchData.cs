@@ -31,6 +31,24 @@ namespace Ushqyr.Bench
         public string direction = "any";
     }
 
+    /// <summary>
+    /// Something standing on the track that is not a gate: a coloured panel or box (a distractor for colour detectors,
+    /// or simply an obstacle). Solid.
+    /// </summary>
+    [Serializable]
+    public sealed class TrackProp
+    {
+        public string id;
+        /// <summary>Middle of the base on the floor.</summary>
+        public float[] position = new float[3];
+        public float yaw;
+        /// <summary>Width, height, depth (m).</summary>
+        public float[] size = { 1f, 1f, 0.1f };
+        public string color = "#FF00C8";
+        /// <summary>True: it shines like an LED strip. False: painted.</summary>
+        public bool glow;
+    }
+
     [Serializable]
     public sealed class TrackStart
     {
@@ -64,6 +82,7 @@ namespace Ushqyr.Bench
         public string lighting = "default";
         public TrackStart start = new TrackStart();
         public List<TrackGate> gates = new List<TrackGate>();
+        public List<TrackProp> props = new List<TrackProp>();
         public TrackRules rules = new TrackRules();
 
         /// <summary>SHA-256 of the file's bytes, set by <see cref="Parse"/>.</summary>
@@ -118,6 +137,19 @@ namespace Ushqyr.Bench
         public float control_hz = 100f;
         public float rc_latency_ms = 10f;
         public float rc_failsafe_ms = 500f;
+        /// <summary>Extra link delay that changes from packet to packet: uniform between 0 and this.</summary>
+        public float rc_jitter_ms = 0f;
+        /// <summary>Share of RC packets that never arrive, in percent.</summary>
+        public float rc_loss_percent = 0f;
+        /// <summary>
+        /// A fixed delay that stands for the program's own processing time, added to the link delay. 0 in training;
+        /// the organisers set it for the competition so that slow and fast computers fly the same.
+        /// </summary>
+        public float compute_delay_ms = 0f;
+        /// <summary>"sync": the simulator advances one step per command. "realtime": it runs with the wall clock.</summary>
+        public string time_mode = "sync";
+        public float lidar_hz = 10f;
+        public bool lidar = true;
         public int camera_width = 640;
         public int camera_height = 480;
         public float camera_fps = 30f;
@@ -128,6 +160,12 @@ namespace Ushqyr.Bench
         /// <summary>Delay from the moment a frame is taken to the moment the program gets it.</summary>
         public float camera_latency_ms = 30f;
         public bool camera_analog = true;
+        /// <summary>Barrel distortion of the lens (radial coefficient k1; 0 = a plain perspective picture).</summary>
+        public float camera_distortion = 0.18f;
+        /// <summary>The camera adjusts its exposure to the brightness of the scene, as a real one does.</summary>
+        public bool camera_auto_exposure = true;
+        /// <summary>Distance at which the analog video signal is at its worst (m).</summary>
+        public float video_range = 80f;
         public float imu_hz = 500f;
         public float tof_hz = 50f;
         public float battery_hz = 10f;
@@ -166,6 +204,7 @@ namespace Ushqyr.Bench
         }
 
         public bool Competition => string.Equals(mode, "competition", StringComparison.OrdinalIgnoreCase);
+        public bool Realtime => string.Equals(time_mode, "realtime", StringComparison.OrdinalIgnoreCase);
 
         /// <summary>
         /// Hash of everything that shapes an attempt. The token and the port are left out: they are not rules, and the

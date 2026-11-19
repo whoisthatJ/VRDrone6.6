@@ -3,6 +3,7 @@
     ushqyr-bench verify <attempt folder> [--key key.file]
     ushqyr-bench resim <attempt folder>              (needs the simulator running in training mode on the same track)
     ushqyr-bench leaderboard <results folder> [--track ID] [--csv results.csv] [--board leaderboard.csv] [--semicolon]
+    ushqyr-bench check-build <build or kit folder> --hidden <folder with the hidden tracks>
 """
 from __future__ import annotations
 
@@ -82,6 +83,20 @@ def cmd_leaderboard(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_check_build(args: argparse.Namespace) -> int:
+    """Makes sure no hidden track got into something that will be handed out."""
+    leaks = attempt.find_hidden_tracks(Path(args.build), Path(args.hidden))
+    hidden = sorted(Path(args.hidden).rglob("*.benchtrack.json"))
+    print(f"{len(hidden)} hidden track(s) checked against {args.build}")
+    for leak in leaks:
+        print("  LEAK: " + leak)
+    print("clean" if not leaks else f"{len(leaks)} leak(s)")
+    if not hidden:
+        print("no hidden tracks found in that folder: nothing was checked")
+        return 2
+    return 1 if leaks else 0
+
+
 def main(argv: Optional[List[str]] = None) -> int:
     parser = argparse.ArgumentParser(
         prog="ushqyr-bench", description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
@@ -109,6 +124,11 @@ def main(argv: Optional[List[str]] = None) -> int:
     p.add_argument("--semicolon", action="store_true",
                    help="';' as separator and ',' as decimal mark (spreadsheets in Russian or Kazakh regions)")
     p.set_defaults(run=cmd_leaderboard)
+
+    p = sub.add_parser("check-build", help="make sure a build or kit folder contains no hidden track")
+    p.add_argument("build")
+    p.add_argument("--hidden", required=True, help="the private folder with the hidden *.benchtrack.json files")
+    p.set_defaults(run=cmd_check_build)
 
     args = parser.parse_args(argv)
     return int(args.run(args))

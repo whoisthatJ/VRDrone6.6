@@ -87,3 +87,27 @@ def test_competition_mode_starts_once_and_has_no_ping():
 def test_ping_round_trip():
     with FakeSim() as fake, Sim.connect(port=fake.port) as sim:
         assert sim.ping(100_000) < 1.0
+
+
+def test_lidar_scan_arrives_between_imu_and_camera():
+    with FakeSim() as fake, Sim.connect(port=fake.port) as sim:
+        obs = sim.reset()
+        assert obs.lidar.ranges is None
+        scans = 0
+        for _ in range(31):
+            obs = sim.step(RC())
+            if obs.lidar.new:
+                scans += 1
+                assert obs.lidar.ranges.shape == (360,)
+                assert float(obs.lidar.ranges[0]) == pytest.approx(5.0)
+            if obs.camera.new:
+                assert obs.camera.image.shape == (48, 64, 3) and int(obs.camera.image[5, 5, 1]) == 128
+        assert scans == 3
+        assert not obs.lidar.new and obs.lidar.ranges is not None, "the last scan is kept"
+
+
+def test_step_without_a_packet():
+    with FakeSim() as fake, Sim.connect(port=fake.port) as sim:
+        sim.reset()
+        sim.step(None)
+        assert fake.received[-1] == []

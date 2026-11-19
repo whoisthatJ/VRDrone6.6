@@ -22,6 +22,85 @@ namespace Ushqyr.Bench
         public static string ChosenTrack;
 
         public static string TracksFolder => Path.Combine(Application.streamingAssetsPath, "Bench", "Tracks");
+        /// <summary>Tracks made in the editor on this computer.</summary>
+        public static string UserTracksFolder => Path.Combine(Application.persistentDataPath, "BenchTracks");
+
+        /// <summary>The track file open in the track editor (set by <see cref="Edit"/>, or <c>-bench-edit</c>); null otherwise.</summary>
+        public static string EditPath { get => _edit ?? (_editCleared ? null : ResolveTrack(Arg("-bench-edit"))); private set => _edit = value; }
+        private static string _edit;
+
+        public struct TrackEntry
+        {
+            public string Name, Path, Venue;
+            public bool Public;
+            public int Gates;
+        }
+
+        public static string[] PublicTrackNames()
+        {
+            if (!Directory.Exists(TracksFolder)) return new string[0];
+            string[] files = Directory.GetFiles(TracksFolder, "*" + TrackExtension);
+            for (int i = 0; i < files.Length; i++) files[i] = Path.GetFileName(files[i]).Replace(TrackExtension, "");
+            Array.Sort(files, StringComparer.Ordinal);
+            return files;
+        }
+
+        /// <summary>Public tracks first, then the user's own.</summary>
+        public static System.Collections.Generic.List<TrackEntry> ListTracks()
+        {
+            var list = new System.Collections.Generic.List<TrackEntry>();
+            foreach (string folder in new[] { TracksFolder, UserTracksFolder })
+            {
+                if (!Directory.Exists(folder)) continue;
+                string[] files = Directory.GetFiles(folder, "*" + TrackExtension);
+                Array.Sort(files, StringComparer.Ordinal);
+                foreach (string file in files)
+                {
+                    try
+                    {
+                        BenchTrack t = BenchTrack.Parse(File.ReadAllText(file));
+                        list.Add(new TrackEntry { Name = t.id, Path = file, Venue = t.venue, Public = folder == TracksFolder, Gates = t.gates.Count });
+                    }
+                    catch (Exception) { /* a broken file is not listed */ }
+                }
+            }
+            return list;
+        }
+
+        /// <summary>A track given as a file path, or by name: a public track, or one of the user's own.</summary>
+        public static string ResolveTrack(string nameOrPath)
+        {
+            if (string.IsNullOrEmpty(nameOrPath)) return null;
+            if (File.Exists(nameOrPath)) return nameOrPath;
+            foreach (string folder in new[] { TracksFolder, UserTracksFolder })
+            {
+                string p = Path.Combine(folder, nameOrPath + TrackExtension);
+                if (File.Exists(p)) return p;
+            }
+            return null;
+        }
+
+        /// <summary>Opens the track editor on a track file (a public track is edited as a copy).</summary>
+        public static void Edit(string nameOrPath)
+        {
+            string path = ResolveTrack(nameOrPath);
+            if (path == null) throw new FileNotFoundException($"track not found: {nameOrPath}");
+            EditPath = path;
+            ReplayFolder = null;
+            SceneManager.LoadScene(SceneFor(BenchTrack.Parse(File.ReadAllText(path))));
+        }
+
+        /// <summary>A new generated track in the user's folder, opened in the editor.</summary>
+        public static void EditNew(string venue)
+        {
+            long seed = DateTime.UtcNow.Ticks % 900 + 1;
+            BenchTrack t = TrackGenerator.Generate(venue, seed, 1);
+            t.id = $"MY_{venue}_{seed}";
+            Directory.CreateDirectory(UserTracksFolder);
+            string path = Path.Combine(UserTracksFolder, t.id + TrackExtension);
+            File.WriteAllText(path, t.ToJson() + "\n");
+            Edit(path);
+        }
         public static string DefaultRulesPath => Path.Combine(Application.streamingAssetsPath, "Bench", "rules.json");
 
         public static bool LoopbackOnly => !HasFlag("-bench-listen-all");
@@ -79,10 +158,28 @@ namespace Ushqyr.Bench
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void FromCommandLine()
         {
-            if (Application.isEditor || !(HasFlag("-bench") || Arg("-bench-replay") != null)) return;
+            // -bench-generate <venue> <seed> <difficulty> <file>: write a random track and quit (for making hidden tracks).
+            string[] all = Args();
+            int gen = Array.FindIndex(all, a => string.Equals(a, "-bench-generate", StringComparison.OrdinalIgnoreCase));
+            if (!Application.isEditor && gen >= 0)
+            {
+                int code = 1;
+                try
+                {
+                    BenchTrack t = TrackGenerator.Generate(all[gen + 1], long.Parse(all[gen + 2]), int.Parse(all[gen + 3]));
+                    File.WriteAllText(all[gen + 4], t.ToJson() + "\n");
+                    Debug.Log($"[Bench] generated {t.id} ({t.gates.Count} gates) -> {all[gen + 4]}");
+                    code = 0;
+                }
+                catch (Exception e) { Debug.LogError("[Bench] -bench-generate <venue> <seed> <difficulty> <file>: " + e.Message); }
+                Application.Quit(code);
+                return;
+            }
+            if (Application.isEditor || !(HasFlag("-bench") || Arg("-bench-replay") != null || Arg("-bench-edit") != null)) return;
             try
             {
-                AppBootstrap.FirstSceneOverride = Arg("-bench-replay") != null ? SceneFor(LoadReplayTrack()) : SceneFor(LoadTrack("H1_Oval"));
+                AppBootstrap.FirstSceneOverride = Arg("-bench-replay") != null ? SceneFor(LoadReplayTrack())
+                    : Arg("-bench-edit") != null ? SceneFor(BenchTrack.Parse(File.ReadAllText(EditPath))) : SceneFor(LoadTrack("H1_Oval"));
             }
             catch (Exception e)
             {
@@ -95,8 +192,12 @@ namespace Ushqyr.Bench
         {
             ChosenTrack = track;
             ReplayFolder = null;
+            EditPath = null;
+            _editCleared = true;
             SceneManager.LoadScene(SceneFor(LoadTrack(track)));
         }
+
+        private static bool _editCleared;
 
         public static string SceneFor(BenchTrack track) => track.venue == "parking" ? "Bench_Parking" : "Bench_Hall";
 
@@ -117,9 +218,9 @@ namespace Ushqyr.Bench
 
         public static BenchTrack LoadTrack(string fallback)
         {
-            string chosen = Arg("-bench-track") ?? ChosenTrack ?? fallback;
-            string path = File.Exists(chosen) ? chosen : Path.Combine(TracksFolder, chosen + TrackExtension);
-            if (!File.Exists(path)) throw new FileNotFoundException($"track file not found: {path}");
+            string chosen = ChosenTrack ?? Arg("-bench-track") ?? fallback;
+            string path = ResolveTrack(chosen);
+            if (path == null) throw new FileNotFoundException($"track not found: {chosen}");
             return BenchTrack.Parse(File.ReadAllText(path));
         }
 

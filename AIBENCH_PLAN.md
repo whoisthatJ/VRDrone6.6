@@ -69,6 +69,16 @@ Items marked ❓ are my defaults; the organisers must confirm them (§16). Every
 | D26 | **`telemetry.csv` holds all 16 channels of every packet**, and `truth.csv` the pose per control step, so `resim` and the replay need nothing else. The "replay file" `replay.grreplay` is an index of those files | One source of truth per fact |
 | D27 | **Leaderboard counting:** a team's line for a track is its best counted attempt (the rules will say how many attempts are allowed); the overall board adds one line per track | D10, made concrete |
 | D28 | **Leak test compares what the program received with the judges' `truth.csv` of the same attempt**: key whitelist, equal values, and correlation after removing linear trends (clocks excluded; the ToF sensor follows the height by design) | "Coordinates can't be obtained through the API" as a runnable check |
+| D29 | **Lens model: radial distortion with one coefficient** (`x_u = x_d (1 + k1 r²)`, default `k1 = 0.18`, in the rules file), not a full fisheye. The scene is rendered as a plain perspective view about 1.5 times larger and resampled through a fixed map; `hfov_deg` stays the edge-to-edge angle | A true 120° fisheye needs a render several times larger for the same sharpness; this keeps the camera above real time on a GTX 1650 and still makes teams deal with a bent picture. Replace with the real lens's calibration when the organisers send it |
+| D30 | **Analog link quality** = distance from a receiver at the start pad (worst at `video_range`, default 80 m) times 0.55 when something solid is in between. It scales noise, line jitter, tearing, colour drift and band break-up | "Noise that grows with distance and obstruction" with two numbers to tune |
+| D31 | **LiDAR is a 2D 360° scanner** in the drone's horizontal plane: 360 rays, 10 Hz, 0.15–12 m, swept across the turn while the drone moves (36 rays per control step). Not written to `telemetry.csv` (360 numbers a scan) | Plan default; the sweep gives the motion distortion for free |
+| D32 | **Compute delay is added to the RC link delay** (not to the observations) | One queue instead of two; the effect on the control loop is the same |
+| D33 | **Realtime mode keeps one message for both directions:** `STEP` hands a packet to the link, observations are pushed every control period, the SDK's `step()` sends and then returns the newest observation that has arrived | The same program runs in both time modes |
+| D34 | **Venues are described once in code** (`Venue`: size, columns, parked cars); the scene builder, the validator and the generator all read that description | They cannot disagree about where a column stands |
+| D35 | **Track editor has no manual test flight.** AI Bench has no hand-flying in any mode (that is also why competition mode needs no input lock). Test flights are the oracle pilot's or a program's | Deviation from plan §4 ("manual in training mode"); adding a hand-flown bench drone would re-open the "no manual control" guarantee |
+| D36 | **The oracle pilot is new code** (`BenchOracle`: waypoints before and after each gate, velocity control through Angle-mode sticks), not the Phase 3 bot core | The bot core follows baked racing lines on spline routes; gate lists in free order need none of it |
+| D37 | **Public tracks keep the plan's names and gate counts**, and a track file may carry `props` (solid coloured panels and boxes) for `X1_Mixed`'s distractors | Plan §4 |
+| D38 | **Hidden-track protection = never shipping the file, plus a check** (`ushqyr-bench check-build`) that a build or kit folder contains no hidden track, its id or its gate data. **The private folder itself is the owner's choice, still open** | D8 with a test |
 
 ## 3. Architecture
 ```
@@ -351,3 +361,18 @@ After B1, B2 and B3 can run in parallel. B4 waits for data. B5 can start any tim
 | Judge replay viewer | Done: integrity state, timeline, decisions with reasons, five cameras |
 | Tests | 37 `BenchTests` (335 EditMode in all), 10 SDK tests, 7 runner tests |
 | Not verified | The competition options were exercised in the editor (through `UserSettings/bench-args.txt`), not yet from a built exe |
+
+### B3 (19 November 2026): tracks, venues, complete sensors
+| Item | State |
+|---|---|
+| LiDAR, IMU vibration noise, link jitter and loss, compute delay | Done, with tests |
+| Full analog camera chain: lens distortion, auto-exposure, signal-dependent noise, tearing, colour drift, break-up | Done; 6.3 ms render + 2.2 ms processing per frame on the GTX 1650 Ti, the sync loop runs at about 2.2× real time |
+| Realtime mode in the API and SDK | Done; the sample flew a lap in realtime mode unchanged |
+| Parking venue, lighting variants | Done (`Bench_Parking`; hall: default / dim / warm, parking: default / dim / bright) |
+| Five more public tracks | Done: `H2_Eight`, `H3_Slalom`, `X1_Mixed`, `P1_Columns`, `P2_Maze` |
+| Oracle pilot passes every track | Done: all six, zero collisions, laps of 20 to 48 s (`Docs/bench/track_check.md`) |
+| Track editor: place / move / turn / duplicate / delete, LED settings, start pad, venue, lighting, checks, test flight, save, map export | Done. No manual test flight (D35). Tried through its functions and a screenshot, not yet by hand with the mouse |
+| Random track generator with seed and difficulty | Done: in the editor and as `-bench-generate`; 36 generated tracks validated in tests |
+| Hidden-track workflow | Done as a procedure plus `ushqyr-bench check-build`; the private folder is not chosen (owner's decision) |
+| Sample solution on the new sensors | `H1_Oval` 5 of 5 laps, `H2_Eight` 4 of 5, `P1_Columns` 4 of 5 (5 seeds each). Below the 90% acceptance bar on two tracks: to be improved before B8 |
+| Tests | 49 `BenchTests`, 12 SDK tests, 8 runner tests |

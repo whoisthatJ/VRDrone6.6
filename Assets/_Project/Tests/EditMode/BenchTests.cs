@@ -375,15 +375,17 @@ namespace Ushqyr.Tests
                 bool bottom = i < w * 3;
                 src[i] = bottom ? (byte)255 : (byte)90; src[i + 1] = bottom ? (byte)0 : (byte)90; src[i + 2] = bottom ? (byte)200 : (byte)90;
             }
-            new AnalogVideo(AnalogVideoSettings.Clean, 1).Process(src, clean, w, h, 0);
+            var map = new Unity.Collections.NativeArray<int>(w * h, Unity.Collections.Allocator.Persistent);
+            AnalogVideo.BuildLensMap(map, w, h, w, h, AnalogVideo.LensFocal(w, 120f, 0f), 0f);
+            new AnalogVideo(AnalogVideoSettings.Clean, 1).Process(src, clean, map, w, h, 0);
             int last = (h - 1) * w * 3 + 15 * 3;
             Assert.AreEqual(255, clean[last]);
             Assert.AreEqual(0, clean[last + 1]);
             Assert.AreEqual(90, clean[15 * 3], "top row of the output is the grey part");
 
-            new AnalogVideo(AnalogVideoSettings.Default, 5).Process(src, a, w, h, 3);
-            new AnalogVideo(AnalogVideoSettings.Default, 5).Process(src, b, w, h, 3);
-            new AnalogVideo(AnalogVideoSettings.Default, 5).Process(src, c, w, h, 4);
+            new AnalogVideo(AnalogVideoSettings.Default, 5).Process(src, a, map, w, h, 3);
+            new AnalogVideo(AnalogVideoSettings.Default, 5).Process(src, b, map, w, h, 3);
+            new AnalogVideo(AnalogVideoSettings.Default, 5).Process(src, c, map, w, h, 4);
             CollectionAssert.AreEqual(a.ToArray(), b.ToArray(), "same seed and frame: the same picture");
             CollectionAssert.AreNotEqual(a.ToArray(), c.ToArray(), "the noise changes from frame to frame");
             CollectionAssert.AreNotEqual(a.ToArray(), clean.ToArray());
@@ -391,7 +393,7 @@ namespace Ushqyr.Tests
             Assert.Greater(a[last], 200);
             Assert.Less(a[last + 1], 60);
             Assert.Greater(a[last + 2], 140);
-            src.Dispose(); clean.Dispose(); a.Dispose(); b.Dispose(); c.Dispose();
+            src.Dispose(); clean.Dispose(); a.Dispose(); b.Dispose(); c.Dispose(); map.Dispose();
         }
 
         // ---------- protocol ----------
@@ -457,6 +459,238 @@ namespace Ushqyr.Tests
             Assert.IsFalse(BenchProtocol.AllowedInCompetition(BenchProtocol.Reset));
             Assert.IsFalse(BenchProtocol.AllowedInCompetition(BenchProtocol.Ping));
             for (int t = 7; t < 256; t++) Assert.IsFalse(BenchProtocol.AllowedInCompetition((byte)t));
+        }
+
+        // ---------- B3: LiDAR, link, lens, venues, validation, generator, oracle ----------
+
+        [Test]
+        public void Lidar_DirectionsTurnLeftFromForward()
+        {
+            Vec3 forward = LidarModel.Direction(0, 360), left = LidarModel.Direction(90, 360), back = LidarModel.Direction(180, 360);
+            Assert.AreEqual(1f, forward.z, 1e-5f);
+            Assert.AreEqual(-1f, left.x, 1e-5f, "90 degrees is to the left (the simulator's -X)");
+            Assert.AreEqual(-1f, back.z, 1e-5f);
+        }
+
+        [Test]
+        public void Lidar_RangeLimitsDropoutsAndSeed()
+        {
+            var settings = LidarSettings.Default;
+            settings.Dropout = 0f;
+            var a = new LidarModel(settings, 3);
+            var b = new LidarModel(settings, 3);
+            Assert.AreEqual(0f, a.Read(-1f), "nothing hit");
+            b.Read(-1f);
+            Assert.AreEqual(0f, a.Read(20f), "beyond 12 m");
+            b.Read(20f);
+            Assert.AreEqual(0f, a.Read(0.05f), "closer than the minimum");
+            b.Read(0.05f);
+            for (int i = 0; i < 100; i++)
+            {
+                float x = a.Read(5f), y = b.Read(5f);
+                Assert.AreEqual(x, y, "same seed, same reading");
+                Assert.AreEqual(5f, x, 0.25f);
+            }
+            settings.Dropout = 0.5f;
+            var c = new LidarModel(settings, 3);
+            int zeros = 0;
+            for (int i = 0; i < 1000; i++)
+                if (c.Read(5f) == 0f) zeros++;
+            Assert.That(zeros, Is.InRange(400, 600));
+        }
+
+        [Test]
+        public void RcLink_LossAndJitter_AreSeeded_AndKeepPacketOrder()
+        {
+            var settings = new RcLinkSettings { RateHz = 100f, Latency = 0.010f, FailsafeTime = 0.5f, Jitter = 0.030f, Loss = 0.2f };
+            var a = new RcLink(settings, 9);
+            var b = new RcLink(settings, 9);
+            var c = new RcLink(settings, 10);
+            bool differs = false;
+            float last = -2f;
+            for (int i = 0; i < 400; i++)
+            {
+                double t = i * 0.01;
+                // The roll channel carries the packet's number, so order and loss can be read back.
+                int[] packet = { 1500 + i, 1500, 1000, 1500, 1000, 1000 };
+                a.Send(t, packet); b.Send(t, packet); c.Send(t, packet);
+                float ra = a.Sample(t).Roll, rb = b.Sample(t).Roll, rc = c.Sample(t).Roll;
+                Assert.AreEqual(ra, rb, "same seed, same link");
+                differs |= ra != rc;
+                Assert.GreaterOrEqual(ra, last, "packets never arrive out of order");
+                last = ra;
+            }
+            Assert.IsTrue(differs, "another seed, another link");
+            Assert.That(a.PacketsLost, Is.InRange(50, 115), "about 20% of 400");
+        }
+
+        [Test]
+        public void Lens_WithoutDistortion_IsAPlainFlip_AndFocalMatchesTheFieldOfView()
+        {
+            Assert.AreEqual(320f / Mathf.Tan(60f * Mathf.Deg2Rad), AnalogVideo.LensFocal(640, 120f, 0f), 0.01f);
+            var map = new Unity.Collections.NativeArray<int>(4 * 3, Unity.Collections.Allocator.Persistent);
+            AnalogVideo.BuildLensMap(map, 4, 3, 4, 3, AnalogVideo.LensFocal(4, 120f, 0f), 0f);
+            // Output row 0 (top) is source row 2 (the bottom-up render's last row).
+            Assert.AreEqual((2 * 4 + 0) * 3, map[0]);
+            Assert.AreEqual((0 * 4 + 3) * 3, map[2 * 4 + 3]);
+            map.Dispose();
+        }
+
+        [Test]
+        public void Lens_WithDistortion_StillSpansTheFieldOfView_AndBendsTheCorners()
+        {
+            const float k1 = 0.18f;
+            float f = AnalogVideo.LensFocal(640, 120f, k1);
+            float xd = 320f / f;
+            Assert.AreEqual(Mathf.Tan(60f * Mathf.Deg2Rad), xd * (1f + k1 * xd * xd), 1e-3f, "the edge of the picture is still 60 degrees off axis");
+            Assert.Greater(f, AnalogVideo.LensFocal(640, 120f, 0f), "the middle of the picture is magnified");
+            AnalogVideo.LensSourceExtent(640, 480, f, k1, out float hx, out float hy);
+            Assert.Greater(hx, Mathf.Tan(60f * Mathf.Deg2Rad), "the corners look further out than the edge");
+            Assert.AreEqual(640f / 480f, hx / hy, 1e-3f);
+        }
+
+        [Test]
+        public void AnalogVideo_WeakSignal_IsNoisier()
+        {
+            const int w = 64, h = 32;
+            var src = new Unity.Collections.NativeArray<byte>(w * h * 3, Unity.Collections.Allocator.Persistent);
+            var good = new Unity.Collections.NativeArray<byte>(src.Length, Unity.Collections.Allocator.Persistent);
+            var bad = new Unity.Collections.NativeArray<byte>(src.Length, Unity.Collections.Allocator.Persistent);
+            var map = new Unity.Collections.NativeArray<int>(w * h, Unity.Collections.Allocator.Persistent);
+            for (int i = 0; i < src.Length; i++) src[i] = 120;
+            AnalogVideo.BuildLensMap(map, w, h, w, h, AnalogVideo.LensFocal(w, 120f, 0f), 0f);
+            new AnalogVideo(AnalogVideoSettings.Default, 2).Process(src, good, map, w, h, 7, 1f);
+            new AnalogVideo(AnalogVideoSettings.Default, 2).Process(src, bad, map, w, h, 7, 0f);
+            double eg = 0, eb = 0;
+            for (int i = 0; i < src.Length; i++)
+            {
+                eg += Math.Abs(good[i] - 120);
+                eb += Math.Abs(bad[i] - 120);
+            }
+            Assert.Greater(eb, eg * 2.5, "the picture at the worst signal is far noisier");
+            src.Dispose(); good.Dispose(); bad.Dispose(); map.Dispose();
+        }
+
+        [Test]
+        public void Imu_VibratesWithTheMotors()
+        {
+            QuadState still = QuadState.AtRest(Vec3.Zero, Quat.Identity), spinning = still;
+            spinning.MotorSpeed = new Motor4 { M0 = 1f, M1 = 1f, M2 = 1f, M3 = 1f };
+            var a = new ImuModel(ImuSettings.Default, 4);
+            var b = new ImuModel(ImuSettings.Default, 4);
+            double quiet = 0, loud = 0;
+            for (int i = 0; i < 400; i++)
+            {
+                quiet += Math.Abs(a.Read(still, still, 0.001f, 9.81f).Az - 9.81f);
+                loud += Math.Abs(b.Read(spinning, spinning, 0.001f, 9.81f).Az - 9.81f);
+            }
+            Assert.Greater(loud, quiet * 4.0);
+        }
+
+        [Test]
+        public void Venues_ParkingHasColumnsAndCars_ThatBlockLinesAndPlaces()
+        {
+            Venue p = Venue.Parking;
+            Assert.AreEqual(28, p.Boxes.FindAll(b => b.Kind == "column").Count);
+            Assert.Greater(p.Boxes.FindAll(b => b.Kind == "car").Count, 20);
+            Assert.IsFalse(p.Free(8f, 4f, 0.2f), "inside a column");
+            Assert.IsTrue(p.Free(4f, 0f, 0.5f), "the middle lane");
+            Assert.IsFalse(p.ClearLine(new Vector2(6f, 4f), new Vector2(10f, 4f), 0.1f), "a column stands in between");
+            Assert.IsTrue(p.ClearLine(new Vector2(-20f, 0f), new Vector2(20f, 0f), 0.1f), "the middle lane is clear end to end");
+            Assert.IsFalse(Venue.Hall.Inside(19.8f, 0f, 0.5f));
+        }
+
+        [Test]
+        public void PublicTracks_AllValidate_AndMatchThePlan()
+        {
+            string[] names = { "H1_Oval", "H2_Eight", "H3_Slalom", "X1_Mixed", "P1_Columns", "P2_Maze" };
+            int[] gates = { 6, 8, 7, 10, 6, 9 };
+            for (int i = 0; i < names.Length; i++)
+            {
+                string path = $"Assets/StreamingAssets/Bench/Tracks/{names[i]}.benchtrack.json";
+                Assert.IsTrue(System.IO.File.Exists(path), names[i]);
+                BenchTrack t = BenchTrack.Parse(System.IO.File.ReadAllText(path));
+                Assert.AreEqual(gates[i], t.gates.Count, names[i]);
+                Assert.AreEqual(names[i].StartsWith("P") ? "parking" : "hall", t.venue);
+                var issues = TrackValidator.Validate(t);
+                Assert.IsFalse(TrackValidator.HasErrors(issues), names[i] + ": " + string.Join("; ", issues));
+            }
+            BenchTrack mixed = BenchTrack.Parse(System.IO.File.ReadAllText("Assets/StreamingAssets/Bench/Tracks/X1_Mixed.benchtrack.json"));
+            var colours = new HashSet<string>();
+            foreach (TrackGate g in mixed.gates) colours.Add(g.led.color);
+            Assert.GreaterOrEqual(colours.Count, 4, "different LED colours");
+            Assert.GreaterOrEqual(mixed.props.Count, 6, "coloured distractors");
+        }
+
+        private static BenchTrack Oval()
+        {
+            return BenchTrack.Parse(System.IO.File.ReadAllText("Assets/StreamingAssets/Bench/Tracks/H1_Oval.benchtrack.json"));
+        }
+
+        [Test]
+        public void Validator_CatchesTheUsualMistakes()
+        {
+            BenchTrack t = Oval();
+            Assert.IsFalse(TrackValidator.HasErrors(TrackValidator.Validate(t)));
+
+            t = Oval();
+            t.gates.RemoveRange(4, 2);
+            StringAssert.Contains("at least 5", string.Join(";", TrackValidator.Validate(t)));
+
+            t = Oval();
+            t.gates[0].position = new[] { 19.6f, 0f, 0f };
+            StringAssert.Contains("too close to a wall", string.Join(";", TrackValidator.Validate(t)));
+
+            t = Oval();
+            t.gates[1].position = new[] { t.gates[0].position[0] + 1f, 0f, t.gates[0].position[2] };
+            StringAssert.Contains("too close to G1", string.Join(";", TrackValidator.Validate(t)));
+
+            t = Oval();
+            t.start.yaw = 180f; // facing the wall behind the pad
+            StringAssert.Contains("no gate is in view", string.Join(";", TrackValidator.Validate(t)));
+
+            t = Oval();
+            t.venue = "parking";
+            t.gates[2].position = new[] { 8f, 0f, 4f };
+            StringAssert.Contains("too close to a column", string.Join(";", TrackValidator.Validate(t)));
+
+            t = Oval();
+            t.gates[3].led.color = "pink-ish";
+            StringAssert.Contains("#RRGGBB", string.Join(";", TrackValidator.Validate(t)));
+        }
+
+        [Test]
+        public void Generator_IsRepeatable_Valid_AndHarderMeansMore()
+        {
+            foreach (string venue in Venue.Ids)
+                for (int difficulty = 1; difficulty <= 3; difficulty++)
+                    for (long seed = 1; seed <= 6; seed++)
+                    {
+                        BenchTrack a = TrackGenerator.Generate(venue, seed, difficulty), b = TrackGenerator.Generate(venue, seed, difficulty);
+                        Assert.AreEqual(a.ToJson(), b.ToJson(), "same seed, same track");
+                        Assert.IsFalse(TrackValidator.HasErrors(TrackValidator.Validate(a)), a.id);
+                        Assert.GreaterOrEqual(a.gates.Count, 5 + difficulty);
+                        // It survives a round trip through the file format.
+                        Assert.AreEqual(a.gates.Count, BenchTrack.Parse(a.ToJson()).gates.Count);
+                    }
+            Assert.AreNotEqual(TrackGenerator.Generate("hall", 1, 2).ToJson(), TrackGenerator.Generate("hall", 2, 2).ToJson());
+            var colours = new HashSet<string>();
+            foreach (TrackGate g in TrackGenerator.Generate("hall", 3, 3).gates) colours.Add(g.led.color);
+            Assert.Greater(colours.Count, 1, "hard tracks mix LED colours");
+        }
+
+        [Test]
+        public void Oracle_FliesTheOval_WithTheRealFlightModel()
+        {
+            // No collision layers here: this checks the pilot, the flight model and the referee together.
+            // The venue's walls, columns and gates are checked by Ushqyr > Bench > Check Public Tracks.
+            OracleResult r = BenchOracle.Fly(Oval(), 0, 60f);
+            Assert.IsTrue(r.Lap, $"no lap: {r.Points} points");
+            Assert.AreEqual(6, r.Points);
+            Assert.Less(r.LapTime, 40.0);
+            Assert.Greater(r.Path.Count, 100);
+            OracleResult again = BenchOracle.Fly(Oval(), 0, 60f);
+            Assert.AreEqual(r.LapTime, again.LapTime, "the oracle run is repeatable");
         }
 
         // ---------- results, manifest, leaderboard ----------

@@ -23,6 +23,10 @@ namespace Ushqyr.Bench
         private float _nextTimeText;
         private BenchLeaderboardPanel _board;
         private BenchReplay _replay;
+        private BenchTrackPanel _tracks;
+#if !USHQYR_BENCH_SERVER
+        private BenchTrackEditor _editor;
+#endif
         private Transform _canvas;
         private GameObject _previewFrame;
 
@@ -42,7 +46,7 @@ namespace Ushqyr.Bench
             scaler.referenceResolution = new Vector2(1920f, 1080f);
             scaler.matchWidthOrHeight = 1f;
 
-            var panel = Panel(canvasGo.transform, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(30f, -30f), new Vector2(600f, 250f));
+            var panel = Panel(canvasGo.transform, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(30f, -30f), new Vector2(600f, 294f));
             _title = Text(panel, new Vector2(24f, -16f), new Vector2(560f, 40f), 26f, new Color(1f, 0.55f, 0.15f));
             _gates = Text(panel, new Vector2(24f, -56f), new Vector2(560f, 70f), 58f, Color.white);
             _time = Text(panel, new Vector2(24f, -128f), new Vector2(560f, 46f), 34f, Color.white);
@@ -66,7 +70,10 @@ namespace Ushqyr.Bench
 
             // The leaderboard (Tab) and, when an attempt folder is being shown, the judge replay.
             _board = gameObject.AddComponent<BenchLeaderboardPanel>();
-            BenchUi.Button(panel, L.T("Leaderboard (Tab)"), 400f, 12f, 190f, 34f, () => _board.Toggle(), 17f);
+            BenchUi.Button(panel, L.T("Leaderboard (Tab)"), 20f, 248f, 190f, 34f, () => _board.Toggle(), 17f);
+            _tracks = gameObject.AddComponent<BenchTrackPanel>();
+            _tracks.Build(_canvas);
+            BenchUi.Button(panel, L.T("Tracks (T)"), 220f, 248f, 150f, 34f, () => _tracks.Toggle(), 17f);
 
             L.Changed += Refresh;
             Refresh();
@@ -94,6 +101,25 @@ namespace Ushqyr.Bench
                 _status.text = session.LoadError;
                 return;
             }
+#if !USHQYR_BENCH_SERVER
+            if (session.EditMode)
+            {
+                if (session.Track == null) return;
+                if (_editor == null)
+                {
+                    _editor = gameObject.AddComponent<BenchTrackEditor>();
+                    _editor.Build(_canvas, session);
+                    _board.Build(_canvas, session);
+                    _previewFrame.SetActive(false);
+                    _title.text = "AI BENCH  ·  " + L.T("TRACK EDITOR");
+                    _gates.text = "";
+                    _time.text = "";
+                    _status.text = L.T("Drag gates on the floor plan. N: new gate, Q / E: turn");
+                    _drone.text = L.T("Wheel: zoom, right mouse button: move the view, V: top / 3D");
+                }
+                return;
+            }
+#endif
             if (session.ReplayMode)
             {
                 if (session.Track == null) return;

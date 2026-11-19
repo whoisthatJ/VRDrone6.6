@@ -5,6 +5,7 @@ import csv
 import hashlib
 import hmac
 import json
+import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, Iterable, List, Optional, Tuple
@@ -73,6 +74,51 @@ def verify(folder: Path, key: Optional[bytes] = None) -> Tuple[str, str]:
     if not hmac.compare_digest(sig_path.read_text(encoding="utf-8").strip().lower(), expected):
         return MODIFIED, "the signature doesn't match"
     return VERIFIED, "checksums and signature match"
+
+
+def find_hidden_tracks(build: Path, hidden: Path) -> List[str]:
+    """Looks for hidden tracks inside a folder that will be handed out. Returns a description of every leak.
+
+    A track counts as leaked when a file in the build is the track file itself (same checksum), or when any file
+    contains the track's id or the text of one of its gate positions (so a track packed into an archive of plain
+    files or pasted into another file is found too). Compressed archives are not unpacked.
+    """
+    needles = []
+    for path in sorted(hidden.rglob("*.benchtrack.json")):
+        raw = path.read_bytes()
+        try:
+            track = json.loads(raw.decode("utf-8"))
+        except ValueError:
+            continue
+        marks = [str(track.get("id", "")).encode("utf-8")]
+        gates = track.get("gates") or []
+        if gates:
+            # The first gate's position exactly as it is written in the file.
+            start = raw.find(b'"position"', raw.find(b'"gates"'))
+            end = raw.find(b"]", start)
+            if start >= 0 and end > start:
+                marks.append(raw[start : end + 1])
+        # Compared without white space, so a re-indented or re-wrapped copy is found as well.
+        marks = [re.sub(rb"\s+", b"", m) for m in marks if len(m) >= 6]
+        needles.append((path.name, hashlib.sha256(raw).hexdigest(), marks))
+
+    leaks: List[str] = []
+    hidden_resolved = hidden.resolve()
+    for file in build.rglob("*"):
+        if not file.is_file() or hidden_resolved in file.resolve().parents:
+            continue
+        data = file.read_bytes()
+        digest = hashlib.sha256(data).hexdigest()
+        squeezed = re.sub(rb"\s+", b"", data) if len(data) < 64 * 1024 * 1024 else data
+        for name, track_hash, marks in needles:
+            if digest == track_hash:
+                leaks.append(f"{file}: is the hidden track {name}")
+            else:
+                for mark in marks:
+                    if mark in squeezed or mark.decode("utf-8").encode("utf-16-le") in data:
+                        leaks.append(f"{file}: contains part of the hidden track {name}")
+                        break
+    return leaks
 
 
 def load_result(folder: Path) -> Dict:

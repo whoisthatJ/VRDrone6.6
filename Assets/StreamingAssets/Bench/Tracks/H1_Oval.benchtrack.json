@@ -106,6 +106,7 @@
             "direction": "any"
         }
     ],
+    "props": [],
     "rules": {
         "repeat_window": 4,
         "time_limit": 120.0

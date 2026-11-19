@@ -13,6 +13,10 @@ namespace Ushqyr.Bench
         public float Latency;
         /// <summary>No packet for this long: the flight controller cuts the motors (s).</summary>
         public float FailsafeTime;
+        /// <summary>Extra delay that differs from packet to packet: uniform between 0 and this (s).</summary>
+        public float Jitter;
+        /// <summary>Chance that a packet never arrives (0..1).</summary>
+        public float Loss;
 
         public static RcLinkSettings Default => new RcLinkSettings { RateHz = 100f, Latency = 0.010f, FailsafeTime = 0.5f };
     }
@@ -44,7 +48,16 @@ namespace Ushqyr.Bench
         private bool _armed;
         private bool _aux1WasHigh;
 
-        public RcLink(RcLinkSettings settings) => _settings = settings;
+        private BenchRandom _rng;
+        private double _lastArrival;
+
+        public RcLink(RcLinkSettings settings, long seed = 1)
+        {
+            _settings = settings;
+            _rng = BenchRandom.For(seed, "rc-link");
+        }
+
+        public int PacketsLost { get; private set; }
 
         public bool Armed => _armed;
         /// <summary>True while no packet has reached the flight controller for longer than the failsafe time.</summary>
@@ -57,6 +70,8 @@ namespace Ushqyr.Bench
             _inFlight.Clear();
             _hasCurrent = false;
             _lastAccepted = double.NegativeInfinity;
+            _lastArrival = 0;
+            PacketsLost = 0;
             _armed = false;
             _aux1WasHigh = false;
             Failsafe = false;
@@ -80,10 +95,21 @@ namespace Ushqyr.Bench
             }
             _lastAccepted = now;
             PacketsAccepted++;
+            // Loss and jitter are drawn for every accepted packet, so the sequence depends only on the seed.
+            bool lost = _rng.NextFloat() < _settings.Loss;
+            float jitter = _rng.NextFloat() * Math.Max(0f, _settings.Jitter);
+            if (lost)
+            {
+                PacketsLost++;
+                return true;
+            }
+            // Packets keep their order, as on a real link: a late one holds back the ones behind it.
+            double arrival = Math.Max(_lastArrival, now + Math.Max(0f, _settings.Latency) + jitter);
+            _lastArrival = arrival;
             int Ch(int i, int fallback) => channelsUs != null && i < channelsUs.Count ? Clamp(channelsUs[i]) : fallback;
             _inFlight.Enqueue(new Packet
             {
-                Arrival = now + Math.Max(0f, _settings.Latency),
+                Arrival = arrival,
                 Roll = Ch(0, MidUs), Pitch = Ch(1, MidUs), Throttle = Ch(2, MinUs), Yaw = Ch(3, MidUs),
                 Aux1 = Ch(4, MinUs), Aux2 = Ch(5, MinUs),
             });

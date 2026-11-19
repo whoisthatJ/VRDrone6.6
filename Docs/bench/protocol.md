@@ -1,7 +1,7 @@
 # Ushqyr AI Bench: wire protocol, version 1
 
 The Python SDK (`bench/sdk/python`) speaks this protocol. It is written down so that a client can be written in any
-language. Status: B2. Sync mode only; realtime mode and LiDAR come with later milestones
+language. Status: B3: sync and realtime modes, all sensors. Later milestones
 and will raise the version number only if an existing message changes.
 
 ## Transport
@@ -65,12 +65,13 @@ and the connection is closed. The mode is decided by the simulator; nothing the 
 | `mode` | `"training"` or `"competition"` |
 | `track` | Training only: `id` and `hash` of the loaded track file. Never sent in competition mode |
 | `sim` | Simulator version |
-| `time_mode` | `"sync"` |
+| `time_mode` | `"sync"` or `"realtime"` (see "Realtime mode") |
 | `control_hz` | Steps per second of simulator time (default 100): one `STEP` advances `1 / control_hz` |
 | `time_limit` | Attempt time limit in seconds |
 | `drone` | `class` (`"ai_mission"`), `name`, `calibrated` (false = placeholder model) |
 | `rc` | `channels` (16), `rate_hz`, `latency_ms`, `failsafe_ms` |
-| `sensors.camera` | `width`, `height`, `fps`, `format` (`"rgb8"`), `hfov_deg`, `tilt_deg` (upward tilt), `latency_ms`, pinhole intrinsics `fx`, `fy`, `cx`, `cy` in pixels, `mount` (position in the body frame, metres) |
+| `sensors.camera` | `width`, `height`, `fps`, `format` (`"rgb8"`), `hfov_deg` (edge to edge), `tilt_deg` (upward tilt), `latency_ms`, intrinsics `fx`, `fy`, `cx`, `cy` in pixels, `distortion` (`model: "radial_k1"`, `k1`), `mount` (position in the body frame, metres) |
+| `sensors.lidar` | `rate_hz`, `rays`, `min_m`, `max_m`, `angle_step_deg`. Absent when the drone has no LiDAR |
 | `sensors.imu` | `rate_hz`, `frame` |
 | `sensors.tof` | `rate_hz`, `min_m`, `max_m`, `direction` (`"down"`) |
 | `sensors.battery` | `rate_hz`, `cells` |
@@ -117,13 +118,27 @@ Header:
 | `imu_n` | int | always | Number of IMU samples in the payload |
 | `tof` | map | when a new reading exists | `t`, `range` (m), `valid` (false when out of range; `range` is then 0) |
 | `battery` | map | when a new reading exists | `t`, `voltage` (V) |
+| `lidar` | map | when a full turn is complete | `t` (end of the turn), `n` (rays) |
 | `camera` | map | when a new frame exists | `t` (when the frame was taken), `seq`, `size` (bytes) |
 | `truth` | map | training, if asked for | `position` and `velocity` as [east, north, up] in metres, `points`, `score_time` |
 
 Payload, in this order:
 
 1. `imu_n` × 7 `float32`: `t, gx, gy, gz, ax, ay, az`.
-2. If `camera` is present: `size` bytes, `height` × `width` × 3, RGB, top row first.
+2. If `lidar` is present: `n` `float32` ranges in metres; 0 = nothing measured.
+3. If `camera` is present: `size` bytes, `height` × `width` × 3, RGB, top row first.
+
+**Camera lens.** The picture has barrel distortion. With `x_d = (u - cx) / fx`, `y_d = (v - cy) / fy` and
+`r² = x_d² + y_d²`, the tangents of the true angles are `x_u = x_d (1 + k1 r²)`, `y_u = y_d (1 + k1 r²)`
+(right and down are positive). `k1 = 0` is a plain perspective picture.
+
+**Camera link.** The frames pass through a model of an analog video link: soft detail, smeared and drifting colour,
+noise, jumping lines and torn bands. It gets worse with the distance from the start pad (where the receiver stands)
+and when something solid is in between. The camera also adjusts its exposure to the scene.
+
+**LiDAR.** A 2D scanner in the drone's own horizontal plane. Ray `k` points `k * angle_step_deg` from the forward axis,
+turning left (anticlockwise seen from above). The rays of one turn are taken one after another while the drone moves,
+so a scan made in flight is bent accordingly.
 
 **Frames and axes.** Body frame: x forward, y left, z up, right-handed. Gyro in rad/s (x: roll right +, y: nose
 down +, z: yaw left +). Accelerometer in m/s² as specific force: at rest and level it reads (0, 0, +9.81).
@@ -154,6 +169,14 @@ One simulator launch is one attempt. The program must connect and send `START` w
 attempt ends with status `timeout`. A program that leaves or is refused ends it with `disconnected`. After the
 attempt, `HELLO` is answered with `attempt_over`. `status` values a program can see: `running`, `finished`,
 `time_limit`, `stuck`.
+
+## Realtime mode
+
+With `time_mode: "realtime"` in the rules the simulator follows the wall clock and waits for nobody. `STEP` then only
+hands a packet to the link; an `OBSERVATION` is sent after every control period whether or not the program asked.
+A program should read everything that has arrived and act on the newest observation (the SDK's `step()` and
+`latest()` do that). A program that stops reading is disconnected when the send buffer is full. Realtime runs are
+not repeatable; `result.json` records the time mode.
 
 ## Determinism
 

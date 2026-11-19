@@ -52,6 +52,13 @@ namespace Ushqyr.Bench
         public IReadOnlyList<BenchGate> Gates => _gates;
         /// <summary>True when the scene shows a recorded attempt instead of running one (judge replay).</summary>
         public bool ReplayMode { get; private set; }
+        /// <summary>True when the scene is the track editor's: no attempt, no API; the editor owns the gates.</summary>
+        public bool EditMode { get; private set; }
+        public BenchGate GatePrefab => gatePrefab;
+        public Transform Spawn => spawn;
+        public LayerMask SolidLayers => solidLayers;
+        /// <summary>The editor replaced the whole track (generator).</summary>
+        public void SetEditedTrack(BenchTrack track) => _track = track;
 
         private BenchRules _rules;
         private BenchTrack _track;
@@ -124,7 +131,9 @@ namespace Ushqyr.Bench
             {
                 _rules = BenchLauncher.LoadRules();
                 ReplayMode = !string.IsNullOrEmpty(BenchLauncher.ReplayFolder);
-                _track = ReplayMode ? BenchLauncher.LoadReplayTrack() : BenchLauncher.LoadTrack(defaultTrack);
+                EditMode = !ReplayMode && !string.IsNullOrEmpty(BenchLauncher.EditPath);
+                _track = ReplayMode ? BenchLauncher.LoadReplayTrack()
+                    : EditMode ? BenchTrack.Parse(File.ReadAllText(BenchLauncher.EditPath)) : BenchLauncher.LoadTrack(defaultTrack);
                 _signingKey = BenchLauncher.SigningKey();
             }
             catch (Exception e)
@@ -135,6 +144,14 @@ namespace Ushqyr.Bench
                 return;
             }
 
+            if (EditMode)
+            {
+                // The editor stands the gates up itself and rebuilds them as they change.
+                _referee = new Referee(new List<RefereeGate>());
+                SetupDrone();
+                Status = "edit";
+                return;
+            }
             BuildTrack();
             SetupDrone();
             SetupClock();
@@ -187,11 +204,40 @@ namespace Ushqyr.Bench
                 refGates.Add(RefereeGate.At(g.id, CollisionHook.FromUnity(gate.OpeningCentre), CollisionHook.FromUnity(gate.transform.rotation),
                     g.direction == "front"));
             }
+            BuildProps(_track, gatesRoot, gatePrefab);
+            var lights = FindAnyObjectByType<BenchVenueLights>();
+            if (lights != null) lights.Apply(_track.lighting);
             int window = _track.rules != null && _track.rules.repeat_window >= 0 ? _track.rules.repeat_window : _rules.repeat_window;
             _referee = new Referee(refGates, window);
             _timeLimit = _track.rules != null && _track.rules.time_limit > 0f ? _track.rules.time_limit : _rules.time_limit;
             // Instantiated colliders must be known to the physics queries before the first step.
             Physics.SyncTransforms();
+        }
+
+        /// <summary>Coloured panels and boxes of the track file: solid, painted or glowing.</summary>
+        public static void BuildProps(BenchTrack track, Transform parent, BenchGate gatePrefab)
+        {
+            if (track.props == null) return;
+            Renderer led = null;
+            foreach (Renderer r in gatePrefab.GetComponentsInChildren<Renderer>(true))
+                if (r.name.StartsWith("LED")) { led = r; break; }
+            foreach (TrackProp p in track.props)
+            {
+                var go = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                go.name = "Prop " + p.id;
+                go.layer = gatePrefab.transform.GetChild(0).gameObject.layer;
+                go.transform.SetParent(parent, false);
+                var size = new Vector3(p.size[0], p.size[1], p.size[2]);
+                go.transform.SetPositionAndRotation(BenchTrack.V(p.position) + Vector3.up * (size.y * 0.5f), Quaternion.Euler(0f, p.yaw, 0f));
+                go.transform.localScale = size;
+                var renderer = go.GetComponent<Renderer>();
+                if (led != null) renderer.sharedMaterial = led.sharedMaterial;
+                ColorUtility.TryParseHtmlString(p.color, out Color c);
+                var block = new MaterialPropertyBlock();
+                block.SetColor("_BaseColor", c);
+                block.SetColor("_EmissionColor", p.glow ? c * 2.2f : Color.black);
+                renderer.SetPropertyBlock(block);
+            }
         }
 
         private void SetupDrone()
@@ -221,7 +267,8 @@ namespace Ushqyr.Bench
             camGo.transform.SetParent(quad.transform, false);
             camGo.transform.localPosition = new Vector3(0f, 0.012f, 0.028f);
             _camera = camGo.AddComponent<BenchCameraSensor>();
-            _camera.Setup(_rules.camera_width, _rules.camera_height, _rules.camera_hfov, _rules.camera_tilt, 1 << quadLayer);
+            _camera.Setup(_rules.camera_width, _rules.camera_height, _rules.camera_hfov, _rules.camera_tilt, 1 << quadLayer,
+                _rules.camera_distortion);
         }
 
         private void SetupClock()
@@ -244,8 +291,22 @@ namespace Ushqyr.Bench
             _referee.Reset(quad.State.Position);
             _link = new RcLink(new RcLinkSettings
             {
-                RateHz = _rules.control_hz, Latency = _rules.rc_latency_ms * 0.001f, FailsafeTime = _rules.rc_failsafe_ms * 0.001f,
-            });
+                RateHz = _rules.control_hz, FailsafeTime = _rules.rc_failsafe_ms * 0.001f,
+                // The program's own thinking time is modelled as a fixed extra delay of its commands.
+                Latency = (_rules.rc_latency_ms + _rules.compute_delay_ms) * 0.001f,
+                Jitter = _rules.rc_jitter_ms * 0.001f, Loss = _rules.rc_loss_percent * 0.01f,
+            }, seed);
+            var lidar = LidarSettings.Default;
+            lidar.RateHz = _rules.lidar_hz;
+            _lidar = new LidarModel(lidar, seed);
+            _lidarRays = lidar.Rays;
+            _lidarMax = lidar.MaxRange;
+            if (_lidarScan == null || _lidarScan.Length != lidar.Rays) _lidarScan = new float[lidar.Rays];
+            _lidarNext = 0;
+            _lidarCarry = 0f;
+            _lidarNew = false;
+            _exposure = 1f;
+            _signal = 1f;
             var imu = ImuSettings.Default;
             imu.RateHz = 1f / (_imuEvery * _dt);
             _imu = new ImuModel(imu, seed);
@@ -274,6 +335,26 @@ namespace Ushqyr.Bench
             _paceCredit = Math.Min(_paceCredit + frameTime, 0.1);
             double controlPeriod = _stepsPerControl * (double)_dt;
             float deadline = Time.realtimeSinceStartup + 0.012f;
+
+            if (_rules.Realtime)
+            {
+                // Realtime mode: the simulation follows the wall clock whatever the program does. Its packets are
+                // taken as they come; an observation goes out after every control period.
+                while (_server.TryDequeue(out _held))
+                {
+                    if (_held.Connection != _server.Connection) continue;
+                    if (_held.Connection != _connection) ConnectionChanged();
+                    Handle(_held);
+                }
+                if (State != AttemptState.Running) _paceCredit = 0;
+                while (State == AttemptState.Running && _paceCredit >= controlPeriod)
+                {
+                    _paceCredit -= controlPeriod;
+                    Advance();
+                    SendObservation();
+                }
+                return;
+            }
 
             while (true)
             {
@@ -307,7 +388,7 @@ namespace Ushqyr.Bench
             {
                 if (State == AttemptState.Waiting && _rules.connect_timeout > 0f && now - _wallStart > _rules.connect_timeout)
                     EndWithoutStart("timeout", "the program did not connect and start in time");
-                else if (State == AttemptState.Running && _rules.step_timeout > 0f && now - _lastStepWall > _rules.step_timeout)
+                else if (State == AttemptState.Running && !_rules.Realtime && _rules.step_timeout > 0f && now - _lastStepWall > _rules.step_timeout)
                 {
                     End("timeout");
                     _server.Close("step timeout");
@@ -331,7 +412,7 @@ namespace Ushqyr.Bench
             var info = new AttemptResult
             {
                 team = BenchLauncher.Team, track_id = _track.id, track_hash = _track.Hash, attempt = BenchLauncher.Attempt,
-                mode = _rules.Competition ? "competition" : "training", seed = seed,
+                mode = _rules.Competition ? "competition" : "training", seed = seed, time_mode = _rules.Realtime ? "realtime" : "sync",
                 build = Application.version + "+" + Application.buildGUID,
                 rules_hash = _rules.Hash(), drone = DroneName, drone_calibrated = DroneCalibrated,
                 drone_config_hash = BenchHash.Sha256(FormattableString.Invariant(
@@ -443,7 +524,7 @@ namespace Ushqyr.Bench
                 .Key("proto").Int(BenchProtocol.Version)
                 .Key("mode").Str(_rules.Competition ? "competition" : "training")
                 .Key("sim").Str(Application.version)
-                .Key("time_mode").Str("sync")
+                .Key("time_mode").Str(_rules.Realtime ? "realtime" : "sync")
                 .Key("control_hz").Double(1.0 / (_stepsPerControl * (double)_dt))
                 .Key("time_limit").Double(_timeLimit)
                 .Key("drone").Map(3)
@@ -455,8 +536,8 @@ namespace Ushqyr.Bench
                     .Key("rate_hz").Double(_rules.control_hz)
                     .Key("latency_ms").Double(_rules.rc_latency_ms)
                     .Key("failsafe_ms").Double(_rules.rc_failsafe_ms)
-                .Key("sensors").Map(4)
-                    .Key("camera").Map(12)
+                .Key("sensors").Map(_rules.lidar ? 5 : 4)
+                    .Key("camera").Map(13)
                         .Key("width").Int(_rules.camera_width)
                         .Key("height").Int(_rules.camera_height)
                         .Key("fps").Double(_rules.camera_fps)
@@ -467,6 +548,8 @@ namespace Ushqyr.Bench
                         .Key("fx").Double(f).Key("fy").Double(f)
                         .Key("cx").Double(_rules.camera_width * 0.5).Key("cy").Double(_rules.camera_height * 0.5)
                         // Mount in the body frame (x forward, y left, z up), metres.
+                        // x_u = x_d * (1 + k1 * r_d^2): x_d = (u - cx) / fx is the picture, x_u the tangent of the true angle.
+                        .Key("distortion").Map(2).Key("model").Str("radial_k1").Key("k1").Double(_camera.Distortion)
                         .Key("mount").Array(3).Double(_camera.MountPosition.z).Double(-_camera.MountPosition.x).Double(_camera.MountPosition.y)
                     .Key("imu").Map(2)
                         .Key("rate_hz").Double(1.0 / (_imuEvery * (double)_dt))
@@ -479,6 +562,14 @@ namespace Ushqyr.Bench
                     .Key("battery").Map(2)
                         .Key("rate_hz").Double(1.0 / (_batteryEvery * (double)_dt))
                         .Key("cells").Int(quad.Profile.Battery.Cells);
+            if (_rules.lidar)
+                _header.Key("lidar").Map(6)
+                    .Key("rate_hz").Double(_rules.lidar_hz)
+                    .Key("rays").Int(_lidarRays)
+                    .Key("min_m").Double(LidarSettings.Default.MinRange)
+                    .Key("max_m").Double(_lidarMax)
+                    .Key("angle_step_deg").Double(360.0 / _lidarRays)
+                    .Key("frame").Str("ray k at angle k * angle_step from forward, turning left; 0 = nothing measured");
             _server.Send(_connection, BenchProtocol.Welcome, _header);
             Debug.Log("[Bench] program connected: " + BenchMessages.Str(h, "client", "unknown client"));
         }
@@ -528,6 +619,15 @@ namespace Ushqyr.Bench
             _lastStepWall = Time.realtimeSinceStartup;
             _rcOk = BenchMessages.Channels(h, "rc", _channels);
             if (_rcOk) _link.Send(SimTime, _channels);
+            // In realtime mode a packet only reaches the link; the clock, not the packet, moves the simulation.
+            if (_rules.Realtime) return;
+            Advance();
+            SendObservation();
+        }
+
+        /// <summary>One control period: physics steps, referee, sensors, logs, end conditions.</summary>
+        private void Advance()
+        {
 
             for (int i = 0; i < _stepsPerControl; i++)
             {
@@ -545,6 +645,7 @@ namespace Ushqyr.Bench
             }
             quad.SyncPose();
 
+            SweepLidar();
             if (_tick % _tofEvery == 0) ReadTof();
             if (_tick % _batteryEvery == 0) ReadBattery();
             if (SimTime + 1e-9 >= _cameraFrames / (double)_rules.camera_fps)
@@ -562,7 +663,7 @@ namespace Ushqyr.Bench
 
             if (SimTime >= _timeLimit) End("time_limit");
             else if (_rules.stuck_time > 0f) CheckStuck();
-            SendObservation();
+            _rcOk = false;
         }
 
         /// <summary>This step's line in the logs, and any events since the last one.</summary>
@@ -582,6 +683,73 @@ namespace Ushqyr.Bench
                 _failsafeWas = _link.Failsafe;
                 _recorder.Note(SimTime, _failsafeWas ? "failsafe" : "failsafe_end", _failsafeWas ? "no RC packet in time: motors cut" : "RC packets again");
             }
+        }
+
+        // ---------- LiDAR ----------
+
+        private LidarModel _lidar;
+        private float[] _lidarScan, _lidarSent;
+        private int _lidarRays, _lidarNext;
+        private float _lidarMax, _lidarCarry;
+        private bool _lidarNew;
+        private double _lidarTime;
+
+        /// <summary>
+        /// The scanner turns while the drone flies: every control step casts the rays of that slice of the turn from
+        /// the pose at that moment. A full turn becomes one scan.
+        /// </summary>
+        private void SweepLidar()
+        {
+            if (!_rules.lidar) return;
+            _lidarCarry += _lidarRays * _rules.lidar_hz * _stepsPerControl * _dt;
+            int count = (int)_lidarCarry;
+            _lidarCarry -= count;
+            Transform t = quad.transform;
+            Vector3 origin = t.position;
+            for (int i = 0; i < count; i++)
+            {
+                Vec3 d = LidarModel.Direction(_lidarNext, _lidarRays);
+                Vector3 dir = t.rotation * new Vector3(d.x, d.y, d.z);
+                float truth = Physics.Raycast(origin, dir, out RaycastHit hit, _lidarMax + 1f, solidLayers, QueryTriggerInteraction.Ignore) ? hit.distance : -1f;
+                _lidarScan[_lidarNext] = _lidar.Read(truth);
+                if (++_lidarNext < _lidarRays) continue;
+                _lidarNext = 0;
+                if (_lidarSent == null || _lidarSent.Length != _lidarRays) _lidarSent = new float[_lidarRays];
+                Array.Copy(_lidarScan, _lidarSent, _lidarRays);
+                _lidarNew = true;
+                _lidarTime = SimTime;
+            }
+        }
+
+        // ---------- video link ----------
+
+        private float _exposure = 1f, _signal = 1f;
+
+        /// <summary>
+        /// Quality of the analog video link, 1 = perfect: it falls with the distance from the receiver (which stands at
+        /// the start pad) and when something solid is between the two.
+        /// </summary>
+        private float SignalQuality()
+        {
+            Vector3 receiver = spawn.position + Vector3.up * 1.2f;
+            Vector3 to = quad.transform.position - receiver;
+            float distance = to.magnitude;
+            float q = 1f - Mathf.Pow(Mathf.Clamp01(distance / Mathf.Max(1f, _rules.video_range)), 2f);
+            if (distance > 0.5f && Physics.Raycast(receiver, to / distance, distance - 0.2f, solidLayers, QueryTriggerInteraction.Ignore)) q *= 0.55f;
+            _signal += (q - _signal) * 0.35f;
+            return _signal;
+        }
+
+        /// <summary>Exposure follows the brightness of the last frame, slowly, like a camera's own control loop.</summary>
+        private void UpdateExposure()
+        {
+            if (!_rules.camera_auto_exposure) return;
+            long sum = 0;
+            int n = 0;
+            for (int i = 0; i < _processed.Length; i += 3 * 37, n++) sum += 77 * _processed[i] + 150 * _processed[i + 1] + 29 * _processed[i + 2];
+            float mean = n > 0 ? sum / (256f * n) : 110f;
+            float wanted = Mathf.Clamp(_exposure * 105f / Mathf.Max(8f, mean), 0.6f, 2.5f);
+            _exposure += (wanted - _exposure) * 0.08f;
         }
 
         private void CheckStuck()
@@ -625,13 +793,16 @@ namespace Ushqyr.Bench
             _watch.Restart();
             Unity.Collections.NativeArray<byte> raw = _camera.Capture();
             float captured = (float)_watch.Elapsed.TotalMilliseconds;
-            if (!_processed.IsCreated || _processed.Length != raw.Length)
+            int frameBytes = _rules.camera_width * _rules.camera_height * 3;
+            if (!_processed.IsCreated || _processed.Length != frameBytes)
             {
                 if (_processed.IsCreated) _processed.Dispose();
-                _processed = new Unity.Collections.NativeArray<byte>(raw.Length, Unity.Collections.Allocator.Persistent);
+                _processed = new Unity.Collections.NativeArray<byte>(frameBytes, Unity.Collections.Allocator.Persistent);
             }
-            _video.Process(raw, _processed, _rules.camera_width, _rules.camera_height, _cameraFrames);
-            byte[] pixels = _framePool.Count > 0 ? _framePool.Pop() : new byte[raw.Length];
+            _video.Process(raw, _processed, _camera.LensMap, _rules.camera_width, _rules.camera_height, _cameraFrames,
+                _rules.camera_analog ? SignalQuality() : 1f, _exposure);
+            UpdateExposure();
+            byte[] pixels = _framePool.Count > 0 ? _framePool.Pop() : new byte[frameBytes];
             _processed.CopyTo(pixels);
             _recorder?.OnboardFrame(pixels, pixels.Length);
             CaptureMs += (captured - CaptureMs) * 0.05f;
@@ -675,7 +846,14 @@ namespace Ushqyr.Bench
 
             bool camera = _delivered != null;
             bool truth = _wantTruth && !_rules.Competition;
-            int fields = 5 + (camera ? 1 : 0) + (_tofNew ? 1 : 0) + (_batteryNew ? 1 : 0) + (truth ? 1 : 0);
+            // The scan travels in the same buffer, right after the IMU samples.
+            int lidarLength = _lidarNew ? _lidarRays * 4 : 0;
+            if (_lidarNew)
+            {
+                if (_imuBytes.Length < imuLength + lidarLength) Array.Resize(ref _imuBytes, (imuLength + lidarLength) * 2);
+                for (int i = 0; i < _lidarRays; i++) Put(_imuBytes, imuLength + i * 4, _lidarSent[i]);
+            }
+            int fields = 5 + (camera ? 1 : 0) + (_tofNew ? 1 : 0) + (_batteryNew ? 1 : 0) + (truth ? 1 : 0) + (_lidarNew ? 1 : 0);
             _header.Reset();
             _header.Map(fields)
                 .Key("t").Double(SimTime)
@@ -685,13 +863,16 @@ namespace Ushqyr.Bench
                 .Key("imu_n").Int(imuCount);
             if (_tofNew) _header.Key("tof").Map(3).Key("t").Double(_tofTime).Key("range").Double(_tofRange).Key("valid").Bool(_tofValid);
             if (_batteryNew) _header.Key("battery").Map(2).Key("t").Double(_batteryTime).Key("voltage").Double(_batteryVoltage);
+            if (_lidarNew) _header.Key("lidar").Map(2).Key("t").Double(_lidarTime).Key("n").Int(_lidarRays);
             if (camera) _header.Key("camera").Map(3).Key("t").Double(_deliveredTime).Key("seq").Int(_deliveredSeq).Key("size").Int(_delivered.Length);
 #if !USHQYR_BENCH_SERVER
             if (truth) GroundTruth.Write(_header, this);
 #endif
             _tofNew = _batteryNew = false;
 
-            _server.Send(_connection, BenchProtocol.Observation, _header, _imuBytes, imuLength, camera ? _delivered : null, camera ? _delivered.Length : 0);
+            _server.Send(_connection, BenchProtocol.Observation, _header, _imuBytes, imuLength + lidarLength,
+                camera ? _delivered : null, camera ? _delivered.Length : 0);
+            _lidarNew = false;
             if (camera)
             {
                 // The preview keeps showing this frame; its buffer returns to the pool when the next one replaces it.

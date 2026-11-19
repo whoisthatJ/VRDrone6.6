@@ -81,11 +81,13 @@ class FakeSim:
                     "fy": 18.5,
                     "cx": self.width / 2,
                     "cy": self.height / 2,
+                    "distortion": {"model": "radial_k1", "k1": 0.0},
                     "mount": [0.03, 0.0, 0.01],
                 },
                 "imu": {"rate_hz": 500.0, "frame": "x forward, y left, z up"},
                 "tof": {"rate_hz": 50.0, "min_m": 0.05, "max_m": 4.0, "direction": "down"},
                 "battery": {"rate_hz": 10.0, "cells": 1},
+                "lidar": {"rate_hz": 10.0, "rays": 360, "min_m": 0.15, "max_m": 12.0, "angle_step_deg": 1.0},
             },
         }
 
@@ -103,6 +105,9 @@ class FakeSim:
             imu[:, 6] = 9.81
             header: Dict[str, Any] = {"t": tick / 1000.0, "tick": tick, "running": running, "status": status, "imu_n": n}
             payload = imu.tobytes()
+            if not first and tick % 100 == 0:
+                header["lidar"] = {"t": tick / 1000.0, "n": 360}
+                payload += np.full(360, 5.0, "<f4").tobytes()
             if first or tick % 30 == 0:
                 image = np.full((self.height, self.width, 3), 128, np.uint8)
                 image[0, 0, 0] = (tick // 10) % 256

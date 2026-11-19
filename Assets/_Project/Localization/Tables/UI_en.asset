@@ -2374,6 +2374,174 @@ MonoBehaviour:
     m_Localized: 'Attempt over: writing logs and video'
     m_Metadata:
       m_Items: []
+  - m_Id: 5808254175145984
+    m_Localized: TRACK EDITOR
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254225477632
+    m_Localized: TRACKS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254225477633
+    m_Localized: Tracks (T)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254225477634
+    m_Localized: New hall track
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254225477635
+    m_Localized: New parking track
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254225477636
+    m_Localized: hall
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254225477637
+    m_Localized: parking
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254225477638
+    m_Localized: '{0} gates'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254225477639
+    m_Localized: mine
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254225477640
+    m_Localized: 'View: top'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254225477641
+    m_Localized: 'View: 3D'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254225477642
+    m_Localized: Venue
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254225477643
+    m_Localized: default
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254225477644
+    m_Localized: dim
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254225477645
+    m_Localized: warm
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254225477646
+    m_Localized: bright
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254225477647
+    m_Localized: 'Time limit: {0} s'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254225477648
+    m_Localized: Gate {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254225477649
+    m_Localized: Brightness {0}%
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254225477650
+    m_Localized: 'LED: blinking'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254225477651
+    m_Localized: 'LED: steady'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254225477652
+    m_Localized: 'Pass: front only'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254225477653
+    m_Localized: 'Pass: any direction'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254225477654
+    m_Localized: Duplicate
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254225477655
+    m_Localized: 'Start pad selected: drag to move, Q / E to turn'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254229671936
+    m_Localized: 'Click a gate or the start pad. N: new gate at the pointer'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254229671937
+    m_Localized: Random track
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254229671938
+    m_Localized: Seed {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254229671939
+    m_Localized: Level {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254229671940
+    m_Localized: Make
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254229671941
+    m_Localized: Checks passed ({0} gates)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254229671942
+    m_Localized: '{0} problem(s) to fix'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254229671943
+    m_Localized: Test flight (oracle pilot)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254229671944
+    m_Localized: Export map
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254229671945
+    m_Localized: Fly it
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254229671946
+    m_Localized: Fix the problems first.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254229671947
+    m_Localized: 'Generated: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254229671948
+    m_Localized: 'Map: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254229671949
+    m_Localized: 'Oracle pilot: full lap in {0} s, {1} collision(s).'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254229671950
+    m_Localized: 'Oracle pilot: NO full lap in {0} s ({1} of {2} gates).'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254229671951
+    m_Localized: 'Drag gates on the floor plan. N: new gate, Q / E: turn'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254229671952
+    m_Localized: 'Wheel: zoom, right mouse button: move the view, V: top / 3D'
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

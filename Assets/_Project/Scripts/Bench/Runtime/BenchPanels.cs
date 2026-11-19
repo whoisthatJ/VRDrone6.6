@@ -203,6 +203,55 @@ namespace Ushqyr.Bench
         }
     }
 
+    /// <summary>The track list (key T): public tracks and the user's own, each with "fly" and "edit"; new tracks.</summary>
+    public sealed class BenchTrackPanel : MonoBehaviour
+    {
+        private RectTransform _root;
+
+        public void Build(Transform canvas)
+        {
+            _root = BenchUi.Panel(canvas, "Tracks", 0f, 0f, 900f, 760f, new Color(0.04f, 0.05f, 0.07f, 1f));
+            _root.anchorMin = _root.anchorMax = _root.pivot = new Vector2(0.5f, 0.5f);
+            _root.anchoredPosition = Vector2.zero;
+            _root.gameObject.SetActive(false);
+        }
+
+        private void Update()
+        {
+            var kb = Keyboard.current;
+            bool typing = EventSystem.current != null && EventSystem.current.currentSelectedGameObject != null
+                          && EventSystem.current.currentSelectedGameObject.GetComponent<TMP_InputField>() != null;
+            if (kb != null && kb.tKey.wasPressedThisFrame && _root != null && !typing) Toggle();
+        }
+
+        public void Toggle()
+        {
+            _root.gameObject.SetActive(!_root.gameObject.activeSelf);
+            if (!_root.gameObject.activeSelf) return;
+            _root.SetAsLastSibling();
+            for (int i = _root.childCount - 1; i >= 0; i--) Destroy(_root.GetChild(i).gameObject);
+            BenchUi.Text(_root, L.T("TRACKS"), 28f, 18f, 300f, 40f, 30f, BenchUi.Accent);
+            BenchUi.Button(_root, "X", 830f, 18f, 44f, 40f, Toggle);
+#if !USHQYR_BENCH_SERVER
+            BenchUi.Button(_root, L.T("New hall track"), 330f, 18f, 230f, 40f, () => BenchLauncher.EditNew("hall"), 20f);
+            BenchUi.Button(_root, L.T("New parking track"), 570f, 18f, 250f, 40f, () => BenchLauncher.EditNew("parking"), 20f);
+#endif
+            float y = 80f;
+            foreach (BenchLauncher.TrackEntry t in BenchLauncher.ListTracks())
+            {
+                if (y > 700f) break;
+                string path = t.Path;
+                BenchUi.Text(_root, t.Name, 30f, y + 3f, 330f, 30f, 21f, t.Public ? Color.white : new Color(0.75f, 0.95f, 1f));
+                BenchUi.Text(_root, L.T(t.Venue) + "   " + L.F("{0} gates", t.Gates) + (t.Public ? "" : "   " + L.T("mine")), 370f, y + 5f, 250f, 28f, 18f, BenchUi.Dim);
+                BenchUi.Button(_root, L.T("Fly"), 640f, y, 100f, 32f, () => BenchLauncher.Launch(path), 19f);
+#if !USHQYR_BENCH_SERVER
+                BenchUi.Button(_root, L.T("Edit"), 750f, y, 120f, 32f, () => BenchLauncher.Edit(path), 19f);
+#endif
+                y += 38f;
+            }
+        }
+    }
+
     /// <summary>
     /// Judge replay of an attempt folder: integrity check first, then the recorded flight on a timeline with every
     /// scoring decision and its reason. Space plays and pauses, C changes the camera, the arrow keys step.

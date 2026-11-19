@@ -2371,6 +2371,174 @@ MonoBehaviour:
     m_Key: 'Attempt over: writing logs and video'
     m_Metadata:
       m_Items: []
+  - m_Id: 5808254175145984
+    m_Key: TRACK EDITOR
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254225477632
+    m_Key: TRACKS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254225477633
+    m_Key: Tracks (T)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254225477634
+    m_Key: New hall track
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254225477635
+    m_Key: New parking track
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254225477636
+    m_Key: hall
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254225477637
+    m_Key: parking
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254225477638
+    m_Key: '{0} gates'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254225477639
+    m_Key: mine
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254225477640
+    m_Key: 'View: top'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254225477641
+    m_Key: 'View: 3D'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254225477642
+    m_Key: Venue
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254225477643
+    m_Key: default
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254225477644
+    m_Key: dim
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254225477645
+    m_Key: warm
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254225477646
+    m_Key: bright
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254225477647
+    m_Key: 'Time limit: {0} s'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254225477648
+    m_Key: Gate {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254225477649
+    m_Key: Brightness {0}%
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254225477650
+    m_Key: 'LED: blinking'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254225477651
+    m_Key: 'LED: steady'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254225477652
+    m_Key: 'Pass: front only'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254225477653
+    m_Key: 'Pass: any direction'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254225477654
+    m_Key: Duplicate
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254225477655
+    m_Key: 'Start pad selected: drag to move, Q / E to turn'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254229671936
+    m_Key: 'Click a gate or the start pad. N: new gate at the pointer'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254229671937
+    m_Key: Random track
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254229671938
+    m_Key: Seed {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254229671939
+    m_Key: Level {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254229671940
+    m_Key: Make
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254229671941
+    m_Key: Checks passed ({0} gates)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254229671942
+    m_Key: '{0} problem(s) to fix'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254229671943
+    m_Key: Test flight (oracle pilot)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254229671944
+    m_Key: Export map
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254229671945
+    m_Key: Fly it
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254229671946
+    m_Key: Fix the problems first.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254229671947
+    m_Key: 'Generated: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254229671948
+    m_Key: 'Map: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254229671949
+    m_Key: 'Oracle pilot: full lap in {0} s, {1} collision(s).'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254229671950
+    m_Key: 'Oracle pilot: NO full lap in {0} s ({1} of {2} gates).'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254229671951
+    m_Key: 'Drag gates on the floor plan. N: new gate, Q / E: turn'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5808254229671952
+    m_Key: 'Wheel: zoom, right mouse button: move the view, V: top / 3D'
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

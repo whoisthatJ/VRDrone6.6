@@ -103,3 +103,26 @@ def test_cli_exit_codes(tmp_path, capsys):
     assert main(["verify", str(folder), "--key", str(key)]) == 1
     assert "modified" in capsys.readouterr().out
     assert main(["leaderboard", str(tmp_path / "empty")]) == 1
+
+
+def test_hidden_tracks_are_found_in_a_build(tmp_path):
+    hidden = tmp_path / "private"
+    hidden.mkdir()
+    track = {"schema": 1, "id": "HID_final_07", "gates": [{"id": "G1", "position": [3.25, 0.0, -4.5], "yaw": 10.0}]}
+    text = json.dumps(track, indent=4)
+    (hidden / "HID_final_07.benchtrack.json").write_text(text, encoding="utf-8")
+
+    clean = tmp_path / "kit"
+    (clean / "Tracks").mkdir(parents=True)
+    (clean / "Tracks" / "H1_Oval.benchtrack.json").write_text('{"id": "H1_Oval", "gates": []}', encoding="utf-8")
+    assert attempt.find_hidden_tracks(clean, hidden) == []
+    assert main(["check-build", str(clean), "--hidden", str(hidden)]) == 0
+
+    # The file itself, a renamed copy, and its content pasted into something else.
+    (clean / "Tracks" / "copy.json").write_text(text, encoding="utf-8")
+    (clean / "bundle.bin").write_bytes(b"\x00\x01junk" + text.encode("utf-8")[40:] + b"more")
+    (clean / "notes.txt").write_text("remember HID_final_07 for the final", encoding="utf-16-le")
+    leaks = attempt.find_hidden_tracks(clean, hidden)
+    assert len(leaks) == 3
+    assert main(["check-build", str(clean), "--hidden", str(hidden)]) == 1
+    assert main(["check-build", str(clean), "--hidden", str(tmp_path / "empty")]) == 2

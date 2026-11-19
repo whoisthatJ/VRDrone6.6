@@ -18,6 +18,7 @@ never sent by the simulator.
 from __future__ import annotations
 
 import os
+import select
 import socket
 import struct
 import time
@@ -140,6 +141,18 @@ class Tof:
 
 
 @dataclass
+class Lidar:
+    """The newest full turn of the 2D scanner."""
+
+    ranges: Optional[np.ndarray] = None
+    """Metres, one per ray; 0 = nothing measured. Ray k points at k * angle_step from forward, turning left
+    (anticlockwise seen from above), in the drone's own horizontal plane. None until the first scan."""
+    t: float = 0.0
+    """Simulator time when the turn was completed. The rays were taken one after another during the turn."""
+    new: bool = False
+
+
+@dataclass
 class Battery:
     voltage: float = 0.0
     t: float = 0.0
@@ -158,6 +171,7 @@ class Observation:
     imu: Imu
     tof: Tof
     battery: Battery
+    lidar: Lidar = field(default_factory=Lidar)
     truth: Optional[Dict[str, Any]] = None
     """Training mode only, and only when asked for with Sim.connect(truth=True)."""
 
@@ -171,11 +185,14 @@ class Sim:
         """What the simulator said at the handshake: mode, drone, control rate, sensor list and camera calibration."""
         self.mode: str = str(info.get("mode", "training"))
         self.control_hz: float = float(info.get("control_hz", 100.0))
+        self.realtime: bool = info.get("time_mode") == "realtime"
+        """True when the simulator runs with the wall clock instead of waiting for step()."""
         self.running = False
         self.status = "waiting"
         self._camera = Camera()
         self._tof = Tof()
         self._battery = Battery()
+        self._lidar = Lidar()
         self._started = False
 
     # ---------- connecting ----------
@@ -263,7 +280,42 @@ class Sim:
         if not self._started:
             raise BenchError("not_started", "call reset() first")
         _send(self._sock, STEP, {} if rc is None else {"rc": rc.channels()})
-        return self._observation()
+        obs = self._observation()
+        return self._catch_up(obs) if self.realtime else obs
+
+    def send(self, rc: RC | _RawRC) -> None:
+        """Realtime mode: sends an RC packet without waiting for anything."""
+        _send(self._sock, STEP, {"rc": rc.channels()})
+
+    def latest(self, wait: bool = False) -> Optional[Observation]:
+        """Realtime mode: the newest observation that has arrived since the last call.
+
+        IMU readings of every observation in between are kept, in order. Returns None when nothing new has arrived,
+        unless `wait` is set, in which case it blocks for the next one.
+        """
+        if not wait and not self._readable():
+            return None
+        return self._catch_up(self._observation())
+
+    def _readable(self) -> bool:
+        return bool(select.select([self._sock], [], [], 0)[0])
+
+    def _catch_up(self, obs: Observation) -> Observation:
+        """Reads whatever else has already arrived, so a slow program acts on the present, not on a backlog."""
+        while obs.running and self._readable():
+            newer = self._observation()
+            newer.imu = Imu(
+                np.concatenate([obs.imu.t, newer.imu.t]),
+                np.concatenate([obs.imu.gyro, newer.imu.gyro]),
+                np.concatenate([obs.imu.accel, newer.imu.accel]),
+            )
+            # "new" means new since the observation the program last saw.
+            newer.camera.new = newer.camera.new or obs.camera.new
+            newer.tof.new = newer.tof.new or obs.tof.new
+            newer.battery.new = newer.battery.new or obs.battery.new
+            newer.lidar.new = newer.lidar.new or obs.lidar.new
+            obs = newer
+        return obs
 
     def done(self) -> Observation:
         """Tells the simulator the program has finished; the attempt ends with status "finished"."""
@@ -296,12 +348,22 @@ class Sim:
         else:
             imu = Imu()
 
+        scan = h.get("lidar")
+        lidar_bytes = 0
+        if scan is not None:
+            rays = int(scan["n"])
+            lidar_bytes = rays * 4
+            ranges = np.frombuffer(payload, dtype="<f4", count=rays, offset=imu_bytes).copy()
+            self._lidar = Lidar(ranges, float(scan["t"]), True)
+        else:
+            self._lidar = Lidar(self._lidar.ranges, self._lidar.t, False)
+
         cam = h.get("camera")
         if cam is not None:
             c = self.info["sensors"]["camera"]
             width, height = int(c["width"]), int(c["height"])
             size = int(cam["size"])
-            image = np.frombuffer(payload, dtype=np.uint8, count=size, offset=imu_bytes).reshape(height, width, 3)
+            image = np.frombuffer(payload, dtype=np.uint8, count=size, offset=imu_bytes + lidar_bytes).reshape(height, width, 3)
             self._camera = Camera(image=image, t=float(cam["t"]), seq=int(cam["seq"]), new=True)
         else:
             self._camera = Camera(self._camera.image, self._camera.t, self._camera.seq, False)
@@ -329,6 +391,7 @@ class Sim:
             imu=imu,
             tof=self._tof,
             battery=self._battery,
+            lidar=self._lidar,
             truth=h.get("truth"),
         )
 
