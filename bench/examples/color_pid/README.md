@@ -7,6 +7,9 @@ A colour detector plus PID, the "ready example" of the task. It flies by itself,
 | `H1_Oval` | 5 of 5 | 26 s |
 | `H2_Eight` | 5 of 5 | 43 to 57 s |
 | `P1_Columns` | 4 of 5 | 51 to 53 s |
+| `H3_Slalom` | 5 of 5 | 38 to 39 s |
+| `P2_Maze` | 5 of 5 | 54 to 58 s |
+| `X1_Mixed` | 0 of 5 (2 of 10 gates) | none: it only looks for magenta, and eight gates have other colours |
 
 ```
 pip install ../../sdk/python opencv-python
@@ -52,6 +55,6 @@ It uses the camera, the gyro, the ToF and the LiDAR. It does not use the acceler
 
 - One LED colour (`GateDetector(hue=...)` changes it). Tracks with several colours or coloured distractors need more.
 - About 2 m/s. It is tuned for the whoop; a heavier or stronger drone needs other gains.
-- Its memory is four gates and its position guess drifts. On a track where the next gate is far away or hidden
-  (`P2_Maze`) it loses time turning round, and sometimes skips a gate.
+- Its memory is four gates and its position guess drifts. Where the next gate is far away or hidden it loses time
+  turning round, and sometimes skips a gate (the one failed run on `P1_Columns`).
 - It reacts to obstacles only when they are a metre away and dead ahead.
