@@ -295,6 +295,12 @@ namespace Ushqyr.Bench
             return BenchTrack.Parse(File.ReadAllText(path));
         }
 
+        /// <summary>
+        /// <c>-bench-graphics Low|Medium|High|Ultra</c>: the graphics preset for this run, whatever the saved settings
+        /// say. For machines that draw in software (Docker without a GPU), where High costs seconds per frame.
+        /// </summary>
+        public static string GraphicsPreset => Arg("-bench-graphics");
+
         public static BenchRules LoadRules()
         {
             string path = Arg("-bench-rules") ?? DefaultRulesPath;
@@ -304,6 +310,7 @@ namespace Ushqyr.Bench
             if (long.TryParse(Arg("-bench-seed"), out long seed)) rules.seed = seed;
             if (Arg("-bench-token") != null) rules.token = Arg("-bench-token");
             if (Arg("-bench-mode") != null) rules.mode = Arg("-bench-mode");
+            if (Arg("-bench-video") != null) rules.video = Arg("-bench-video");
             string envToken = Environment.GetEnvironmentVariable("USHQYR_BENCH_TOKEN");
             if (string.IsNullOrEmpty(rules.token) && !string.IsNullOrEmpty(envToken)) rules.token = envToken;
             return rules;

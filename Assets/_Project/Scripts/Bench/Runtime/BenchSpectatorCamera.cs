@@ -53,6 +53,8 @@ namespace Ushqyr.Bench
         private void Awake()
         {
             _camera = GetComponent<Camera>();
+            // No screen, nobody watching: the spectator's picture would be drawn for nothing.
+            if (Application.isBatchMode && _camera != null) _camera.enabled = false;
             _baseFov = _camera != null ? _camera.fieldOfView : 60f;
         }
 

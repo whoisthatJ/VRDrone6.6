@@ -423,3 +423,25 @@ round obstacles with the LiDAR.
 14 of 15 runs complete a lap (93%), which meets the plan's acceptance line for the sample (at least 90% over these
 three tracks and five seeds). The one failure is on `P1_Columns` seed 5: the next gate, 18 m away in the dim light,
 is not picked up after the second gate, and the drone wanders. Measured in the editor in training mode, sync time.
+
+### B6, first part: Docker sandbox and `submit-check` (19 November 2026)
+Docker Desktop with WSL2 was installed on the development PC (the owner chose it over a Linux machine for now).
+
+| Item | State |
+|---|---|
+| Linux no-screen rendering spike | Done. The Linux player renders under Xvfb in a container: Mesa llvmpipe without a GPU, Mesa d3d12 on the video card under Docker Desktop for Windows |
+| Bench Server build | Done: `BuildScript.BuildBenchServer`, Linux, Boot + the two Bench scenes, `USHQYR_BENCH_SERVER` (269 MB). Addressables are now rebuilt for the build's platform; before, a Linux build carried Windows language bundles |
+| Images | `ushqyr-bench-server` (1.2 GB) and `ushqyr-bench-base:cpu` (550 MB); `ushqyr-bench build-images` |
+| Solution template | `bench/template`; the sample has a Dockerfile |
+| `submit-check` | Done: builds the image, checks its size, flies one competition attempt on an internal network, verifies the attempt folder |
+| Hardening | Done and tested with `bench/runner/tests/hostile`: internet, DNS, host, image writes, `/results`, root, Docker socket, 400 processes, other simulator ports and ground truth all blocked |
+| Sample in the sandbox | `H1_Oval`, seed 1: 28 points in the 120 s limit; 241 s of real time for the whole check with the GPU |
+| Speed without a GPU | About 20 times slower than real time at Low, about 100 times at High. All of it is drawing |
+
+**Not done in B6 yet:** ROS 2 bridge and images; Linux Team Kit build; a Linux server with a GPU (drawing there is
+neither set up nor measured); the build scan for leaks (`check-build` against real hidden tracks, which exist only on
+the server, D47); image size and resource limits are the plan's defaults, not the organisers'.
+
+**Found on the way:** the camera picture depends on the graphics preset (render scale, shadows, anti-aliasing), and
+the preset is each player's own setting. For a fair qualification the server must fix one preset for everyone, and
+teams should train at that preset. Not decided yet.

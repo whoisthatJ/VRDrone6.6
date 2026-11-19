@@ -1,0 +1,1 @@
+# Extra Python packages your solution needs. numpy, opencv-python-headless and ushqyr_bench are in the base image.

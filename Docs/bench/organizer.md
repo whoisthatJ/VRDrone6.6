@@ -231,6 +231,50 @@ It sends hostile input over 200 connections, flies one attempt while asking for 
 the forbidden messages, and then compares every number it received with the judges' `truth.csv` of that attempt.
 Exit code 0 means nothing leaked.
 
+## Solutions in Docker (B6)
+
+A team's solution is a Docker image. The simulator runs in a second container, and the two share a network that has
+no way out.
+
+```
+ushqyr-bench build-images                       # ushqyr-bench-server (simulator) and ushqyr-bench-base:cpu
+ushqyr-bench submit-check <folder or image.tar> --track H1_Oval --seed 1 --out results [--key key.file] [--logs]
+```
+
+`build-images` needs the Linux server build in `Builds/BenchServer` (Unity menu **Ushqyr / Build / Build Bench Server
+(Linux)**). That build holds only the AI Bench scenes and is compiled with `USHQYR_BENCH_SERVER`: the oracle pilot, the
+track editor, the dataset tool and the ground-truth message are not in it.
+
+**The simulator's container** starts a virtual display (Xvfb) and is never started with `-nographics`, which would
+turn the camera off. How it draws:
+
+| Where | How | One 120 s attempt (sample solution, H1_Oval) |
+|---|---|---|
+| Docker Desktop on Windows, `--sim-gpu auto` | Mesa's Direct3D 12 driver on the PC's video card (`--gpus all`, `/usr/lib/wsl` mounted read-only) | about 4 minutes for the whole check, videos included (GTX 1650 Ti) |
+| No GPU | Mesa's software OpenGL (llvmpipe) | about 40 minutes at the Low preset with no trackside video; about 3 hours at High |
+| Linux server with a GPU | **not set up or measured yet**: needs the real machine | — |
+
+`-bench-graphics Low|Medium|High|Ultra` sets the preset for one run and `-bench-video on|off` overrides the rules
+file's video setting. The preset changes the camera picture slightly (shadows, anti-aliasing), so a qualification
+must run every team at the same preset. It writes the attempt folder to
+`/results`; the rules file, the signing key and a folder of hidden tracks are mounted into it read-only when given.
+
+**The solution's container** is treated as hostile:
+
+| Measure | Docker option |
+|---|---|
+| Only the simulator is reachable; no internet, no DNS, no host | `--network <internal network>` |
+| File system read-only, 256 MB of `/tmp` in memory | `--read-only --tmpfs /tmp` |
+| No capabilities, no privilege gain, not root | `--cap-drop ALL --security-opt no-new-privileges --user 10001:10001` |
+| Memory 4 GB (no swap), 4 processors, 256 processes | `--memory --memory-swap --cpus --pids-limit` |
+| Nothing of the host mounted, no shared memory with other containers | no `-v`; `--ipc none` |
+
+The limits are the plan's defaults (`sandbox.Limits`); the real ones are the organisers' decision.
+
+`bench/runner/tests/hostile` is a solution that tries to get out (internet, DNS, the host, writing into the image,
+reading `/results`, becoming root, the Docker socket, 400 processes, other ports of the simulator, asking for ground
+truth). Run it with `submit-check --logs`: every line must say `blocked`.
+
 ## Not in B2
 
 - The scan of a Bench Server build for ground-truth code and hidden tracks comes with that build (B6).

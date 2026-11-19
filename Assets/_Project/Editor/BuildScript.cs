@@ -74,6 +74,32 @@ namespace Ushqyr.EditorTools
             Build(path, BuildTarget.StandaloneLinux64, BuildTargetGroup.Standalone);
         }
 
+        public const string BenchServerPath = "Builds/BenchServer/UshqyrBench.x86_64";
+
+        /// <summary>
+        /// The qualification server's player: Linux, the AI Bench scenes only, compiled with USHQYR_BENCH_SERVER so
+        /// ground truth, the oracle, the track editor and the dataset tool are not in it. Run it in batch mode under
+        /// a virtual display (not -nographics: the drone's camera has to render).
+        /// </summary>
+        [MenuItem("Ushqyr/Build/Build Bench Server (Linux)")]
+        public static void BuildBenchServer()
+        {
+            PlayerSettings.fullScreenMode = FullScreenMode.Windowed;
+            PlayerSettings.defaultIsNativeResolution = false;
+            PlayerSettings.resizableWindow = true;
+            var scenes = EditorBuildSettings.scenes.Where(s => s.enabled).Select(s => s.path)
+                .Where(s => s.EndsWith("/Boot.unity") || Path.GetFileName(s).StartsWith("Bench_")).ToArray();
+            Build(BenchServerPath, BuildTarget.StandaloneLinux64, BuildTargetGroup.Standalone, scenes, new[] { "USHQYR_BENCH_SERVER" });
+        }
+
+        public static string BuildBenchServerDeferred()
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(ResultPath));
+            File.WriteAllText(ResultPath, "building " + System.DateTime.Now.ToString("HH:mm:ss"));
+            EditorApplication.delayCall += BuildBenchServer;
+            return ResultPath;
+        }
+
         // ---------- version ----------
 
         /// <summary>The current version, from <see cref="VersionPath"/> (1.0 if there is none yet).</summary>
@@ -120,10 +146,10 @@ namespace Ushqyr.EditorTools
             return ResultPath;
         }
 
-        private static void Build(string path, BuildTarget target, BuildTargetGroup targetGroup)
+        private static void Build(string path, BuildTarget target, BuildTargetGroup targetGroup, string[] scenes = null, string[] defines = null)
         {
             Directory.CreateDirectory(Path.GetDirectoryName(path));
-            var scenes = EditorBuildSettings.scenes.Where(s => s.enabled).Select(s => s.path).ToArray();
+            scenes ??= EditorBuildSettings.scenes.Where(s => s.enabled).Select(s => s.path).ToArray();
             var options = new BuildPlayerOptions
             {
                 scenes = scenes,
@@ -131,10 +157,12 @@ namespace Ushqyr.EditorTools
                 target = target,
                 targetGroup = targetGroup,
                 options = BuildOptions.None,
+                extraScriptingDefines = defines,
             };
 
             ApplyIcon();
             StampVersion();
+            BuildAddressables(target, targetGroup);
             BuildReport report = BuildPipeline.BuildPlayer(options);
             var summary = report.summary;
             string line = $"Build {summary.result} v{Version}: {summary.outputPath} " +
@@ -150,6 +178,20 @@ namespace Ushqyr.EditorTools
 
             if (Application.isBatchMode)
                 EditorApplication.Exit(summary.result == BuildResult.Succeeded ? 0 : 1);
+        }
+
+        /// <summary>
+        /// Rebuilds the addressable content (the language tables) for <paramref name="target"/>. Without this a build
+        /// for another platform carries the bundles of the platform built last and cannot load them.
+        /// </summary>
+        private static void BuildAddressables(BuildTarget target, BuildTargetGroup targetGroup)
+        {
+            if (EditorUserBuildSettings.activeBuildTarget != target)
+                EditorUserBuildSettings.SwitchActiveBuildTarget(targetGroup, target);
+            var settings = System.Type.GetType("UnityEditor.AddressableAssets.Settings.AddressableAssetSettings, Unity.Addressables.Editor");
+            var build = settings?.GetMethod("BuildPlayerContent", System.Type.EmptyTypes);
+            if (build == null) { Debug.LogWarning("[Ushqyr] Addressables not found: content not rebuilt"); return; }
+            build.Invoke(null, null);
         }
 
         public const string IconPath = "Assets/_Project/Art/Icon/Ushqyr.png";

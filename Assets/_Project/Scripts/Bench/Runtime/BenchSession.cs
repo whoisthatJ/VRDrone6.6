@@ -185,6 +185,11 @@ namespace Ushqyr.Bench
                 return;
             }
 #endif
+            if (BenchLauncher.GraphicsPreset != null && System.Array.IndexOf(Ushqyr.Core.GraphicsQuality.Presets, BenchLauncher.GraphicsPreset) >= 0)
+            {
+                Ushqyr.Core.GraphicsQuality.Apply(Ushqyr.Core.GraphicsQuality.Current.WithPreset(BenchLauncher.GraphicsPreset));
+                Debug.Log($"[Bench] graphics preset {BenchLauncher.GraphicsPreset} (-bench-graphics)");
+            }
             bool video = _rules.video == "on" || (_rules.video != "off" && _rules.Competition);
             _ffmpeg = video ? BenchLauncher.FindFfmpeg() : null;
             if (video && _ffmpeg == null) Debug.LogWarning("[Bench] no ffmpeg found: attempts are recorded without video");

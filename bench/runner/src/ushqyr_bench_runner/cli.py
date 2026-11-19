@@ -7,6 +7,8 @@
     ushqyr-bench validate-drone <drone.yaml> [--limits class_limits.json]
     ushqyr-bench dataset --sim Ushqyr.exe --track H1_Oval --out <folder> [--count 500] [--seed 1] [--masks]
     ushqyr-bench dataset-check <dataset folder> [--draw 100]
+    ushqyr-bench build-images [--build Builds/BenchServer]     (Docker: the simulator image and the solutions' base image)
+    ushqyr-bench submit-check <solution folder or image.tar> [--track H1_Oval] [--seed 1] [--out results]
 """
 from __future__ import annotations
 
@@ -147,6 +149,87 @@ def cmd_dataset_check(args: argparse.Namespace) -> int:
     return 1 if problems else 0
 
 
+def _bench_root() -> Path:
+    """The repository's bench/ folder (this file is bench/runner/src/ushqyr_bench_runner/cli.py)."""
+    return Path(__file__).resolve().parents[3]
+
+
+def cmd_build_images(args: argparse.Namespace) -> int:
+    from . import sandbox
+
+    root = Path(args.bench) if args.bench else _bench_root()
+    try:
+        sandbox.require_engine()
+        print(f"building {sandbox.BASE_IMAGE} ...")
+        sandbox.build_base(root)
+        if args.base_only:
+            return 0
+        build = Path(args.build) if args.build else root.parent / "Builds" / "BenchServer"
+        print(f"building {sandbox.SERVER_IMAGE} from {build} ...")
+        sandbox.build_server(root, build)
+    except sandbox.SandboxError as e:
+        print("error:", e)
+        return 2
+    print("done")
+    return 0
+
+
+def cmd_submit_check(args: argparse.Namespace) -> int:
+    """Builds a solution's image and flies one competition attempt with it, exactly as the server will."""
+    from . import sandbox
+
+    limits = sandbox.Limits(memory=args.memory, cpus=args.cpus, wall_seconds=args.wall, gpu=args.gpu)
+    source = Path(args.solution)
+    built = False
+    try:
+        sandbox.require_engine()
+        if source.is_dir():
+            print(f"building the image from {source} ...")
+            image, size = sandbox.build_solution(source, limits)
+            built = True
+        else:
+            image = sandbox.load_solution(source)
+            size = sandbox.image_size(image)
+        print(f"image: {size / 1024**2:.0f} MB (limit {limits.image_bytes / 1024**2:.0f} MB)")
+        if size > limits.image_bytes:
+            print("FAILED: the image is larger than the limit")
+            return 1
+        sim_gpu = args.sim_gpu == "on" or (args.sim_gpu == "auto" and sandbox.wsl_gpu())
+        graphics = args.graphics or (None if sim_gpu else "Low")
+        video = True if args.video else None if (args.rules or sim_gpu) else False
+        print(f"flying one competition attempt on {args.track}, seed {args.seed} ...")
+        if not sim_gpu:
+            print("note: the simulator draws without a GPU: lowest graphics, no trackside video, and far slower than real time")
+        try:
+            o = sandbox.run_attempt(image, Path(args.out), args.track, args.seed, team=args.team, limits=limits,
+                                    rules=Path(args.rules) if args.rules else None, key=Path(args.key) if args.key else None,
+                                    graphics=graphics, video=video, sim_gpu=sim_gpu)
+        finally:
+            if built:
+                sandbox.docker("image", "rm", "-f", image, check=False, timeout=120)
+    except sandbox.SandboxError as e:
+        print("error:", e)
+        return 2
+    for note in o.notes:
+        print("note:", note)
+    if args.logs or o.result is None:
+        print("---- the solution printed ----")
+        print(o.solution_log.strip()[-4000:] or "(nothing)")
+    if o.result is None:
+        print("---- the simulator printed (end) ----")
+        print(o.simulator_log.strip()[-3000:] or "(nothing)")
+        print("FAILED: the attempt produced no result")
+        return 1
+    r = o.result
+    state, detail = attempt.verify(o.folder, _key(args.key))
+    print(f"result: {r['status']}, {r['points']} point(s), time {r['time']:.2f} s, simulator time {r['sim_time']:.2f} s")
+    print(f"attempt folder: {o.folder}  (files: {state}{', ' + detail if detail else ''})")
+    print(f"the solution exited with code {o.solution_exit}")
+    ok = state in (attempt.VERIFIED, attempt.CHECKSUMS_ONLY) and r["status"] != "error" and not o.notes
+    print("OK: the solution runs under the server's conditions" if ok else "FAILED")
+    return 0 if ok else 1
+
+
 def main(argv: Optional[List[str]] = None) -> int:
     parser = argparse.ArgumentParser(
         prog="ushqyr-bench", description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
@@ -200,6 +283,32 @@ def main(argv: Optional[List[str]] = None) -> int:
     p.add_argument("folder")
     p.add_argument("--draw", type=int, default=0, help="draw the labels over this many random pictures (needs opencv)")
     p.set_defaults(run=cmd_dataset_check)
+
+    p = sub.add_parser("build-images", help="Docker: build the simulator image and the base image for solutions")
+    p.add_argument("--build", help="folder of the Linux Bench Server build (default: Builds/BenchServer)")
+    p.add_argument("--bench", help="the bench/ folder (default: next to this tool)")
+    p.add_argument("--base-only", action="store_true", help="only the base image for solutions")
+    p.set_defaults(run=cmd_build_images)
+
+    p = sub.add_parser("submit-check", help="Docker: build a solution and fly one competition attempt, as the server will")
+    p.add_argument("solution", help="folder with a Dockerfile, or a `docker save` file")
+    p.add_argument("--track", default="H1_Oval")
+    p.add_argument("--seed", type=int, default=1)
+    p.add_argument("--team", default="check")
+    p.add_argument("--out", default="bench_results")
+    p.add_argument("--rules", help="rules file (default: the one in the simulator image)")
+    p.add_argument("--key", help="signing key file (organisers)")
+    p.add_argument("--memory", default="4g")
+    p.add_argument("--cpus", type=float, default=4.0)
+    p.add_argument("--wall", type=float, default=1800.0, help="real seconds allowed for the attempt")
+    p.add_argument("--gpu", action="store_true", help="give the solution the GPU")
+    p.add_argument("--logs", action="store_true", help="print what the solution printed")
+    p.add_argument("--sim-gpu", default="auto", choices=["auto", "on", "off"],
+                   help="let the simulator draw on the video card (auto: yes on Docker Desktop for Windows)")
+    p.add_argument("--graphics", choices=["Low", "Medium", "High", "Ultra"],
+                   help="graphics preset of the simulator (default: the build's own with a GPU, Low without)")
+    p.add_argument("--video", action="store_true", help="record the trackside video even without a GPU")
+    p.set_defaults(run=cmd_submit_check)
 
     args = parser.parse_args(argv)
     return int(args.run(args))
