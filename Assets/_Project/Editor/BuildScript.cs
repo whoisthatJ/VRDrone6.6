@@ -11,6 +11,7 @@ namespace Ushqyr.EditorTools
         public const string ApkPath = "Builds/Ushqyr.apk";
         public const string WindowsPath = "Builds/Windows/Ushqyr.exe";
         public const string MacPath = "Builds/macOS/Ushqyr.app";
+        public const string LinuxPath = "Builds/Linux/Ushqyr.x86_64";
         /// <summary>The game's version, one line ("1.4"): what every build and the installer are stamped with.</summary>
         public const string VersionPath = "Version.txt";
         public const string ResultPath = "Builds/build-result.txt";
@@ -56,6 +57,21 @@ namespace Ushqyr.EditorTools
             PlayerSettings.resizableWindow = true;
             UnityEditor.OSXStandalone.UserBuildSettings.architecture = UnityEditor.Build.OSArchitecture.x64ARM64;
             Build(appPath, BuildTarget.StandaloneOSX, BuildTargetGroup.Standalone);
+        }
+
+        /// <summary>
+        /// The Linux player (x86-64, Mono) into <paramref name="path"/>: the same game, for teams on Linux and, started
+        /// in batch mode under a virtual display, for the qualification server.
+        /// </summary>
+        [MenuItem("Ushqyr/Build/Build Linux")]
+        public static void BuildLinux() => BuildLinuxTo(LinuxPath);
+
+        public static void BuildLinuxTo(string path)
+        {
+            PlayerSettings.fullScreenMode = FullScreenMode.FullScreenWindow;
+            PlayerSettings.defaultIsNativeResolution = true;
+            PlayerSettings.resizableWindow = true;
+            Build(path, BuildTarget.StandaloneLinux64, BuildTargetGroup.Standalone);
         }
 
         // ---------- version ----------
