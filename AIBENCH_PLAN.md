@@ -529,10 +529,11 @@ Version 1.4. `UshqyrAIBench-win-1.4.zip` 342 MB, `UshqyrAIBench-linux-1.4.zip` 3
 `H1_Oval` in training mode, the SDK was installed from the kit into a fresh virtual environment, and the kit's
 `color_pid` sample scored 6 of 6 gates in 25.5 s.
 
-**Not tested:** the Linux kit has not been run. The build succeeded with no errors and the archive is checked (layout,
-run permissions), but the container test could not start: Docker Desktop would not come up on the development PC
-because WSL stopped answering. The script for it is ready; the same code as the Windows kit and the Linux server
-build (tested in B6) is all that stands behind it until then. A Linux desktop has not been tried at all.
+**Tested for real, Linux kit in a container** (Ubuntu image, GPU through WSL, virtual display): the player started
+with no `-bench` opened AI Bench on `H1_Oval`; the SDK was installed from the kit; the kit's `color_pid` sample scored
+6 of 6 gates in 25.539 s, the same time to the millisecond as the Windows kit.
+
+**Not tested:** the Linux kit on a real Linux desktop (window, own GPU driver, unzipping on Linux).
 
 **Notes:**
 - No hidden track exists yet (D47), so neither kit went through a `--hidden` check. It must be run on the
