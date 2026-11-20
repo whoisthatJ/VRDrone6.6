@@ -225,7 +225,7 @@ namespace Ushqyr.Bench
         }
     }
 
-    /// <summary>Message numbers and limits of protocol version 1 (Docs/bench/protocol.md).</summary>
+    /// <summary>Message numbers and limits of protocol version 1 (Docs/bench/en/protocol.md).</summary>
     public static class BenchProtocol
     {
         public const int Version = 1;

@@ -20,4 +20,6 @@ ushqyr-bench leaderboard <results folder> --csv results.csv --board leaderboard.
 `--semicolon` writes `;` as the separator and `,` as the decimal mark, which is what spreadsheet programs expect in
 Russian and Kazakh regional settings. The files are UTF-8 with a byte-order mark.
 
-The batch runner (`ushqyr-bench batch`), `submit-check`, `validate-drone` and `dataset` arrive with later milestones.
+Other commands: `validate-drone`, `dataset`, `dataset-check`, `check-build`, `build-images`, `submit-check` and `batch`.
+They are described in `Docs/bench/<ru|kk|en>/`: `drone.md`, `dataset.md`, `docker.md` and `organizer.md`. The Docker
+commands need Docker; `batch` reads YAML files with PyYAML (`pip install pyyaml`) or takes JSON.

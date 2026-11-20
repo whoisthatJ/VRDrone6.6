@@ -1,7 +1,7 @@
-# AI Bench: organiser guide (B5)
+# Organiser guide
 
-How to run an attempt in competition mode, what the simulator writes, and how to check it. Team-facing material is in
-`ru/quickstart.md` and `protocol.md`.
+How to run an attempt in competition mode, what the simulator writes, how to check it, and how to run the whole
+qualification unattended. Team-facing pages are listed in [README.md](README.md).
 
 ## Running one attempt
 
@@ -37,7 +37,7 @@ In the editor the same options are read from `UserSettings/bench-args.txt`, one 
 ## Rules file
 
 Everything the organisers may want to change lives in a rules file (`-bench-rules`), not in the build. The fields and
-their defaults are in `StreamingAssets/Bench/rules.json`. Those added in B3:
+their defaults are in `StreamingAssets/Bench/rules.json`. The ones most often changed:
 
 | Field | Default | Meaning |
 |---|---|---|
@@ -67,7 +67,7 @@ Six public tracks ship in `StreamingAssets/Bench/Tracks`:
 | `P1_Columns` | parking | 6 | A loop round the column rows, low light |
 | `P2_Maze` | parking | 9 | Turns behind columns: the next gate is often out of sight |
 
-`track_check.md` (next to this file) records that each of them validates and that the oracle pilot completes a lap.
+`Docs/bench/track_check.md` records that each of them validates and that the oracle pilot completes a lap.
 
 **Track editor.** In the app: **T** opens the track list (fly, edit, new). In the editor, drag gates on the floor
 plan, give each its LED colour, brightness, steady or blinking, and allowed direction; move and turn the start pad;
@@ -77,7 +77,7 @@ pilot fly the track and draws its path. **Save** writes the file to the user's `
 writes a top-down picture next to it; **Fly it** opens the track for a program.
 
 **Oracle pilot.** An autopilot that knows the true positions. It is for authoring only (test flights, track checks,
-later dataset camera paths), is compiled out of the server build, and has no connection to the API.
+dataset camera paths), is compiled out of the server build, and has no connection to the API.
 
 **Random tracks.** The editor's "Random track" (seed, level 1 to 3), or from the command line:
 `Ushqyr.exe -bench-generate parking 4217 3 D:\private\HID_p_4217.benchtrack.json`. The same seed gives the same
@@ -91,7 +91,7 @@ camera tilt and field of view, and which sensors it carries. An example with com
 
 - The class limits are yours: `StreamingAssets/Bench/class_limits.json` (or `-bench-limits`). Defaults: at most
   300 × 300 × 180 mm (the task's limit), 25 to 1500 g, thrust-to-weight 1.5 to 8, up to 6 cells and 2200 mAh,
-  rates up to 1000 deg/s, camera tilt 0 to 60°, field of view 60 to 150°, sensors from
+  rates up to 1000 deg/s, motor time constant at least 10 ms, tilt in Angle mode up to 70°, camera tilt 0 to 60°, field of view 60 to 150°, sensors from
   `camera, imu, tof, lidar, battery`.
 - A team checks its file with `ushqyr-bench validate-drone drone.yaml [--limits class_limits.json]`. The simulator
   runs the same checks when it loads the file and refuses a drone that fails, with the reasons in plain words.
@@ -231,7 +231,7 @@ It sends hostile input over 200 connections, flies one attempt while asking for 
 the forbidden messages, and then compares every number it received with the judges' `truth.csv` of that attempt.
 Exit code 0 means nothing leaked.
 
-## Solutions in Docker (B6)
+## Solutions in Docker
 
 A team's solution is a Docker image. The simulator runs in a second container, and the two share a network that has
 no way out.
@@ -252,11 +252,11 @@ turn the camera off. How it draws:
 |---|---|---|
 | Docker Desktop on Windows, `--sim-gpu auto` | Mesa's Direct3D 12 driver on the PC's video card (`--gpus all`, `/usr/lib/wsl` mounted read-only) | about 4 minutes for the whole check, videos included (GTX 1650 Ti) |
 | No GPU | Mesa's software OpenGL (llvmpipe) | about 40 minutes at the Low preset with no trackside video; about 3 hours at High |
-| Linux server with a GPU | **not set up or measured yet**: needs the real machine | — |
+| Linux server with a GPU | **not set up or measured yet**: needs the real machine | - |
 
 `-bench-graphics Low|Medium|High|Ultra` sets the preset for one run and `-bench-video on|off` overrides the rules
 file's video setting. The preset changes the camera picture slightly (shadows, anti-aliasing), so a qualification
-must run every team at the same preset. It writes the attempt folder to
+must run every team at the same preset. The container writes the attempt folder to
 `/results`; the rules file, the signing key and a folder of hidden tracks are mounted into it read-only when given.
 
 **The solution's container** is treated as hostile:
@@ -279,9 +279,9 @@ truth). Run it with `submit-check --logs`: every line must say `blocked`.
 
 `ushqyr-bench build-images --ros2 jazzy` (or `humble`) builds the base image for ROS 2 solutions: ROS 2, the SDK, the
 bridge node and its messages. A ROS 2 solution is an ordinary submission: its container runs the bridge and the team's
-nodes together, and the simulator sees one client. Topics, parameters and timing are in `Docs/bench/ru/ros2.md`.
+nodes together, and the simulator sees one client. Topics, parameters and timing are in [ros2.md](ros2.md).
 
-## The batch run (B7)
+## The batch run
 
 Every team's solution on every track, unattended, into one results file.
 
@@ -339,11 +339,19 @@ The exit code is 0 when every job has a result, 1 when some do not, 2 when the r
 
 Use one `--graphics` preset for the whole qualification: the preset changes the camera picture.
 
-## Not in B2
+## Hidden tracks and the signing key on the qualification server
 
-- The scan of a Bench Server build for ground-truth code and hidden tracks comes with that build (B6).
-- Programs are not yet isolated in a container (B6); until then the "no memory or file access" guarantees depend on
-  running the program on another machine or account.
-- The signing key and the hidden tracks have no fixed home yet: both are given by path and live outside the project.
-- The track editor has no manual test flight: AI Bench has no hand-flying at all. Test flights are the oracle pilot's
-  or a program's.
+Both exist only on the qualification server: not in the repository, not on a developer's machine, not in any build or
+kit. Make the hidden tracks and the key there, keep them in a folder only the organisers can read, and give them to the
+batch run by path (`tracks.yaml` `folder`, `--key`). Until that server exists, development uses the public tracks and
+a throwaway test key.
+
+## Not done yet
+
+- **A Linux server with a video card** has not been set up or measured. The simulator's container is proven on Docker
+  Desktop for Windows (video card through WSL) and with software drawing.
+- **One graphics preset for the qualification** is not chosen. The preset changes the camera picture, so every team
+  must be flown at the same one (`--graphics`).
+- **Limits for solutions** (4 GB, 4 processors, 8 GB image, no video card) are placeholders until the organisers decide.
+- **The whoop** (class AI MISSION) is a placeholder model until it is calibrated against measurements of the real drone.
+- **No manual test flight**: AI Bench has no hand-flying at all. Test flights are the oracle pilot's or a program's.

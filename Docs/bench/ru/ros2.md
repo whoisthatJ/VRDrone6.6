@@ -1,6 +1,6 @@
 # ROS 2
 
-Мост ROS 2 превращает датчики симулятора в обычные топики и принимает каналы пульта. Сам мост — это узел на Python,
+Мост ROS 2 превращает датчики симулятора в обычные топики и принимает каналы пульта. Сам мост это узел на Python,
 который подключается к симулятору через SDK, поэтому в ROS 2 доступно ровно то же, что и в SDK.
 
 Поддерживаются **Humble** и **Jazzy**. Исходники: `bench/ros2` (пакеты `ushqyr_msgs` и `ushqyr_ros2_bridge`).
@@ -14,11 +14,11 @@ ushqyr-bench submit-check bench/examples/color_pid_ros2 --logs
 
 Для Humble: `build-images --ros2 humble` и `submit-check ... --build-arg ROS_DISTRO=humble`.
 
-Пример `bench/examples/color_pid_ros2` — то же решение `color_pid`, но все данные оно получает из топиков.
+Пример `bench/examples/color_pid_ros2` это то же решение `color_pid`, но все данные оно получает из топиков.
 
 ## Запуск без Docker
 
-Нужен установленный ROS 2 и SDK (`pip install bench/sdk/python`).
+Нужен установленный ROS 2 и SDK (`pip install ./bench/sdk/python`).
 
 ```
 cd bench/ros2 && colcon build && source install/setup.bash
@@ -42,19 +42,19 @@ ros2 run ushqyr_ros2_bridge bridge
 | `ushqyr/scan` | `sensor_msgs/LaserScan` | 2D-лидар; луч 0 смотрит вперед, углы растут влево |
 | `ushqyr/battery` | `sensor_msgs/BatteryState` | Напряжение батареи |
 | `ushqyr/status` | `ushqyr_msgs/AttemptStatus` | Раз в шаг управления, после сообщений датчиков этого шага |
-| `ushqyr/info` | `std_msgs/String` | Рукопожатие симулятора в JSON (хранится для новых подписчиков) |
+| `ushqyr/info` | `std_msgs/String` | Приветствие симулятора в JSON (хранится для новых подписчиков) |
 
 Мост слушает:
 
 | Топик | Тип | Что это |
 |---|---|---|
 | `ushqyr/rc` | `ushqyr_msgs/RcChannels` | 16 каналов в микросекундах (1000–2000) |
-| `ushqyr/joy` | `sensor_msgs/Joy` | Оси: крен, тангаж, газ (0..1), рыскание. Кнопки: 0 — арм, 1 — Horizon, 2 — Acro |
+| `ushqyr/joy` | `sensor_msgs/Joy` | Оси: крен, тангаж, газ (0..1), рыскание. Кнопки: 0 арм, 1 Horizon, 2 Acro |
 
 Каналы `RcChannels`: 0 крен, 1 тангаж, 2 газ, 3 рыскание, 4 AUX1 (арм), 5 AUX2 (режим полета). Арминг срабатывает,
 только когда AUX1 поднимается при газе не выше 1050.
 
-Система координат корпуса: x вперед, y влево, z вверх (REP 103). Метки времени во всех сообщениях — время симулятора.
+Система координат корпуса: x вперед, y влево, z вверх (REP 103). Метки времени во всех сообщениях это время симулятора.
 
 ## Калибровка камеры
 
@@ -85,7 +85,7 @@ ros2 run ushqyr_ros2_bridge bridge
 | `connect_wait` | 60 | Сколько секунд пытаться подключиться |
 | `wait_for_rc` | true | Начинать попытку по первому сообщению RC |
 | `sync_wait` | 0.2 | Сколько ждать RC на каждом шаге (синхронный режим) |
-| `seed` | не задан | Режим тренировки: зерно шума датчиков |
+| `seed` | не задан | Тренировочный режим: зерно шума датчиков |
 
 ## В контейнере решения
 

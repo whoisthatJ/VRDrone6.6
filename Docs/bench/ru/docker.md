@@ -6,11 +6,11 @@
 ## Что нужно
 
 - Docker (на Windows: Docker Desktop с WSL2).
-- Этот репозиторий: папки `bench/template`, `bench/runner`, `bench/docker`.
+- Из набора участника: папки `bench/template`, `bench/runner`, `bench/docker` и Linux-сборка симулятора `Builds/BenchServer`.
 - Образ симулятора `ushqyr-bench-server` и базовый образ `ushqyr-bench-base:cpu`. Их собирает одна команда (см. ниже).
 
 ```
-pip install bench/runner
+pip install ./bench/runner
 ushqyr-bench build-images
 ```
 

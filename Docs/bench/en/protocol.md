@@ -1,8 +1,8 @@
 # Ushqyr AI Bench: wire protocol, version 1
 
 The Python SDK (`bench/sdk/python`) speaks this protocol. It is written down so that a client can be written in any
-language. Status: B3: sync and realtime modes, all sensors. Later milestones
-and will raise the version number only if an existing message changes.
+language. It covers sync and realtime modes and all sensors. The version number is raised only if an existing
+message changes.
 
 ## Transport
 

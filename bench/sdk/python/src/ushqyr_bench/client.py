@@ -1,4 +1,4 @@
-"""Client for the Ushqyr AI Bench simulator (protocol version 1, see Docs/bench/protocol.md).
+"""Client for the Ushqyr AI Bench simulator (protocol version 1, see Docs/bench/en/protocol.md).
 
     from ushqyr_bench import Sim, RC
 

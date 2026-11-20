@@ -27,7 +27,7 @@ The flight controller arms only when the arm switch goes from off to on while th
 Environment variables: `USHQYR_BENCH_HOST` (default `127.0.0.1`), `USHQYR_BENCH_PORT` (`5757`),
 `USHQYR_BENCH_TOKEN` (empty).
 
-A working example is in `bench/examples/color_pid`. The wire protocol is described in `Docs/bench/protocol.md`; a Russian quickstart is in `Docs/bench/ru/quickstart.md`.
+A working example is in `bench/examples/color_pid`. The full reference is in `Docs/bench/<ru|kk|en>/sdk.md`, the wire protocol in `protocol.md` beside it, and the quickstart in `quickstart.md`.
 `ushqyr_bench.fake.FakeSim` is a stand-in simulator for unit tests of your own code.
 
 ## Licences of the dependencies

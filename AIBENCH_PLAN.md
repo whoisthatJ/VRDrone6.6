@@ -494,3 +494,20 @@ missing team was reported and did not stop the run; a second start flew nothing 
 
 Note: a track file carries its own `time_limit`, and that one is used; the rules file's value did not shorten the
 test attempts.
+
+### B8, first part: documentation in three languages (20 November 2026)
+`Docs/bench/ru` (the reference text), `Docs/bench/en`, `Docs/bench/kk`; the same twelve pages in each.
+
+| Page | State |
+|---|---|
+| `README` (index), `quickstart` (30 minutes, Windows and Linux), `rules`, `drone` (drone and sensors, AI CORE), `sdk`, `tracks` (and editor), `dataset`, `docker`, `ros2`, `troubleshooting`, `organizer`, `protocol` | Written in Russian (`organizer` and `protocol` translated from the English originals), translated to English and Kazakh |
+| Kazakh | Machine translation with a fixed glossary and the app's own strings for buttons. **Every page is marked as needing a native review**; no reviewer is named yet (question 16) |
+| Consistency | `bench/runner/tests/test_docs.py`: the same pages in every language, the same code blocks, table sizes and headings as the Russian text, every link resolves |
+
+`Docs/bench/organizer.md` and `protocol.md` moved to `Docs/bench/en/`.
+
+**Not done in B8:**
+- The 30-minute test with people who have never seen it (at least 3, Windows and Linux): needs people.
+- The pilot with 3 to 5 teams and its fix list: needs the organisers.
+- The quickstart describes a Team Kit (the simulator plus the `bench` folder). The kit is not assembled yet, and there
+  is no Linux Team Kit build (left from B6). Until then the quickstart's Linux half is untested.
