@@ -9,6 +9,7 @@ The solution's container is treated as hostile:
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import secrets
 import shutil
@@ -159,12 +160,33 @@ def solution_args(limits: Limits, network: str, token: str, port: int) -> List[s
     return args
 
 
+OWNER_LABEL = "ushqyr.owner"
+
+
+def owner_of(folder: Path) -> str:
+    """A label value for everything one results folder starts, so that a later run can find what a killed one left."""
+    return hashlib.sha1(str(folder.resolve()).lower().encode("utf-8")).hexdigest()[:16]
+
+
+def remove_leftovers(owner: str) -> int:
+    """Removes the containers and networks a killed run with this owner left behind. Returns how many."""
+    select = ["--filter", f"label={OWNER_LABEL}={owner}"]
+    containers = docker("ps", "-aq", *select, check=False, timeout=60).stdout.split()
+    if containers:
+        docker("rm", "-f", *containers, check=False, timeout=180)
+    networks = docker("network", "ls", "-q", *select, check=False, timeout=60).stdout.split()
+    if networks:
+        docker("network", "rm", *networks, check=False, timeout=60)
+    return len(containers) + len(networks)
+
+
 def run_attempt(image: str, out: Path, track: str, seed: int = 1, team: str = "check", attempt: int = 1,
                 limits: Optional[Limits] = None, rules: Optional[Path] = None, key: Optional[Path] = None,
                 tracks: Optional[Path] = None, port: int = 5757, sim_args: Optional[List[str]] = None,
                 graphics: Optional[str] = None, video: Optional[bool] = None, on_progress=None,
-                sim_gpu: bool = False) -> Outcome:
+                sim_gpu: bool = False, owner: Optional[str] = None) -> Outcome:
     """One competition attempt of `image` on `track`. The attempt's folder appears under `out`."""
+    label = ["--label", f"{OWNER_LABEL}={owner}"] if owner else []
     limits = limits or Limits()
     require_engine()
     if not image_exists(SERVER_IMAGE):
@@ -196,11 +218,11 @@ def run_attempt(image: str, out: Path, track: str, seed: int = 1, team: str = "c
         mounts += ["-v", f"{tracks.resolve()}:/tracks:ro"]
         options[options.index("-bench-track") + 1] = f"/tracks/{track}.benchtrack.json"
     try:
-        docker("network", "create", "--internal", network, timeout=60)
-        docker("run", "-d", "--name", sim, "--network", network, "--network-alias", SIM_ALIAS, "--user", "0:0",
+        docker("network", "create", "--internal", *label, network, timeout=60)
+        docker("run", "-d", "--name", sim, *label, "--network", network, "--network-alias", SIM_ALIAS, "--user", "0:0",
                "--cap-drop", "ALL", "--security-opt", "no-new-privileges", *mounts, SERVER_IMAGE, *options, *(sim_args or []),
                timeout=120)
-        docker("run", "-d", "--name", sol, *solution_args(limits, network, token, port), image, timeout=120)
+        docker("run", "-d", "--name", sol, *label, *solution_args(limits, network, token, port), image, timeout=120)
         deadline = time.monotonic() + limits.wall_seconds
         while time.monotonic() < deadline:
             state = docker("inspect", "--format", "{{.State.Running}}", sim, timeout=60).stdout.strip()

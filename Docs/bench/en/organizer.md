@@ -337,7 +337,8 @@ What the run does:
 - **Retries only infrastructure failures** (Docker errors, the simulator producing no result): `--retries`, default 2.
   A solution that crashes, hangs or never connects is not retried: the simulator writes that as the attempt's result.
 - **Can be stopped and started again.** `results/batch_state.json` records every finished job; the same command
-  continues with what is left.
+  continues with what is left. If the run was killed during a flight, the next start first removes the containers it
+  left behind; those attempts are flown again.
 - `--workers N` flies N attempts at once. They share the processor and the video card, so on a small machine more
   workers do not mean more speed; in sync mode the scores do not depend on it.
 

@@ -183,6 +183,12 @@ def run(submissions: List[Submission], plan: Plan, out: Path, limits: Optional[s
     attempts_dir = out / "attempts"
     attempts_dir.mkdir(parents=True, exist_ok=True)
     state = State(out / "batch_state.json")
+    owner = sandbox.owner_of(out)
+    if fly is sandbox.run_attempt:
+        # A run that was killed could not remove its containers; they would fly on and hold the video card.
+        left = sandbox.remove_leftovers(owner)
+        if left:
+            say(f"removed {left} container(s) and network(s) left by a run that was killed")
     jobs = jobs_for(submissions, plan)
     todo = [j for j in jobs if not state.done(j, out)]
     say(f"{len(jobs)} job(s): {len(submissions)} team(s) x {len(plan.tracks)} track(s) x {plan.attempts} attempt(s); "
@@ -212,7 +218,7 @@ def run(submissions: List[Submission], plan: Plan, out: Path, limits: Optional[s
         for attempt_no in range(1, retries + 2):
             try:
                 o = fly(images[job.team], folder, job.track, job.seed, team=job.team, attempt=job.attempt, limits=limits,
-                        rules=rules, key=key, tracks=plan.folder, graphics=graphics, video=video, sim_gpu=sim_gpu)
+                        rules=rules, key=key, tracks=plan.folder, graphics=graphics, video=video, sim_gpu=sim_gpu, owner=owner)
             except sandbox.SandboxError as e:
                 o, error = None, str(e)
             if o is not None and o.result is not None:
