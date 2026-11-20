@@ -509,5 +509,32 @@ test attempts.
 **Not done in B8:**
 - The 30-minute test with people who have never seen it (at least 3, Windows and Linux): needs people.
 - The pilot with 3 to 5 teams and its fix list: needs the organisers.
-- The quickstart describes a Team Kit (the simulator plus the `bench` folder). The kit is not assembled yet, and there
-  is no Linux Team Kit build (left from B6). Until then the quickstart's Linux half is untested.
+- The quickstart's Linux half is untested on a Linux desktop (see the Team Kit entry below).
+
+### B6, third part: the Team Kit (20 November 2026)
+What a team downloads: the simulator, the `bench` folder and the documentation in one archive, with the repository's
+own paths so that every command in the documentation works unchanged.
+
+| Part | State |
+|---|---|
+| Team Kit player (`Ushqyr/Build/Build Team Kit (Windows)` and `(Linux)`) | Done: only Boot and the `Bench_*` scenes, define `USHQYR_BENCH_KIT`, opens AI Bench without `-bench`, windowed 1280x720. Editor, oracle, datasets and training mode are in; no other game mode is |
+| `ushqyr-bench make-kit` | Done: player + `bench/` (SDK, examples, template, runner, Docker, ROS 2, schemas) + `Docs/bench/` + optionally `Builds/BenchServer/` + `README.txt`, zipped beside the folder; Linux executables keep their run permission in the zip; with `--hidden` it refuses to zip a kit that holds a hidden track |
+| Left out of the kit | Unity's debug folders, caches, `.meta` files, the hostile test solution |
+| Runner installed with pip (not `-e`) | Fixed: it finds the `bench/` folder from the current directory |
+
+Version 1.4. `UshqyrAIBench-win-1.4.zip` 342 MB, `UshqyrAIBench-linux-1.4.zip` 344 MB, both with the server build
+(in `Builds/TeamKit/`, not in the repository).
+
+**Tested for real:** the Windows kit, by the quickstart: the player started with no options opened AI Bench on
+`H1_Oval` in training mode, the SDK was installed from the kit into a fresh virtual environment, and the kit's
+`color_pid` sample scored 6 of 6 gates in 25.5 s.
+
+**Not tested:** the Linux kit has not been run. The build succeeded with no errors and the archive is checked (layout,
+run permissions), but the container test could not start: Docker Desktop would not come up on the development PC
+because WSL stopped answering. The script for it is ready; the same code as the Windows kit and the Linux server
+build (tested in B6) is all that stands behind it until then. A Linux desktop has not been tried at all.
+
+**Notes:**
+- No hidden track exists yet (D47), so neither kit went through a `--hidden` check. It must be run on the
+  qualification server before anything is handed out.
+- In the kit Esc does nothing in AI Bench (there is no menu to return to); the window is closed the usual way.

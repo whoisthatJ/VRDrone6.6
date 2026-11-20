@@ -229,3 +229,29 @@ def test_solution_container_is_locked_down():
 def test_ros2_example_carries_the_same_pilot():
     examples = Path(__file__).resolve().parents[2] / "examples"
     assert (examples / "color_pid_ros2" / "color_pid.py").read_bytes() == (examples / "color_pid" / "color_pid.py").read_bytes()
+
+
+def test_team_kit_layout(tmp_path):
+    """A kit holds the player, bench/ and the documentation at the repository's own paths, and no caches."""
+    import pytest
+
+    from ushqyr_bench_runner import kit
+
+    repo, build = tmp_path / "repo", tmp_path / "build"
+    for f in ["bench/sdk/python/pyproject.toml", "bench/sdk/python/__pycache__/x.pyc", "bench/examples/a.py",
+              "bench/runner/tests/hostile/hostile.py", "bench/runner/tests/test_x.py", "bench/template/Dockerfile",
+              "Docs/bench/README.md", "Docs/bench/ru/quickstart.md", "Docs/bench/demo/video.mp4", "Assets/secret.cs"]:
+        (repo / f).parent.mkdir(parents=True, exist_ok=True)
+        (repo / f).write_text("x", encoding="utf-8")
+    for f in ["Ushqyr.exe", "Ushqyr_Data/level0", "Ushqyr_BurstDebugInformation_DoNotShip/a.pdb"]:
+        (build / f).parent.mkdir(parents=True, exist_ok=True)
+        (build / f).write_text("x", encoding="utf-8")
+
+    out = tmp_path / "kit"
+    archive = kit.make(build, repo, out, "9.9", say=lambda _: None)
+    assert kit.files(out) == ["Docs/bench/README.md", "Docs/bench/ru/quickstart.md", "README.txt", "Ushqyr.exe",
+                              "Ushqyr_Data/level0", "bench/examples/a.py", "bench/runner/tests/test_x.py",
+                              "bench/sdk/python/pyproject.toml", "bench/template/Dockerfile"]
+    assert archive.is_file() and "9.9" in (out / "README.txt").read_text(encoding="utf-8")
+    with pytest.raises(kit.KitError):
+        kit.make(build, repo, out, "9.9", say=lambda _: None)      # never into a folder that has something in it

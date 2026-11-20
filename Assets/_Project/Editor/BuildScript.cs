@@ -100,6 +100,44 @@ namespace Ushqyr.EditorTools
             return ResultPath;
         }
 
+        public const string TeamKitWindowsPath = "Builds/TeamKit/Windows/Ushqyr.exe";
+        public const string TeamKitLinuxPath = "Builds/TeamKit/Linux/Ushqyr.x86_64";
+
+        /// <summary>
+        /// The teams' player: the AI Bench scenes only, compiled with USHQYR_BENCH_KIT so it opens AI Bench straight
+        /// away. It keeps what the server build leaves out (track editor, oracle pilot, dataset tool, training mode).
+        /// `ushqyr-bench make-kit` puts the SDK, examples and documentation beside it.
+        /// </summary>
+        [MenuItem("Ushqyr/Build/Build Team Kit (Windows)")]
+        public static void BuildTeamKitWindows() => BuildTeamKit(TeamKitWindowsPath, BuildTarget.StandaloneWindows64);
+
+        [MenuItem("Ushqyr/Build/Build Team Kit (Linux)")]
+        public static void BuildTeamKitLinux() => BuildTeamKit(TeamKitLinuxPath, BuildTarget.StandaloneLinux64);
+
+        private static void BuildTeamKit(string path, BuildTarget target)
+        {
+            // A window, not fullscreen: a team works with a terminal and an editor beside the simulator.
+            PlayerSettings.fullScreenMode = FullScreenMode.Windowed;
+            PlayerSettings.defaultIsNativeResolution = false;
+            PlayerSettings.defaultScreenWidth = 1280;
+            PlayerSettings.defaultScreenHeight = 720;
+            PlayerSettings.resizableWindow = true;
+            var scenes = EditorBuildSettings.scenes.Where(s => s.enabled).Select(s => s.path)
+                .Where(s => s.EndsWith("/Boot.unity") || Path.GetFileName(s).StartsWith("Bench_")).ToArray();
+            Build(path, target, BuildTargetGroup.Standalone, scenes, new[] { "USHQYR_BENCH_KIT" });
+        }
+
+        public static string BuildTeamKitWindowsDeferred() => Deferred(BuildTeamKitWindows);
+        public static string BuildTeamKitLinuxDeferred() => Deferred(BuildTeamKitLinux);
+
+        private static string Deferred(EditorApplication.CallbackFunction build)
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(ResultPath));
+            File.WriteAllText(ResultPath, "building " + System.DateTime.Now.ToString("HH:mm:ss"));
+            EditorApplication.delayCall += build;
+            return ResultPath;
+        }
+
         // ---------- version ----------
 
         /// <summary>The current version, from <see cref="VersionPath"/> (1.0 if there is none yet).</summary>

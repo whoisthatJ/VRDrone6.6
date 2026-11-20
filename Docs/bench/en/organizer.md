@@ -164,6 +164,22 @@ ushqyr-bench check-build <build or kit folder> --hidden D:\private
 It fails if any file there is a hidden track, or contains a hidden track's id or gate data (also re-indented or
 inside another file). Compressed archives are not unpacked: check the folder before zipping it.
 
+## The Team Kit
+
+The Team Kit is what a team downloads: the simulator, the `bench` folder and this documentation in one archive.
+
+1. Build the player in Unity: **Ushqyr > Build > Build Team Kit (Windows)** or **(Linux)**. This player holds only
+   the AI Bench scenes and opens AI Bench without `-bench`; the editor, the datasets and training mode are all there.
+2. Put the kit together:
+
+```
+ushqyr-bench make-kit --build Builds/TeamKit/Windows --out Builds/TeamKit/UshqyrAIBench-win-1.4 --server Builds/BenchServer --hidden D:\private
+```
+
+`--server` adds the Linux server build, which teams need for `build-images` and `submit-check`. With `--hidden` the
+finished folder is checked for hidden tracks before it is zipped, and nothing is zipped if one is found. The archive
+appears beside the folder. Make one kit per platform.
+
 ## What competition mode changes
 
 - No ground truth, no score, no track name on the API; `RESET` and `PING` are refused; the simulation always runs at

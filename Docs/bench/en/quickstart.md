@@ -41,10 +41,12 @@ The SDK depends only on `numpy` and `msgpack`. OpenCV is needed by the example, 
 
 ## 2. Start the simulator in AI Bench mode (2 minutes)
 
-Either of two ways:
+Start the simulator from the Team Kit: it opens AI Bench straight away.
 
-- In the main menu press **AI Bench**.
-- Or from the command line: `Ushqyr.exe -bench` (Linux: `chmod +x Ushqyr.x86_64`, then `./Ushqyr.x86_64 -bench`).
+- Windows: `Ushqyr.exe`
+- Linux: `chmod +x Ushqyr.x86_64`, then `./Ushqyr.x86_64`
+
+In the full game, press **AI Bench** in the main menu or start it with the `-bench` option.
 
 The hall opens with the track `H1_Oval` (6 gates in an oval). The top left corner says "Waiting for a program on port
 5757". The drone stands on the start pad.
@@ -63,7 +65,7 @@ The drone takes off, finds a gate by the colour of its LEDs and flies round the 
 - bottom right: the picture from the onboard camera, exactly the one the program receives;
 - in a separate window (option `--show`): the same picture with a box around the gate that was found.
 
-Key **C** switches the view: the camera behind the drone or an overview of the hall. **Esc** returns to the menu.
+Key **C** switches the view: the camera behind the drone or an overview of the hall. In the full game **Esc** returns to the menu.
 
 An attempt lasts 120 seconds. To stop after one lap, add `--points 6`.
 

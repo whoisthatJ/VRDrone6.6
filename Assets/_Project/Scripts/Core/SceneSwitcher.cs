@@ -37,6 +37,8 @@ namespace Ushqyr.Core
                            || (Gamepad.current != null && Gamepad.current.rightStickButton.wasPressedThisFrame);
             if (!pressed || SceneManager.GetActiveScene().name == menuScene) return;
             if (MenuOverride != null && MenuOverride()) return;
+            // A build without the menu (the AI Bench Team Kit, the Bench Server) has nowhere to go back to.
+            if (!Application.CanStreamedLevelBeLoaded(menuScene)) return;
             MenuOverride = null;
             SceneManager.LoadScene(menuScene);
         }

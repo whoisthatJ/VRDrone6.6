@@ -226,6 +226,13 @@ namespace Ushqyr.Bench
             return null;
         }
 
+        /// <summary>The Team Kit player holds nothing but AI Bench and opens it without being asked to.</summary>
+#if USHQYR_BENCH_KIT
+        public const bool KitBuild = true;
+#else
+        public const bool KitBuild = false;
+#endif
+
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void FromCommandLine()
         {
@@ -246,7 +253,7 @@ namespace Ushqyr.Bench
                 Application.Quit(code);
                 return;
             }
-            if (Application.isEditor || !(HasFlag("-bench") || Arg("-bench-replay") != null || Arg("-bench-edit") != null || Arg("-bench-dataset") != null)) return;
+            if (Application.isEditor || !(KitBuild || HasFlag("-bench") || Arg("-bench-replay") != null || Arg("-bench-edit") != null || Arg("-bench-dataset") != null)) return;
             try
             {
                 AppBootstrap.FirstSceneOverride = Arg("-bench-replay") != null ? SceneFor(LoadReplayTrack())

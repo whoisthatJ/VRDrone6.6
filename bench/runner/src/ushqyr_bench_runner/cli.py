@@ -151,8 +151,44 @@ def cmd_dataset_check(args: argparse.Namespace) -> int:
 
 
 def _bench_root() -> Path:
-    """The repository's bench/ folder (this file is bench/runner/src/ushqyr_bench_runner/cli.py)."""
-    return Path(__file__).resolve().parents[3]
+    """The bench/ folder: where this file lives in a checkout (bench/runner/src/ushqyr_bench_runner/cli.py), or, when
+    the tool was installed with pip, the bench/ folder of the kit the command is run from."""
+    here = Path(__file__).resolve().parents[3]
+    if (here / "docker").is_dir():
+        return here
+    cwd = Path.cwd()
+    for folder in [cwd, *cwd.parents]:
+        for candidate in (folder / "bench", folder):
+            if (candidate / "docker" / "base").is_dir() and (candidate / "sdk").is_dir():
+                return candidate
+    return here
+
+
+def cmd_make_kit(args: argparse.Namespace) -> int:
+    """Assembles a Team Kit and proves no hidden track is in it."""
+    from . import kit
+
+    repo = Path(args.repo) if args.repo else _bench_root().parent
+    try:
+        version = args.version or (repo / "Version.txt").read_text(encoding="utf-8").strip()
+        out = Path(args.out)
+        kit.make(Path(args.build), repo, out, version, Path(args.server) if args.server else None, archive=False)
+        if args.hidden:
+            leaks = attempt.find_hidden_tracks(out, Path(args.hidden))
+            for leak in leaks:
+                print("  LEAK: " + leak)
+            if leaks:
+                print(f"{len(leaks)} hidden track(s) in the kit: not archived")
+                return 1
+            print("no hidden track in the kit")
+        else:
+            print("not checked for hidden tracks (no --hidden folder given)")
+        if not args.no_zip:
+            kit.make_archive(out)
+    except (kit.KitError, OSError) as e:
+        print("error:", e)
+        return 2
+    return 0
 
 
 def cmd_build_images(args: argparse.Namespace) -> int:
@@ -312,6 +348,16 @@ def main(argv: Optional[List[str]] = None) -> int:
     p.add_argument("folder")
     p.add_argument("--draw", type=int, default=0, help="draw the labels over this many random pictures (needs opencv)")
     p.set_defaults(run=cmd_dataset_check)
+
+    p = sub.add_parser("make-kit", help="assemble a Team Kit: simulator build + bench/ + documentation")
+    p.add_argument("--build", required=True, help="folder of the Team Kit build (Builds/TeamKit/Windows or .../Linux)")
+    p.add_argument("--out", required=True, help="the kit folder to create; the archive is written beside it")
+    p.add_argument("--repo", help="the repository root (default: found from this tool)")
+    p.add_argument("--server", help="also include this Linux Bench Server build, for `submit-check`")
+    p.add_argument("--hidden", help="folder of hidden tracks: fail if any of them is in the kit")
+    p.add_argument("--version", help="default: Version.txt")
+    p.add_argument("--no-zip", action="store_true")
+    p.set_defaults(run=cmd_make_kit)
 
     p = sub.add_parser("build-images", help="Docker: build the simulator image and the base image for solutions")
     p.add_argument("--build", help="folder of the Linux Bench Server build (default: Builds/BenchServer)")
