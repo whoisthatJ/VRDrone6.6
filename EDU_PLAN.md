@@ -49,6 +49,7 @@ Items marked ❓ are my defaults; the customer should confirm them (§13). Each 
 | D19 | **MAVLink: path A (our own endpoint), provisionally.** It presents an ArduPilot quadrotor and passes 25 of 25 automated checks flying the real flight model through the autopilot. Final only after the QGroundControl try | `Docs/spikes/mavlink_qgroundcontrol.md` |
 | D20 | **Soccer contacts: each PC simulates its own ball**, other balls are predicted forward by their speed, one bounce per pair until they separate, the host decides goals and fouls. Provisional until tried on two real instances in ED8 | `Docs/spikes/lan_collisions.md` (a numerical model, not yet a LAN test) |
 | D22 | **Third-party parts are fetched by a script at pinned versions and checked against recorded hashes** (`Tools/Edu/fetch_third_party.py`). Blockly (923 KB of text files) is kept in the repository; the Python runtime (237 MB) is not, and a build takes it from `ThirdParty/edu/python` | A build never depends on what the internet serves that day; the repository stays small |
+| D23 | **Soccer follows FAI Volume F9, 2026 Edition, Version 2 (effective 1 June 2026)**, as read into `Docs/reference/fai/f9a_values.md`. Where that page and the table in §6 differ, the page wins: goal rings 2 m from the ground to the bottom of the inner opening, hanging from the cage's ceiling; **Position and Altitude hold are off in soccer** (the rules forbid automatic position and height holding); the Striker changes within a set only when its ball can no longer fly; instant replay is not a referee's tool in a "strict FAI" match | The prompt's rule "sport rules follow the FAI text"; which edition the customer's events use is still question 6 of §13 |
 | D21 | **Names are compared and sorted in code, not in SQL.** SQLite folds case for Latin letters only and orders by character code, which made "7Б" and "7б" two groups and put every Kazakh letter after the Russian alphabet | Found by the store tests |
 
 ## 3. Shared foundations
@@ -505,4 +506,8 @@ an activity, writes the recording next to the database (named by activity and co
 journal; `Regrade` grades a stored attempt again. Live in `Track_Field` the autopilot flew the sample exercise
 "take off, hover at 2 m, land": **99.4 of 100, three stars**, one journal row, a 44 KB recording. This is the plan's
 "reference flight must score 90 or more", flown for real instead of made up from numbers.
+
+**FAI rules read (21 November, evening).** The owner saved the PDF; all F9A values are in
+`Docs/reference/fai/f9a_values.md` with paragraph numbers, and the nine differences from the table in §6 are listed
+there (decision D23). The one that touches a design already built: assisted modes must be switched off for drone balls.
 
