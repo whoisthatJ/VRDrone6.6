@@ -3356,6 +3356,170 @@ MonoBehaviour:
     m_Localized: 'The second circle turns the other way: slow down in the middle box before you change direction.'
     m_Metadata:
       m_Items: []
+  - m_Id: 6778737641914368
+    m_Localized: 'Look straight into the bucket: the camera must be in front of its mouth, not to one side.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6778737700634624
+    m_Localized: Page Up and Page Down tilt the camera, Z and X zoom, P takes a photo.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6778737700634625
+    m_Localized: Photograph the low bucket from straight in front
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6778737700634626
+    m_Localized: Climb and photograph the high bucket
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6778737700634627
+    m_Localized: Fly over the bucket on the ground, tilt the camera straight down and photograph it
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6778737700634628
+    m_Localized: 'Position: three buckets'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6778737700634629
+    m_Localized: 'Three buckets: one low, one high, one on the ground with its mouth up. Put the drone where the camera looks straight into each one and take a photo. Page Up and Page Down tilt the camera, Z and X zoom, P takes a photo.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6778737700634630
+    m_Localized: Photos taken
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6778737700634631
+    m_Localized: 'Line the camera up first, then take one photo: a photo that misses the bucket is wasted.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6778737700634632
+    m_Localized: Photograph bucket 1 from straight in front
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6778737700634633
+    m_Localized: Photograph bucket 2 from straight in front
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6778737700634634
+    m_Localized: Photograph bucket 3 from straight in front
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6778737700634635
+    m_Localized: Photograph bucket 4 from straight in front
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6778737700634636
+    m_Localized: 'Traverse: four buckets in a row'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6778737700634637
+    m_Localized: Four buckets stand in a row, all at 2 m. Slide sideways along the row, level and at the same distance, and photograph each one from straight in front. Do not turn the drone.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6778737700634638
+    m_Localized: Photograph the bucket facing you
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6778737700634639
+    m_Localized: Go on round the stand and photograph the next bucket
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6778737700634640
+    m_Localized: 'Orbit: four sides of a stand'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6778737700634641
+    m_Localized: A stand carries four buckets, one facing each way. Circle it clockwise, 5 m out, with the camera on the stand, and photograph each bucket as you come in front of it.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6778737700634642
+    m_Localized: Keeping the distance from the stand
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6778737700634643
+    m_Localized: If the circle grows, push a little towards the stand; if it shrinks, pull away.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6778737700634644
+    m_Localized: Camera on the stand
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6778737700634645
+    m_Localized: Photograph the bucket at 2 m
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6778737700634646
+    m_Localized: Photograph the bucket at 4 m
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6778737700634647
+    m_Localized: Photograph the bucket at 6 m
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6778737700634648
+    m_Localized: Come down the other side and photograph the last bucket, at 4 m
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6778737700634649
+    m_Localized: 'Spiral: up and down a tower'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6778737700634650
+    m_Localized: The buckets are on a tower, at 2 m, 4 m, 6 m and 4 m, each facing a different way. Climb round the tower to the top and come down the other side, photographing each bucket from in front.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6778737700634651
+    m_Localized: Camera on the tower
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6778737700634652
+    m_Localized: 'Climb and turn at the same time, a little of each: the tower should stay in the middle of the picture.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6778737700634653
+    m_Localized: Fly over bucket 1, look straight down and photograph it
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6778737700634654
+    m_Localized: Fly over bucket 2, look straight down and photograph it
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6778737700634655
+    m_Localized: Fly over bucket 3, look straight down and photograph it
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6778737700634656
+    m_Localized: 'Recon: look into three buckets'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6778737700634657
+    m_Localized: Three buckets lie on the ground with their mouths up. Fly over each at 3 m or more, tilt the camera straight down, bring the bucket to the middle of the picture and photograph it. Zoom in if you need to.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6778737700634658
+    m_Localized: Fly out to the far box and hold it for 3 seconds
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6778737700634659
+    m_Localized: 'The battery is low: fly straight back and stop over the pad'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6778737700634660
+    m_Localized: 'A motor is weak: land now, gently, on the pad'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6778737700634661
+    m_Localized: Emergency drills
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6778737700634662
+    m_Localized: 'Things go wrong on this flight. When you reach the far box the battery drops: come straight home. Over the pad a motor weakens: land at once and gently. Read the top of the screen and do not hurry more than you must.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6778737700634663
+    m_Localized: 'With a weak motor the drone sinks faster: add throttle earlier than usual.'
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

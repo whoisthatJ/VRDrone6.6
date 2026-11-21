@@ -422,6 +422,177 @@ EXERCISES.append({
 })
 
 
+# ================================================================ Block C: camera-drone proficiency
+# Modelled on the open-lane tests for small drones: the camera must look straight into each bucket. Flown through the
+# drone's own stabilised camera.
+CAM = dict(CAMERA, view='fpv')
+
+
+def bucket(id, x, y, z, heading=180, tilt=0):
+    return {'type': 'target', 'id': id, 'x': x, 'y': y, 'z': z, 'size': 0.4, 'heading': heading, 'tilt': tilt}
+
+
+def shot(x, y, z, heading=180, tilt=0, **more):
+    return dict({'x': x, 'y': y, 'z': z, 'heading': heading, 'tilt': tilt}, **more)
+
+
+def photos_line(weight, needed):
+    return {'id': 'photos', 'metric': 'event_count', 'label': t('Photos taken', 'Түсірілген фотолар', 'Сделано снимков'),
+            'tip': t('Line the camera up first, then take one photo: a photo that misses the bucket is wasted.', 'Алдымен камераны дәлдеңіз, содан кейін бір фото түсіріңіз: шелекке түспеген фото босқа кетеді.',
+                     'Сначала наведите камеру, потом сделайте один снимок: снимок мимо ведра потрачен зря.'),
+            'weight': weight, 'best': needed, 'worst': needed * 3, 'params': {'type': 'photo'}}
+
+
+AIM = t('Look straight into the bucket: the camera must be in front of its mouth, not to one side.', 'Шелектің ішіне тура қараңыз: камера оның аузының жанында емес, дәл алдында болуы керек.',
+        'Смотрите прямо в ведро: камера должна быть напротив его горловины, а не сбоку.')
+KEYS = t('Page Up and Page Down tilt the camera, Z and X zoom, P takes a photo.', 'Page Up және Page Down камераны еңкейтеді, Z және X үлкейтеді, P фото түсіреді.',
+         'Page Up и Page Down наклоняют камеру, Z и X меняют приближение, P делает снимок.')
+
+# ---------------------------------------------------------------- C13
+steps = [
+    {'say': t('Photograph the low bucket from straight in front', 'Төменгі шелекті дәл алдынан суретке түсіріңіз', 'Сфотографируйте нижнее ведро точно спереди'), 'photo': shot(0, 1, 10)},
+    {'say': t('Climb and photograph the high bucket', 'Көтеріліп, жоғарғы шелекті суретке түсіріңіз', 'Поднимитесь и сфотографируйте верхнее ведро'), 'photo': shot(0, 3, 10)},
+    {'say': t('Fly over the bucket on the ground, tilt the camera straight down and photograph it', 'Жердегі шелектің үстіне ұшып, камераны тік төмен еңкейтіп, суретке түсіріңіз', 'Зависните над ведром на земле, наклоните камеру строго вниз и сфотографируйте его'),
+     'photo': shot(0, 0.3, 5, 0, 90)},
+    LAND_HOME,
+]
+EXERCISES.append({
+    'format': 1, 'id': 'c13-position', 'type': 'exercise',
+    'title': t('Position: three buckets', 'Орналасу: үш шелек', 'Позиция: три ведра'),
+    'briefing': t('Three buckets: one low, one high, one on the ground with its mouth up. Put the drone where the camera looks straight into each one and take a photo. ' + KEYS,
+                  'Үш шелек: бірі төмен, бірі жоғары, бірі жерде аузы жоғары қарап жатыр. Камера әрқайсысының ішіне тура қарайтындай дронды орналастырып, фото түсіріңіз. ' + TEXTS[KEYS][0],
+                  'Три ведра: одно низко, одно высоко, одно лежит на земле горловиной вверх. Поставьте дрон так, чтобы камера смотрела прямо в каждое, и сделайте снимок. ' + TEXTS[KEYS][1]),
+    'pass': 60, 'time_limit': 240,
+    'setup': dict(CAM, objects=[PAD, bucket('low', 0, 1, 10), bucket('high', 0, 3, 10), bucket('ground', 0, 0.3, 5, 0, 90)]),
+    'rubric': [dict(steps_line(steps, 60), tip=AIM), photos_line(10, 3), landing_line(15), time_line(15, 70, 200)],
+    'reference': [{'takeoff': 1, 'wait': 4}, {'goto': [0, 1, 5], 'heading': 0, 'wait': 6}, {'gimbal': 0, 'photo': True, 'until_step': 1},
+                  {'goto': [0, 3, 5], 'heading': 0, 'wait': 6}, {'photo': True, 'until_step': 2},
+                  {'goto': [0, 4.5, 4.9], 'heading': 0, 'wait': 6}, {'gimbal': -90, 'wait': 1.5}, {'photo': True, 'until_step': 3},
+                  {'gimbal': 0, 'wait': 0.5}, {'goto': [0, 2, 0], 'heading': 0, 'wait': 7}, {'land': True, 'until_landed': True}],
+})
+
+# ---------------------------------------------------------------- C14
+row = [-6, -2, 2, 6]
+steps = [{'say': t('Photograph bucket %d from straight in front' % (i + 1), '%d-шелекті дәл алдынан суретке түсіріңіз' % (i + 1), 'Сфотографируйте ведро %d точно спереди' % (i + 1)), 'photo': shot(x, 2, 10)}
+         for i, x in enumerate(row)] + [LAND_HOME]
+ref = [{'takeoff': 2, 'wait': 4}]
+for i, x in enumerate(row):
+    ref += [{'goto': [x, 2, 5], 'heading': 0, 'wait': 7}, {'gimbal': 0, 'photo': True, 'until_step': i + 1}]
+ref += [{'goto': [0, 2, 0], 'heading': 0, 'wait': 9}, {'land': True, 'until_landed': True}]
+EXERCISES.append({
+    'format': 1, 'id': 'c14-traverse', 'type': 'exercise',
+    'title': t('Traverse: four buckets in a row', 'Траверс: қатардағы төрт шелек', 'Траверс: четыре ведра в ряд'),
+    'briefing': t('Four buckets stand in a row, all at 2 m. Slide sideways along the row, level and at the same distance, and photograph each one from straight in front. Do not turn the drone.',
+                  'Төрт шелек бір қатарда, барлығы 2 м биіктікте тұр. Қатар бойымен бір деңгейде әрі бірдей қашықтықта бүйірлеп жылжып, әрқайсысын дәл алдынан суретке түсіріңіз. Дронды бұрмаңыз.',
+                  'Четыре ведра стоят в ряд, все на высоте 2 м. Смещайтесь вбок вдоль ряда, на одной высоте и на одном расстоянии, и снимайте каждое точно спереди. Дрон не поворачивайте.'),
+    'pass': 60, 'time_limit': 240,
+    'setup': dict(CAM, objects=[PAD] + [bucket('b%d' % (i + 1), x, 2, 10) for i, x in enumerate(row)]),
+    'rubric': [dict(steps_line(steps, 50), tip=AIM), height_line(15, 2, 0.2, 1.0, **{'from': 6}), photos_line(10, 4), landing_line(10), time_line(15, 80, 220)],
+    'reference': ref,
+})
+
+# ---------------------------------------------------------------- C15
+hub = {'x': 0, 'z': 12, 'near': 2.5, 'far': 7.5}
+sides = [(0, 11.6, 180, 0, 7, 0), (-0.4, 12, 270, -5, 12, 90), (0, 12.4, 0, 0, 17, 180), (0.4, 12, 90, 5, 12, 270)]  # bucket x, z, facing; drone x, z, heading
+steps = [{'say': t('Photograph the bucket facing you', 'Сізге қараған шелекті суретке түсіріңіз', 'Сфотографируйте ведро, обращённое к вам') if i == 0 else
+                 t('Go on round the stand and photograph the next bucket', 'Тіректі айнала жалғастырып, келесі шелекті суретке түсіріңіз', 'Продолжайте облёт стойки и сфотографируйте следующее ведро'),
+          'photo': shot(bx, 2, bz, facing)} for i, (bx, bz, facing, _, _, _) in enumerate(sides)] + [LAND_HOME]
+ref = [{'takeoff': 2, 'wait': 4}, {'goto': [0, 2, 7], 'heading': 0, 'wait': 7}, {'gimbal': 0, 'photo': True, 'until_step': 1}]
+for i, (_, _, _, dx, dz, heading) in enumerate(sides[1:]):
+    ref += [{'orbit': [0, 12], 'radius': 5, 'speed': 2, 'wait': 4.2}, {'goto': [dx, 2, dz], 'heading': heading, 'wait': 5}, {'photo': True, 'until_step': i + 2}]
+ref += [{'orbit': [0, 12], 'radius': 5, 'speed': 2, 'wait': 4.2}, {'goto': [0, 2, 7], 'heading': 0, 'wait': 4}, {'goto': [0, 2, 0], 'heading': 0, 'wait': 8}, {'land': True, 'until_landed': True}]
+EXERCISES.append({
+    'format': 1, 'id': 'c15-orbit', 'type': 'exercise',
+    'title': t('Orbit: four sides of a stand', 'Орбита: тіректің төрт жағы', 'Орбита: четыре стороны стойки'),
+    'briefing': t('A stand carries four buckets, one facing each way. Circle it clockwise, 5 m out, with the camera on the stand, and photograph each bucket as you come in front of it.',
+                  'Тіректе төрт шелек бар, әрқайсысы бір жаққа қарап тұр. Камераны тірекке қаратып, оны 5 м қашықтықта сағат тілі бағытымен айналыңыз да, әр шелектің алдына келгенде суретке түсіріңіз.',
+                  'На стойке четыре ведра, по одному на каждую сторону. Облетайте её по часовой стрелке в 5 м, держа камеру на стойке, и снимайте каждое ведро, когда окажетесь напротив.'),
+    'pass': 60, 'time_limit': 300,
+    'setup': dict(CAM, objects=[PAD, pole('stand', 0, 12, 1.8)] + [bucket('s%d' % (i + 1), bx, 2, bz, facing) for i, (bx, bz, facing, _, _, _) in enumerate(sides)]),
+    'rubric': [dict(steps_line(steps, 45), tip=AIM),
+               {'id': 'radius', 'metric': 'radius_error', 'label': t('Keeping the distance from the stand', 'Тіректен қашықтықты сақтау', 'Удержание расстояния до стойки'),
+                'tip': t('If the circle grows, push a little towards the stand; if it shrinks, pull away.', 'Шеңбер үлкейсе, тірекке сәл жақындаңыз; кішірейсе, алыстаңыз.', 'Если круг растёт, чуть подайте дрон к стойке; если сжимается, отойдите.'),
+                'weight': 15, 'best': 0.4, 'worst': 2, 'params': dict(hub, radius=5)},
+               {'id': 'aim', 'metric': 'aim_error', 'label': t('Camera on the stand', 'Камера тірекке қараған', 'Камера на стойке'),
+                'tip': t('Turn with the left stick at the same pace as you slide with the right one.', 'Оң стикпен жылжыған қарқынмен сол стикпен бұрылыңыз.', 'Поворачивайте левым стиком в том же темпе, в каком смещаетесь правым.'),
+                'weight': 15, 'best': 8, 'worst': 40, 'params': hub},
+               height_line(10, 2, 0.2, 1.0, **{'from': 6}), landing_line(15)],
+    'reference': ref,
+})
+
+# ---------------------------------------------------------------- C16
+tower = [(0, 2, 11.6, 180, 0, 7, 0), (-0.4, 4, 12, 270, -5, 12, 90), (0, 6, 12.4, 0, 0, 17, 180), (0.4, 4, 12, 90, 5, 12, 270)]  # bucket x, y, z, facing; drone x, z, heading
+steps = [{'say': t('Photograph the bucket at %d m' % by, '%d м биіктіктегі шелекті суретке түсіріңіз' % by, 'Сфотографируйте ведро на высоте %d м' % by), 'photo': shot(bx, by, bz, facing)}
+         for (bx, by, bz, facing, _, _, _) in tower[:3]]
+steps.append({'say': t('Come down the other side and photograph the last bucket, at 4 m', 'Екінші жағынан төмендеп, 4 м биіктіктегі соңғы шелекті суретке түсіріңіз', 'Снизьтесь с другой стороны и сфотографируйте последнее ведро на 4 м'),
+              'photo': shot(*tower[3][:4])})
+steps.append(LAND_HOME)
+ref = [{'takeoff': 2, 'wait': 4}]
+for i, (_, by, _, _, dx, dz, heading) in enumerate(tower):
+    ref += [{'goto': [dx, by, dz], 'heading': heading, 'wait': 9}, {'gimbal': 0, 'photo': True, 'until_step': i + 1}]
+ref += [{'goto': [0, 2, 7], 'heading': 0, 'wait': 9}, {'goto': [0, 2, 0], 'heading': 0, 'wait': 8}, {'land': True, 'until_landed': True}]
+EXERCISES.append({
+    'format': 1, 'id': 'c16-spiral', 'type': 'exercise',
+    'title': t('Spiral: up and down a tower', 'Спираль: мұнара бойымен жоғары-төмен', 'Спираль: вверх и вниз вокруг вышки'),
+    'briefing': t('The buckets are on a tower, at 2 m, 4 m, 6 m and 4 m, each facing a different way. Climb round the tower to the top and come down the other side, photographing each bucket from in front.',
+                  'Шелектер мұнарада 2 м, 4 м, 6 м және 4 м биіктікте тұр, әрқайсысы әр жаққа қараған. Мұнараны айнала ұшар басына дейін көтеріліп, екінші жағынан төмендеңіз де, әр шелекті алдынан суретке түсіріңіз.',
+                  'Вёдра закреплены на вышке на высоте 2 м, 4 м, 6 м и 4 м, каждое смотрит в свою сторону. Поднимитесь вокруг вышки до верха и спуститесь с другой стороны, снимая каждое ведро спереди.'),
+    'pass': 60, 'time_limit': 300,
+    'setup': dict(CAM, objects=[PAD, pole('tower', 0, 12, 6.4)] + [bucket('t%d' % (i + 1), bx, by, bz, facing) for i, (bx, by, bz, facing, _, _, _) in enumerate(tower)]),
+    'rubric': [dict(steps_line(steps, 55), tip=AIM),
+               {'id': 'aim', 'metric': 'aim_error', 'label': t('Camera on the tower', 'Камера мұнараға қараған', 'Камера на вышке'),
+                'tip': t('Climb and turn at the same time, a little of each: the tower should stay in the middle of the picture.', 'Бір мезгілде аз-аздан көтеріліп әрі бұрылыңыз: мұнара суреттің ортасында қалуы керек.',
+                         'Набирайте высоту и поворачивайте одновременно, понемногу: вышка должна оставаться в центре кадра.'),
+                'weight': 15, 'best': 8, 'worst': 40, 'params': hub},
+               photos_line(10, 4), landing_line(10), time_line(10, 100, 260)],
+    'reference': ref,
+})
+
+# ---------------------------------------------------------------- C17
+ground = [(-6, 8), (0, 14), (6, 8)]
+steps = [{'say': t('Fly over bucket %d, look straight down and photograph it' % (i + 1), '%d-шелектің үстіне ұшып, тік төмен қарап, суретке түсіріңіз' % (i + 1), 'Зависните над ведром %d, посмотрите строго вниз и сфотографируйте его' % (i + 1)),
+          'photo': shot(x, 0.3, z, 0, 90, near=2.5, far=12, cone=12)} for i, (x, z) in enumerate(ground)] + [LAND_HOME]
+ref = [{'takeoff': 3, 'wait': 4}, {'gimbal': -90, 'wait': 0.5}]
+for i, (x, z) in enumerate(ground):
+    ref += [{'goto': [x, 5, z - 0.1], 'heading': 0, 'wait': 9}, {'photo': True, 'until_step': i + 1}]
+ref += [{'gimbal': 0, 'wait': 0.5}, {'goto': [0, 2, 0], 'heading': 0, 'wait': 10}, {'land': True, 'until_landed': True}]
+EXERCISES.append({
+    'format': 1, 'id': 'c17-recon', 'type': 'exercise',
+    'title': t('Recon: look into three buckets', 'Барлау: үш шелектің ішіне қарау', 'Разведка: заглянуть в три ведра'),
+    'briefing': t('Three buckets lie on the ground with their mouths up. Fly over each at 3 m or more, tilt the camera straight down, bring the bucket to the middle of the picture and photograph it. Zoom in if you need to.',
+                  'Үш шелек жерде аузы жоғары қарап жатыр. Әрқайсысының үстінен 3 м немесе одан биік ұшып, камераны тік төмен еңкейтіңіз, шелекті суреттің ортасына келтіріп, суретке түсіріңіз. Қажет болса, үлкейтіңіз.',
+                  'Три ведра лежат на земле горловиной вверх. Пролетите над каждым на высоте 3 м или выше, наклоните камеру строго вниз, выведите ведро в центр кадра и сделайте снимок. При необходимости приблизьте.'),
+    'pass': 60, 'time_limit': 300,
+    'setup': dict(CAM, objects=[PAD] + [bucket('g%d' % (i + 1), x, 0.3, z, 0, 90) for i, (x, z) in enumerate(ground)]),
+    'rubric': [dict(steps_line(steps, 60), tip=AIM), photos_line(10, 3), landing_line(15), time_line(15, 80, 240)],
+    'reference': ref,
+})
+
+# ---------------------------------------------------------------- C18
+steps = [
+    {'say': t('Fly out to the far box and hold it for 3 seconds', 'Алыс қорапқа ұшып, оны 3 секунд ұстаңыз', 'Летите к дальнему кубу и удерживайте его 3 секунды'), 'zone': zone(0, 3, 20), 'for': 3},
+    {'say': t('The battery is low: fly straight back and stop over the pad', 'Батарея таусылып барады: тура кері ұшып, алаңша үстінде тоқтаңыз', 'Батарея садится: летите прямо назад и остановитесь над площадкой'), 'zone': zone(0, 3, 0, 1.5), 'for': 2},
+    {'say': t('A motor is weak: land now, gently, on the pad', 'Бір қозғалтқыш әлсіреді: қазір алаңшаға жайлап қоныңыз', 'Один мотор ослаб: садитесь сейчас, мягко, на площадку'), 'landed': True, 'pad': {'x': 0, 'z': 0, 'radius': 1.5}},
+]
+EXERCISES.append({
+    'format': 1, 'id': 'c18-emergency', 'type': 'exercise',
+    'title': t('Emergency drills', 'Төтенше жағдай жаттығулары', 'Аварийные ситуации'),
+    'briefing': t('Things go wrong on this flight. When you reach the far box the battery drops: come straight home. Over the pad a motor weakens: land at once and gently. Read the top of the screen and do not hurry more than you must.',
+                  'Бұл ұшуда ақаулар болады. Алыс қорапқа жеткенде батарея күрт азаяды: бірден кері қайтыңыз. Алаңша үстінде бір қозғалтқыш әлсірейді: дереу әрі жайлап қоныңыз. Экранның жоғарғы жағын оқып, қажеттен артық асықпаңыз.',
+                  'В этом полёте случаются отказы. Когда долетите до дальнего куба, просядет батарея: сразу возвращайтесь. Над площадкой ослабнет мотор: садитесь немедленно и мягко. Читайте подсказку вверху экрана и не спешите больше, чем нужно.'),
+    'pass': 60, 'time_limit': 240,
+    'setup': dict(CAMERA, objects=[PAD, box('far', 0, 3, 20), box('over', 0, 3, 0, 3, 1)],
+                  timeline=[{'after_step': 1, 'name': 'battery_drop', 'value': 0.72}, {'after_step': 2, 'name': 'motor2', 'value': 0.3}]),
+    'rubric': [steps_line(steps, 50), dict(landing_line(20), worst=2.0),
+               {'id': 'touch', 'metric': 'touchdown_speed', 'label': t('A soft landing', 'Жұмсақ қону', 'Мягкая посадка'),
+                'tip': t('With a weak motor the drone sinks faster: add throttle earlier than usual.', 'Қозғалтқыш әлсіз болғанда дрон тезірек төмендейді: газды әдеттегіден ертерек қосыңыз.', 'Со слабым мотором дрон снижается быстрее: добавляйте газ раньше обычного.'),
+                'weight': 15, 'best': 0.6, 'worst': 2.5},
+               time_line(15, 70, 200)],
+    'reference': [{'takeoff': 3, 'wait': 5}, {'goto': [0, 3, 20], 'heading': 0, 'until_step': 1}, {'goto': [0, 3, 0], 'heading': 0, 'until_step': 2},
+                  {'land': True, 'until_landed': True}],
+})
+
+
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
     for e in EXERCISES:

@@ -1,0 +1,273 @@
+{
+  "format": 1,
+  "id": "c16-spiral",
+  "type": "exercise",
+  "title": "Spiral: up and down a tower",
+  "briefing": "The buckets are on a tower, at 2 m, 4 m, 6 m and 4 m, each facing a different way. Climb round the tower to the top and come down the other side, photographing each bucket from in front.",
+  "pass": 60,
+  "time_limit": 300,
+  "setup": {
+    "place": "field",
+    "drone": "edu-camera900",
+    "assist": "position",
+    "view": "fpv",
+    "objects": [
+      {
+        "type": "pad",
+        "id": "home",
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "size": 1.5
+      },
+      {
+        "type": "pole",
+        "id": "tower",
+        "x": 0,
+        "y": 0,
+        "z": 12,
+        "size": 0.25,
+        "height": 6.4
+      },
+      {
+        "type": "target",
+        "id": "t1",
+        "x": 0,
+        "y": 2,
+        "z": 11.6,
+        "size": 0.4,
+        "heading": 180,
+        "tilt": 0
+      },
+      {
+        "type": "target",
+        "id": "t2",
+        "x": -0.4,
+        "y": 4,
+        "z": 12,
+        "size": 0.4,
+        "heading": 270,
+        "tilt": 0
+      },
+      {
+        "type": "target",
+        "id": "t3",
+        "x": 0,
+        "y": 6,
+        "z": 12.4,
+        "size": 0.4,
+        "heading": 0,
+        "tilt": 0
+      },
+      {
+        "type": "target",
+        "id": "t4",
+        "x": 0.4,
+        "y": 4,
+        "z": 12,
+        "size": 0.4,
+        "heading": 90,
+        "tilt": 0
+      }
+    ]
+  },
+  "rubric": [
+    {
+      "id": "steps",
+      "metric": "steps_done",
+      "label": "Steps done",
+      "tip": "Look straight into the bucket: the camera must be in front of its mouth, not to one side.",
+      "weight": 55,
+      "best": 5,
+      "worst": 2,
+      "required": true,
+      "params": {
+        "steps": [
+          {
+            "say": "Photograph the bucket at 2 m",
+            "photo": {
+              "x": 0,
+              "y": 2,
+              "z": 11.6,
+              "heading": 180,
+              "tilt": 0
+            }
+          },
+          {
+            "say": "Photograph the bucket at 4 m",
+            "photo": {
+              "x": -0.4,
+              "y": 4,
+              "z": 12,
+              "heading": 270,
+              "tilt": 0
+            }
+          },
+          {
+            "say": "Photograph the bucket at 6 m",
+            "photo": {
+              "x": 0,
+              "y": 6,
+              "z": 12.4,
+              "heading": 0,
+              "tilt": 0
+            }
+          },
+          {
+            "say": "Come down the other side and photograph the last bucket, at 4 m",
+            "photo": {
+              "x": 0.4,
+              "y": 4,
+              "z": 12,
+              "heading": 90,
+              "tilt": 0
+            }
+          },
+          {
+            "say": "Fly back, land on the pad and switch the motors off",
+            "landed": true,
+            "pad": {
+              "x": 0,
+              "z": 0,
+              "radius": 0.75
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "aim",
+      "metric": "aim_error",
+      "label": "Camera on the tower",
+      "tip": "Climb and turn at the same time, a little of each: the tower should stay in the middle of the picture.",
+      "weight": 15,
+      "best": 8,
+      "worst": 40,
+      "params": {
+        "x": 0,
+        "z": 12,
+        "near": 2.5,
+        "far": 7.5
+      }
+    },
+    {
+      "id": "photos",
+      "metric": "event_count",
+      "label": "Photos taken",
+      "tip": "Line the camera up first, then take one photo: a photo that misses the bucket is wasted.",
+      "weight": 10,
+      "best": 4,
+      "worst": 12,
+      "params": {
+        "type": "photo"
+      }
+    },
+    {
+      "id": "landing",
+      "metric": "landing_distance",
+      "label": "Landing on the pad",
+      "tip": "Stop above the pad first, then come straight down.",
+      "weight": 10,
+      "best": 0.25,
+      "worst": 1.5,
+      "required": true,
+      "params": {
+        "x": 0,
+        "z": 0
+      }
+    },
+    {
+      "id": "time",
+      "metric": "duration",
+      "label": "Time taken",
+      "tip": "You have the moves; now do them without long pauses.",
+      "weight": 10,
+      "best": 100,
+      "worst": 260
+    }
+  ],
+  "reference": [
+    {
+      "takeoff": 2,
+      "wait": 4
+    },
+    {
+      "goto": [
+        0,
+        2,
+        7
+      ],
+      "heading": 0,
+      "wait": 9
+    },
+    {
+      "gimbal": 0,
+      "photo": true,
+      "until_step": 1
+    },
+    {
+      "goto": [
+        -5,
+        4,
+        12
+      ],
+      "heading": 90,
+      "wait": 9
+    },
+    {
+      "gimbal": 0,
+      "photo": true,
+      "until_step": 2
+    },
+    {
+      "goto": [
+        0,
+        6,
+        17
+      ],
+      "heading": 180,
+      "wait": 9
+    },
+    {
+      "gimbal": 0,
+      "photo": true,
+      "until_step": 3
+    },
+    {
+      "goto": [
+        5,
+        4,
+        12
+      ],
+      "heading": 270,
+      "wait": 9
+    },
+    {
+      "gimbal": 0,
+      "photo": true,
+      "until_step": 4
+    },
+    {
+      "goto": [
+        0,
+        2,
+        7
+      ],
+      "heading": 0,
+      "wait": 9
+    },
+    {
+      "goto": [
+        0,
+        2,
+        0
+      ],
+      "heading": 0,
+      "wait": 8
+    },
+    {
+      "land": true,
+      "until_landed": true
+    }
+  ]
+}

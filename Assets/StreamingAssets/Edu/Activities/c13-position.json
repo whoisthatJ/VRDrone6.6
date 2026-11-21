@@ -1,0 +1,212 @@
+{
+  "format": 1,
+  "id": "c13-position",
+  "type": "exercise",
+  "title": "Position: three buckets",
+  "briefing": "Three buckets: one low, one high, one on the ground with its mouth up. Put the drone where the camera looks straight into each one and take a photo. Page Up and Page Down tilt the camera, Z and X zoom, P takes a photo.",
+  "pass": 60,
+  "time_limit": 240,
+  "setup": {
+    "place": "field",
+    "drone": "edu-camera900",
+    "assist": "position",
+    "view": "fpv",
+    "objects": [
+      {
+        "type": "pad",
+        "id": "home",
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "size": 1.5
+      },
+      {
+        "type": "target",
+        "id": "low",
+        "x": 0,
+        "y": 1,
+        "z": 10,
+        "size": 0.4,
+        "heading": 180,
+        "tilt": 0
+      },
+      {
+        "type": "target",
+        "id": "high",
+        "x": 0,
+        "y": 3,
+        "z": 10,
+        "size": 0.4,
+        "heading": 180,
+        "tilt": 0
+      },
+      {
+        "type": "target",
+        "id": "ground",
+        "x": 0,
+        "y": 0.3,
+        "z": 5,
+        "size": 0.4,
+        "heading": 0,
+        "tilt": 90
+      }
+    ]
+  },
+  "rubric": [
+    {
+      "id": "steps",
+      "metric": "steps_done",
+      "label": "Steps done",
+      "tip": "Look straight into the bucket: the camera must be in front of its mouth, not to one side.",
+      "weight": 60,
+      "best": 4,
+      "worst": 2,
+      "required": true,
+      "params": {
+        "steps": [
+          {
+            "say": "Photograph the low bucket from straight in front",
+            "photo": {
+              "x": 0,
+              "y": 1,
+              "z": 10,
+              "heading": 180,
+              "tilt": 0
+            }
+          },
+          {
+            "say": "Climb and photograph the high bucket",
+            "photo": {
+              "x": 0,
+              "y": 3,
+              "z": 10,
+              "heading": 180,
+              "tilt": 0
+            }
+          },
+          {
+            "say": "Fly over the bucket on the ground, tilt the camera straight down and photograph it",
+            "photo": {
+              "x": 0,
+              "y": 0.3,
+              "z": 5,
+              "heading": 0,
+              "tilt": 90
+            }
+          },
+          {
+            "say": "Fly back, land on the pad and switch the motors off",
+            "landed": true,
+            "pad": {
+              "x": 0,
+              "z": 0,
+              "radius": 0.75
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "photos",
+      "metric": "event_count",
+      "label": "Photos taken",
+      "tip": "Line the camera up first, then take one photo: a photo that misses the bucket is wasted.",
+      "weight": 10,
+      "best": 3,
+      "worst": 9,
+      "params": {
+        "type": "photo"
+      }
+    },
+    {
+      "id": "landing",
+      "metric": "landing_distance",
+      "label": "Landing on the pad",
+      "tip": "Stop above the pad first, then come straight down.",
+      "weight": 15,
+      "best": 0.25,
+      "worst": 1.5,
+      "required": true,
+      "params": {
+        "x": 0,
+        "z": 0
+      }
+    },
+    {
+      "id": "time",
+      "metric": "duration",
+      "label": "Time taken",
+      "tip": "You have the moves; now do them without long pauses.",
+      "weight": 15,
+      "best": 70,
+      "worst": 200
+    }
+  ],
+  "reference": [
+    {
+      "takeoff": 1,
+      "wait": 4
+    },
+    {
+      "goto": [
+        0,
+        1,
+        5
+      ],
+      "heading": 0,
+      "wait": 6
+    },
+    {
+      "gimbal": 0,
+      "photo": true,
+      "until_step": 1
+    },
+    {
+      "goto": [
+        0,
+        3,
+        5
+      ],
+      "heading": 0,
+      "wait": 6
+    },
+    {
+      "photo": true,
+      "until_step": 2
+    },
+    {
+      "goto": [
+        0,
+        4.5,
+        4.9
+      ],
+      "heading": 0,
+      "wait": 6
+    },
+    {
+      "gimbal": -90,
+      "wait": 1.5
+    },
+    {
+      "photo": true,
+      "until_step": 3
+    },
+    {
+      "gimbal": 0,
+      "wait": 0.5
+    },
+    {
+      "goto": [
+        0,
+        2,
+        0
+      ],
+      "heading": 0,
+      "wait": 7
+    },
+    {
+      "land": true,
+      "until_landed": true
+    }
+  ]
+}

@@ -1,0 +1,314 @@
+{
+  "format": 1,
+  "id": "c15-orbit",
+  "type": "exercise",
+  "title": "Orbit: four sides of a stand",
+  "briefing": "A stand carries four buckets, one facing each way. Circle it clockwise, 5 m out, with the camera on the stand, and photograph each bucket as you come in front of it.",
+  "pass": 60,
+  "time_limit": 300,
+  "setup": {
+    "place": "field",
+    "drone": "edu-camera900",
+    "assist": "position",
+    "view": "fpv",
+    "objects": [
+      {
+        "type": "pad",
+        "id": "home",
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "size": 1.5
+      },
+      {
+        "type": "pole",
+        "id": "stand",
+        "x": 0,
+        "y": 0,
+        "z": 12,
+        "size": 0.25,
+        "height": 1.8
+      },
+      {
+        "type": "target",
+        "id": "s1",
+        "x": 0,
+        "y": 2,
+        "z": 11.6,
+        "size": 0.4,
+        "heading": 180,
+        "tilt": 0
+      },
+      {
+        "type": "target",
+        "id": "s2",
+        "x": -0.4,
+        "y": 2,
+        "z": 12,
+        "size": 0.4,
+        "heading": 270,
+        "tilt": 0
+      },
+      {
+        "type": "target",
+        "id": "s3",
+        "x": 0,
+        "y": 2,
+        "z": 12.4,
+        "size": 0.4,
+        "heading": 0,
+        "tilt": 0
+      },
+      {
+        "type": "target",
+        "id": "s4",
+        "x": 0.4,
+        "y": 2,
+        "z": 12,
+        "size": 0.4,
+        "heading": 90,
+        "tilt": 0
+      }
+    ]
+  },
+  "rubric": [
+    {
+      "id": "steps",
+      "metric": "steps_done",
+      "label": "Steps done",
+      "tip": "Look straight into the bucket: the camera must be in front of its mouth, not to one side.",
+      "weight": 45,
+      "best": 5,
+      "worst": 2,
+      "required": true,
+      "params": {
+        "steps": [
+          {
+            "say": "Photograph the bucket facing you",
+            "photo": {
+              "x": 0,
+              "y": 2,
+              "z": 11.6,
+              "heading": 180,
+              "tilt": 0
+            }
+          },
+          {
+            "say": "Go on round the stand and photograph the next bucket",
+            "photo": {
+              "x": -0.4,
+              "y": 2,
+              "z": 12,
+              "heading": 270,
+              "tilt": 0
+            }
+          },
+          {
+            "say": "Go on round the stand and photograph the next bucket",
+            "photo": {
+              "x": 0,
+              "y": 2,
+              "z": 12.4,
+              "heading": 0,
+              "tilt": 0
+            }
+          },
+          {
+            "say": "Go on round the stand and photograph the next bucket",
+            "photo": {
+              "x": 0.4,
+              "y": 2,
+              "z": 12,
+              "heading": 90,
+              "tilt": 0
+            }
+          },
+          {
+            "say": "Fly back, land on the pad and switch the motors off",
+            "landed": true,
+            "pad": {
+              "x": 0,
+              "z": 0,
+              "radius": 0.75
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "radius",
+      "metric": "radius_error",
+      "label": "Keeping the distance from the stand",
+      "tip": "If the circle grows, push a little towards the stand; if it shrinks, pull away.",
+      "weight": 15,
+      "best": 0.4,
+      "worst": 2,
+      "params": {
+        "x": 0,
+        "z": 12,
+        "near": 2.5,
+        "far": 7.5,
+        "radius": 5
+      }
+    },
+    {
+      "id": "aim",
+      "metric": "aim_error",
+      "label": "Camera on the stand",
+      "tip": "Turn with the left stick at the same pace as you slide with the right one.",
+      "weight": 15,
+      "best": 8,
+      "worst": 40,
+      "params": {
+        "x": 0,
+        "z": 12,
+        "near": 2.5,
+        "far": 7.5
+      }
+    },
+    {
+      "id": "height",
+      "metric": "height_error",
+      "label": "Keeping the height",
+      "tip": "Watch the height while you hover: small, slow moves of the left stick.",
+      "weight": 10,
+      "best": 0.2,
+      "worst": 1.0,
+      "params": {
+        "y": 2,
+        "from": 6
+      }
+    },
+    {
+      "id": "landing",
+      "metric": "landing_distance",
+      "label": "Landing on the pad",
+      "tip": "Stop above the pad first, then come straight down.",
+      "weight": 15,
+      "best": 0.25,
+      "worst": 1.5,
+      "required": true,
+      "params": {
+        "x": 0,
+        "z": 0
+      }
+    }
+  ],
+  "reference": [
+    {
+      "takeoff": 2,
+      "wait": 4
+    },
+    {
+      "goto": [
+        0,
+        2,
+        7
+      ],
+      "heading": 0,
+      "wait": 7
+    },
+    {
+      "gimbal": 0,
+      "photo": true,
+      "until_step": 1
+    },
+    {
+      "orbit": [
+        0,
+        12
+      ],
+      "radius": 5,
+      "speed": 2,
+      "wait": 4.2
+    },
+    {
+      "goto": [
+        -5,
+        2,
+        12
+      ],
+      "heading": 90,
+      "wait": 5
+    },
+    {
+      "photo": true,
+      "until_step": 2
+    },
+    {
+      "orbit": [
+        0,
+        12
+      ],
+      "radius": 5,
+      "speed": 2,
+      "wait": 4.2
+    },
+    {
+      "goto": [
+        0,
+        2,
+        17
+      ],
+      "heading": 180,
+      "wait": 5
+    },
+    {
+      "photo": true,
+      "until_step": 3
+    },
+    {
+      "orbit": [
+        0,
+        12
+      ],
+      "radius": 5,
+      "speed": 2,
+      "wait": 4.2
+    },
+    {
+      "goto": [
+        5,
+        2,
+        12
+      ],
+      "heading": 270,
+      "wait": 5
+    },
+    {
+      "photo": true,
+      "until_step": 4
+    },
+    {
+      "orbit": [
+        0,
+        12
+      ],
+      "radius": 5,
+      "speed": 2,
+      "wait": 4.2
+    },
+    {
+      "goto": [
+        0,
+        2,
+        7
+      ],
+      "heading": 0,
+      "wait": 4
+    },
+    {
+      "goto": [
+        0,
+        2,
+        0
+      ],
+      "heading": 0,
+      "wait": 8
+    },
+    {
+      "land": true,
+      "until_landed": true
+    }
+  ]
+}

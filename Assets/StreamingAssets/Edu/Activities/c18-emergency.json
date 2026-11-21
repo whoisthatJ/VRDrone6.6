@@ -1,0 +1,162 @@
+{
+  "format": 1,
+  "id": "c18-emergency",
+  "type": "exercise",
+  "title": "Emergency drills",
+  "briefing": "Things go wrong on this flight. When you reach the far box the battery drops: come straight home. Over the pad a motor weakens: land at once and gently. Read the top of the screen and do not hurry more than you must.",
+  "pass": 60,
+  "time_limit": 240,
+  "setup": {
+    "place": "field",
+    "drone": "edu-camera900",
+    "assist": "position",
+    "view": "chase",
+    "objects": [
+      {
+        "type": "pad",
+        "id": "home",
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "size": 1.5
+      },
+      {
+        "type": "box",
+        "id": "far",
+        "x": 0,
+        "y": 3,
+        "z": 20,
+        "size": 2,
+        "height": 1
+      },
+      {
+        "type": "box",
+        "id": "over",
+        "x": 0,
+        "y": 3,
+        "z": 0,
+        "size": 3,
+        "height": 1
+      }
+    ],
+    "timeline": [
+      {
+        "after_step": 1,
+        "name": "battery_drop",
+        "value": 0.72
+      },
+      {
+        "after_step": 2,
+        "name": "motor2",
+        "value": 0.3
+      }
+    ]
+  },
+  "rubric": [
+    {
+      "id": "steps",
+      "metric": "steps_done",
+      "label": "Steps done",
+      "tip": "Do the steps in the order shown at the top of the screen; each one counts only when the one before it is done.",
+      "weight": 50,
+      "best": 3,
+      "worst": 1,
+      "required": true,
+      "params": {
+        "steps": [
+          {
+            "say": "Fly out to the far box and hold it for 3 seconds",
+            "zone": {
+              "x": 0,
+              "y": 3,
+              "z": 20,
+              "radius": 1,
+              "tolerance": 0.5
+            },
+            "for": 3
+          },
+          {
+            "say": "The battery is low: fly straight back and stop over the pad",
+            "zone": {
+              "x": 0,
+              "y": 3,
+              "z": 0,
+              "radius": 1.5,
+              "tolerance": 0.5
+            },
+            "for": 2
+          },
+          {
+            "say": "A motor is weak: land now, gently, on the pad",
+            "landed": true,
+            "pad": {
+              "x": 0,
+              "z": 0,
+              "radius": 1.5
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "landing",
+      "metric": "landing_distance",
+      "label": "Landing on the pad",
+      "tip": "Stop above the pad first, then come straight down.",
+      "weight": 20,
+      "best": 0.25,
+      "worst": 2.0,
+      "required": true,
+      "params": {
+        "x": 0,
+        "z": 0
+      }
+    },
+    {
+      "id": "touch",
+      "metric": "touchdown_speed",
+      "label": "A soft landing",
+      "tip": "With a weak motor the drone sinks faster: add throttle earlier than usual.",
+      "weight": 15,
+      "best": 0.6,
+      "worst": 2.5
+    },
+    {
+      "id": "time",
+      "metric": "duration",
+      "label": "Time taken",
+      "tip": "You have the moves; now do them without long pauses.",
+      "weight": 15,
+      "best": 70,
+      "worst": 200
+    }
+  ],
+  "reference": [
+    {
+      "takeoff": 3,
+      "wait": 5
+    },
+    {
+      "goto": [
+        0,
+        3,
+        20
+      ],
+      "heading": 0,
+      "until_step": 1
+    },
+    {
+      "goto": [
+        0,
+        3,
+        0
+      ],
+      "heading": 0,
+      "until_step": 2
+    },
+    {
+      "land": true,
+      "until_landed": true
+    }
+  ]
+}

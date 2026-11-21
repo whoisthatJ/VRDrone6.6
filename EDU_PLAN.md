@@ -64,6 +64,7 @@ Items marked ❓ are my defaults; the customer should confirm them (§13). Each 
 | D35 | **One step tracker guides the pilot and grades the recording** | What the screen asked for and what was scored cannot disagree; the grade still comes from the recording alone |
 | D36 | **"Steps done" is required and earns nothing below half of the steps** | A flight that did not do the exercise must not pass on its side marks (found by test: a hover passed the pirouette) |
 | D37 | **Reference flights are made by flying the exercise's own recipe** through the autopilot or the sticks | A reference of 90 or more for every exercise, re-made whenever the exercise changes |
+| D38 | **A failure or a change of weather can follow a step of a guided exercise** instead of the clock | The pilot sets the pace; the emergency comes when the drone is where the drill needs it |
 | D21 | **Names are compared and sorted in code, not in SQL.** SQLite folds case for Latin letters only and orders by character code, which made "7Б" and "7б" two groups and put every Kazakh letter after the Russian alphabet | Found by the store tests |
 
 ## 3. Shared foundations
@@ -742,4 +743,22 @@ the pad to the middle box (the reference flew into it; the poles now stand side 
 objects of the same name was refused by the file check, as it should be.
 
 **Twelve of thirty exercises exist.** Blocks C (camera targets), D and E (FPV with gates) are not started.
+
+### 22 November 2026, later still: block C of the training course
+Six exercises flown through the camera drone's own camera: three buckets (low, high, on the ground mouth up), four in
+a row, the four sides of a stand, a tower climbed in a spiral, three buckets looked into from above, and the emergency
+drills. A photo is a step done only when the camera really looks into the bucket: in front of its mouth within 15° of
+its axis, 1 to 15 m away, and aimed at it within 8°. The emergency drill's failures follow the pilot, not the clock:
+the battery drops when the far box is reached, a motor weakens when the drone is back over the pad. References: 98.8
+to 100. 465 tests pass.
+
+- **D38. A failure can follow a step** (`after_step`), with a delay if wanted. A failure by the clock would come
+  before a slow pilot was ready for it, or after a fast one had finished.
+
+**Left out of the emergency drill: loss of positioning.** With no position the autopilot cannot fly the reference
+(it drops to altitude hold and drifts, as it should), and an exercise with no reference flight is not allowed. That
+drill needs either a reference flown by a person or a way to record one; block B's "without position hold" exercise
+teaches the same handling meanwhile.
+
+**Eighteen of thirty exercises exist.** Blocks D and E (FPV: gates, flags, acro) are not started.
 

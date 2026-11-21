@@ -36,7 +36,8 @@ namespace Ushqyr.Edu
                 var holder = new GameObject(o.Type + (o.Id.Length > 0 ? " " + o.Id : "")).transform;
                 holder.SetParent(root, false);
                 holder.localPosition = new Vector3((float)o.X, (float)o.Y, (float)o.Z);
-                holder.localRotation = Quaternion.Euler(0f, (float)o.HeadingDeg, 0f);
+                // A target's mouth faces along its heading, lifted by its tilt; everything else only turns about the upright.
+                holder.localRotation = Quaternion.Euler(0f, (float)o.HeadingDeg, 0f) * Quaternion.Euler(o.Type == "target" ? -(float)o.TiltDeg : 0f, 0f, 0f);
                 float size = (float)o.Size, height = (float)o.Height;
                 switch (o.Type)
                 {
@@ -74,7 +75,8 @@ namespace Ushqyr.Edu
                     }
                     case "target":
                         // A bucket on a stand: the camera must look into its mouth, which faces along the object's heading.
-                        Shape(PrimitiveType.Cylinder, holder, new Vector3(0f, -0.5f * (float)o.Y, 0f), new Vector3(0.05f, Mathf.Max(0.05f, (float)o.Y), 0.05f), paint, Color.white, true, solidLayer);
+                        if (o.TiltDeg < 45 && o.Y > 0.3)
+                            Shape(PrimitiveType.Cylinder, holder, new Vector3(0f, -0.5f * (float)o.Y, 0f), new Vector3(0.05f, Mathf.Max(0.05f, (float)o.Y), 0.05f), paint, Color.white, true, solidLayer);
                         Shape(PrimitiveType.Cylinder, holder, Vector3.zero, new Vector3(size, size * 0.6f, size), paint, new Color(0.9f, 0.9f, 0.92f), true, solidLayer, new Vector3(90f, 0f, 0f));
                         Shape(PrimitiveType.Cylinder, holder, new Vector3(0f, 0f, size * 0.305f), new Vector3(size * 0.8f, 0.004f, size * 0.8f), paint, new Color(0.1f, 0.1f, 0.12f), false, 0, new Vector3(90f, 0f, 0f));
                         Shape(PrimitiveType.Cylinder, holder, new Vector3(0f, 0f, size * 0.31f), new Vector3(size * 0.3f, 0.004f, size * 0.3f), paint, Solid, false, 0, new Vector3(90f, 0f, 0f));

@@ -84,12 +84,19 @@ namespace Ushqyr.Edu
         public double Size = 1;
         public double Height = 1;
         public double HeadingDeg;
+        /// <summary>A target's mouth lifted above the horizon (90 = it lies on its back, mouth up).</summary>
+        public double TiltDeg;
     }
 
     /// <summary>A failure or a change of weather at a moment of the attempt.</summary>
     public sealed class TimedChange
     {
         public double T;
+        /// <summary>
+        /// 0 or more: the change comes <see cref="T"/> seconds after this many steps of a guided exercise are done,
+        /// not at a time of the clock (the pilot sets the pace, the failure follows). -1: by the clock.
+        /// </summary>
+        public int AfterStep = -1;
         /// <summary>A failure's name (<c>gps_lost</c>, <c>prop2</c> …) or a weather value (<c>wind</c>, <c>rain</c> …).</summary>
         public string Name;
         public double Value;
@@ -162,7 +169,7 @@ namespace Ushqyr.Edu
                     Type = Json.Str(o, "type", ""),
                     Id = Json.Str(o, "id", ""),
                     X = Json.Num(o, "x", 0), Y = Json.Num(o, "y", 0), Z = Json.Num(o, "z", 0),
-                    Size = Json.Num(o, "size", 1), Height = Json.Num(o, "height", 1), HeadingDeg = Json.Num(o, "heading", 0),
+                    Size = Json.Num(o, "size", 1), Height = Json.Num(o, "height", 1), HeadingDeg = Json.Num(o, "heading", 0), TiltDeg = Json.Num(o, "tilt", 0),
                 };
                 if (Array.IndexOf(ActivityObject.Types, obj.Type) < 0) throw new FormatException(where + ": object type \"" + obj.Type + "\" is not one of " + string.Join(", ", ActivityObject.Types));
                 if (obj.Size <= 0 || obj.Height <= 0 || obj.Size > 200 || obj.Height > 200) throw new FormatException(where + ": object " + obj.Type + " has a size or height outside 0 to 200 m");
@@ -180,14 +187,15 @@ namespace Ushqyr.Edu
             foreach (object item in Json.Arr(setup, "timeline") ?? new List<object>())
             {
                 var o = item as Dictionary<string, object> ?? throw new FormatException(where + ": every timeline entry must be an object {…}");
-                var change = new TimedChange { T = Json.Num(o, "t", -1), Name = Json.Str(o, "name", ""), Value = Json.Num(o, "value", 1) };
-                if (change.T < 0) throw new FormatException(where + ": a timeline entry has no time \"t\" (seconds from the start)");
+                var change = new TimedChange { T = Json.Num(o, "t", -1), Name = Json.Str(o, "name", ""), Value = Json.Num(o, "value", 1), AfterStep = (int)Json.Num(o, "after_step", -1) };
+                if (change.AfterStep >= 0 && change.T < 0) change.T = 0;
+                if (change.T < 0) throw new FormatException(where + ": a timeline entry needs a time \"t\" (seconds from the start) or \"after_step\"");
                 bool isWeather = Array.IndexOf(WeatherNames, change.Name) >= 0;
                 if (!isWeather && (knownFailure == null || !knownFailure(change.Name)))
                     throw new FormatException(where + ": timeline name \"" + change.Name + "\" is neither a failure nor a weather value");
                 s.Timeline.Add(change);
             }
-            s.Timeline.Sort((a, b) => a.T.CompareTo(b.T));
+            s.Timeline.Sort((a, b) => a.AfterStep != b.AfterStep ? a.AfterStep.CompareTo(b.AfterStep) : a.T.CompareTo(b.T));
             return s;
         }
     }

@@ -193,6 +193,44 @@ namespace Ushqyr.Tests
         }
 
         [Test]
+        public void PhotoStep_CountsOnlyAPhotoThatLooksIntoTheTarget()
+        {
+            // A bucket 2 m up at z = 8, its mouth facing the start (heading 180).
+            List<StepSpec> steps = Steps("[{\"say\":\"p\",\"photo\":{\"x\":0,\"y\":2,\"z\":8,\"heading\":180}}]");
+            StepSpec target = steps[0];
+            Assert.IsTrue(target.PhotoAligned("0.00;2.00;4.00;0.0;0.0;1.0"), "straight in front, looking at it");
+            Assert.IsFalse(target.PhotoAligned("0.00;2.00;4.00;90.0;0.0;1.0"), "in the right place, looking the wrong way");
+            Assert.IsFalse(target.PhotoAligned("4.00;2.00;6.00;296.6;0.0;1.0"), "looking at it, but from the side: the mouth cannot be seen into");
+            Assert.IsFalse(target.PhotoAligned("0.00;2.00;12.00;180.0;0.0;1.0"), "from behind");
+            Assert.IsFalse(target.PhotoAligned("0.00;2.00;-20.00;0.0;0.0;1.0"), "too far away");
+            Assert.IsTrue(target.PhotoAligned("0.50;2.30;4.00;352.9;-4.3;1.0"), "a little off the axis and aimed back at it");
+            Assert.IsFalse(target.PhotoAligned("nonsense"));
+
+            // A bucket on the ground with its mouth up: the camera must look straight down from above it.
+            StepSpec up = Steps("[{\"say\":\"p\",\"photo\":{\"x\":3,\"y\":0.3,\"z\":5,\"tilt\":90}}]")[0];
+            Assert.IsTrue(up.PhotoAligned("3.00;4.00;5.00;0.0;-90.0;2.0"));
+            Assert.IsFalse(up.PhotoAligned("3.00;4.00;5.00;0.0;0.0;2.0"), "above it, but looking at the horizon");
+
+            // In a flight: the photo taken at the right place counts, at its own moment.
+            FlightRecording flight = Line(10f, 1f);
+            flight.Event(2f, "photo", "0.00;2.00;2.00;90.0;0.0;1.0");
+            flight.Event(4f, "photo", "0.00;2.00;4.00;0.0;0.0;1.0");
+            Assert.AreEqual(1, StepTracker.CountDone(steps, flight));
+            Assert.AreEqual(0, StepTracker.CountDone(steps, Line(10f, 1f)), "no photo, no step");
+        }
+
+        [Test]
+        public void AChange_CanFollowAStep()
+        {
+            const string head = "{\"format\":1,\"id\":\"x\",\"type\":\"exercise\",\"title\":\"t\",\"rubric\":[{\"id\":\"a\",\"metric\":\"time\",\"label\":\"l\",\"best\":1,\"worst\":9}],\"setup\":";
+            ActivitySetup setup = ActivityDefinition.Parse(head + "{\"timeline\":[{\"after_step\":2,\"t\":3,\"name\":\"motor1\",\"value\":0.3},{\"after_step\":1,\"name\":\"battery_drop\",\"value\":0.7},{\"t\":5,\"name\":\"wind\",\"value\":4}]}}").Setup;
+            Assert.AreEqual(-1, setup.Timeline[0].AfterStep, "changes by the clock come first");
+            Assert.AreEqual(1, setup.Timeline[1].AfterStep);
+            Assert.AreEqual(0, setup.Timeline[1].T, "no delay given: at once");
+            Assert.AreEqual(3, setup.Timeline[2].T);
+        }
+
+        [Test]
         public void LandingStep_CanAskForAPad()
         {
             List<StepSpec> steps = Steps("[{\"say\":\"l\",\"landed\":true,\"pad\":{\"x\":5,\"z\":5,\"radius\":0.5}}]");

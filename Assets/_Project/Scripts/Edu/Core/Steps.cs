@@ -10,7 +10,7 @@ namespace Ushqyr.Edu
 
         /// <summary>What the pilot is told (a key of the language table).</summary>
         public string Say = "";
-        /// <summary>"stick", "zone", "height", "turn", "heading", "circle" or "landed".</summary>
+        /// <summary>"stick", "zone", "height", "turn", "heading", "circle", "photo" or "landed".</summary>
         public string Kind = "";
         public string Stick = "";
         /// <summary>Stick: the value to go above (or below, when <see cref="Below"/>).</summary>
@@ -29,6 +29,36 @@ namespace Ushqyr.Edu
         public double Near, Far = 1000;
         /// <summary>Landed: true when the landing must be inside the circle (X, Z, Radius).</summary>
         public bool OnPad;
+        /// <summary>
+        /// Photo: the target's mouth is at (X, Y, Z) and faces along <see cref="Degrees"/> (a heading), lifted by
+        /// <see cref="TiltDeg"/> (90 = straight up). The photo counts when the camera is in front of the mouth within
+        /// <see cref="ConeDeg"/> of its axis, between <see cref="Near"/> and <see cref="Far"/> away, and points at it
+        /// within <see cref="AimDeg"/>.
+        /// </summary>
+        public double TiltDeg, ConeDeg = 15, AimDeg = 8;
+
+        /// <summary>
+        /// True when a photo (the data of a "photo" event: x;y;z;heading;tilt;zoom, in the activity's frame) looks into
+        /// this step's target.
+        /// </summary>
+        public bool PhotoAligned(string photo)
+        {
+            string[] parts = (photo ?? "").Split(';');
+            if (parts.Length < 5) return false;
+            var inv = System.Globalization.CultureInfo.InvariantCulture;
+            var n = new double[5];
+            for (int i = 0; i < 5; i++)
+                if (!double.TryParse(parts[i], System.Globalization.NumberStyles.Float, inv, out n[i])) return false;
+            const double rad = Math.PI / 180.0;
+            // The way the mouth faces, and the way the camera looks.
+            double ax = Math.Sin(Degrees * rad) * Math.Cos(TiltDeg * rad), ay = Math.Sin(TiltDeg * rad), az = Math.Cos(Degrees * rad) * Math.Cos(TiltDeg * rad);
+            double fx = Math.Sin(n[3] * rad) * Math.Cos(n[4] * rad), fy = Math.Sin(n[4] * rad), fz = Math.Cos(n[3] * rad) * Math.Cos(n[4] * rad);
+            double dx = n[0] - X, dy = n[1] - Y, dz = n[2] - Z, distance = Math.Sqrt(dx * dx + dy * dy + dz * dz);
+            if (distance < Near || distance > Far || distance < 1e-6) return false;
+            double inFront = Math.Acos(Math.Max(-1, Math.Min(1, (dx * ax + dy * ay + dz * az) / distance))) / rad;
+            double aim = Math.Acos(Math.Max(-1, Math.Min(1, -(dx * fx + dy * fy + dz * fz) / distance))) / rad;
+            return inFront <= ConeDeg && aim <= AimDeg;
+        }
     }
 
     /// <summary>
@@ -151,16 +181,37 @@ namespace Ushqyr.Edu
             return step.Below ? v <= step.Level : v >= step.Level;
         }
 
+        /// <summary>
+        /// Something that happened in the flight (an event of the recording, in the activity's frame). A photo step is
+        /// done by a "photo" event that looks into its target; every other event is ignored.
+        /// </summary>
+        public void FeedEvent(in FlightEvent e)
+        {
+            if (Finished || e.Type != "photo") return;
+            StepSpec step = _steps[Done];
+            if (step.Kind != "photo" || !step.PhotoAligned(e.Data)) return;
+            Done++;
+            _held = _turned = 0;
+            _hasHeading = _wasAway = false;
+            Progress = 0f;
+        }
+
         /// <summary>How many steps a recorded flight completed, in order.</summary>
         public static int CountDone(List<StepSpec> steps, FlightRecording flight)
         {
             var tracker = new StepTracker(steps);
             double dt = flight.Rate > 0 ? 1.0 / flight.Rate : 0.01;
+            // Events are taken at their own moments, between the samples.
+            var events = new List<FlightEvent>(flight.Events);
+            events.Sort((a, b) => a.T.CompareTo(b.T));
+            int next = 0;
             foreach (FlightSample s in flight.Samples)
             {
+                while (next < events.Count && events[next].T <= s.T) tracker.FeedEvent(events[next++]);
                 tracker.Feed(s, dt);
                 if (tracker.Finished) break;
             }
+            while (next < events.Count && !tracker.Finished) tracker.FeedEvent(events[next++]);
             return tracker.Done;
         }
 
@@ -211,6 +262,16 @@ namespace Ushqyr.Edu
                     step.Degrees = Json.Num(o, "heading", 0);
                     step.Tolerance = Json.Num(o, "tolerance", 15);
                 }
+                else if (o.ContainsKey("photo"))
+                {
+                    Dictionary<string, object> t = Json.Obj(o, "photo") ?? throw new FormatException(where + ": \"photo\" must be an object {x, y, z, heading, tilt, cone, aim, near, far}");
+                    step.Kind = "photo";
+                    step.X = Json.Num(t, "x", 0); step.Y = Json.Num(t, "y", 0); step.Z = Json.Num(t, "z", 0);
+                    step.Degrees = Json.Num(t, "heading", 0); step.TiltDeg = Json.Num(t, "tilt", 0);
+                    step.ConeDeg = Json.Num(t, "cone", 15); step.AimDeg = Json.Num(t, "aim", 8);
+                    step.Near = Json.Num(t, "near", 1); step.Far = Json.Num(t, "far", 15);
+                    if (step.ConeDeg <= 0 || step.AimDeg <= 0 || step.Far <= step.Near) throw new FormatException(where + ": a photo target needs a cone and an aim above 0, and \"far\" beyond \"near\"");
+                }
                 else if (o.ContainsKey("circle"))
                 {
                     Dictionary<string, object> c = Json.Obj(o, "circle") ?? throw new FormatException(where + ": \"circle\" must be an object {x, z, degrees, near, far}");
@@ -233,7 +294,7 @@ namespace Ushqyr.Edu
                         if (step.Radius <= 0) throw new FormatException(where + ": a pad's radius must be above 0");
                     }
                 }
-                else throw new FormatException(where + ": a step needs one of \"stick\", \"zone\", \"height\", \"turn\", \"heading\", \"circle\" or \"landed\"");
+                else throw new FormatException(where + ": a step needs one of \"stick\", \"zone\", \"height\", \"turn\", \"heading\", \"circle\", \"photo\" or \"landed\"");
                 steps.Add(step);
             }
             return steps;

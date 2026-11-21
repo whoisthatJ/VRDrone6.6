@@ -53,7 +53,9 @@ namespace Ushqyr.Edu
         private TextMeshProUGUI _timer, _prompt;
         private RectTransform _promptBar;
         private StepTracker _steps;
-        private int _fed;
+        private int _fed, _fedEvents, _stepsSeen;
+        private float _stepDoneAt;
+        private readonly HashSet<TimedChange> _applied = new HashSet<TimedChange>();
         private float _stepsDoneFor;
         private readonly List<UnityEngine.Object> _made = new List<UnityEngine.Object>();
 
@@ -179,7 +181,9 @@ namespace Ushqyr.Edu
             _vehicle.Respawn();
             _vehicle.HoldAtSpawn = Activity.Setup.OnTheGround;
             _steps = Activity.Steps != null ? new StepTracker(Activity.Steps) : null;
-            _fed = 0;
+            _fed = _fedEvents = _stepsSeen = 0;
+            _stepDoneAt = 0f;
+            _applied.Clear();
             _stepsDoneFor = 0f;
             _vehicle.Crashed -= OnCrashed;
             _vehicle.Crashed += OnCrashed;
@@ -203,13 +207,42 @@ namespace Ushqyr.Edu
             _promptBar = EduUi.Panel(prompt, "Progress", 0f, 58f, 0f, 6f, EduUi.Accent, false);
         }
 
+        /// <summary>A photo's place and heading as the activity's frame sees them.</summary>
+        private FlightEvent LocalEvent(FlightEvent e)
+        {
+            if (e.Type != "photo" || _frame.IsIdentity) return e;
+            string[] parts = (e.Data ?? "").Split(';');
+            CultureInfo inv = CultureInfo.InvariantCulture;
+            if (parts.Length < 4 || !float.TryParse(parts[0], NumberStyles.Float, inv, out float x) || !float.TryParse(parts[1], NumberStyles.Float, inv, out float y)
+                || !float.TryParse(parts[2], NumberStyles.Float, inv, out float z) || !float.TryParse(parts[3], NumberStyles.Float, inv, out float heading)) return e;
+            _frame.ToLocal(x, y, z, out x, out y, out z);
+            parts[0] = x.ToString("0.00", inv);
+            parts[1] = y.ToString("0.00", inv);
+            parts[2] = z.ToString("0.00", inv);
+            parts[3] = (((heading - _frame.HeadingDeg) % 360f + 360f) % 360f).ToString("0.0", inv);
+            e.Data = string.Join(";", parts);
+            return e;
+        }
+
         /// <summary>Gives the step tracker the moments recorded since last time, in the activity's own frame.</summary>
         private void FeedSteps()
         {
             if (_steps == null || _recorder.Recording == null) return;
             List<FlightSample> samples = _recorder.Recording.Samples;
             double dt = 1.0 / _recorder.Recording.Rate;
-            for (; _fed < samples.Count && !_steps.Finished; _fed++) _steps.Feed(_frame.Local(samples[_fed]), dt);
+            List<FlightEvent> events = _recorder.Recording.Events;
+            for (; _fed < samples.Count && !_steps.Finished; _fed++)
+            {
+                // Events (a photo) at their own moments, in the activity's frame like the samples.
+                for (; _fedEvents < events.Count && events[_fedEvents].T <= samples[_fed].T; _fedEvents++) _steps.FeedEvent(LocalEvent(events[_fedEvents]));
+                _steps.Feed(_frame.Local(samples[_fed]), dt);
+            }
+            for (; _fedEvents < events.Count && !_steps.Finished; _fedEvents++) _steps.FeedEvent(LocalEvent(events[_fedEvents]));
+            if (_steps.Done != _stepsSeen)
+            {
+                _stepsSeen = _steps.Done;
+                _stepDoneAt = _clock;
+            }
             if (_prompt == null) return;
             StepSpec now = _steps.Current;
             _prompt.text = now != null ? (_steps.Done + 1) + " / " + _steps.Count + "     " + L.T(now.Say) : L.T("All steps done");
@@ -269,9 +302,13 @@ namespace Ushqyr.Edu
 
             _clock += Time.deltaTime;
             ActivitySetup setup = Activity.Setup;
-            while (_timelineNext < setup.Timeline.Count && setup.Timeline[_timelineNext].T <= _clock)
+            foreach (TimedChange change in setup.Timeline)
             {
-                TimedChange change = setup.Timeline[_timelineNext++];
+                if (_applied.Contains(change)) continue;
+                // By the clock, or so many seconds after the pilot finished a step.
+                bool due = change.AfterStep < 0 ? change.T <= _clock : _steps != null && _steps.Done >= change.AfterStep && _clock - _stepDoneAt >= change.T;
+                if (!due) continue;
+                _applied.Add(change);
                 if (Array.IndexOf(ActivitySetup.WeatherNames, change.Name) >= 0)
                 {
                     SetWeatherValue(change.Name, (float)change.Value);

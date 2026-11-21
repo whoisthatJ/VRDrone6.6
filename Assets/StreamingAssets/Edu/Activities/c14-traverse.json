@@ -1,0 +1,253 @@
+{
+  "format": 1,
+  "id": "c14-traverse",
+  "type": "exercise",
+  "title": "Traverse: four buckets in a row",
+  "briefing": "Four buckets stand in a row, all at 2 m. Slide sideways along the row, level and at the same distance, and photograph each one from straight in front. Do not turn the drone.",
+  "pass": 60,
+  "time_limit": 240,
+  "setup": {
+    "place": "field",
+    "drone": "edu-camera900",
+    "assist": "position",
+    "view": "fpv",
+    "objects": [
+      {
+        "type": "pad",
+        "id": "home",
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "size": 1.5
+      },
+      {
+        "type": "target",
+        "id": "b1",
+        "x": -6,
+        "y": 2,
+        "z": 10,
+        "size": 0.4,
+        "heading": 180,
+        "tilt": 0
+      },
+      {
+        "type": "target",
+        "id": "b2",
+        "x": -2,
+        "y": 2,
+        "z": 10,
+        "size": 0.4,
+        "heading": 180,
+        "tilt": 0
+      },
+      {
+        "type": "target",
+        "id": "b3",
+        "x": 2,
+        "y": 2,
+        "z": 10,
+        "size": 0.4,
+        "heading": 180,
+        "tilt": 0
+      },
+      {
+        "type": "target",
+        "id": "b4",
+        "x": 6,
+        "y": 2,
+        "z": 10,
+        "size": 0.4,
+        "heading": 180,
+        "tilt": 0
+      }
+    ]
+  },
+  "rubric": [
+    {
+      "id": "steps",
+      "metric": "steps_done",
+      "label": "Steps done",
+      "tip": "Look straight into the bucket: the camera must be in front of its mouth, not to one side.",
+      "weight": 50,
+      "best": 5,
+      "worst": 2,
+      "required": true,
+      "params": {
+        "steps": [
+          {
+            "say": "Photograph bucket 1 from straight in front",
+            "photo": {
+              "x": -6,
+              "y": 2,
+              "z": 10,
+              "heading": 180,
+              "tilt": 0
+            }
+          },
+          {
+            "say": "Photograph bucket 2 from straight in front",
+            "photo": {
+              "x": -2,
+              "y": 2,
+              "z": 10,
+              "heading": 180,
+              "tilt": 0
+            }
+          },
+          {
+            "say": "Photograph bucket 3 from straight in front",
+            "photo": {
+              "x": 2,
+              "y": 2,
+              "z": 10,
+              "heading": 180,
+              "tilt": 0
+            }
+          },
+          {
+            "say": "Photograph bucket 4 from straight in front",
+            "photo": {
+              "x": 6,
+              "y": 2,
+              "z": 10,
+              "heading": 180,
+              "tilt": 0
+            }
+          },
+          {
+            "say": "Fly back, land on the pad and switch the motors off",
+            "landed": true,
+            "pad": {
+              "x": 0,
+              "z": 0,
+              "radius": 0.75
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "height",
+      "metric": "height_error",
+      "label": "Keeping the height",
+      "tip": "Watch the height while you hover: small, slow moves of the left stick.",
+      "weight": 15,
+      "best": 0.2,
+      "worst": 1.0,
+      "params": {
+        "y": 2,
+        "from": 6
+      }
+    },
+    {
+      "id": "photos",
+      "metric": "event_count",
+      "label": "Photos taken",
+      "tip": "Line the camera up first, then take one photo: a photo that misses the bucket is wasted.",
+      "weight": 10,
+      "best": 4,
+      "worst": 12,
+      "params": {
+        "type": "photo"
+      }
+    },
+    {
+      "id": "landing",
+      "metric": "landing_distance",
+      "label": "Landing on the pad",
+      "tip": "Stop above the pad first, then come straight down.",
+      "weight": 10,
+      "best": 0.25,
+      "worst": 1.5,
+      "required": true,
+      "params": {
+        "x": 0,
+        "z": 0
+      }
+    },
+    {
+      "id": "time",
+      "metric": "duration",
+      "label": "Time taken",
+      "tip": "You have the moves; now do them without long pauses.",
+      "weight": 15,
+      "best": 80,
+      "worst": 220
+    }
+  ],
+  "reference": [
+    {
+      "takeoff": 2,
+      "wait": 4
+    },
+    {
+      "goto": [
+        -6,
+        2,
+        5
+      ],
+      "heading": 0,
+      "wait": 7
+    },
+    {
+      "gimbal": 0,
+      "photo": true,
+      "until_step": 1
+    },
+    {
+      "goto": [
+        -2,
+        2,
+        5
+      ],
+      "heading": 0,
+      "wait": 7
+    },
+    {
+      "gimbal": 0,
+      "photo": true,
+      "until_step": 2
+    },
+    {
+      "goto": [
+        2,
+        2,
+        5
+      ],
+      "heading": 0,
+      "wait": 7
+    },
+    {
+      "gimbal": 0,
+      "photo": true,
+      "until_step": 3
+    },
+    {
+      "goto": [
+        6,
+        2,
+        5
+      ],
+      "heading": 0,
+      "wait": 7
+    },
+    {
+      "gimbal": 0,
+      "photo": true,
+      "until_step": 4
+    },
+    {
+      "goto": [
+        0,
+        2,
+        0
+      ],
+      "heading": 0,
+      "wait": 9
+    },
+    {
+      "land": true,
+      "until_landed": true
+    }
+  ]
+}
