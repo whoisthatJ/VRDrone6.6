@@ -165,6 +165,23 @@ namespace Ushqyr.Tests
             foreach (string name in new[] { "Chase", "Onboard", "Fixed", "From above", "Free", "Height", "Speed", "Throttle", "crash", "respawn", "gate" })
                 Need("replay viewer", name);
 
+            // Activities: what the pilot reads in the briefing, on the way and in the result.
+            Assert.IsNotEmpty(Ushqyr.Edu.EduSession.Activities);
+            foreach (Ushqyr.Edu.ActivityDefinition a in Ushqyr.Edu.EduSession.Activities.Values)
+            {
+                Need(a.Id + " title", a.Title);
+                Need(a.Id + " briefing", a.Briefing);
+                foreach (Ushqyr.Edu.Criterion c in a.Criteria)
+                {
+                    Need(a.Id + " label", c.Label);
+                    Need(a.Id + " tip", c.Tip);
+                    if (c.Steps != null)
+                        foreach (Ushqyr.Edu.StepSpec step in c.Steps) Need(a.Id + " step", step.Say);
+                }
+            }
+            foreach (string name in Ushqyr.Edu.Course.BlockNames) Need("course block", name);
+            foreach (string name in Ushqyr.Edu.EduFlight.ModeNames) Need("flight mode", name);
+
             Assert.IsEmpty(missing, string.Join("\n", missing));
         }
 

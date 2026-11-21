@@ -2989,6 +2989,190 @@ MonoBehaviour:
     m_Key: All steps done
     m_Metadata:
       m_Items: []
+  - m_Id: 6765196264341504
+    m_Key: Land on the pad and switch the motors off
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6765196318867456
+    m_Key: Left stick all the way up (more throttle)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6765196318867457
+    m_Key: Left stick all the way down (less throttle)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6765196318867458
+    m_Key: Left stick to the left (turn left)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6765196318867459
+    m_Key: Left stick to the right (turn right)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6765196318867460
+    m_Key: Right stick up (fly forward)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6765196318867461
+    m_Key: Right stick down (fly backward)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6765196318867462
+    m_Key: Right stick to the left (slide left)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6765196318867463
+    m_Key: Right stick to the right (slide right)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6765196323061760
+    m_Key: Controls check
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6765196323061761
+    m_Key: The drone stays on the ground with its motors off. Move each stick as the screen asks, all the way and back to the middle. This is how you learn which stick does what.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6765196323061762
+    m_Key: Steps done
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6765196323061763
+    m_Key: Do the steps in the order shown at the top of the screen; each one counts only when the one before it is done.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6765196323061764
+    m_Key: Time taken
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6765196323061765
+    m_Key: You have the moves; now do them without long pauses.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6765196323061766
+    m_Key: Climb or descend to 1 m and hold it for 5 seconds
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6765196323061767
+    m_Key: Climb or descend to 3 m and hold it for 5 seconds
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6765196323061768
+    m_Key: Climb or descend to 5 m and hold it for 5 seconds
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6765196323061769
+    m_Key: Climb or descend to 2 m and hold it for 5 seconds
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6765196323061770
+    m_Key: Height steps
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6765196323061771
+    m_Key: 'Fly to four heights, one after another: 1 m, 3 m, 5 m and 2 m. Hold each for 5 seconds inside its box, without drifting sideways. Then land.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6765196323061772
+    m_Key: Staying over the pad
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6765196323061773
+    m_Key: 'Only the left stick moves in this exercise: keep your right thumb still.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6765196323061774
+    m_Key: Take off and hover in the box, 2 m up
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6765196323061775
+    m_Key: Turn a full circle to the right, on the spot
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6765196323061776
+    m_Key: Turn a full circle to the left, on the spot
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6765196323061777
+    m_Key: Pirouette
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6765196323061778
+    m_Key: Hover in the small box and turn the drone once around to the right, then once around to the left, without leaving the box. Only the left stick turns the drone.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6765196323061779
+    m_Key: Staying in the box while turning
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6765196323061780
+    m_Key: Turn slowly. If the drone slides away, stop turning, bring it back, then go on.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6765196323061781
+    m_Key: Take off and hover in the near box, 2 m up
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6765196323061782
+    m_Key: Fly 15 m forward and stop in the far box for 3 seconds
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6765196323061783
+    m_Key: Fly back and stop in the near box for 3 seconds
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6765196323061784
+    m_Key: Out and back
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6765196323061785
+    m_Key: Fly straight ahead to the far box, 15 m away, and stop inside it. Then fly back, stop in the near box and land. Start slowing down before you reach a box.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6765196323061786
+    m_Key: Flying a straight line
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6765196323061787
+    m_Key: Push the right stick straight up and down, not at an angle.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6765196323061788
+    m_Key: Fly to corner 1 and stop for 2 seconds
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6765196323061789
+    m_Key: Fly to corner 2 and stop for 2 seconds
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6765196323061790
+    m_Key: Fly to corner 3 and stop for 2 seconds
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6765196323061791
+    m_Key: Fly to corner 4 and stop for 2 seconds
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6765196323061792
+    m_Key: 'Close the square: back to corner 1, stop for 2 seconds'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6765196323061793
+    m_Key: Square, tail towards you
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6765196323061794
+    m_Key: Fly a square through four boxes and stop in each. Keep the drone facing away from you the whole time, so left is always left. Then come back and land on the pad.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6765196323061795
+    m_Key: Keeping the tail towards you
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6765196323061796
+    m_Key: 'Leave the left stick in the middle from side to side: in this exercise the drone never turns.'
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

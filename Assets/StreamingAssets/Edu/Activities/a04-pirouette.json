@@ -1,0 +1,158 @@
+{
+  "format": 1,
+  "id": "a04-pirouette",
+  "type": "exercise",
+  "title": "Pirouette",
+  "briefing": "Hover in the small box and turn the drone once around to the right, then once around to the left, without leaving the box. Only the left stick turns the drone.",
+  "pass": 60,
+  "time_limit": 120,
+  "setup": {
+    "place": "field",
+    "drone": "edu-camera900",
+    "assist": "position",
+    "view": "chase",
+    "objects": [
+      {
+        "type": "pad",
+        "id": "home",
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "size": 1.5
+      },
+      {
+        "type": "box",
+        "id": "spot",
+        "x": 0,
+        "y": 2,
+        "z": 0,
+        "size": 1.5,
+        "height": 1
+      }
+    ]
+  },
+  "rubric": [
+    {
+      "id": "steps",
+      "metric": "steps_done",
+      "label": "Steps done",
+      "tip": "Do the steps in the order shown at the top of the screen; each one counts only when the one before it is done.",
+      "weight": 50,
+      "best": 4,
+      "worst": 2,
+      "required": true,
+      "params": {
+        "steps": [
+          {
+            "say": "Take off and hover in the box, 2 m up",
+            "zone": {
+              "x": 0,
+              "y": 2,
+              "z": 0,
+              "radius": 0.75,
+              "tolerance": 0.5
+            },
+            "for": 2
+          },
+          {
+            "say": "Turn a full circle to the right, on the spot",
+            "turn": 360
+          },
+          {
+            "say": "Turn a full circle to the left, on the spot",
+            "turn": -360
+          },
+          {
+            "say": "Land on the pad and switch the motors off",
+            "landed": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "drift",
+      "metric": "position_error",
+      "label": "Staying in the box while turning",
+      "tip": "Turn slowly. If the drone slides away, stop turning, bring it back, then go on.",
+      "weight": 30,
+      "best": 0.15,
+      "worst": 0.75,
+      "params": {
+        "x": 0,
+        "z": 0
+      }
+    },
+    {
+      "id": "height",
+      "metric": "height_error",
+      "label": "Keeping the height",
+      "tip": "Watch the height while you hover: small, slow moves of the left stick.",
+      "weight": 10,
+      "best": 0.15,
+      "worst": 0.8,
+      "params": {
+        "y": 2
+      }
+    },
+    {
+      "id": "landing",
+      "metric": "landing_distance",
+      "label": "Landing on the pad",
+      "tip": "Stop above the pad first, then come straight down.",
+      "weight": 10,
+      "best": 0.25,
+      "worst": 1.5,
+      "required": true,
+      "params": {
+        "x": 0,
+        "z": 0
+      }
+    }
+  ],
+  "reference": [
+    {
+      "takeoff": 2,
+      "until_step": 1
+    },
+    {
+      "heading": 100,
+      "wait": 3.5
+    },
+    {
+      "heading": 200,
+      "wait": 3.5
+    },
+    {
+      "heading": 300,
+      "wait": 3.5
+    },
+    {
+      "heading": 10,
+      "until_step": 2
+    },
+    {
+      "heading": 270,
+      "wait": 3.5
+    },
+    {
+      "heading": 180,
+      "wait": 3.5
+    },
+    {
+      "heading": 90,
+      "wait": 3.5
+    },
+    {
+      "heading": 350,
+      "until_step": 3
+    },
+    {
+      "heading": 0,
+      "wait": 2
+    },
+    {
+      "land": true,
+      "until_landed": true
+    }
+  ]
+}

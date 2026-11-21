@@ -208,6 +208,44 @@ namespace Ushqyr.Tests
                 Assert.Throws<FormatException>(() => ActivityDefinition.Parse(head + bad + "}"), bad);
         }
 
+        /// <summary>
+        /// The other half of the quality gate: flights that did not do the exercise do not pass it. Three of them for
+        /// every shipped activity: the drone never leaves the ground; it takes off, hovers where it started and comes
+        /// down again; and it flies off in a straight line and never comes back.
+        /// </summary>
+        [Test]
+        public void EveryShippedActivity_FailsFlightsThatDidNotDoIt()
+        {
+            FlightRecording Flight(Func<float, FlightSample> at, float seconds)
+            {
+                var rec = new FlightRecording { Rate = 100f };
+                for (int i = 0; i <= (int)(seconds * 100f); i++)
+                {
+                    FlightSample s = at(i / 100f);
+                    s.T = i / 100f;
+                    s.Qw = 1f;
+                    s.Battery = 1f;
+                    rec.Samples.Add(s);
+                }
+                return rec;
+            }
+            FlightRecording idle = Flight(t => new FlightSample { Y = 0.02f }, 30f);
+            // Up to 2 m in 2 s, 20 s there, down in 2 s, motors off: right for "take off, hover, land" only.
+            FlightRecording hop = Flight(t => new FlightSample
+            {
+                Y = t < 2f ? t : t < 22f ? 2f : t < 24f ? 24f - t : 0.02f, Vy = t < 2f ? 1f : t >= 22f && t < 24f ? -1f : 0f,
+                Armed = t < 24f, Throttle = 0.5f,
+            }, 26f);
+            FlightRecording away = Flight(t => new FlightSample { X = 3f * t, Y = 2f, Vx = 3f, Armed = true, Throttle = 0.5f }, 40f);
+
+            foreach (ActivityDefinition a in EduSession.Activities.Values)
+            {
+                Assert.IsFalse(Rubric.Score(a, idle).Passed, a.Id + ": a drone that never took off must not pass");
+                Assert.IsFalse(Rubric.Score(a, away).Passed, a.Id + ": flying away in a straight line must not pass");
+                if (a.Id != "a02-hover-land") Assert.IsFalse(Rubric.Score(a, hop).Passed, a.Id + ": a plain take-off and landing must not pass");
+            }
+        }
+
         [Test]
         public void Playback_RunsAtTheChosenSpeed_AndStopsAtTheEnd()
         {

@@ -218,6 +218,8 @@ namespace Ushqyr.Edu
         private static readonly Dictionary<string, Fn> All = new Dictionary<string, Fn>
         {
             ["time"] = (p, f) => AirTime(p, f),
+            // The whole attempt from start to end, on the ground or in the air.
+            ["duration"] = (p, f) => f.Duration,
             ["zone_reached"] = ZoneReached,
             ["hold_time"] = HoldTime,
             ["position_error"] = PositionError,
@@ -243,6 +245,7 @@ namespace Ushqyr.Edu
             switch (metric)
             {
                 case "time":
+                case "duration":
                 case "hold_time":
                 case "outside_fence":
                     return "{0} s";

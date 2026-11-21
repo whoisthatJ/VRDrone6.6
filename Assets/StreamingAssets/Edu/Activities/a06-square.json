@@ -1,0 +1,248 @@
+{
+  "format": 1,
+  "id": "a06-square",
+  "type": "exercise",
+  "title": "Square, tail towards you",
+  "briefing": "Fly a square through four boxes and stop in each. Keep the drone facing away from you the whole time, so left is always left. Then come back and land on the pad.",
+  "pass": 60,
+  "time_limit": 180,
+  "setup": {
+    "place": "field",
+    "drone": "edu-camera900",
+    "assist": "position",
+    "view": "chase",
+    "objects": [
+      {
+        "type": "pad",
+        "id": "home",
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "size": 1.5
+      },
+      {
+        "type": "box",
+        "id": "c1",
+        "x": -4,
+        "y": 2,
+        "z": 4,
+        "size": 2,
+        "height": 1
+      },
+      {
+        "type": "box",
+        "id": "c2",
+        "x": 4,
+        "y": 2,
+        "z": 4,
+        "size": 2,
+        "height": 1
+      },
+      {
+        "type": "box",
+        "id": "c3",
+        "x": 4,
+        "y": 2,
+        "z": 12,
+        "size": 2,
+        "height": 1
+      },
+      {
+        "type": "box",
+        "id": "c4",
+        "x": -4,
+        "y": 2,
+        "z": 12,
+        "size": 2,
+        "height": 1
+      }
+    ]
+  },
+  "rubric": [
+    {
+      "id": "steps",
+      "metric": "steps_done",
+      "label": "Steps done",
+      "tip": "Do the steps in the order shown at the top of the screen; each one counts only when the one before it is done.",
+      "weight": 50,
+      "best": 6,
+      "worst": 3,
+      "required": true,
+      "params": {
+        "steps": [
+          {
+            "say": "Fly to corner 1 and stop for 2 seconds",
+            "zone": {
+              "x": -4,
+              "y": 2,
+              "z": 4,
+              "radius": 1,
+              "tolerance": 0.5
+            },
+            "for": 2
+          },
+          {
+            "say": "Fly to corner 2 and stop for 2 seconds",
+            "zone": {
+              "x": 4,
+              "y": 2,
+              "z": 4,
+              "radius": 1,
+              "tolerance": 0.5
+            },
+            "for": 2
+          },
+          {
+            "say": "Fly to corner 3 and stop for 2 seconds",
+            "zone": {
+              "x": 4,
+              "y": 2,
+              "z": 12,
+              "radius": 1,
+              "tolerance": 0.5
+            },
+            "for": 2
+          },
+          {
+            "say": "Fly to corner 4 and stop for 2 seconds",
+            "zone": {
+              "x": -4,
+              "y": 2,
+              "z": 12,
+              "radius": 1,
+              "tolerance": 0.5
+            },
+            "for": 2
+          },
+          {
+            "say": "Close the square: back to corner 1, stop for 2 seconds",
+            "zone": {
+              "x": -4,
+              "y": 2,
+              "z": 4,
+              "radius": 1,
+              "tolerance": 0.5
+            },
+            "for": 2
+          },
+          {
+            "say": "Land on the pad and switch the motors off",
+            "landed": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "heading",
+      "metric": "heading_error",
+      "label": "Keeping the tail towards you",
+      "tip": "Leave the left stick in the middle from side to side: in this exercise the drone never turns.",
+      "weight": 20,
+      "best": 5,
+      "worst": 45,
+      "params": {
+        "heading": 0
+      }
+    },
+    {
+      "id": "height",
+      "metric": "height_error",
+      "label": "Keeping the height",
+      "tip": "Watch the height while you hover: small, slow moves of the left stick.",
+      "weight": 10,
+      "best": 0.2,
+      "worst": 1.0,
+      "params": {
+        "y": 2,
+        "from": 6
+      }
+    },
+    {
+      "id": "landing",
+      "metric": "landing_distance",
+      "label": "Landing on the pad",
+      "tip": "Stop above the pad first, then come straight down.",
+      "weight": 10,
+      "best": 0.25,
+      "worst": 1.5,
+      "required": true,
+      "params": {
+        "x": 0,
+        "z": 0
+      }
+    },
+    {
+      "id": "time",
+      "metric": "duration",
+      "label": "Time taken",
+      "tip": "You have the moves; now do them without long pauses.",
+      "weight": 10,
+      "best": 70,
+      "worst": 160
+    }
+  ],
+  "reference": [
+    {
+      "takeoff": 2,
+      "wait": 5
+    },
+    {
+      "goto": [
+        -4,
+        2,
+        4
+      ],
+      "heading": 0,
+      "until_step": 1
+    },
+    {
+      "goto": [
+        4,
+        2,
+        4
+      ],
+      "heading": 0,
+      "until_step": 2
+    },
+    {
+      "goto": [
+        4,
+        2,
+        12
+      ],
+      "heading": 0,
+      "until_step": 3
+    },
+    {
+      "goto": [
+        -4,
+        2,
+        12
+      ],
+      "heading": 0,
+      "until_step": 4
+    },
+    {
+      "goto": [
+        -4,
+        2,
+        4
+      ],
+      "heading": 0,
+      "until_step": 5
+    },
+    {
+      "goto": [
+        0,
+        2,
+        0
+      ],
+      "heading": 0,
+      "wait": 6
+    },
+    {
+      "land": true,
+      "until_landed": true
+    }
+  ]
+}

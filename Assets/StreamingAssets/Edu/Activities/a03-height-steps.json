@@ -1,0 +1,178 @@
+{
+  "format": 1,
+  "id": "a03-height-steps",
+  "type": "exercise",
+  "title": "Height steps",
+  "briefing": "Fly to four heights, one after another: 1 m, 3 m, 5 m and 2 m. Hold each for 5 seconds inside its box, without drifting sideways. Then land.",
+  "pass": 60,
+  "time_limit": 150,
+  "setup": {
+    "place": "field",
+    "drone": "edu-camera900",
+    "assist": "position",
+    "view": "chase",
+    "objects": [
+      {
+        "type": "pad",
+        "id": "home",
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "size": 1.5
+      },
+      {
+        "type": "box",
+        "id": "h1",
+        "x": 0,
+        "y": 1,
+        "z": 0,
+        "size": 2,
+        "height": 0.6
+      },
+      {
+        "type": "box",
+        "id": "h3",
+        "x": 0,
+        "y": 3,
+        "z": 0,
+        "size": 2,
+        "height": 0.6
+      },
+      {
+        "type": "box",
+        "id": "h5",
+        "x": 0,
+        "y": 5,
+        "z": 0,
+        "size": 2,
+        "height": 0.6
+      },
+      {
+        "type": "box",
+        "id": "h2",
+        "x": 0,
+        "y": 2,
+        "z": 0,
+        "size": 2,
+        "height": 0.6
+      }
+    ]
+  },
+  "rubric": [
+    {
+      "id": "steps",
+      "metric": "steps_done",
+      "label": "Steps done",
+      "tip": "Do the steps in the order shown at the top of the screen; each one counts only when the one before it is done.",
+      "weight": 50,
+      "best": 5,
+      "worst": 2,
+      "required": true,
+      "params": {
+        "steps": [
+          {
+            "say": "Climb or descend to 1 m and hold it for 5 seconds",
+            "height": 1,
+            "tolerance": 0.3,
+            "for": 5
+          },
+          {
+            "say": "Climb or descend to 3 m and hold it for 5 seconds",
+            "height": 3,
+            "tolerance": 0.3,
+            "for": 5
+          },
+          {
+            "say": "Climb or descend to 5 m and hold it for 5 seconds",
+            "height": 5,
+            "tolerance": 0.3,
+            "for": 5
+          },
+          {
+            "say": "Climb or descend to 2 m and hold it for 5 seconds",
+            "height": 2,
+            "tolerance": 0.3,
+            "for": 5
+          },
+          {
+            "say": "Land on the pad and switch the motors off",
+            "landed": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "drift",
+      "metric": "position_error",
+      "label": "Staying over the pad",
+      "tip": "Only the left stick moves in this exercise: keep your right thumb still.",
+      "weight": 20,
+      "best": 0.15,
+      "worst": 1.5,
+      "params": {
+        "x": 0,
+        "z": 0
+      }
+    },
+    {
+      "id": "landing",
+      "metric": "landing_distance",
+      "label": "Landing on the pad",
+      "tip": "Stop above the pad first, then come straight down.",
+      "weight": 15,
+      "best": 0.25,
+      "worst": 1.5,
+      "required": true,
+      "params": {
+        "x": 0,
+        "z": 0
+      }
+    },
+    {
+      "id": "smooth",
+      "metric": "smoothness",
+      "label": "Smooth sticks",
+      "tip": "Move the sticks slowly and a little at a time.",
+      "weight": 15,
+      "best": 1.5,
+      "worst": 8
+    }
+  ],
+  "reference": [
+    {
+      "takeoff": 1,
+      "until_step": 1
+    },
+    {
+      "goto": [
+        0,
+        3,
+        0
+      ],
+      "heading": 0,
+      "until_step": 2
+    },
+    {
+      "goto": [
+        0,
+        5,
+        0
+      ],
+      "heading": 0,
+      "until_step": 3
+    },
+    {
+      "goto": [
+        0,
+        2,
+        0
+      ],
+      "heading": 0,
+      "until_step": 4
+    },
+    {
+      "land": true,
+      "until_landed": true
+    }
+  ]
+}

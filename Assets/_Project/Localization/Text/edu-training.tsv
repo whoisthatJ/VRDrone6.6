@@ -1,0 +1,59 @@
+# Education Suite: the training exercises (written by Tools/Edu/make_exercises.py; edit the texts there). Russian was written first; the Kazakh column needs a native review. Columns: English (key) <TAB> Kazakh <TAB> Russian
+Land on the pad and switch the motors off	Алаңшаға қонып, қозғалтқыштарды өшіріңіз	Сядьте на площадку и выключите моторы
+Left stick all the way up (more throttle)	Сол стикті соңына дейін жоғары (газды көбейту)	Левый стик до упора вверх (больше газа)
+Left stick all the way down (less throttle)	Сол стикті соңына дейін төмен (газды азайту)	Левый стик до упора вниз (меньше газа)
+Left stick to the left (turn left)	Сол стикті солға (солға бұрылу)	Левый стик влево (поворот влево)
+Left stick to the right (turn right)	Сол стикті оңға (оңға бұрылу)	Левый стик вправо (поворот вправо)
+Right stick up (fly forward)	Оң стикті жоғары (алға ұшу)	Правый стик вверх (лететь вперёд)
+Right stick down (fly backward)	Оң стикті төмен (артқа ұшу)	Правый стик вниз (лететь назад)
+Right stick to the left (slide left)	Оң стикті солға (солға жылжу)	Правый стик влево (смещение влево)
+Right stick to the right (slide right)	Оң стикті оңға (оңға жылжу)	Правый стик вправо (смещение вправо)
+Controls check	Басқаруды тексеру	Проверка управления
+The drone stays on the ground with its motors off. Move each stick as the screen asks, all the way and back to the middle. This is how you learn which stick does what.	Дрон қозғалтқыштары өшірулі күйде жерде тұрады. Әр стикті экранда сұралғандай соңына дейін қозғап, ортаға қайтарыңыз. Осылай қай стик не істейтінін үйренесіз.	Дрон стоит на земле с выключенными моторами. Двигайте каждый стик так, как просит экран: до упора и обратно в центр. Так вы запомните, что делает каждый стик.
+Steps done	Орындалған қадамдар	Выполненные шаги
+Do the steps in the order shown at the top of the screen; each one counts only when the one before it is done.	Қадамдарды экранның жоғарғы жағында көрсетілген ретпен орындаңыз; әрқайсысы алдыңғысы орындалғанда ғана есептеледі.	Выполняйте шаги в том порядке, который показан вверху экрана; каждый засчитывается только после предыдущего.
+Time taken	Жұмсалған уақыт	Затраченное время
+You have the moves; now do them without long pauses.	Қимылдарды меңгердіңіз; енді оларды ұзақ үзіліссіз орындаңыз.	Движения вы освоили; теперь выполняйте их без долгих пауз.
+Take off, hover, land	Ұшып көтерілу, қалықтау, қону	Взлёт, висение, посадка
+Take off and climb into the blue box, 2 m up. Stay inside it for 20 seconds. Then come down and land on the pad you started from.	Ұшып көтеріліп, 2 м биіктіктегі көк қорапқа кіріңіз. Оның ішінде 20 секунд тұрыңыз. Содан кейін төмендеп, ұшқан алаңшаңызға қоныңыз.	Взлетите и поднимитесь в синий куб на высоте 2 м. Оставайтесь в нём 20 секунд. Затем снизьтесь и сядьте на площадку, с которой взлетели.
+Time inside the box	Қорап ішіндегі уақыт	Время внутри куба
+Climb until the drone is inside the blue box, then let go of the right stick and only correct small drifts.	Дрон көк қораптың ішіне кіргенше көтеріліңіз, содан кейін оң стикті жіберіп, тек шағын ығысуларды түзетіңіз.	Поднимайтесь, пока дрон не окажется в синем кубе, затем отпустите правый стик и поправляйте только небольшой снос.
+Keeping the height	Биіктікті сақтау	Удержание высоты
+Watch the height while you hover: small, slow moves of the left stick.	Қалықтап тұрғанда биіктікті қадағалаңыз: сол стикті аз-аздан, баяу қозғаңыз.	Следите за высотой во время висения: небольшие, медленные движения левого стика.
+Landing on the pad	Алаңшаға қону	Посадка на площадку
+Stop above the pad first, then come straight down.	Алдымен алаңшаның үстінде тоқтаңыз, содан кейін тік төмен түсіңіз.	Сначала остановитесь над площадкой, затем снижайтесь строго вниз.
+A soft landing	Жұмсақ қону	Мягкая посадка
+Slow the descent in the last metre.	Соңғы метрде төмендеуді баяулатыңыз.	Замедлите снижение на последнем метре.
+Smooth sticks	Стиктерді бірқалыпты қозғау	Плавная работа стиками
+Move the sticks slowly and a little at a time.	Стиктерді баяу әрі аз-аздан қозғаңыз.	Двигайте стики медленно и понемногу.
+Climb or descend to 1 m and hold it for 5 seconds	1 м биіктікке көтеріліп немесе төмендеп, 5 секунд ұстаңыз	Наберите или снизьтесь до 1 м и удерживайте 5 секунд
+Climb or descend to 3 m and hold it for 5 seconds	3 м биіктікке көтеріліп немесе төмендеп, 5 секунд ұстаңыз	Наберите или снизьтесь до 3 м и удерживайте 5 секунд
+Climb or descend to 5 m and hold it for 5 seconds	5 м биіктікке көтеріліп немесе төмендеп, 5 секунд ұстаңыз	Наберите или снизьтесь до 5 м и удерживайте 5 секунд
+Climb or descend to 2 m and hold it for 5 seconds	2 м биіктікке көтеріліп немесе төмендеп, 5 секунд ұстаңыз	Наберите или снизьтесь до 2 м и удерживайте 5 секунд
+Height steps	Биіктік сатылары	Ступени высоты
+Fly to four heights, one after another: 1 m, 3 m, 5 m and 2 m. Hold each for 5 seconds inside its box, without drifting sideways. Then land.	Төрт биіктікке бірінен соң бірін ұшыңыз: 1 м, 3 м, 5 м және 2 м. Әрқайсысын өз қорабының ішінде, бүйірге ығыспай, 5 секунд ұстаңыз. Содан кейін қоныңыз.	Пролетите четыре высоты одну за другой: 1 м, 3 м, 5 м и 2 м. На каждой продержитесь 5 секунд внутри её куба, не смещаясь в стороны. Затем сядьте.
+Staying over the pad	Алаңша үстінде қалу	Удержание над площадкой
+Only the left stick moves in this exercise: keep your right thumb still.	Бұл жаттығуда тек сол стик қозғалады: оң бас бармағыңызды қозғамаңыз.	В этом упражнении двигается только левый стик: правый большой палец держите неподвижно.
+Take off and hover in the box, 2 m up	Ұшып көтеріліп, 2 м биіктіктегі қорапта қалықтаңыз	Взлетите и зависните в кубе на высоте 2 м
+Turn a full circle to the right, on the spot	Орнында тұрып, оңға толық айналым жасаңыз	Сделайте полный оборот вправо на месте
+Turn a full circle to the left, on the spot	Орнында тұрып, солға толық айналым жасаңыз	Сделайте полный оборот влево на месте
+Pirouette	Пируэт	Пируэт
+Hover in the small box and turn the drone once around to the right, then once around to the left, without leaving the box. Only the left stick turns the drone.	Шағын қорапта қалықтап тұрып, дронды бір рет оңға, содан кейін бір рет солға айналдырыңыз, қораптан шықпаңыз. Дронды тек сол стик бұрады.	Зависните в маленьком кубе и разверните дрон на полный оборот вправо, затем на полный оборот влево, не выходя из куба. Поворачивает дрон только левый стик.
+Staying in the box while turning	Бұрылу кезінде қорапта қалу	Удержание в кубе при повороте
+Turn slowly. If the drone slides away, stop turning, bring it back, then go on.	Баяу бұрылыңыз. Дрон ығысып кетсе, бұрылуды тоқтатып, оны қайтарыңыз да, жалғастырыңыз.	Поворачивайте медленно. Если дрон уходит в сторону, остановите поворот, верните его и продолжайте.
+Take off and hover in the near box, 2 m up	Ұшып көтеріліп, 2 м биіктіктегі жақын қорапта қалықтаңыз	Взлетите и зависните в ближнем кубе на высоте 2 м
+Fly 15 m forward and stop in the far box for 3 seconds	15 м алға ұшып, алыс қорапта 3 секунд тоқтаңыз	Пролетите 15 м вперёд и остановитесь в дальнем кубе на 3 секунды
+Fly back and stop in the near box for 3 seconds	Кері ұшып, жақын қорапта 3 секунд тоқтаңыз	Вернитесь и остановитесь в ближнем кубе на 3 секунды
+Out and back	Барып қайту	Туда и обратно
+Fly straight ahead to the far box, 15 m away, and stop inside it. Then fly back, stop in the near box and land. Start slowing down before you reach a box.	15 м қашықтықтағы алыс қорапқа тура алға ұшып, оның ішінде тоқтаңыз. Содан кейін кері ұшып, жақын қорапта тоқтап, қоныңыз. Қорапқа жетпей тұрып баяулай бастаңыз.	Летите прямо к дальнему кубу в 15 м и остановитесь внутри него. Затем вернитесь, остановитесь в ближнем кубе и сядьте. Начинайте тормозить до того, как долетите до куба.
+Flying a straight line	Түзу сызықпен ұшу	Полёт по прямой
+Push the right stick straight up and down, not at an angle.	Оң стикті қиғаш емес, тура жоғары-төмен итеріңіз.	Двигайте правый стик строго вверх и вниз, не по диагонали.
+Fly to corner 1 and stop for 2 seconds	1-бұрышқа ұшып, 2 секунд тоқтаңыз	Летите к углу 1 и остановитесь на 2 секунды
+Fly to corner 2 and stop for 2 seconds	2-бұрышқа ұшып, 2 секунд тоқтаңыз	Летите к углу 2 и остановитесь на 2 секунды
+Fly to corner 3 and stop for 2 seconds	3-бұрышқа ұшып, 2 секунд тоқтаңыз	Летите к углу 3 и остановитесь на 2 секунды
+Fly to corner 4 and stop for 2 seconds	4-бұрышқа ұшып, 2 секунд тоқтаңыз	Летите к углу 4 и остановитесь на 2 секунды
+Close the square: back to corner 1, stop for 2 seconds	Шаршыны жабыңыз: 1-бұрышқа қайтып, 2 секунд тоқтаңыз	Замкните квадрат: вернитесь к углу 1 и остановитесь на 2 секунды
+Square, tail towards you	Шаршы, құйрығы өзіңізге қарай	Квадрат хвостом к себе
+Fly a square through four boxes and stop in each. Keep the drone facing away from you the whole time, so left is always left. Then come back and land on the pad.	Төрт қорап арқылы шаршы бойымен ұшып, әрқайсысында тоқтаңыз. Дрон үнемі сізден теріс қарап тұрсын, сонда сол жақ әрқашан сол жақ болады. Содан кейін қайтып, алаңшаға қоныңыз.	Пролетите квадрат через четыре куба, останавливаясь в каждом. Всё время держите дрон хвостом к себе, тогда лево всегда будет слева. Затем вернитесь и сядьте на площадку.
+Keeping the tail towards you	Құйрықты өзіңізге қаратып ұстау	Удержание хвостом к себе
+Leave the left stick in the middle from side to side: in this exercise the drone never turns.	Сол стикті оңға-солға қозғамай, ортасында ұстаңыз: бұл жаттығуда дрон бұрылмайды.	Не отклоняйте левый стик вправо-влево: в этом упражнении дрон не поворачивается.

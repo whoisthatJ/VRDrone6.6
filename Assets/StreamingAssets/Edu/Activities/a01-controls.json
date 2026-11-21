@@ -1,0 +1,199 @@
+{
+  "format": 1,
+  "id": "a01-controls",
+  "type": "exercise",
+  "title": "Controls check",
+  "briefing": "The drone stays on the ground with its motors off. Move each stick as the screen asks, all the way and back to the middle. This is how you learn which stick does what.",
+  "pass": 60,
+  "time_limit": 120,
+  "setup": {
+    "place": "field",
+    "drone": "edu-camera900",
+    "assist": "position",
+    "view": "chase",
+    "on_the_ground": true,
+    "objects": [
+      {
+        "type": "pad",
+        "id": "home",
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "size": 1.5
+      }
+    ],
+    "end": {
+      "landing": false,
+      "crash": false
+    }
+  },
+  "rubric": [
+    {
+      "id": "steps",
+      "metric": "steps_done",
+      "label": "Steps done",
+      "tip": "Do the steps in the order shown at the top of the screen; each one counts only when the one before it is done.",
+      "weight": 80,
+      "best": 8,
+      "worst": 4,
+      "required": true,
+      "params": {
+        "steps": [
+          {
+            "say": "Left stick all the way up (more throttle)",
+            "stick": "throttle",
+            "above": 0.8
+          },
+          {
+            "say": "Left stick all the way down (less throttle)",
+            "stick": "throttle",
+            "below": 0.2
+          },
+          {
+            "say": "Left stick to the left (turn left)",
+            "stick": "yaw",
+            "below": -0.7
+          },
+          {
+            "say": "Left stick to the right (turn right)",
+            "stick": "yaw",
+            "above": 0.7
+          },
+          {
+            "say": "Right stick up (fly forward)",
+            "stick": "pitch",
+            "above": 0.7
+          },
+          {
+            "say": "Right stick down (fly backward)",
+            "stick": "pitch",
+            "below": -0.7
+          },
+          {
+            "say": "Right stick to the left (slide left)",
+            "stick": "roll",
+            "below": -0.7
+          },
+          {
+            "say": "Right stick to the right (slide right)",
+            "stick": "roll",
+            "above": 0.7
+          }
+        ]
+      }
+    },
+    {
+      "id": "time",
+      "metric": "duration",
+      "label": "Time taken",
+      "tip": "You have the moves; now do them without long pauses.",
+      "weight": 20,
+      "best": 25,
+      "worst": 90
+    }
+  ],
+  "reference": [
+    {
+      "sticks": {
+        "throttle": 1
+      },
+      "wait": 0.6
+    },
+    {
+      "sticks": {
+        "throttle": 1
+      },
+      "wait": 0.5
+    },
+    {
+      "sticks": {
+        "throttle": 0
+      },
+      "wait": 0.6
+    },
+    {
+      "sticks": {
+        "throttle": 0
+      },
+      "wait": 0.5
+    },
+    {
+      "sticks": {
+        "throttle": 0,
+        "yaw": -1
+      },
+      "wait": 0.6
+    },
+    {
+      "sticks": {
+        "throttle": 0
+      },
+      "wait": 0.5
+    },
+    {
+      "sticks": {
+        "throttle": 0,
+        "yaw": 1
+      },
+      "wait": 0.6
+    },
+    {
+      "sticks": {
+        "throttle": 0
+      },
+      "wait": 0.5
+    },
+    {
+      "sticks": {
+        "throttle": 0,
+        "pitch": 1
+      },
+      "wait": 0.6
+    },
+    {
+      "sticks": {
+        "throttle": 0
+      },
+      "wait": 0.5
+    },
+    {
+      "sticks": {
+        "throttle": 0,
+        "pitch": -1
+      },
+      "wait": 0.6
+    },
+    {
+      "sticks": {
+        "throttle": 0
+      },
+      "wait": 0.5
+    },
+    {
+      "sticks": {
+        "throttle": 0,
+        "roll": -1
+      },
+      "wait": 0.6
+    },
+    {
+      "sticks": {
+        "throttle": 0
+      },
+      "wait": 0.5
+    },
+    {
+      "sticks": {
+        "throttle": 0,
+        "roll": 1
+      },
+      "wait": 0.6
+    },
+    {
+      "sticks": {
+        "throttle": 0
+      },
+      "wait": 0.5
+    }
+  ]
+}
