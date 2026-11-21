@@ -42,6 +42,82 @@ namespace Ushqyr.Tests
             }
         }
 
+        // ---------- an activity's own frame ----------
+
+        [Test]
+        public void Frame_TurnsAndShiftsPoints_ThereAndBack()
+        {
+            var frame = new FlightFrame { X = 10f, Y = 0.5f, Z = -4f, HeadingDeg = 90f };
+            // The frame's +Z points east (+X of the world): one metre ahead of its origin is one metre east.
+            frame.ToWorld(0f, 2f, 1f, out float wx, out float wy, out float wz);
+            Assert.AreEqual(11f, wx, 1e-4f);
+            Assert.AreEqual(2.5f, wy, 1e-4f);
+            Assert.AreEqual(-4f, wz, 1e-4f);
+            frame.ToLocal(wx, wy, wz, out float lx, out float ly, out float lz);
+            Assert.AreEqual(0f, lx, 1e-4f);
+            Assert.AreEqual(2f, ly, 1e-4f);
+            Assert.AreEqual(1f, lz, 1e-4f);
+            Assert.IsTrue(FlightFrame.TryParse(frame.ToString(), out FlightFrame read));
+            Assert.AreEqual(90f, read.HeadingDeg);
+            Assert.IsFalse(FlightFrame.TryParse("1;2;3", out _));
+            Assert.IsTrue(default(FlightFrame).IsIdentity);
+        }
+
+        [Test]
+        public void AFlightFlownElsewhere_ScoresTheSameInItsOwnFrame()
+        {
+            // The same straight flight, once at the world's origin and once somewhere else, facing another way.
+            FlightRecording home = Line(10f, 2f);
+            home.Event(3f, "photo", "0.00;2.00;6.00;0.0;-30.0;1.0");
+            var frame = new FlightFrame { X = 40f, Y = 3f, Z = 25f, HeadingDeg = 135f };
+            FlightRecording away = home.PlacedAt(frame);
+            Assert.AreEqual(frame.ToString(), away.Notes["frame"]);
+            Assert.AreNotEqual(home.Samples[500].X, away.Samples[500].X);
+            Assert.AreEqual(135f, away.Samples[500].Heading, 0.01f, "the drone faces the way the frame does");
+            Assert.AreEqual(home.Samples[500].Speed, away.Samples[500].Speed, 1e-4f);
+
+            FlightRecording back = away.InOwnFrame();
+            Assert.IsFalse(back.Notes.ContainsKey("frame"));
+            for (int i = 0; i < home.Samples.Count; i += 97)
+            {
+                Assert.AreEqual(home.Samples[i].X, back.Samples[i].X, 1e-3f);
+                Assert.AreEqual(home.Samples[i].Y, back.Samples[i].Y, 1e-3f);
+                Assert.AreEqual(home.Samples[i].Z, back.Samples[i].Z, 1e-3f);
+                Assert.AreEqual(home.Samples[i].Vz, back.Samples[i].Vz, 1e-3f);
+                Assert.AreEqual(0f, back.Samples[i].Heading, 0.01f);
+            }
+            StringAssert.StartsWith("0.00;2.00;6.00;0.0", back.Events[0].Data, "the place and heading of a photo come back too");
+            StringAssert.Contains(";135.0;", away.Events[0].Data);
+            Assert.AreSame(home, home.InOwnFrame(), "a flight with no frame is left alone");
+        }
+
+        [Test]
+        public void Setup_IsReadAndChecked()
+        {
+            const string head = "{\"format\":1,\"id\":\"x\",\"type\":\"exercise\",\"title\":\"t\",\"rubric\":[{\"id\":\"a\",\"metric\":\"time\",\"label\":\"l\",\"best\":1,\"worst\":9}],\"setup\":";
+            ActivityDefinition a = ActivityDefinition.Parse(head + "{\"place\":\"field\",\"drone\":\"edu-camera900\",\"assist\":\"position\",\"view\":\"chase\","
+                + "\"start\":{\"x\":2,\"z\":-3,\"heading\":90},\"weather\":{\"wind\":4,\"rain\":0.5},"
+                + "\"objects\":[{\"type\":\"box\",\"id\":\"b\",\"y\":2,\"size\":2,\"height\":1},{\"type\":\"pad\",\"size\":1.5}],"
+                + "\"timeline\":[{\"t\":20,\"name\":\"gps_lost\"},{\"t\":5,\"name\":\"wind\",\"value\":8}],\"end\":{\"crash\":false}}}");
+            Assert.AreEqual("edu-camera900", a.Setup.Drone);
+            Assert.AreEqual(90, a.Setup.StartHeadingDeg);
+            Assert.AreEqual(2, a.Setup.Objects.Count);
+            Assert.AreEqual(4, a.Setup.Weather["wind"]);
+            Assert.AreEqual("wind", a.Setup.Timeline[0].Name, "the timeline is in order of time");
+            Assert.AreEqual(1, a.Setup.Timeline[1].Value, "a failure with no value is switched on");
+            Assert.IsTrue(a.Setup.EndOnLanding);
+            Assert.IsFalse(a.Setup.EndOnCrash);
+
+            Assert.IsNotNull(ActivityDefinition.Parse(head + "{}}").Setup, "an empty setup is fine");
+            foreach (string bad in new[]
+                     {
+                         "{\"assist\":\"magic\"}", "{\"view\":\"top\"}", "{\"objects\":[{\"type\":\"tree\"}]}", "{\"objects\":[{\"type\":\"box\",\"size\":0}]}",
+                         "{\"objects\":[{\"type\":\"box\",\"id\":\"a\"},{\"type\":\"pad\",\"id\":\"a\"}]}", "{\"weather\":{\"snow\":1}}",
+                         "{\"timeline\":[{\"t\":3,\"name\":\"wings_fall_off\"}]}", "{\"timeline\":[{\"name\":\"gps_lost\"}]}",
+                     })
+                Assert.Throws<FormatException>(() => ActivityDefinition.Parse(head + bad + "}"), bad);
+        }
+
         [Test]
         public void Playback_RunsAtTheChosenSpeed_AndStopsAtTheEnd()
         {

@@ -29,6 +29,8 @@ namespace Ushqyr.Edu
         public double[] Stars = { 60, 80, 95 };
         public readonly List<Criterion> Criteria = new List<Criterion>();
         public Dictionary<string, object> Raw;
+        /// <summary>How the activity is flown: place, drone, objects, weather, what ends it. Never null.</summary>
+        public ActivitySetup Setup = new ActivitySetup();
 
         private static readonly string[] Types = { "exercise", "race", "soccer", "scenario", "program", "free" };
 
@@ -93,6 +95,7 @@ namespace Ushqyr.Edu
                 if (string.IsNullOrEmpty(cr.Label)) throw new FormatException("activity " + a.Id + ", line " + cr.Id + ": \"label\" is missing");
                 a.Criteria.Add(cr);
             }
+            a.Setup = ActivitySetup.Parse(Json.Obj(o, "setup"), a.Id, name => Array.IndexOf(Ushqyr.Flight.FailureSet.Names, name) >= 0);
             using (SHA256 sha = SHA256.Create())
             {
                 var sb = new StringBuilder();
@@ -132,6 +135,8 @@ namespace Ushqyr.Edu
         {
             if (activity == null) throw new ArgumentNullException(nameof(activity));
             if (flight == null) throw new ArgumentNullException(nameof(flight));
+            // An activity's numbers are in its own frame; a flight flown somewhere else in a scene is brought into it.
+            flight = flight.InOwnFrame();
             var result = new ScoreResult();
             double total = 0, earned = 0;
             bool requiredFailed = false;

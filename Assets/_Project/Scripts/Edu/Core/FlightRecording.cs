@@ -66,6 +66,83 @@ namespace Ushqyr.Edu
 
         public void Event(float t, string type, string data = "") => Events.Add(new FlightEvent { T = t, Type = type, Data = data ?? "" });
 
+        /// <summary>Events whose data begins with a place "x;y;z": they move with the flight when it is put into another frame.</summary>
+        private static readonly string[] PlacedEvents = { "photo", "drop", "payload_landed" };
+
+        /// <summary>The frame this flight was flown in (the note "frame"), or the world itself when it has none.</summary>
+        public FlightFrame Frame => Notes.TryGetValue("frame", out string text) && FlightFrame.TryParse(text, out FlightFrame f) ? f : FlightFrame.Identity;
+
+        /// <summary>
+        /// The same flight seen from its activity's frame: positions, speeds, attitudes and the places of events are
+        /// those the activity's own numbers talk about. A flight with no frame is returned as it is.
+        /// </summary>
+        public FlightRecording InOwnFrame()
+        {
+            FlightFrame frame = Frame;
+            return frame.IsIdentity ? this : Moved(frame, false);
+        }
+
+        /// <summary>
+        /// This flight (in its own frame's numbers or the world's) placed into the world at <paramref name="frame"/>:
+        /// used to show a reference flight in a scene other than the one it was flown in.
+        /// </summary>
+        public FlightRecording PlacedAt(FlightFrame frame)
+        {
+            FlightRecording local = InOwnFrame();
+            return frame.IsIdentity ? local : local.Moved(frame, true);
+        }
+
+        private FlightRecording Moved(FlightFrame frame, bool toWorld)
+        {
+            var moved = new FlightRecording { Rate = Rate };
+            foreach (KeyValuePair<string, string> note in Notes)
+                if (note.Key != "frame") moved.Notes[note.Key] = note.Value;
+            if (toWorld) moved.Notes["frame"] = frame.ToString();
+            // The attitude turns about the upright axis by the frame's heading.
+            double half = (toWorld ? frame.HeadingDeg : -frame.HeadingDeg) * Math.PI / 360.0;
+            float ry = (float)Math.Sin(half), rw = (float)Math.Cos(half);
+            moved.Samples.Capacity = Samples.Count;
+            foreach (FlightSample s in Samples)
+            {
+                FlightSample m = s;
+                if (toWorld) frame.ToWorld(s.X, s.Y, s.Z, out m.X, out m.Y, out m.Z);
+                else frame.ToLocal(s.X, s.Y, s.Z, out m.X, out m.Y, out m.Z);
+                frame.Turn(s.Vx, s.Vz, toWorld, out m.Vx, out m.Vz);
+                // (0, ry, 0, rw) × q
+                m.Qx = rw * s.Qx + ry * s.Qz;
+                m.Qy = rw * s.Qy + ry * s.Qw;
+                m.Qz = rw * s.Qz - ry * s.Qx;
+                m.Qw = rw * s.Qw - ry * s.Qy;
+                moved.Samples.Add(m);
+            }
+            System.Globalization.CultureInfo inv = System.Globalization.CultureInfo.InvariantCulture;
+            foreach (FlightEvent e in Events)
+            {
+                FlightEvent m = e;
+                string[] parts = (e.Data ?? "").Split(';');
+                if (Array.IndexOf(PlacedEvents, e.Type) >= 0 && parts.Length >= 3
+                    && float.TryParse(parts[0], System.Globalization.NumberStyles.Float, inv, out float x)
+                    && float.TryParse(parts[1], System.Globalization.NumberStyles.Float, inv, out float y)
+                    && float.TryParse(parts[2], System.Globalization.NumberStyles.Float, inv, out float z))
+                {
+                    if (toWorld) frame.ToWorld(x, y, z, out x, out y, out z); else frame.ToLocal(x, y, z, out x, out y, out z);
+                    parts[0] = x.ToString("0.00", inv);
+                    parts[1] = y.ToString("0.00", inv);
+                    parts[2] = z.ToString("0.00", inv);
+                    // A heading right after the place (a photo's) turns with the frame too.
+                    if (e.Type == "photo" && parts.Length >= 4 && float.TryParse(parts[3], System.Globalization.NumberStyles.Float, inv, out float heading))
+                    {
+                        heading += toWorld ? frame.HeadingDeg : -frame.HeadingDeg;
+                        heading = ((heading % 360f) + 360f) % 360f;
+                        parts[3] = heading.ToString("0.0", inv);
+                    }
+                    m.Data = string.Join(";", parts);
+                }
+                moved.Events.Add(m);
+            }
+            return moved;
+        }
+
         public void Save(string path)
         {
             using (var file = new FileStream(path, FileMode.Create, FileAccess.Write)) Save(file);
