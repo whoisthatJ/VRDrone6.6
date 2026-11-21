@@ -70,6 +70,11 @@ namespace Ushqyr.Flight
         public float BatteryUsedMah;
         /// <summary>Simulated time (s).</summary>
         public double Time;
+        /// <summary>
+        /// Thrust lost per motor, 0..1: 0 = healthy (the default), 0.3 = a damaged propeller or weak motor, 1 = stopped.
+        /// Set by failure scenarios; a healthy drone computes exactly what it did before this field existed.
+        /// </summary>
+        public Motor4 MotorLoss;
 
         public static QuadState AtRest(Vec3 position, Quat orientation) => new QuadState
         {

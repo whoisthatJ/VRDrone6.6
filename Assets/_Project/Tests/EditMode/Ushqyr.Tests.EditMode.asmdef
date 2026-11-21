@@ -21,7 +21,9 @@
         "Ushqyr.EditorTools",
         "Ushqyr.AI",
         "Ushqyr.Strike",
-        "Ushqyr.Bench"
+        "Ushqyr.Bench",
+        "Ushqyr.Edu.Core",
+        "Ushqyr.Edu"
     ],
     "includePlatforms": [
         "Editor"
