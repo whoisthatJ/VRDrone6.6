@@ -43,7 +43,7 @@ Camera, area, finds and payload metrics wait for ED2 and ED6, where the things t
 | 4.6 | Video export through ffmpeg (already used by the AI Bench recorder) | An exported file plays |
 
 **State on 21 November 2026:** 4.1 to 4.5 are done (`EDU_PLAN.md` §15). 4.3 has no button yet: the recorder keeps the
-last ten minutes and `Save` writes them, the button comes with the training hub. 4.6 waits for ffmpeg.
+last ten minutes and `Save` writes them, the button comes with the training hub. 4.6 is done in the editor (not yet tried in a built program).
 
 The AI Bench recorder stays as it is (its files are signed evidence). The new recorder shares the reader of the truth
 track where that is natural, and nothing in the AI Bench attempt folder changes.

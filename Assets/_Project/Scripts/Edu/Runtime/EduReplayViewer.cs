@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using TMPro;
@@ -21,7 +22,7 @@ namespace Ushqyr.Edu
     /// nothing in the scene (gates, timers, bots) reacts to a flight that is only being watched.
     /// </para>
     /// Space plays and pauses, the arrow keys step (Shift: one second), C changes the camera, − and + the speed,
-    /// R shows or hides the reference, Esc closes.
+    /// R shows or hides the reference, V saves the flight as a video, Esc closes.
     /// </summary>
     public sealed class EduReplayViewer : MonoBehaviour
     {
@@ -44,7 +45,12 @@ namespace Ushqyr.Edu
         private LineRenderer _path, _referencePath;
         private string _title;
         private TextMeshProUGUI _titleText;
-        private Button _close;
+        private Button _close, _videoButton;
+        private EduVideo _video;
+        private float _exportStep;
+        private bool _exportStop;
+        private string _notice = "";
+        private float _noticeUntil;
         private FlightRecording _reference;
         private ReplayComparison _gap;
         private List<KeyValuePair<float, FlightEvent>> _events;
@@ -65,6 +71,11 @@ namespace Ushqyr.Edu
         /// <summary>Seconds behind the reference at the cursor (negative: ahead); NaN with no reference or off its path.</summary>
         public float Gap => _gap != null ? _gap.GapAt(Playback.Time) : float.NaN;
         public event Action Closed;
+        /// <summary>True while a video is being written; the viewer plays by itself then.</summary>
+        public bool Exporting => _video != null;
+        /// <summary>The last video written (a path), or why the last try failed.</summary>
+        public string LastVideo { get; private set; } = "";
+        public bool LastVideoOk { get; private set; }
 
         /// <summary>
         /// Opens the viewer on <paramref name="flight"/>, with <paramref name="reference"/> to compare against if given.
@@ -155,6 +166,11 @@ namespace Ushqyr.Edu
         public void Close()
         {
             if (_vehicle == null && Current != this) return;
+            if (_video != null)
+            {
+                _video.Abort();
+                _video = null;
+            }
             L.Changed -= Relabel;
             foreach (Renderer r in _hidden) if (r != null) r.enabled = true;
             foreach (Camera c in _cameras) if (c != null) c.enabled = true;
@@ -325,10 +341,11 @@ namespace Ushqyr.Edu
             EduUi.Button(bar, "−", 198f, 50f, 48f, 48f, () => Playback.Slower(), 28f);
             _speed = EduUi.Text(bar, "", 250f, 50f, 84f, 48f, 23f, Color.white, TextAlignmentOptions.Center);
             EduUi.Button(bar, "+", 338f, 50f, 48f, 48f, () => Playback.Faster(), 28f);
-            _cameraButton = EduUi.Button(bar, "", 400f, 50f, 330f, 48f, () => View.Next());
-            if (_reference != null) _referenceButton = EduUi.Button(bar, "", 742f, 50f, 330f, 48f, ToggleReference);
-            _clock = EduUi.Text(bar, "", 1090f, 50f, 250f, 48f, 25f);
-            EduUi.Text(bar, "Space   ← →   C   − +" + (_reference != null ? "   R" : "") + "   Esc", 1340f, 50f, 350f, 48f, 17f, EduUi.Dim, TextAlignmentOptions.MidlineRight);
+            _cameraButton = EduUi.Button(bar, "", 400f, 50f, 300f, 48f, () => View.Next());
+            if (_reference != null) _referenceButton = EduUi.Button(bar, "", 712f, 50f, 310f, 48f, ToggleReference);
+            _videoButton = EduUi.Button(bar, "", 1034f, 50f, 150f, 48f, () => ExportVideo());
+            _clock = EduUi.Text(bar, "", 1200f, 50f, 230f, 48f, 25f);
+            EduUi.Text(bar, "Space  ← →  C  − +" + (_reference != null ? "  R" : "") + "  V  Esc", 1430f, 50f, 262f, 48f, 16f, EduUi.Dim, TextAlignmentOptions.MidlineRight);
             _close = EduUi.Button(bar, "", 1704f, 50f, 160f, 48f, Close);
             _close.name = "Close";
 
@@ -405,6 +422,7 @@ namespace Ushqyr.Edu
         {
             _titleText.text = string.IsNullOrEmpty(_title) ? L.T("Recorded flight") : _title;
             EduUi.SetLabel(_close, L.T("Close"));
+            EduUi.SetLabel(_videoButton, L.T("Video"));
             if (_referenceButton != null) EduUi.SetLabel(_referenceButton, L.T("Reference flight") + ": " + L.T(ShowReference ? "shown" : "hidden"));
         }
 
@@ -414,13 +432,111 @@ namespace Ushqyr.Edu
                 ? t.ToLocalTime().ToString("dd.MM.yyyy HH:mm", CultureInfo.InvariantCulture) : "";
         }
 
+        // ---------- video ----------
+
+        /// <summary>
+        /// Saves the whole flight as an MP4 of what the viewer shows (the chosen camera, the sticks, the graphs), at
+        /// <paramref name="fps"/> pictures a second of flight time. The flight plays from the start by itself; Esc stops
+        /// it. Returns false, with the reason in <see cref="LastVideo"/>, when it cannot start.
+        /// </summary>
+        public bool ExportVideo(string path = null, float fps = 30f)
+        {
+            if (Exporting) return false;
+            LastVideoOk = false;
+            string ffmpeg = EduVideo.Find();
+            if (ffmpeg == null)
+            {
+                LastVideo = L.T("ffmpeg was not found, so a video cannot be made");
+                Notice(LastVideo);
+                return false;
+            }
+            if (string.IsNullOrEmpty(path))
+                path = System.IO.Path.Combine(EduSession.Folder, "videos", "flight-" + DateTime.Now.ToString("yyyyMMdd-HHmmss", CultureInfo.InvariantCulture) + ".mp4");
+            try
+            {
+                // A texture's bytes start with the bottom row and a video's with the top one. Where the graphics system
+                // counts rows from the top (Direct3D), the picture grabbed from the screen is already upside down, and
+                // the two cancel; elsewhere ffmpeg turns it over.
+                _video = new EduVideo(ffmpeg, Screen.width, Screen.height, fps, path, !SystemInfo.graphicsUVStartsAtTop);
+            }
+            catch (Exception e)
+            {
+                LastVideo = e.Message;
+                Notice(L.F("The video was not saved: {0}", e.Message));
+                return false;
+            }
+            _exportStep = 1f / fps;
+            _exportStop = false;
+            _notice = "";
+            StartCoroutine(Export(path));
+            return true;
+        }
+
+        private IEnumerator Export(string path)
+        {
+            int width = Screen.width, height = Screen.height;
+            var target = new RenderTexture(width, height, 0, RenderTextureFormat.ARGB32);
+            var picture = new Texture2D(width, height, TextureFormat.RGB24, false);
+            var bytes = new byte[width * height * 3];
+            var endOfFrame = new WaitForEndOfFrame();
+            Playback.Playing = false;
+            Playback.Seek(0f);
+            _jumped = true;
+            int frames = Mathf.CeilToInt(Playback.End / _exportStep) + 1;
+            for (int i = 0; i < frames && !_exportStop && !_video.Failed; i++)
+            {
+                Playback.Seek(i * _exportStep);
+                yield return endOfFrame; // Update has put the drone and the screen at this moment; now the frame is drawn
+                if (Screen.width != width || Screen.height != height) { _exportStop = true; break; } // the window was resized
+                ScreenCapture.CaptureScreenshotIntoRenderTexture(target);
+                RenderTexture before = RenderTexture.active;
+                RenderTexture.active = target;
+                picture.ReadPixels(new Rect(0f, 0f, width, height), 0, 0, false);
+                RenderTexture.active = before;
+                picture.GetRawTextureData<byte>().CopyTo(bytes);
+                _video.Write(bytes, bytes.Length);
+            }
+            EduVideo video = _video;
+            _video = null;
+            Destroy(target);
+            Destroy(picture);
+            if (_exportStop)
+            {
+                video.Abort();
+                LastVideo = L.T("The video was stopped");
+                Notice(LastVideo);
+            }
+            else if (video.Close())
+            {
+                LastVideo = path;
+                LastVideoOk = true;
+                Notice(L.F("Video saved: {0}", path));
+            }
+            else
+            {
+                LastVideo = video.Errors.Length > 0 ? video.Errors : "ffmpeg";
+                Notice(L.F("The video was not saved: {0}", LastVideo));
+            }
+        }
+
+        private void Notice(string text)
+        {
+            _notice = text;
+            _noticeUntil = Time.unscaledTime + 10f;
+        }
+
         // ---------- every frame ----------
 
         private void Update()
         {
             if (Playback == null) return;
             Keyboard kb = Keyboard.current;
-            if (kb != null)
+            if (Exporting)
+            {
+                // The video sets the time itself, one picture at a time; only Esc is listened to, and it stops the video.
+                if (kb != null && kb.escapeKey.wasPressedThisFrame) _exportStop = true;
+            }
+            else if (kb != null)
             {
                 bool shift = kb.leftShiftKey.isPressed || kb.rightShiftKey.isPressed;
                 if (kb.escapeKey.wasPressedThisFrame) { Close(); return; }
@@ -431,9 +547,10 @@ namespace Ushqyr.Edu
                 if (kb.minusKey.wasPressedThisFrame || kb.numpadMinusKey.wasPressedThisFrame) Playback.Slower();
                 if (kb.equalsKey.wasPressedThisFrame || kb.numpadPlusKey.wasPressedThisFrame) Playback.Faster();
                 if (kb.rKey.wasPressedThisFrame && _reference != null) ToggleReference();
+                if (kb.vKey.wasPressedThisFrame) ExportVideo();
             }
-            float dt = Time.unscaledDeltaTime;
-            Playback.Advance(dt);
+            float dt = Exporting ? _exportStep : Time.unscaledDeltaTime;
+            if (!Exporting) Playback.Advance(dt);
             float t = Playback.Time;
             FlightSample s = Playback.Now;
             var position = new Vector3(s.X, s.Y, s.Z);
@@ -489,6 +606,7 @@ namespace Ushqyr.Edu
                 if (t - _events[i].Key <= 3f) happened = EduUi.Clock(_events[i].Key) + "   " + L.T(_events[i].Value.Type);
                 break;
             }
+            if (_notice.Length > 0 && !Exporting && Time.unscaledTime < _noticeUntil) happened = _notice;
             _event.text = happened;
 
             if (_gapText != null)

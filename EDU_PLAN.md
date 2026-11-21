@@ -548,3 +548,26 @@ the clock, the cameras, the game's screens and the drone.
 - **Propellers do not turn** in the replay (the models are still copies).
 - **The picture on a weak PC** was not measured.
 
+### 21 November 2026, later: a replay can be saved as a video (ED1 task 4.6)
+**What exists.** The viewer has a "Video" button (key V). It plays the flight from the start by itself and writes an
+MP4 of what the viewer shows: the chosen camera, the sticks, the graphs, the reference flight. 30 pictures for each
+second of the flight, at the size of the window; Esc stops it and removes the half-written file. Files go to
+`edu/videos` in the user's data folder. `EduVideo` finds ffmpeg (the variable `USHQYR_FFMPEG`, the copy shipped with
+the program, the developer's copy in `ThirdParty/edu/ffmpeg`, the PATH), tries which H.264 encoder really runs on
+this PC and uses the first that does.
+
+**ffmpeg.** The owner allowed the download. `Tools/Edu/fetch_third_party.py ffmpeg` fetches a pinned **LGPL** build
+(8.1.3, no x264), checks its hash and keeps `ffmpeg.exe` and the licence text, 134 MB, outside the repository.
+
+**Checked.** In the editor a 34 s comparison of two flights was exported at 1920 × 1080: a 29 MB H.264 file, 34.4 s,
+30 pictures a second; ffmpeg decodes all of it without an error, and the picture at 6 s shows the viewer at 0:06.00,
+the right way up. The first try was upside down; the cause (a texture's rows run bottom to top, and Direct3D's screen
+grab is already turned over) is written in the code.
+
+**Not checked or not decided.**
+- **In a built program:** only the editor was tried. The picture's orientation on Linux (OpenGL or Vulkan) follows
+  from the same reasoning but was not seen.
+- **Another video player:** the file was decoded by ffmpeg only, not opened in Windows' own player.
+- **Shipping:** ffmpeg is in no build yet. 134 MB more in the school installer is the owner's call, and so is the
+  licence question in `THIRD_PARTY_NOTICES.md` (LGPL text and source offer; H.264 patents).
+- **AI Bench videos:** its recorder asks for the x264 encoder, which the LGPL build lacks. Nothing there was changed.

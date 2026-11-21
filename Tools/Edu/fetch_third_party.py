@@ -2,6 +2,7 @@
 
     python -I Tools/Edu/fetch_third_party.py blockly     Blockly → Assets/StreamingAssets/Edu/Studio/blockly (kept in the repository)
     python -I Tools/Edu/fetch_third_party.py python      Python runtime with numpy, OpenCV and pymavlink → ThirdParty/edu/python (not in the repository)
+    python -I Tools/Edu/fetch_third_party.py ffmpeg      ffmpeg (LGPL build) for video export → ThirdParty/edu/ffmpeg (not in the repository)
     python -I Tools/Edu/fetch_third_party.py all
 
 Every download is checked against the hash written in this file; a file that does not match is refused. To move to a
@@ -38,6 +39,16 @@ PYTHON = {
     'packages': ['numpy==2.2.6', 'opencv-python-headless==4.11.0.86', 'pymavlink==2.4.50'],
 }
 
+# The LGPL build (no x264): the program runs it as a separate process and never links it. The builder removes old
+# daily builds after a while; keep the downloaded archive in ThirdParty/edu, or move to a newer tag and its hash.
+FFMPEG = {
+    'version': '8.1.3 (n8.1.3-39-g660b5aa7db, LGPL)',
+    'name': 'ffmpeg-n8.1.3-39-g660b5aa7db-win64-lgpl-8.1.zip',
+    'url': 'https://github.com/BtbN/FFmpeg-Builds/releases/download/autobuild-2026-11-21-12-37/'
+           'ffmpeg-n8.1.3-39-g660b5aa7db-win64-lgpl-8.1.zip',
+    'files': ['bin/ffmpeg.exe', 'LICENSE.txt'],
+}
+
 HASHES = REPO / 'Tools' / 'Edu' / 'third_party_hashes.json'
 
 
@@ -50,7 +61,7 @@ def download(url, name, algorithm, print_hashes):
     target = CACHE / name
     if not target.exists():
         print('downloading', url)
-        with urllib.request.urlopen(url, timeout=120) as r:
+        with urllib.request.urlopen(url, timeout=600) as r:
             data = r.read()
         target.write_bytes(data)
     data = target.read_bytes()
@@ -125,12 +136,33 @@ def python_runtime(print_hashes):
     print(f'python {PYTHON["version"]} with {", ".join(PYTHON["packages"])}: {size:.0f} MB in {out.relative_to(REPO)}')
 
 
+def ffmpeg(print_hashes):
+    data = download(FFMPEG['url'], FFMPEG['name'], 'sha256', print_hashes)
+    out = CACHE / 'ffmpeg'
+    if out.exists():
+        shutil.rmtree(out)
+    out.mkdir(parents=True)
+    kept = []
+    with zipfile.ZipFile(io.BytesIO(data)) as z:
+        for info in z.infolist():
+            # Inside the archive everything sits in one folder named after the build.
+            rel = info.filename.split('/', 1)[1] if '/' in info.filename else info.filename
+            if rel in FFMPEG['files'] and safe(info.filename):
+                (out / Path(rel).name).write_bytes(z.read(info))
+                kept.append(Path(rel).name)
+    missing = [Path(f).name for f in FFMPEG['files'] if Path(f).name not in kept]
+    size = sum(f.stat().st_size for f in out.iterdir()) / 1e6
+    print(f'ffmpeg {FFMPEG["version"]}: {", ".join(kept)}, {size:.0f} MB in {out.relative_to(REPO)}' + (f'; NOT in the archive: {missing}' if missing else ''))
+
+
 if __name__ == '__main__':
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument('what', choices=['blockly', 'python', 'all'])
+    ap.add_argument('what', choices=['blockly', 'python', 'ffmpeg', 'all'])
     ap.add_argument('--print-hashes', action='store_true', help='print the hashes of what was downloaded instead of checking them')
     a = ap.parse_args()
     if a.what in ('blockly', 'all'):
         blockly(a.print_hashes)
     if a.what in ('python', 'all'):
         python_runtime(a.print_hashes)
+    if a.what in ('ffmpeg', 'all'):
+        ffmpeg(a.print_hashes)

@@ -2651,6 +2651,26 @@ MonoBehaviour:
     m_Key: level with the reference
     m_Metadata:
       m_Items: []
+  - m_Id: 6721110102769664
+    m_Key: Video
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6721110157295616
+    m_Key: 'Video saved: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6721110157295617
+    m_Key: 'The video was not saved: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6721110157295618
+    m_Key: The video was stopped
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6721110157295619
+    m_Key: ffmpeg was not found, so a video cannot be made
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:
