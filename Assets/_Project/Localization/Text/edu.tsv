@@ -1,0 +1,25 @@
+# Education Suite: the replay viewer. Russian was written first; the Kazakh column needs a native review. Columns: English (key) <TAB> Kazakh <TAB> Russian
+Close	Жабу	Закрыть
+Height	Биіктік	Высота
+Speed	Жылдамдық	Скорость
+Throttle	Газ	Газ
+Battery	Батарея	Батарея
+Mode	Режим	Режим
+Fixed	Тұрақты	Неподвижная
+From above	Жоғарыдан	Сверху
+Acro	Акро	Акро
+Angle	Тұрақтандыру	Стабилизация
+Horizon	Горизонт	Горизонт
+crash	соқтығыс	авария
+respawn	стартқа қайту	возврат на старт
+gate	қақпа	ворота
+Recorded flight	Жазылған ұшу	Записанный полёт
+Reference flight	Үлгі ұшу	Образцовый полёт
+shown	көрсетілген	показан
+hidden	жасырылған	скрыт
+{0} m	{0} м	{0} м
+{0} m/s	{0} м/с	{0} м/с
+motors off	қозғалтқыштар өшірулі	моторы выключены
+{0} s behind the reference	үлгіден {0} с артта	на {0} с позади образца
+{0} s ahead of the reference	үлгіден {0} с алда	на {0} с впереди образца
+level with the reference	үлгімен қатар	наравне с образцом

@@ -70,6 +70,23 @@ namespace Ushqyr.Edu
         }
 
         /// <summary>
+        /// The reference flight shipped with an activity (the demo before it, the flight to compare with after it):
+        /// the file with the activity's id beside its definition. Null when the activity has none or it cannot be read.
+        /// </summary>
+        public static FlightRecording Reference(ActivityDefinition activity)
+        {
+            if (activity == null) return null;
+            string file = Path.Combine(Application.streamingAssetsPath, "Edu/Activities", activity.Id + ".grreplay");
+            if (!File.Exists(file)) return null;
+            try { return FlightRecording.Load(file); }
+            catch (InvalidDataException e)
+            {
+                Debug.LogError("[Edu] reference flight of " + activity.Id + ": " + e.Message);
+                return null;
+            }
+        }
+
+        /// <summary>
         /// Ends an attempt: grades the recorder's flight against the activity and stores it for the current student.
         /// With nobody chosen yet, a local student named by the seat's computer is used, so a first flight is never lost.
         /// </summary>

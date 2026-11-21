@@ -50,6 +50,9 @@ Items marked ❓ are my defaults; the customer should confirm them (§13). Each 
 | D20 | **Soccer contacts: each PC simulates its own ball**, other balls are predicted forward by their speed, one bounce per pair until they separate, the host decides goals and fouls. Provisional until tried on two real instances in ED8 | `Docs/spikes/lan_collisions.md` (a numerical model, not yet a LAN test) |
 | D22 | **Third-party parts are fetched by a script at pinned versions and checked against recorded hashes** (`Tools/Edu/fetch_third_party.py`). Blockly (923 KB of text files) is kept in the repository; the Python runtime (237 MB) is not, and a build takes it from `ThirdParty/edu/python` | A build never depends on what the internet serves that day; the repository stays small |
 | D23 | **Soccer follows FAI Volume F9, 2026 Edition, Version 2 (effective 1 June 2026)**, as read into `Docs/reference/fai/f9a_values.md`. Where that page and the table in §6 differ, the page wins: goal rings 2 m from the ground to the bottom of the inner opening, hanging from the cage's ceiling; **Position and Altitude hold are off in soccer** (the rules forbid automatic position and height holding); the Striker changes within a set only when its ball can no longer fly; instant replay is not a referee's tool in a "strict FAI" match | The prompt's rule "sport rules follow the FAI text"; which edition the customer's events use is still question 6 of §13 |
+| D24 | **A flight nobody flew records the commands, not empty sticks.** With a person at the sticks the recording holds the sticks as held; with nobody there (a mission, a student's program) it holds what the flight controller was given, and the note `sticks` says which | The stick display, the throttle graph and the smoothness measure would otherwise be empty for every programmed flight |
+| D25 | **The time between two flights is measured along the path**: when the other flight was at the nearest place, searching forward only; no figure when the two are more than 5 m apart | Laps and crossings must not be confused; for a hover the figure means little, so the hub shows it only for activities with a route |
+| D26 | **Reference flights are files** `Edu/Activities/<id>.grreplay`, flown in the simulator; a test requires one for every shipped activity, scoring 90 or more | The prompt's rule "activities are data with a reference flight of 90 or more as a test", on real flights |
 | D21 | **Names are compared and sorted in code, not in SQL.** SQLite folds case for Latin letters only and orders by character code, which made "7Б" and "7б" two groups and put every Kazakh letter after the Russian alphabet | Found by the store tests |
 
 ## 3. Shared foundations
@@ -510,4 +513,38 @@ journal; `Regrade` grades a stored attempt again. Live in `Track_Field` the auto
 **FAI rules read (21 November, evening).** The owner saved the PDF; all F9A values are in
 `Docs/reference/fai/f9a_values.md` with paragraph numbers, and the nine differences from the table in §6 are listed
 there (decision D23). The one that touches a design already built: assisted modes must be switched off for drone balls.
+
+### 21 November 2026, night: the replay viewer (ED1 tasks 4.4 and 4.5)
+**What exists.** `EduReplayViewer.Open(drone, flight, reference)` shows a `.grreplay` on a timeline: play and pause,
+0.1 to 4 times the flown speed, steps of 0.05 s and 1 s, five cameras (behind, from the drone, fixed, from above,
+free), the sticks as a mode 2 radio holds them, graphs of height, speed and throttle with a cursor, coloured markers
+on the timeline for what happened, and the flight's path as a line in the air. With a second flight it also shows that
+flight as a light-blue drone with its own path, and the time between the two ("0.95 s behind the reference"). The
+viewer flies copies of the drone's model, stops the game's clock and hides the game's screens, so nothing in the scene
+reacts to a flight that is only watched; closing gives everything back. Texts are in three languages
+(`Localization/Text/edu.tsv`, Kazakh needs a native review).
+
+**Decisions.**
+- **D24. Sticks of a flight nobody flew.** With a person at the sticks the recording holds the sticks as that person
+  held them. With nobody there (a mission, later a student's program) it holds the commands the flight controller was
+  given, and the note `sticks` says which (`pilot` or `commands`). Otherwise the stick display, the throttle graph and
+  the smoothness measure would be empty for every programmed flight.
+- **D25. The time between two flights** is found along the path: for each moment of one flight, when the other was at
+  the nearest place, searching forward only (so laps and crossings are not confused). More than 5 m apart there is no
+  figure. For a hover the figure means little; the hub should show it only for activities with a route.
+- **D26. Reference flights are files.** `Edu/Activities/<id>.grreplay` beside the activity's definition, flown in the
+  simulator, and a test checks that every shipped activity has one that scores 90 or more. The sample exercise's
+  reference was flown by the autopilot: 98.4 of 100.
+
+**Checked.** 9 new tests (clock, blending, events, graph columns, time between flights on a line and on laps, the
+reference gate); 432 of 432 pass. Live in `Track_Field`: two autopilot flights of the same route at 5 and 3.5 m/s,
+opened one against the other; the screen was looked at in the five views and the three languages; closing restores
+the clock, the cameras, the game's screens and the drone.
+
+**Not done of the viewer.**
+- **Video export (task 4.6):** there is no ffmpeg on this PC, and getting one is a download the owner has to allow.
+- **Opening it from the game:** there is no button yet. It comes with the training hub (ED3: replay library, "watch
+  my last flight", "compare with the reference" after an exercise).
+- **Propellers do not turn** in the replay (the models are still copies).
+- **The picture on a weak PC** was not measured.
 

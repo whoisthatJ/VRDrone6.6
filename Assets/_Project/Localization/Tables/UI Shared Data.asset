@@ -2555,6 +2555,102 @@ MonoBehaviour:
     m_Key: Making images and labels
     m_Metadata:
       m_Items: []
+  - m_Id: 6715609080135680
+    m_Key: Close
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6715609159827456
+    m_Key: Height
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6715609159827457
+    m_Key: Speed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6715609159827458
+    m_Key: Throttle
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6715609159827459
+    m_Key: Battery
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6715609159827460
+    m_Key: Mode
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6715609159827461
+    m_Key: Fixed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6715609159827462
+    m_Key: From above
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6715609159827463
+    m_Key: Acro
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6715609159827464
+    m_Key: Angle
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6715609159827465
+    m_Key: Horizon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6715609159827466
+    m_Key: crash
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6715609159827467
+    m_Key: respawn
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6715609159827468
+    m_Key: gate
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6715609159827469
+    m_Key: Recorded flight
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6715609159827470
+    m_Key: Reference flight
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6715609159827471
+    m_Key: shown
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6715609159827472
+    m_Key: hidden
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6715609159827473
+    m_Key: '{0} m'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6715609159827474
+    m_Key: '{0} m/s'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6715609159827475
+    m_Key: motors off
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6715609159827476
+    m_Key: '{0} s behind the reference'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6715609159827477
+    m_Key: '{0} s ahead of the reference'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6715609159827478
+    m_Key: level with the reference
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

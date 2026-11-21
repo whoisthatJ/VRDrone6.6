@@ -21,6 +21,7 @@ namespace Ushqyr.Edu
         private EduFlight _flight;
         private FlightRecorderCore _core;
         private double _clock;
+        private bool _pilotSticks = true;
 
         public FlightRecording Recording => _core?.Recording;
         public bool Paused { get; set; }
@@ -56,6 +57,8 @@ namespace Ushqyr.Edu
             Note("scene", gameObject.scene.name);
             Note("drone", _vehicle != null ? _vehicle.Profile.Name ?? "" : "");
             Note("started", DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ", System.Globalization.CultureInfo.InvariantCulture));
+            _pilotSticks = true;
+            Note("sticks", "pilot");
         }
 
         public void Note(string key, string value) => _core.Recording.Notes[key] = value ?? "";
@@ -73,7 +76,15 @@ namespace Ushqyr.Edu
             ref readonly QuadState s = ref _vehicle.State;
             float capacity = _vehicle.Profile.Battery.CapacityMah;
             float battery = _flight != null ? _flight.Battery : capacity > 0f ? Mathf.Clamp01(1f - s.BatteryUsedMah / capacity) : 1f;
-            _core.Push(_clock, s, _vehicle.LastInput, battery);
+            // With a person flying, the sticks as that person holds them. With nobody at the sticks (a mission, a
+            // student's program) there is nothing to show there, so the commands the flight controller was given.
+            bool pilot = _flight == null || _flight.PilotPresent;
+            if (pilot != _pilotSticks)
+            {
+                _pilotSticks = pilot;
+                Note("sticks", pilot ? "pilot" : "commands");
+            }
+            _core.Push(_clock, s, pilot ? _vehicle.LastInput : _vehicle.FlownInput, battery);
         }
 
         /// <summary>Writes the recording so far to a `.grreplay` file and returns its hash.</summary>

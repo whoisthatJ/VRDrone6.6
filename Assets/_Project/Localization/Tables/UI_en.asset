@@ -2558,6 +2558,102 @@ MonoBehaviour:
     m_Localized: Making images and labels
     m_Metadata:
       m_Items: []
+  - m_Id: 6715609080135680
+    m_Localized: Close
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6715609159827456
+    m_Localized: Height
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6715609159827457
+    m_Localized: Speed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6715609159827458
+    m_Localized: Throttle
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6715609159827459
+    m_Localized: Battery
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6715609159827460
+    m_Localized: Mode
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6715609159827461
+    m_Localized: Fixed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6715609159827462
+    m_Localized: From above
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6715609159827463
+    m_Localized: Acro
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6715609159827464
+    m_Localized: Angle
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6715609159827465
+    m_Localized: Horizon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6715609159827466
+    m_Localized: crash
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6715609159827467
+    m_Localized: respawn
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6715609159827468
+    m_Localized: gate
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6715609159827469
+    m_Localized: Recorded flight
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6715609159827470
+    m_Localized: Reference flight
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6715609159827471
+    m_Localized: shown
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6715609159827472
+    m_Localized: hidden
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6715609159827473
+    m_Localized: '{0} m'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6715609159827474
+    m_Localized: '{0} m/s'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6715609159827475
+    m_Localized: motors off
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6715609159827476
+    m_Localized: '{0} s behind the reference'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6715609159827477
+    m_Localized: '{0} s ahead of the reference'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6715609159827478
+    m_Localized: level with the reference
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

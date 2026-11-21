@@ -14,7 +14,10 @@ namespace Ushqyr.Edu
         public float X, Y, Z;
         public float Vx, Vy, Vz;
         public float Qx, Qy, Qz, Qw;
-        /// <summary>Sticks as the flight controller got them: throttle 0..1, the others -1..1.</summary>
+        /// <summary>
+        /// Sticks, throttle 0..1 and the others -1..1: as the pilot held them, or, in a flight with nobody at the
+        /// sticks, the commands the flight controller was given (the note "sticks" says which: "pilot" or "commands").
+        /// </summary>
         public float Throttle, Yaw, Pitch, Roll;
         public byte Mode;
         public bool Armed;
