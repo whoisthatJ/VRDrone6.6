@@ -10,7 +10,7 @@ namespace Ushqyr.Edu
 
         /// <summary>What the pilot is told (a key of the language table).</summary>
         public string Say = "";
-        /// <summary>"stick", "zone", "height", "turn", "heading" or "landed".</summary>
+        /// <summary>"stick", "zone", "height", "turn", "heading", "circle" or "landed".</summary>
         public string Kind = "";
         public string Stick = "";
         /// <summary>Stick: the value to go above (or below, when <see cref="Below"/>).</summary>
@@ -20,8 +20,15 @@ namespace Ushqyr.Edu
         public double X, Y, Z, Radius = 1, Tolerance = 0.5;
         /// <summary>Seconds the condition must hold without a break.</summary>
         public double For;
-        /// <summary>Turn: degrees to turn on the spot, clockwise positive. Heading: the heading to face.</summary>
+        /// <summary>
+        /// Turn: degrees to turn on the spot, clockwise positive. Heading: the heading to face. Circle: degrees to
+        /// fly round the point (X, Z), clockwise seen from above positive.
+        /// </summary>
         public double Degrees;
+        /// <summary>Circle: only flying at a distance between these from the point counts (m).</summary>
+        public double Near, Far = 1000;
+        /// <summary>Landed: true when the landing must be inside the circle (X, Z, Radius).</summary>
+        public bool OnPad;
     }
 
     /// <summary>
@@ -102,8 +109,27 @@ namespace Ushqyr.Edu
                     Progress = (float)Math.Max(0.0, Math.Min(1.0, share));
                     break;
                 }
+                case "circle":
+                {
+                    double dx = s.X - step.X, dz = s.Z - step.Z, distance = Math.Sqrt(dx * dx + dz * dz);
+                    float bearing = (float)(Math.Atan2(dx, dz) * 180.0 / Math.PI);
+                    // Only the way flown at the right distance counts; cutting across the middle earns nothing.
+                    if (_hasHeading && distance >= step.Near && distance <= step.Far)
+                        _turned += ((bearing - _lastHeading) % 360f + 540f) % 360f - 180f;
+                    _lastHeading = bearing;
+                    _hasHeading = true;
+                    double share = step.Degrees != 0 ? _turned / step.Degrees : 1;
+                    met = share >= 1;
+                    Progress = (float)Math.Max(0.0, Math.Min(1.0, share));
+                    break;
+                }
                 case "landed":
                     met = !s.Armed && s.Y < 0.3f && s.Speed < 0.3f;
+                    if (met && step.OnPad)
+                    {
+                        double dx = s.X - step.X, dz = s.Z - step.Z;
+                        met = dx * dx + dz * dz <= step.Radius * step.Radius;
+                    }
                     Progress = met ? 1f : 0f;
                     break;
                 default:
@@ -185,8 +211,29 @@ namespace Ushqyr.Edu
                     step.Degrees = Json.Num(o, "heading", 0);
                     step.Tolerance = Json.Num(o, "tolerance", 15);
                 }
-                else if (Json.Flag(o, "landed")) step.Kind = "landed";
-                else throw new FormatException(where + ": a step needs one of \"stick\", \"zone\", \"height\", \"turn\", \"heading\" or \"landed\"");
+                else if (o.ContainsKey("circle"))
+                {
+                    Dictionary<string, object> c = Json.Obj(o, "circle") ?? throw new FormatException(where + ": \"circle\" must be an object {x, z, degrees, near, far}");
+                    step.Kind = "circle";
+                    step.X = Json.Num(c, "x", 0); step.Z = Json.Num(c, "z", 0);
+                    step.Degrees = Json.Num(c, "degrees", 360);
+                    step.Near = Json.Num(c, "near", 0); step.Far = Json.Num(c, "far", 1000);
+                    if (step.Degrees == 0 || step.Near < 0 || step.Far <= step.Near)
+                        throw new FormatException(where + ": a circle needs degrees other than 0 and \"far\" beyond \"near\"");
+                }
+                else if (Json.Flag(o, "landed"))
+                {
+                    step.Kind = "landed";
+                    Dictionary<string, object> pad = Json.Obj(o, "pad");
+                    if (pad != null)
+                    {
+                        step.OnPad = true;
+                        step.X = Json.Num(pad, "x", 0); step.Z = Json.Num(pad, "z", 0);
+                        step.Radius = Json.Num(pad, "radius", 0.75);
+                        if (step.Radius <= 0) throw new FormatException(where + ": a pad's radius must be above 0");
+                    }
+                }
+                else throw new FormatException(where + ": a step needs one of \"stick\", \"zone\", \"height\", \"turn\", \"heading\", \"circle\" or \"landed\"");
                 steps.Add(step);
             }
             return steps;

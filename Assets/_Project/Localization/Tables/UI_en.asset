@@ -3176,6 +3176,186 @@ MonoBehaviour:
     m_Localized: 'Leave the left stick in the middle from side to side: in this exercise the drone never turns.'
     m_Metadata:
       m_Items: []
+  - m_Id: 6771039097585664
+    m_Localized: Fly back, land on the pad and switch the motors off
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6771039164694528
+    m_Localized: Fly to corner 1 and stop
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6771039164694529
+    m_Localized: Turn the nose towards the next corner
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6771039164694530
+    m_Localized: Fly to corner 2 and stop
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6771039164694531
+    m_Localized: Fly to corner 3 and stop
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6771039164694532
+    m_Localized: Fly to corner 4 and stop
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6771039164694533
+    m_Localized: 'Close the square: fly back to corner 1'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6771039164694534
+    m_Localized: Square, nose forward
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6771039164694535
+    m_Localized: Fly the square again, but this time turn the drone at every corner so that its nose always points where it is going. When it flies towards you, left and right are swapped.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6771039164694536
+    m_Localized: Staying on the line
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6771039164694537
+    m_Localized: Look at the next box, not at the drone, and fly straight at it.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6771039164694538
+    m_Localized: Fly to the box in front of the pole
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6771039164694539
+    m_Localized: Circle the pole once clockwise, nose on the pole
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6771039164694540
+    m_Localized: Now once the other way, nose still on the pole
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6771039164694541
+    m_Localized: Circle a pole
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6771039164694542
+    m_Localized: 'Fly a circle around the pole, 5 m from it, keeping the nose of the drone pointed at the pole all the way round. Then do it the other way. You need both sticks at the same time: one slides the drone sideways, the other turns it.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6771039164694543
+    m_Localized: Keeping the distance from the pole
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6771039164694544
+    m_Localized: If the circle grows, push a little towards the pole; if it shrinks, pull away.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6771039164694545
+    m_Localized: Nose on the pole
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6771039164694546
+    m_Localized: Turn with the left stick at the same pace as you slide with the right one.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6771039164694547
+    m_Localized: Come through the box between the poles
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6771039164694550
+    m_Localized: Figure of eight
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6771039164694553
+    m_Localized: Start each circle from the middle box at an easy speed; a fast entry makes a wide circle.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6771039164694556
+    m_Localized: Take off and back away into the box; hold it for 15 seconds, nose towards you
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6771039164694557
+    m_Localized: Come back over the pad
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6771039164694558
+    m_Localized: Land on the pad, nose still towards you
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6771039164694559
+    m_Localized: Nose-in hover and landing
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6771039164694560
+    m_Localized: The drone faces you. Now its left is your right, and pushing the stick forward brings it towards you. Hover in the box and land without turning it round.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6771039164694561
+    m_Localized: Keeping the nose towards you
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6771039164694562
+    m_Localized: 'Do not turn the drone to make it easier: small stick moves, and think from the drone''s seat.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6771039164694563
+    m_Localized: Land on pad 1 and switch the motors off
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6771039164694564
+    m_Localized: Land on pad 2 and switch the motors off
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6771039164694565
+    m_Localized: Land on pad 3 and switch the motors off
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6771039164694566
+    m_Localized: Land on pad 4 and switch the motors off
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6771039164694567
+    m_Localized: Landing circuit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6771039168888832
+    m_Localized: Four pads, each smaller than the one before. Land on each in turn and switch the motors off, then take off again for the next. Finish on the pad you started from.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6771039168888833
+    m_Localized: Take off and hover over the pad for 10 seconds; hold against the wind
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6771039168888834
+    m_Localized: Without position hold, in wind
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6771039168888835
+    m_Localized: 'Position hold is switched off: the drone keeps its height but no longer stays where you leave it, and a light wind pushes it sideways. Hover, then fly the square. This is how a drone flies when it loses its satellite fix.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6775319762305024
+    m_Localized: Circle the left pole clockwise
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6775319980408832
+    m_Localized: Circle the right pole the other way
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6775319980408833
+    m_Localized: 'Fly a figure of eight around the two poles: once round the left pole, through the box in the middle, then round the right pole the other way. Keep the height the same all the way.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6775319980408834
+    m_Localized: The circle round the left pole
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6775319980408835
+    m_Localized: The circle round the right pole
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6775319980408836
+    m_Localized: 'The second circle turns the other way: slow down in the middle box before you change direction.'
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

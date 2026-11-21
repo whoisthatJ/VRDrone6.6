@@ -85,6 +85,9 @@ namespace Ushqyr.Edu
             _store = null;
         }
 
+        /// <summary>Reads the shipped activities again the next time they are asked for (their files were changed).</summary>
+        public static void ReloadActivities() => _activities = null;
+
         /// <summary>Every activity shipped with the program, by id. A file that does not pass its checks is reported and left out.</summary>
         public static IReadOnlyDictionary<string, ActivityDefinition> Activities
         {

@@ -230,6 +230,198 @@ EXERCISES.append({
 })
 
 
+# ================================================================ Block B: orientation and precision
+# Flown from where the pilot stands (line of sight), so the drone's own left and right no longer match the pilot's.
+LOS = dict(CAMERA, view='los')
+HOME = {'x': 0, 'z': 0, 'radius': 0.75}
+LAND_HOME = {'say': t('Fly back, land on the pad and switch the motors off', 'Кері ұшып, алаңшаға қонып, қозғалтқыштарды өшіріңіз', 'Вернитесь, сядьте на площадку и выключите моторы'),
+             'landed': True, 'pad': HOME}
+
+
+def pole(id, x, z, height=3.5):
+    return {'type': 'pole', 'id': id, 'x': x, 'y': 0, 'z': z, 'size': 0.25, 'height': height}
+
+
+def path_line(weight, points, best=0.4, worst=2.5):
+    return {'id': 'path', 'metric': 'path_error', 'label': t('Staying on the line', 'Сызық бойында қалу', 'Удержание линии'),
+            'tip': t('Look at the next box, not at the drone, and fly straight at it.', 'Дронға емес, келесі қорапқа қарап, тура соған ұшыңыз.', 'Смотрите на следующий куб, а не на дрон, и летите прямо к нему.'),
+            'weight': weight, 'best': best, 'worst': worst, 'params': {'points': points}}
+
+
+# ---------------------------------------------------------------- B7
+sq = [(-4, 4), (4, 4), (4, 12), (-4, 12)]
+face = [90, 0, 270, 180]
+steps, ref = [], [{'takeoff': 2, 'wait': 5}]
+for i in range(5):
+    x, z = sq[i % 4]
+    n = i % 4 + 1
+    steps.append({'say': t('Fly to corner %d and stop' % n if i < 4 else 'Close the square: fly back to corner 1',
+                           '%d-бұрышқа ұшып, тоқтаңыз' % n if i < 4 else 'Шаршыны жабыңыз: 1-бұрышқа қайта ұшыңыз',
+                           'Летите к углу %d и остановитесь' % n if i < 4 else 'Замкните квадрат: вернитесь к углу 1'),
+                  'zone': zone(x, 2, z), 'for': 1})
+    ref.append({'goto': [x, 2, z], 'heading': face[(i + 3) % 4] if i > 0 else 0, 'until_step': len(steps)})
+    if i < 4:
+        steps.append({'say': t('Turn the nose towards the next corner', 'Тұмсықты келесі бұрышқа бұрыңыз', 'Поверните нос к следующему углу'),
+                      'heading': face[i], 'tolerance': 20, 'for': 1})
+        ref.append({'heading': face[i], 'until_step': len(steps)})
+steps.append(LAND_HOME)
+ref += [{'goto': [0, 2, 0], 'heading': 0, 'wait': 7}, {'land': True, 'until_landed': True}]
+EXERCISES.append({
+    'format': 1, 'id': 'b07-square-nose-forward', 'type': 'exercise',
+    'title': t('Square, nose forward', 'Шаршы, тұмсығы алға', 'Квадрат носом вперёд'),
+    'briefing': t('Fly the square again, but this time turn the drone at every corner so that its nose always points where it is going. When it flies towards you, left and right are swapped.',
+                  'Шаршыны қайта ұшыңыз, бірақ бұл жолы әр бұрышта дронды бұрып, тұмсығы әрдайым ұшу бағытына қарап тұрсын. Ол сізге қарай ұшқанда, оң мен сол ауысады.',
+                  'Пролетите квадрат снова, но теперь поворачивайте дрон на каждом углу, чтобы нос всегда смотрел по ходу движения. Когда он летит к вам, лево и право меняются местами.'),
+    'pass': 60, 'time_limit': 240,
+    'setup': dict(LOS, objects=[PAD] + [box('c%d' % (i + 1), x, 2, z) for i, (x, z) in enumerate(sq)]),
+    'rubric': [steps_line(steps, 50), path_line(20, [[0, 2, 0], [-4, 2, 4], [4, 2, 4], [4, 2, 12], [-4, 2, 12], [-4, 2, 4], [0, 2, 0]]),
+               height_line(10, 2, 0.2, 1.0, **{'from': 6}), landing_line(10), time_line(10, 100, 220)],
+    'reference': ref,
+})
+
+# ---------------------------------------------------------------- B8
+ring = {'x': 0, 'z': 10, 'near': 2.5, 'far': 7.5}
+steps = [
+    {'say': t('Fly to the box in front of the pole', 'Бағана алдындағы қорапқа ұшыңыз', 'Летите к кубу перед столбом'), 'zone': zone(0, 2, 5, 1.2), 'for': 1},
+    {'say': t('Circle the pole once clockwise, nose on the pole', 'Тұмсықты бағанаға қаратып, бағананы сағат тілі бағытымен бір айналыңыз', 'Облетите столб один раз по часовой стрелке, носом к столбу'),
+     'circle': dict(ring, degrees=360)},
+    {'say': t('Now once the other way, nose still on the pole', 'Енді кері бағытта бір рет, тұмсық әлі бағанаға қарап тұрсын', 'Теперь один раз в обратную сторону, нос по-прежнему на столб'),
+     'circle': dict(ring, degrees=-360)},
+    LAND_HOME,
+]
+EXERCISES.append({
+    'format': 1, 'id': 'b08-circle-a-pole', 'type': 'exercise',
+    'title': t('Circle a pole', 'Бағананы айналу', 'Облёт столба'),
+    'briefing': t('Fly a circle around the pole, 5 m from it, keeping the nose of the drone pointed at the pole all the way round. Then do it the other way. You need both sticks at the same time: one slides the drone sideways, the other turns it.',
+                  'Бағанадан 5 м қашықтықта оны айнала ұшыңыз, дронның тұмсығы бүкіл жол бойы бағанаға қарап тұрсын. Содан кейін кері бағытта қайталаңыз. Екі стик бір мезгілде керек: бірі дронды бүйірге жылжытады, екіншісі бұрады.',
+                  'Облетите столб по кругу в 5 м от него, всё время удерживая нос дрона на столбе. Затем повторите в другую сторону. Нужны оба стика одновременно: один смещает дрон вбок, другой поворачивает.'),
+    'pass': 60, 'time_limit': 240,
+    'setup': dict(LOS, objects=[PAD, pole('pole', 0, 10), box('start', 0, 2, 5)]),
+    'rubric': [steps_line(steps, 40),
+               {'id': 'radius', 'metric': 'radius_error', 'label': t('Keeping the distance from the pole', 'Бағанадан қашықтықты сақтау', 'Удержание расстояния до столба'),
+                'tip': t('If the circle grows, push a little towards the pole; if it shrinks, pull away.', 'Шеңбер үлкейсе, бағанаға сәл жақындаңыз; кішірейсе, алыстаңыз.', 'Если круг растёт, чуть подайте дрон к столбу; если сжимается, отойдите.'),
+                'weight': 20, 'best': 0.4, 'worst': 2, 'params': dict(ring, radius=5)},
+               {'id': 'aim', 'metric': 'aim_error', 'label': t('Nose on the pole', 'Тұмсық бағанаға қараған', 'Нос на столб'),
+                'tip': t('Turn with the left stick at the same pace as you slide with the right one.', 'Оң стикпен жылжыған қарқынмен сол стикпен бұрылыңыз.', 'Поворачивайте левым стиком в том же темпе, в каком смещаетесь правым.'),
+                'weight': 20, 'best': 8, 'worst': 40, 'params': ring},
+               height_line(10, 2, 0.2, 1.0, **{'from': 6}), landing_line(10)],
+    'reference': [{'takeoff': 2, 'wait': 5}, {'goto': [0, 2, 5], 'heading': 0, 'until_step': 1},
+                  {'orbit': [0, 10], 'radius': 5, 'speed': 2, 'until_step': 2}, {'orbit': [0, 10], 'radius': 5, 'speed': -2, 'until_step': 3},
+                  {'goto': [0, 2, 0], 'heading': 0, 'wait': 8}, {'land': True, 'until_landed': True}],
+})
+
+# ---------------------------------------------------------------- B9
+# The poles stand side by side, 12 m out, so the way from the pad to the box between them is clear.
+one = {'x': -5, 'z': 12, 'near': 2.5, 'far': 7.5}
+two = {'x': 5, 'z': 12, 'near': 2.5, 'far': 7.5}
+MIDDLE = {'say': t('Come through the box between the poles', 'Бағаналар арасындағы қорап арқылы өтіңіз', 'Пройдите через куб между столбами'), 'zone': zone(0, 2, 12, 1.5)}
+steps = [
+    dict(MIDDLE, **{'for': 1}),
+    {'say': t('Circle the left pole clockwise', 'Сол жақ бағананы сағат тілі бағытымен айналыңыз', 'Облетите левый столб по часовой стрелке'), 'circle': dict(one, degrees=360)},
+    MIDDLE,
+    {'say': t('Circle the right pole the other way', 'Оң жақ бағананы кері бағытта айналыңыз', 'Облетите правый столб в обратную сторону'), 'circle': dict(two, degrees=-360)},
+    MIDDLE,
+    LAND_HOME,
+]
+EXERCISES.append({
+    'format': 1, 'id': 'b09-figure-eight', 'type': 'exercise',
+    'title': t('Figure of eight', 'Сегіздік', 'Восьмёрка'),
+    'briefing': t('Fly a figure of eight around the two poles: once round the left pole, through the box in the middle, then round the right pole the other way. Keep the height the same all the way.',
+                  'Екі бағананы айнала сегіздік жасаңыз: сол жақ бағананы бір айналып, ортадағы қорап арқылы өтіп, оң жақ бағананы кері бағытта айналыңыз. Биіктікті бүкіл жол бойы бірдей ұстаңыз.',
+                  'Пролетите восьмёрку вокруг двух столбов: один раз вокруг левого, через куб посередине, затем вокруг правого в обратную сторону. Высоту держите одинаковой весь путь.'),
+    'pass': 60, 'time_limit': 240,
+    'setup': dict(LOS, objects=[PAD, pole('left', -5, 12), pole('right', 5, 12), box('middle', 0, 2, 12, 3, 1)]),
+    'rubric': [steps_line(steps, 45),
+               {'id': 'left', 'metric': 'radius_error', 'label': t('The circle round the left pole', 'Сол жақ бағана айналасындағы шеңбер', 'Круг вокруг левого столба'),
+                'tip': t('Start each circle from the middle box at an easy speed; a fast entry makes a wide circle.', 'Әр шеңберді ортадағы қораптан баяу бастаңыз; жылдам кіру шеңберді кеңейтеді.', 'Начинайте каждый круг из среднего куба на небольшой скорости; быстрый вход делает круг широким.'),
+                'weight': 15, 'best': 0.5, 'worst': 2.5, 'params': dict(one, radius=5)},
+               {'id': 'right', 'metric': 'radius_error', 'label': t('The circle round the right pole', 'Оң жақ бағана айналасындағы шеңбер', 'Круг вокруг правого столба'),
+                'tip': t('The second circle turns the other way: slow down in the middle box before you change direction.', 'Екінші шеңбер кері бағытта: бағытты өзгертпес бұрын ортадағы қорапта баяулаңыз.', 'Второй круг идёт в другую сторону: притормозите в среднем кубе, прежде чем менять направление.'),
+                'weight': 15, 'best': 0.5, 'worst': 2.5, 'params': dict(two, radius=5)},
+               height_line(10, 2, 0.2, 1.0, **{'from': 6}), landing_line(15)],
+    'reference': [{'takeoff': 2, 'wait': 5}, {'goto': [0, 2, 12], 'heading': 0, 'until_step': 1},
+                  {'orbit': [-5, 12], 'radius': 5, 'speed': 2, 'until_step': 3}, {'orbit': [5, 12], 'radius': 5, 'speed': -2, 'until_step': 5},
+                  {'goto': [0, 2, 0], 'heading': 0, 'wait': 10}, {'land': True, 'until_landed': True}],
+})
+
+# ---------------------------------------------------------------- B10
+# The drone starts facing the pilot, so the frame's +Z points at the pilot and "away" is -Z.
+steps = [
+    {'say': t('Take off and back away into the box; hold it for 15 seconds, nose towards you', 'Ұшып көтеріліп, шегініп қорапқа кіріңіз; тұмсықты өзіңізге қаратып, 15 секунд ұстаңыз', 'Взлетите и отойдите назад в куб; удерживайте 15 секунд носом к себе'),
+     'zone': zone(0, 2, -4), 'for': 15},
+    {'say': t('Come back over the pad', 'Алаңшаның үстіне қайтыңыз', 'Вернитесь и зависните над площадкой'), 'zone': zone(0, 2, 0), 'for': 2},
+    {'say': t('Land on the pad, nose still towards you', 'Тұмсықты өзіңізге қаратқан күйі алаңшаға қоныңыз', 'Сядьте на площадку, по-прежнему носом к себе'), 'landed': True, 'pad': HOME},
+]
+EXERCISES.append({
+    'format': 1, 'id': 'b10-nose-in', 'type': 'exercise',
+    'title': t('Nose-in hover and landing', 'Тұмсықты өзіне қаратып қалықтау және қону', 'Висение и посадка носом к себе'),
+    'briefing': t('The drone faces you. Now its left is your right, and pushing the stick forward brings it towards you. Hover in the box and land without turning it round.',
+                  'Дрон сізге қарап тұр. Енді оның сол жағы сіздің оң жағыңыз, ал стикті алға итерсеңіз, ол сізге жақындайды. Қорапта қалықтап, дронды бұрмай қоныңыз.',
+                  'Дрон смотрит на вас. Теперь его лево для вас справа, а стик вперёд ведёт его к вам. Зависните в кубе и сядьте, не разворачивая дрон.'),
+    'pass': 60, 'time_limit': 180,
+    'setup': dict(LOS, start={'x': 0, 'z': 0, 'heading': 180}, objects=[PAD, box('away', 0, 2, -4)]),
+    'rubric': [steps_line(steps, 40),
+               {'id': 'heading', 'metric': 'heading_error', 'label': t('Keeping the nose towards you', 'Тұмсықты өзіңізге қаратып ұстау', 'Удержание носом к себе'),
+                'tip': t('Do not turn the drone to make it easier: small stick moves, and think from the drone\'s seat.', 'Жеңілдету үшін дронды бұрмаңыз: стикті аз-аздан қозғап, дронның орнынан ойлаңыз.', 'Не разворачивайте дрон, чтобы стало проще: маленькие движения стиком, думайте с места дрона.'),
+                'weight': 25, 'best': 5, 'worst': 40, 'params': {'heading': 0}},
+               height_line(10, 2, 0.2, 1.0, **{'from': 6}), landing_line(15), smooth_line(10)],
+    'reference': [{'takeoff': 2, 'wait': 5}, {'goto': [0, 2, -4], 'heading': 0, 'until_step': 1}, {'goto': [0, 2, 0], 'heading': 0, 'until_step': 2},
+                  {'land': True, 'until_landed': True}],
+})
+
+# ---------------------------------------------------------------- B11
+pads = [(-5, 5, 2.0), (5, 5, 1.5), (5, 12, 1.0), (-5, 12, 0.7)]
+steps, ref = [], []
+for i, (x, z, size) in enumerate(pads):
+    steps.append({'say': t('Land on pad %d and switch the motors off' % (i + 1), '%d-алаңшаға қонып, қозғалтқыштарды өшіріңіз' % (i + 1), 'Сядьте на площадку %d и выключите моторы' % (i + 1)),
+                  'landed': True, 'pad': {'x': x, 'z': z, 'radius': size / 2}})
+    ref += [{'takeoff': 2, 'wait': 4}, {'goto': [x, 2, z], 'heading': 0, 'wait': 9}, {'land': True, 'until_step': i + 1}]
+steps.append(LAND_HOME)
+ref += [{'takeoff': 2, 'wait': 4}, {'goto': [0, 2, 0], 'heading': 0, 'wait': 10}, {'land': True, 'until_landed': True}]
+EXERCISES.append({
+    'format': 1, 'id': 'b11-landing-circuit', 'type': 'exercise',
+    'title': t('Landing circuit', 'Қону айналымы', 'Круг посадок'),
+    'briefing': t('Four pads, each smaller than the one before. Land on each in turn and switch the motors off, then take off again for the next. Finish on the pad you started from.',
+                  'Төрт алаңша, әрқайсысы алдыңғысынан кіші. Әрқайсысына кезекпен қонып, қозғалтқыштарды өшіріңіз, содан кейін келесісі үшін қайта көтеріліңіз. Бастаған алаңшада аяқтаңыз.',
+                  'Четыре площадки, каждая меньше предыдущей. Сядьте на каждую по очереди и выключите моторы, затем взлетайте к следующей. Закончите на площадке, с которой начали.'),
+    'pass': 60, 'time_limit': 300,
+    'setup': dict(LOS, end={'landing': False}, objects=[PAD] + [{'type': 'pad', 'id': 'p%d' % (i + 1), 'x': x, 'y': 0, 'z': z, 'size': size} for i, (x, z, size) in enumerate(pads)]),
+    'rubric': [steps_line(steps, 60),
+               {'id': 'touch', 'metric': 'touchdown_speed', 'label': t('A soft landing', 'Жұмсақ қону', 'Мягкая посадка'),
+                'tip': t('Slow the descent in the last metre.', 'Соңғы метрде төмендеуді баяулатыңыз.', 'Замедлите снижение на последнем метре.'),
+                'weight': 15, 'best': 0.5, 'worst': 2.5},
+               time_line(15, 150, 290), smooth_line(10)],
+    'reference': ref,
+})
+
+# ---------------------------------------------------------------- B12
+steps = [{'say': t('Take off and hover over the pad for 10 seconds; hold against the wind', 'Ұшып көтеріліп, алаңша үстінде 10 секунд қалықтаңыз; желге қарсы ұстаңыз', 'Взлетите и зависните над площадкой на 10 секунд; держитесь против ветра'),
+          'zone': zone(0, 2, 0, 1.2), 'for': 10}]
+ref = [{'takeoff': 2, 'until_step': 1}]
+for i in range(5):
+    x, z = sq[i % 4]
+    n = i % 4 + 1
+    steps.append({'say': t('Fly to corner %d and stop' % n if i < 4 else 'Close the square: fly back to corner 1',
+                           '%d-бұрышқа ұшып, тоқтаңыз' % n if i < 4 else 'Шаршыны жабыңыз: 1-бұрышқа қайта ұшыңыз',
+                           'Летите к углу %d и остановитесь' % n if i < 4 else 'Замкните квадрат: вернитесь к углу 1'),
+                  'zone': zone(x, 2, z, 1.2), 'for': 1})
+    ref.append({'goto': [x, 2, z], 'heading': 0, 'until_step': len(steps)})
+steps.append(LAND_HOME)
+ref += [{'goto': [0, 2, 0], 'heading': 0, 'wait': 8}, {'land': True, 'until_landed': True}]
+EXERCISES.append({
+    'format': 1, 'id': 'b12-no-position-hold', 'type': 'exercise',
+    'title': t('Without position hold, in wind', 'Орынды ұстаусыз, желде', 'Без удержания позиции, на ветру'),
+    'briefing': t('Position hold is switched off: the drone keeps its height but no longer stays where you leave it, and a light wind pushes it sideways. Hover, then fly the square. This is how a drone flies when it loses its satellite fix.',
+                  'Орынды ұстау өшірілген: дрон биіктігін сақтайды, бірақ қалдырған жеріңізде тұрмайды, әрі жеңіл жел оны бүйірге итереді. Қалықтаңыз, содан кейін шаршыны ұшыңыз. Спутниктік сигналын жоғалтқан дрон осылай ұшады.',
+                  'Удержание позиции выключено: дрон держит высоту, но больше не стоит там, где вы его оставили, и лёгкий ветер сносит его вбок. Зависните, затем пролетите квадрат. Так летит дрон, потерявший спутники.'),
+    'pass': 60, 'time_limit': 240,
+    'setup': dict(LOS, assist='altitude', weather={'wind': 3, 'wind_from': 90, 'gusts': 0.2},
+                  objects=[PAD, box('hover', 0, 2, 0, 2.4, 1)] + [box('c%d' % (i + 1), x, 2, z, 2.4, 1) for i, (x, z) in enumerate(sq)]),
+    'rubric': [steps_line(steps, 55), landing_line(20), smooth_line(10), time_line(15, 100, 220)],
+    'reference': ref,
+})
+
+
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
     for e in EXERCISES:

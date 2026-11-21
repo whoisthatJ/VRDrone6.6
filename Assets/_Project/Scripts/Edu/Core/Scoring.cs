@@ -228,6 +228,8 @@ namespace Ushqyr.Edu
             ["landing_distance"] = LandingDistance,
             ["touchdown_speed"] = TouchdownSpeed,
             ["smoothness"] = Smoothness,
+            ["radius_error"] = RadiusError,
+            ["aim_error"] = AimError,
             ["event_count"] = EventCount,
             ["steps_done"] = (p, f) => StepTracker.CountDone(StepTracker.Parse(Json.Arr(p, "steps"), "steps"), f),
             ["gates_in_order"] = GatesInOrder,
@@ -250,6 +252,7 @@ namespace Ushqyr.Edu
                 case "outside_fence":
                     return "{0} s";
                 case "position_error":
+                case "radius_error":
                 case "height_error":
                 case "landing_distance":
                 case "path_error":
@@ -257,6 +260,7 @@ namespace Ushqyr.Edu
                 case "touchdown_speed":
                     return "{0} m/s";
                 case "heading_error":
+                case "aim_error":
                     return "{0}°";
                 case "battery_left":
                 case "speed_in_band":
@@ -400,6 +404,46 @@ namespace Ushqyr.Edu
                 n++;
             }
             return n > 0 ? Math.Sqrt(sum / n) : double.NaN;
+        }
+
+        /// <summary>
+        /// True for the moments a circling measure looks at: in the air and at a distance from (x, z) between "near"
+        /// and "far". The way to the circle and back from it is left out, however long the pilot takes over it.
+        /// </summary>
+        private static bool OnCircle(FlightSample s, Dictionary<string, object> p, out double distance)
+        {
+            distance = Flat(s, p);
+            return distance >= Json.Num(p, "near", 0) && distance <= Json.Num(p, "far", double.PositiveInfinity);
+        }
+
+        /// <summary>Mean distance from the circle of "radius" round (x, z), while flying between "near" and "far" of the point.</summary>
+        private static double RadiusError(Dictionary<string, object> p, FlightRecording f)
+        {
+            double ground = Ground(p), radius = Json.Num(p, "radius", 1), sum = 0;
+            int n = 0;
+            foreach (FlightSample s in f.Samples)
+            {
+                if (!InWindow(s, p, f) || !InAir(s, ground) || !OnCircle(s, p, out double d)) continue;
+                sum += Math.Abs(d - radius);
+                n++;
+            }
+            return n > 0 ? sum / n : double.NaN;
+        }
+
+        /// <summary>Mean angle (degrees) between the drone's nose and the direction to (x, z), while flying between "near" and "far" of the point.</summary>
+        private static double AimError(Dictionary<string, object> p, FlightRecording f)
+        {
+            double ground = Ground(p), x = Json.Num(p, "x", 0), z = Json.Num(p, "z", 0), sum = 0;
+            int n = 0;
+            foreach (FlightSample s in f.Samples)
+            {
+                if (!InWindow(s, p, f) || !InAir(s, ground) || !OnCircle(s, p, out double d) || d < 0.2) continue;
+                double want = Math.Atan2(x - s.X, z - s.Z) * 180.0 / Math.PI;
+                double off = Math.Abs(((s.Heading - want) % 360 + 540) % 360 - 180);
+                sum += off;
+                n++;
+            }
+            return n > 0 ? sum / n : double.NaN;
         }
 
         /// <summary>How many events of "type" the recording holds.</summary>

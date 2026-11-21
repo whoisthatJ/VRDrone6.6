@@ -13,7 +13,8 @@ namespace Ushqyr.Edu
     /// flight is made (EDU_PLAN F1: every activity ships a flight that scores 90 or more), and it can be made again
     /// whenever the exercise changes.
     /// <para>Commands, in order: <c>takeoff</c> (height), <c>goto</c> ([x, y, z] in the activity's frame, with
-    /// <c>heading</c> and <c>speed</c>), <c>heading</c> alone (turn on the spot), <c>land</c>, <c>sticks</c>
+    /// <c>heading</c> and <c>speed</c>), <c>heading</c> alone (turn on the spot), <c>orbit</c> ([x, z] with
+    /// <c>radius</c> and <c>speed</c>), <c>land</c>, <c>sticks</c>
     /// ({throttle, yaw, pitch, roll}). Each waits for <c>wait</c> seconds, <c>until_step</c> N steps are done, or
     /// <c>until_landed</c>, and gives up after a minute.</para>
     /// </summary>
@@ -100,6 +101,14 @@ namespace Ushqyr.Edu
                         frame.ToWorld((float)x, (float)y, (float)z, out float wx, out float wy, out float wz);
                         target = new Vec3(wx, wy, wz);
                         flight.Autopilot.GoTo(target, heading, (float)Json.Num(c, "speed", 0));
+                    }
+                    else if (c.ContainsKey("orbit") && Json.Arr(c, "orbit") is List<object> o && o.Count == 2 && o[0] is double ox && o[1] is double oz)
+                    {
+                        // Round a point at the present height, nose on the point; a negative speed goes the other way.
+                        frame.ToWorld((float)ox, 0f, (float)oz, out float cx, out _, out float cz);
+                        QuadState now = _vehicle.State;
+                        flight.Autopilot.Orbit(now, new Vec3(cx, now.Position.y, cz), (float)Json.Num(c, "radius", 5), (float)Json.Num(c, "speed", 2));
+                        target = now.Position;
                     }
                     else if (Json.Flag(c, "land")) flight.Autopilot.Land();
                     else if (c.ContainsKey("heading") && airborne) flight.Autopilot.GoTo(target, heading);

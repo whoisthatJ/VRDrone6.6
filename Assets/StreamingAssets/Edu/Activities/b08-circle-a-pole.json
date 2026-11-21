@@ -1,0 +1,203 @@
+{
+  "format": 1,
+  "id": "b08-circle-a-pole",
+  "type": "exercise",
+  "title": "Circle a pole",
+  "briefing": "Fly a circle around the pole, 5 m from it, keeping the nose of the drone pointed at the pole all the way round. Then do it the other way. You need both sticks at the same time: one slides the drone sideways, the other turns it.",
+  "pass": 60,
+  "time_limit": 240,
+  "setup": {
+    "place": "field",
+    "drone": "edu-camera900",
+    "assist": "position",
+    "view": "los",
+    "objects": [
+      {
+        "type": "pad",
+        "id": "home",
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "size": 1.5
+      },
+      {
+        "type": "pole",
+        "id": "pole",
+        "x": 0,
+        "y": 0,
+        "z": 10,
+        "size": 0.25,
+        "height": 3.5
+      },
+      {
+        "type": "box",
+        "id": "start",
+        "x": 0,
+        "y": 2,
+        "z": 5,
+        "size": 2,
+        "height": 1
+      }
+    ]
+  },
+  "rubric": [
+    {
+      "id": "steps",
+      "metric": "steps_done",
+      "label": "Steps done",
+      "tip": "Do the steps in the order shown at the top of the screen; each one counts only when the one before it is done.",
+      "weight": 40,
+      "best": 4,
+      "worst": 2,
+      "required": true,
+      "params": {
+        "steps": [
+          {
+            "say": "Fly to the box in front of the pole",
+            "zone": {
+              "x": 0,
+              "y": 2,
+              "z": 5,
+              "radius": 1.2,
+              "tolerance": 0.5
+            },
+            "for": 1
+          },
+          {
+            "say": "Circle the pole once clockwise, nose on the pole",
+            "circle": {
+              "x": 0,
+              "z": 10,
+              "near": 2.5,
+              "far": 7.5,
+              "degrees": 360
+            }
+          },
+          {
+            "say": "Now once the other way, nose still on the pole",
+            "circle": {
+              "x": 0,
+              "z": 10,
+              "near": 2.5,
+              "far": 7.5,
+              "degrees": -360
+            }
+          },
+          {
+            "say": "Fly back, land on the pad and switch the motors off",
+            "landed": true,
+            "pad": {
+              "x": 0,
+              "z": 0,
+              "radius": 0.75
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "radius",
+      "metric": "radius_error",
+      "label": "Keeping the distance from the pole",
+      "tip": "If the circle grows, push a little towards the pole; if it shrinks, pull away.",
+      "weight": 20,
+      "best": 0.4,
+      "worst": 2,
+      "params": {
+        "x": 0,
+        "z": 10,
+        "near": 2.5,
+        "far": 7.5,
+        "radius": 5
+      }
+    },
+    {
+      "id": "aim",
+      "metric": "aim_error",
+      "label": "Nose on the pole",
+      "tip": "Turn with the left stick at the same pace as you slide with the right one.",
+      "weight": 20,
+      "best": 8,
+      "worst": 40,
+      "params": {
+        "x": 0,
+        "z": 10,
+        "near": 2.5,
+        "far": 7.5
+      }
+    },
+    {
+      "id": "height",
+      "metric": "height_error",
+      "label": "Keeping the height",
+      "tip": "Watch the height while you hover: small, slow moves of the left stick.",
+      "weight": 10,
+      "best": 0.2,
+      "worst": 1.0,
+      "params": {
+        "y": 2,
+        "from": 6
+      }
+    },
+    {
+      "id": "landing",
+      "metric": "landing_distance",
+      "label": "Landing on the pad",
+      "tip": "Stop above the pad first, then come straight down.",
+      "weight": 10,
+      "best": 0.25,
+      "worst": 1.5,
+      "required": true,
+      "params": {
+        "x": 0,
+        "z": 0
+      }
+    }
+  ],
+  "reference": [
+    {
+      "takeoff": 2,
+      "wait": 5
+    },
+    {
+      "goto": [
+        0,
+        2,
+        5
+      ],
+      "heading": 0,
+      "until_step": 1
+    },
+    {
+      "orbit": [
+        0,
+        10
+      ],
+      "radius": 5,
+      "speed": 2,
+      "until_step": 2
+    },
+    {
+      "orbit": [
+        0,
+        10
+      ],
+      "radius": 5,
+      "speed": -2,
+      "until_step": 3
+    },
+    {
+      "goto": [
+        0,
+        2,
+        0
+      ],
+      "heading": 0,
+      "wait": 8
+    },
+    {
+      "land": true,
+      "until_landed": true
+    }
+  ]
+}

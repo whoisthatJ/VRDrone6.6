@@ -1,0 +1,233 @@
+{
+  "format": 1,
+  "id": "b09-figure-eight",
+  "type": "exercise",
+  "title": "Figure of eight",
+  "briefing": "Fly a figure of eight around the two poles: once round the left pole, through the box in the middle, then round the right pole the other way. Keep the height the same all the way.",
+  "pass": 60,
+  "time_limit": 240,
+  "setup": {
+    "place": "field",
+    "drone": "edu-camera900",
+    "assist": "position",
+    "view": "los",
+    "objects": [
+      {
+        "type": "pad",
+        "id": "home",
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "size": 1.5
+      },
+      {
+        "type": "pole",
+        "id": "left",
+        "x": -5,
+        "y": 0,
+        "z": 12,
+        "size": 0.25,
+        "height": 3.5
+      },
+      {
+        "type": "pole",
+        "id": "right",
+        "x": 5,
+        "y": 0,
+        "z": 12,
+        "size": 0.25,
+        "height": 3.5
+      },
+      {
+        "type": "box",
+        "id": "middle",
+        "x": 0,
+        "y": 2,
+        "z": 12,
+        "size": 3,
+        "height": 1
+      }
+    ]
+  },
+  "rubric": [
+    {
+      "id": "steps",
+      "metric": "steps_done",
+      "label": "Steps done",
+      "tip": "Do the steps in the order shown at the top of the screen; each one counts only when the one before it is done.",
+      "weight": 45,
+      "best": 6,
+      "worst": 3,
+      "required": true,
+      "params": {
+        "steps": [
+          {
+            "say": "Come through the box between the poles",
+            "zone": {
+              "x": 0,
+              "y": 2,
+              "z": 12,
+              "radius": 1.5,
+              "tolerance": 0.5
+            },
+            "for": 1
+          },
+          {
+            "say": "Circle the left pole clockwise",
+            "circle": {
+              "x": -5,
+              "z": 12,
+              "near": 2.5,
+              "far": 7.5,
+              "degrees": 360
+            }
+          },
+          {
+            "say": "Come through the box between the poles",
+            "zone": {
+              "x": 0,
+              "y": 2,
+              "z": 12,
+              "radius": 1.5,
+              "tolerance": 0.5
+            }
+          },
+          {
+            "say": "Circle the right pole the other way",
+            "circle": {
+              "x": 5,
+              "z": 12,
+              "near": 2.5,
+              "far": 7.5,
+              "degrees": -360
+            }
+          },
+          {
+            "say": "Come through the box between the poles",
+            "zone": {
+              "x": 0,
+              "y": 2,
+              "z": 12,
+              "radius": 1.5,
+              "tolerance": 0.5
+            }
+          },
+          {
+            "say": "Fly back, land on the pad and switch the motors off",
+            "landed": true,
+            "pad": {
+              "x": 0,
+              "z": 0,
+              "radius": 0.75
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "left",
+      "metric": "radius_error",
+      "label": "The circle round the left pole",
+      "tip": "Start each circle from the middle box at an easy speed; a fast entry makes a wide circle.",
+      "weight": 15,
+      "best": 0.5,
+      "worst": 2.5,
+      "params": {
+        "x": -5,
+        "z": 12,
+        "near": 2.5,
+        "far": 7.5,
+        "radius": 5
+      }
+    },
+    {
+      "id": "right",
+      "metric": "radius_error",
+      "label": "The circle round the right pole",
+      "tip": "The second circle turns the other way: slow down in the middle box before you change direction.",
+      "weight": 15,
+      "best": 0.5,
+      "worst": 2.5,
+      "params": {
+        "x": 5,
+        "z": 12,
+        "near": 2.5,
+        "far": 7.5,
+        "radius": 5
+      }
+    },
+    {
+      "id": "height",
+      "metric": "height_error",
+      "label": "Keeping the height",
+      "tip": "Watch the height while you hover: small, slow moves of the left stick.",
+      "weight": 10,
+      "best": 0.2,
+      "worst": 1.0,
+      "params": {
+        "y": 2,
+        "from": 6
+      }
+    },
+    {
+      "id": "landing",
+      "metric": "landing_distance",
+      "label": "Landing on the pad",
+      "tip": "Stop above the pad first, then come straight down.",
+      "weight": 15,
+      "best": 0.25,
+      "worst": 1.5,
+      "required": true,
+      "params": {
+        "x": 0,
+        "z": 0
+      }
+    }
+  ],
+  "reference": [
+    {
+      "takeoff": 2,
+      "wait": 5
+    },
+    {
+      "goto": [
+        0,
+        2,
+        12
+      ],
+      "heading": 0,
+      "until_step": 1
+    },
+    {
+      "orbit": [
+        -5,
+        12
+      ],
+      "radius": 5,
+      "speed": 2,
+      "until_step": 3
+    },
+    {
+      "orbit": [
+        5,
+        12
+      ],
+      "radius": 5,
+      "speed": -2,
+      "until_step": 5
+    },
+    {
+      "goto": [
+        0,
+        2,
+        0
+      ],
+      "heading": 0,
+      "wait": 10
+    },
+    {
+      "land": true,
+      "until_landed": true
+    }
+  ]
+}

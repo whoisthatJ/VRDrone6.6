@@ -166,6 +166,7 @@ namespace Ushqyr.Tests
                 Need("replay viewer", name);
 
             // Activities: what the pilot reads in the briefing, on the way and in the result.
+            Ushqyr.Edu.EduSession.ReloadActivities(); // the files on disk, not what an earlier run read
             Assert.IsNotEmpty(Ushqyr.Edu.EduSession.Activities);
             foreach (Ushqyr.Edu.ActivityDefinition a in Ushqyr.Edu.EduSession.Activities.Values)
             {

@@ -1,0 +1,235 @@
+{
+  "format": 1,
+  "id": "b11-landing-circuit",
+  "type": "exercise",
+  "title": "Landing circuit",
+  "briefing": "Four pads, each smaller than the one before. Land on each in turn and switch the motors off, then take off again for the next. Finish on the pad you started from.",
+  "pass": 60,
+  "time_limit": 300,
+  "setup": {
+    "place": "field",
+    "drone": "edu-camera900",
+    "assist": "position",
+    "view": "los",
+    "end": {
+      "landing": false
+    },
+    "objects": [
+      {
+        "type": "pad",
+        "id": "home",
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "size": 1.5
+      },
+      {
+        "type": "pad",
+        "id": "p1",
+        "x": -5,
+        "y": 0,
+        "z": 5,
+        "size": 2.0
+      },
+      {
+        "type": "pad",
+        "id": "p2",
+        "x": 5,
+        "y": 0,
+        "z": 5,
+        "size": 1.5
+      },
+      {
+        "type": "pad",
+        "id": "p3",
+        "x": 5,
+        "y": 0,
+        "z": 12,
+        "size": 1.0
+      },
+      {
+        "type": "pad",
+        "id": "p4",
+        "x": -5,
+        "y": 0,
+        "z": 12,
+        "size": 0.7
+      }
+    ]
+  },
+  "rubric": [
+    {
+      "id": "steps",
+      "metric": "steps_done",
+      "label": "Steps done",
+      "tip": "Do the steps in the order shown at the top of the screen; each one counts only when the one before it is done.",
+      "weight": 60,
+      "best": 5,
+      "worst": 2,
+      "required": true,
+      "params": {
+        "steps": [
+          {
+            "say": "Land on pad 1 and switch the motors off",
+            "landed": true,
+            "pad": {
+              "x": -5,
+              "z": 5,
+              "radius": 1.0
+            }
+          },
+          {
+            "say": "Land on pad 2 and switch the motors off",
+            "landed": true,
+            "pad": {
+              "x": 5,
+              "z": 5,
+              "radius": 0.75
+            }
+          },
+          {
+            "say": "Land on pad 3 and switch the motors off",
+            "landed": true,
+            "pad": {
+              "x": 5,
+              "z": 12,
+              "radius": 0.5
+            }
+          },
+          {
+            "say": "Land on pad 4 and switch the motors off",
+            "landed": true,
+            "pad": {
+              "x": -5,
+              "z": 12,
+              "radius": 0.35
+            }
+          },
+          {
+            "say": "Fly back, land on the pad and switch the motors off",
+            "landed": true,
+            "pad": {
+              "x": 0,
+              "z": 0,
+              "radius": 0.75
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "touch",
+      "metric": "touchdown_speed",
+      "label": "A soft landing",
+      "tip": "Slow the descent in the last metre.",
+      "weight": 15,
+      "best": 0.5,
+      "worst": 2.5
+    },
+    {
+      "id": "time",
+      "metric": "duration",
+      "label": "Time taken",
+      "tip": "You have the moves; now do them without long pauses.",
+      "weight": 15,
+      "best": 150,
+      "worst": 290
+    },
+    {
+      "id": "smooth",
+      "metric": "smoothness",
+      "label": "Smooth sticks",
+      "tip": "Move the sticks slowly and a little at a time.",
+      "weight": 10,
+      "best": 1.5,
+      "worst": 8
+    }
+  ],
+  "reference": [
+    {
+      "takeoff": 2,
+      "wait": 4
+    },
+    {
+      "goto": [
+        -5,
+        2,
+        5
+      ],
+      "heading": 0,
+      "wait": 9
+    },
+    {
+      "land": true,
+      "until_step": 1
+    },
+    {
+      "takeoff": 2,
+      "wait": 4
+    },
+    {
+      "goto": [
+        5,
+        2,
+        5
+      ],
+      "heading": 0,
+      "wait": 9
+    },
+    {
+      "land": true,
+      "until_step": 2
+    },
+    {
+      "takeoff": 2,
+      "wait": 4
+    },
+    {
+      "goto": [
+        5,
+        2,
+        12
+      ],
+      "heading": 0,
+      "wait": 9
+    },
+    {
+      "land": true,
+      "until_step": 3
+    },
+    {
+      "takeoff": 2,
+      "wait": 4
+    },
+    {
+      "goto": [
+        -5,
+        2,
+        12
+      ],
+      "heading": 0,
+      "wait": 9
+    },
+    {
+      "land": true,
+      "until_step": 4
+    },
+    {
+      "takeoff": 2,
+      "wait": 4
+    },
+    {
+      "goto": [
+        0,
+        2,
+        0
+      ],
+      "heading": 0,
+      "wait": 10
+    },
+    {
+      "land": true,
+      "until_landed": true
+    }
+  ]
+}

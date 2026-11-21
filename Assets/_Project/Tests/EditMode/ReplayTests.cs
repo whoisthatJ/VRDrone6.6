@@ -32,6 +32,7 @@ namespace Ushqyr.Tests
         [Test]
         public void EveryShippedActivity_HasAReferenceFlightThatScores90()
         {
+            EduSession.ReloadActivities(); // the files on disk, not what an earlier test run read
             Assert.IsNotEmpty(EduSession.Activities);
             foreach (ActivityDefinition a in EduSession.Activities.Values)
             {
@@ -163,6 +164,59 @@ namespace Ushqyr.Tests
             Assert.IsTrue(t.Finished);
         }
 
+        /// <summary>A flight round (cx, cz) at radius r, 2 m up, nose on the centre, turning by degPerSec (clockwise positive).</summary>
+        private static FlightRecording Circle(float cx, float cz, float r, float degPerSec, float seconds, float noseOffDeg = 0f)
+        {
+            var rec = new FlightRecording { Rate = 100f };
+            for (int i = 0; i <= (int)(seconds * 100f); i++)
+            {
+                float t = i / 100f;
+                double a = degPerSec * t * Math.PI / 180.0;
+                var s = new FlightSample { T = t, X = cx + r * (float)Math.Sin(a), Y = 2f, Z = cz + r * (float)Math.Cos(a), Armed = true };
+                Face(ref s, degPerSec * t + 180f + noseOffDeg); // from a bearing of a, the centre lies at a + 180
+                rec.Samples.Add(s);
+            }
+            return rec;
+        }
+
+        [Test]
+        public void CircleStep_CountsOnlyTheWayFlownAtTheRightDistance()
+        {
+            List<StepSpec> once = Steps("[{\"say\":\"c\",\"circle\":{\"x\":0,\"z\":10,\"degrees\":360,\"near\":3,\"far\":7}}]");
+            Assert.AreEqual(1, StepTracker.CountDone(once, Circle(0f, 10f, 5f, 30f, 13f)), "a full circle clockwise");
+            Assert.AreEqual(0, StepTracker.CountDone(once, Circle(0f, 10f, 5f, 30f, 11f)), "330 degrees is not a circle");
+            Assert.AreEqual(0, StepTracker.CountDone(once, Circle(0f, 10f, 5f, -30f, 13f)), "the wrong way round");
+            Assert.AreEqual(0, StepTracker.CountDone(once, Circle(0f, 10f, 1f, 30f, 13f)), "a small turn close to the pole is not the circle");
+            List<StepSpec> back = Steps("[{\"say\":\"c\",\"circle\":{\"x\":0,\"z\":10,\"degrees\":-360,\"near\":3,\"far\":7}}]");
+            Assert.AreEqual(1, StepTracker.CountDone(back, Circle(0f, 10f, 5f, -30f, 13f)));
+            Assert.Throws<FormatException>(() => Steps("[{\"say\":\"c\",\"circle\":{\"degrees\":0}}]"));
+        }
+
+        [Test]
+        public void LandingStep_CanAskForAPad()
+        {
+            List<StepSpec> steps = Steps("[{\"say\":\"l\",\"landed\":true,\"pad\":{\"x\":5,\"z\":5,\"radius\":0.5}}]");
+            var t = new StepTracker(steps);
+            var s = new FlightSample { Qw = 1f, X = 5f, Z = 6f, Y = 0.05f };
+            t.Feed(s, 0.01);
+            Assert.AreEqual(0, t.Done, "landed, but a metre from the pad");
+            s.Z = 5.3f;
+            t.Feed(s, 0.01);
+            Assert.AreEqual(1, t.Done);
+        }
+
+        [Test]
+        public void CirclingMeasures_LookOnlyAtTheCircle()
+        {
+            var p = new Dictionary<string, object> { ["x"] = 0.0, ["z"] = 10.0, ["radius"] = 5.0, ["near"] = 3.0, ["far"] = 7.0 };
+            FlightRecording good = Circle(0f, 10f, 5.5f, 30f, 13f, noseOffDeg: 10f);
+            Assert.AreEqual(0.5, Metrics.Measure("radius_error", p, good), 0.01);
+            Assert.AreEqual(10.0, Metrics.Measure("aim_error", p, good), 0.1);
+            // A long way to the circle and back does not spoil the measure: it is outside "near" to "far".
+            FlightRecording far = Circle(0f, 10f, 20f, 30f, 13f);
+            Assert.IsTrue(double.IsNaN(Metrics.Measure("radius_error", p, far)), "never on the circle: no value");
+        }
+
         [Test]
         public void StepsDone_IsMeasuredFromTheRecording_InItsOwnFrame()
         {
@@ -229,6 +283,7 @@ namespace Ushqyr.Tests
                 }
                 return rec;
             }
+            EduSession.ReloadActivities(); // the files on disk, not what an earlier test run read
             FlightRecording idle = Flight(t => new FlightSample { Y = 0.02f }, 30f);
             // Up to 2 m in 2 s, 20 s there, down in 2 s, motors off: right for "take off, hover, land" only.
             FlightRecording hop = Flight(t => new FlightSample

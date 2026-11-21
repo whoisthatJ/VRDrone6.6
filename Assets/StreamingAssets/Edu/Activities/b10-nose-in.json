@@ -1,0 +1,162 @@
+{
+  "format": 1,
+  "id": "b10-nose-in",
+  "type": "exercise",
+  "title": "Nose-in hover and landing",
+  "briefing": "The drone faces you. Now its left is your right, and pushing the stick forward brings it towards you. Hover in the box and land without turning it round.",
+  "pass": 60,
+  "time_limit": 180,
+  "setup": {
+    "place": "field",
+    "drone": "edu-camera900",
+    "assist": "position",
+    "view": "los",
+    "start": {
+      "x": 0,
+      "z": 0,
+      "heading": 180
+    },
+    "objects": [
+      {
+        "type": "pad",
+        "id": "home",
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "size": 1.5
+      },
+      {
+        "type": "box",
+        "id": "away",
+        "x": 0,
+        "y": 2,
+        "z": -4,
+        "size": 2,
+        "height": 1
+      }
+    ]
+  },
+  "rubric": [
+    {
+      "id": "steps",
+      "metric": "steps_done",
+      "label": "Steps done",
+      "tip": "Do the steps in the order shown at the top of the screen; each one counts only when the one before it is done.",
+      "weight": 40,
+      "best": 3,
+      "worst": 1,
+      "required": true,
+      "params": {
+        "steps": [
+          {
+            "say": "Take off and back away into the box; hold it for 15 seconds, nose towards you",
+            "zone": {
+              "x": 0,
+              "y": 2,
+              "z": -4,
+              "radius": 1,
+              "tolerance": 0.5
+            },
+            "for": 15
+          },
+          {
+            "say": "Come back over the pad",
+            "zone": {
+              "x": 0,
+              "y": 2,
+              "z": 0,
+              "radius": 1,
+              "tolerance": 0.5
+            },
+            "for": 2
+          },
+          {
+            "say": "Land on the pad, nose still towards you",
+            "landed": true,
+            "pad": {
+              "x": 0,
+              "z": 0,
+              "radius": 0.75
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "heading",
+      "metric": "heading_error",
+      "label": "Keeping the nose towards you",
+      "tip": "Do not turn the drone to make it easier: small stick moves, and think from the drone's seat.",
+      "weight": 25,
+      "best": 5,
+      "worst": 40,
+      "params": {
+        "heading": 0
+      }
+    },
+    {
+      "id": "height",
+      "metric": "height_error",
+      "label": "Keeping the height",
+      "tip": "Watch the height while you hover: small, slow moves of the left stick.",
+      "weight": 10,
+      "best": 0.2,
+      "worst": 1.0,
+      "params": {
+        "y": 2,
+        "from": 6
+      }
+    },
+    {
+      "id": "landing",
+      "metric": "landing_distance",
+      "label": "Landing on the pad",
+      "tip": "Stop above the pad first, then come straight down.",
+      "weight": 15,
+      "best": 0.25,
+      "worst": 1.5,
+      "required": true,
+      "params": {
+        "x": 0,
+        "z": 0
+      }
+    },
+    {
+      "id": "smooth",
+      "metric": "smoothness",
+      "label": "Smooth sticks",
+      "tip": "Move the sticks slowly and a little at a time.",
+      "weight": 10,
+      "best": 1.5,
+      "worst": 8
+    }
+  ],
+  "reference": [
+    {
+      "takeoff": 2,
+      "wait": 5
+    },
+    {
+      "goto": [
+        0,
+        2,
+        -4
+      ],
+      "heading": 0,
+      "until_step": 1
+    },
+    {
+      "goto": [
+        0,
+        2,
+        0
+      ],
+      "heading": 0,
+      "until_step": 2
+    },
+    {
+      "land": true,
+      "until_landed": true
+    }
+  ]
+}
