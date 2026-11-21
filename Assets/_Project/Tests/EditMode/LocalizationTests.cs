@@ -79,6 +79,7 @@ namespace Ushqyr.Tests
         {
             "AI BENCH", "AI BENCH  ·  ", "USHQYR", "Ushqyr", "Betaflight", "Actual", "SMAA", "MSAA 2x", "MSAA 4x",
             "Тіл / Язык / Language:  ", "Space  ← →  C  − +", "  V  Esc",
+            "  (Space)", "  (Esc)", // names of keys, as printed on the keyboard
             "hall", "parking", "blink", "front", " label",
             "   · PIN", // the same three letters in Kazakh, Russian and English
         };

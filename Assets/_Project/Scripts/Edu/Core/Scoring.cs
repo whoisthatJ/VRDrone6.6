@@ -200,6 +200,32 @@ namespace Ushqyr.Edu
 
         public static bool Known(string metric) => metric != null && All.ContainsKey(metric);
 
+        /// <summary>How a metric's value is written: a format with its unit ("{0} m"), a key of the language table.</summary>
+        public static string Unit(string metric)
+        {
+            switch (metric)
+            {
+                case "time":
+                case "hold_time":
+                case "outside_fence":
+                    return "{0} s";
+                case "position_error":
+                case "height_error":
+                case "landing_distance":
+                case "path_error":
+                    return "{0} m";
+                case "touchdown_speed":
+                    return "{0} m/s";
+                case "heading_error":
+                    return "{0}°";
+                case "battery_left":
+                case "speed_in_band":
+                    return "{0}%";
+                default:
+                    return "{0}";
+            }
+        }
+
         public static IEnumerable<string> Names => All.Keys;
 
         public static double Measure(string metric, Dictionary<string, object> p, FlightRecording f)

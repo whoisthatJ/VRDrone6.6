@@ -2853,6 +2853,98 @@ MonoBehaviour:
     m_Key: Autopilot
     m_Metadata:
       m_Items: []
+  - m_Id: 6761043387482112
+    m_Key: You are scored on
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6761043458785280
+    m_Key: required
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6761043458785281
+    m_Key: 'Time limit: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6761043458785282
+    m_Key: Start
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6761043458785283
+    m_Key: Leave
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6761043458785284
+    m_Key: 'Enter: finish'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6761043458785285
+    m_Key: Passed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6761043458785286
+    m_Key: Not passed yet
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6761043458785287
+    m_Key: Fly again
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6761043458785288
+    m_Key: "{0}\xB0"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6761043458785289
+    m_Key: '{0}%'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6761043458785290
+    m_Key: Take off, hover, land
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6761043458785291
+    m_Key: Take off and climb into the blue box, 2 m up. Stay inside it for 20 seconds. Then come down and land on the pad you started from.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6761043458785292
+    m_Key: Time inside the box
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6761043458785293
+    m_Key: Climb until the drone is inside the blue box, then let go of the right stick and only correct small drifts.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6761043458785294
+    m_Key: Keeping the height
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6761043458785295
+    m_Key: 'Watch the height while you hover: small, slow moves of the left stick.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6761043458785296
+    m_Key: Landing on the pad
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6761043458785297
+    m_Key: Stop above the pad first, then come straight down.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6761043458785298
+    m_Key: A soft landing
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6761043458785299
+    m_Key: Slow the descent in the last metre.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6761043458785300
+    m_Key: Smooth sticks
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6761043458785301
+    m_Key: Move the sticks slowly and a little at a time.
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

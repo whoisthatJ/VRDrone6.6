@@ -109,6 +109,23 @@ namespace Ushqyr.Game
             return true;
         }
 
+        /// <summary>
+        /// Opens the scene of <paramref name="place"/> (an environment of the track catalogue) to run an activity of
+        /// the Education Suite, which the scene picks up by itself. The saved choice of track is not changed.
+        /// </summary>
+        public static bool Activity(TrackCatalog catalog, string place)
+        {
+            string scene = catalog != null ? catalog.SceneFor(string.IsNullOrEmpty(place) ? "field" : place) : null;
+            if (string.IsNullOrEmpty(scene))
+            {
+                Debug.LogWarning($"[Ushqyr] No scene for the place '{place}'");
+                return false;
+            }
+            PendingEdit = null;
+            SceneManager.LoadScene(scene);
+            return true;
+        }
+
         public static void Menu() => SceneManager.LoadScene(MenuScene);
 
         public static void Diagnostics() => SceneManager.LoadScene(DiagnosticsScene);

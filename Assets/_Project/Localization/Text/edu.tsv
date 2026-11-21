@@ -62,3 +62,26 @@ The small camera drone, under 250 g. Light and quiet; wind moves it sooner.	Ка
 2.5 kg, built to carry a 1 kg box and to set it down where it is needed.	2,5 кг, 1 кг қорапты тасып, қажетті жерге қоюға арналған.	2,5 кг, рассчитан нести коробку весом 1 кг и опускать её там, где нужно.
 A small drone with propeller guards, two cameras and distance sensors: the one that is programmed.	Винт қорғанышы, екі камерасы және қашықтық датчиктері бар шағын дрон: оны бағдарламалайды.	Маленький дрон с защитой винтов, двумя камерами и датчиками расстояния: именно его программируют.
 Autopilot	Автопилот	Автопилот
+You are scored on	Не бағаланады	Что оценивается
+required	міндетті	обязательно
+Time limit: {0}	Уақыт шегі: {0}	Лимит времени: {0}
+Start	Бастау	Старт
+Leave	Шығу	Выйти
+Enter: finish	Enter: аяқтау	Enter: закончить
+Passed	Өтті	Зачтено
+Not passed yet	Әзірге өтпеді	Пока не зачтено
+Fly again	Қайта ұшу	Лететь снова
+{0}°	{0}°	{0}°
+{0}%	{0}%	{0}%
+Take off, hover, land	Ұшып көтерілу, қалықтау, қону	Взлёт, висение, посадка
+Take off and climb into the blue box, 2 m up. Stay inside it for 20 seconds. Then come down and land on the pad you started from.	Ұшып көтеріліп, 2 м биіктіктегі көк қорапқа кіріңіз. Оның ішінде 20 секунд тұрыңыз. Содан кейін төмендеп, ұшқан алаңшаңызға қоныңыз.	Взлетите и поднимитесь в синий куб на высоте 2 м. Оставайтесь в нём 20 секунд. Затем снизьтесь и сядьте на площадку, с которой взлетели.
+Time inside the box	Қорап ішіндегі уақыт	Время внутри куба
+Climb until the drone is inside the blue box, then let go of the right stick and only correct small drifts.	Дрон көк қораптың ішіне кіргенше көтеріліңіз, содан кейін оң стикті жіберіп, тек шағын ығысуларды түзетіңіз.	Поднимайтесь, пока дрон не окажется в синем кубе, затем отпустите правый стик и поправляйте только небольшой снос.
+Keeping the height	Биіктікті сақтау	Удержание высоты
+Watch the height while you hover: small, slow moves of the left stick.	Қалықтап тұрғанда биіктікті қадағалаңыз: сол стикті аз-аздан, баяу қозғаңыз.	Следите за высотой во время висения: небольшие, медленные движения левого стика.
+Landing on the pad	Алаңшаға қону	Посадка на площадку
+Stop above the pad first, then come straight down.	Алдымен алаңшаның үстінде тоқтаңыз, содан кейін тік төмен түсіңіз.	Сначала остановитесь над площадкой, затем снижайтесь строго вниз.
+A soft landing	Жұмсақ қону	Мягкая посадка
+Slow the descent in the last metre.	Соңғы метрде төмендеуді баяулатыңыз.	Замедлите снижение на последнем метре.
+Smooth sticks	Стиктерді бірқалыпты қозғау	Плавная работа стиками
+Move the sticks slowly and a little at a time.	Стиктерді баяу әрі аз-аздан қозғаңыз.	Двигайте стики медленно и понемногу.

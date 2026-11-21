@@ -77,6 +77,13 @@ namespace Ushqyr.Game
                 return;
             }
             if (editor != null) editor.gameObject.SetActive(false);
+            // An activity of the Education Suite (an exercise from the training hub) takes the scene over.
+            _activity = Ushqyr.Edu.EduActivityRunner.TakePending();
+            if (_activity != null)
+            {
+                StartActivity(settings);
+                return;
+            }
             LoadTrack(GameFlow.TakeTrackToLoad());
             if (views != null) views.Apply((ViewMode)settings.Camera.ViewMode);
             if (Ushqyr.Net.NetRace.InRace && Track != null && PrepareStrike(settings))
@@ -320,9 +327,41 @@ namespace Ushqyr.Game
             Debug.Log($"[Ushqyr] Track '{data.Name}' loaded: {Track.Gates.Length} gates, {data.Props.Count} props, {data.Laps} laps");
         }
 
+        private Ushqyr.Edu.ActivityDefinition _activity;
+
+        /// <summary>
+        /// The scene with nothing in it but what the activity brings: no race, the activity's drone and view, and the
+        /// runner that shows the briefing, records, grades and shows the result.
+        /// </summary>
+        private void StartActivity(GameSettings settings)
+        {
+            // The place's own start point, with no gates: the first track of this place lends its spawn.
+            var first = tracks.Load(tracks.FirstFor(environment));
+            var data = new TrackData { Id = "edu-" + _activity.Id, Name = _activity.Title, Environment = environment, FreeFlight = true, Laps = 1 };
+            if (first != null) data.Spawn = first.Spawn;
+            LoadData(data);
+            HudFlags.HideFreeFlightInfo = true;
+            var area = GetComponent<FlightArea>();
+            if (area != null) area.enabled = false; // no spawn switching or reset keys in the middle of an attempt
+            ApplySettings(settings);
+            string view = _activity.Setup.View;
+            if (views != null) views.Apply(view == "fpv" ? ViewMode.Fpv : view == "los" ? ViewMode.LineOfSight : view == "chase" ? ViewMode.Chase : (ViewMode)settings.Camera.ViewMode);
+            Ushqyr.Edu.EduActivityRunner.Begin(vehicle, _activity, GameFlow.Menu);
+        }
+
+        /// <summary>The pilot's settings with what the activity fixes: its drone, and the assist it asks for.</summary>
+        private GameSettings ForActivity(GameSettings s)
+        {
+            if (_activity == null || string.IsNullOrEmpty(_activity.Setup.Drone)) return s;
+            GameSettings mine = s.Clone();
+            mine.QuadId = _activity.Setup.Drone;
+            return mine;
+        }
+
         /// <summary>Applies everything from the settings to the scene. Safe to call any time.</summary>
         public void ApplySettings(GameSettings s)
         {
+            s = ForActivity(s);
             ApplyQuad(s);
 
             if (fpvCamera != null)

@@ -1,14 +1,23 @@
 {
   "format": 1, "id": "a02-hover-land", "type": "exercise",
-  "title": "edu.a02.title", "briefing": "edu.a02.briefing", "pass": 60, "time_limit": 90,
+  "title": "Take off, hover, land",
+  "briefing": "Take off and climb into the blue box, 2 m up. Stay inside it for 20 seconds. Then come down and land on the pad you started from.",
+  "pass": 60, "time_limit": 90,
+  "setup": {
+    "place": "field", "drone": "edu-camera900", "assist": "position", "view": "chase",
+    "objects": [
+      {"type": "box", "id": "hover", "x": 0, "y": 2, "z": 0, "size": 2, "height": 1},
+      {"type": "pad", "id": "home", "x": 0, "y": 0, "z": 0, "size": 1.5}
+    ]
+  },
   "rubric": [
-    {"id": "hold", "metric": "hold_time", "label": "edu.m.hold", "tip": "edu.tip.hold", "weight": 40, "best": 20, "worst": 0, "required": true,
+    {"id": "hold", "metric": "hold_time", "label": "Time inside the box", "tip": "Climb until the drone is inside the blue box, then let go of the right stick and only correct small drifts.", "weight": 40, "best": 20, "worst": 0, "required": true,
      "params": {"x": 0, "z": 0, "radius": 1, "y": 2, "height_tolerance": 0.5}},
-    {"id": "height", "metric": "height_error", "label": "edu.m.height", "tip": "edu.tip.height", "weight": 15, "best": 0.1, "worst": 0.8,
+    {"id": "height", "metric": "height_error", "label": "Keeping the height", "tip": "Watch the height while you hover: small, slow moves of the left stick.", "weight": 15, "best": 0.1, "worst": 0.8,
      "params": {"y": 2, "from": 4, "to": 24}},
-    {"id": "landing", "metric": "landing_distance", "label": "edu.m.landing", "tip": "edu.tip.landing", "weight": 25, "best": 0.2, "worst": 1.5, "required": true,
+    {"id": "landing", "metric": "landing_distance", "label": "Landing on the pad", "tip": "Stop above the pad first, then come straight down.", "weight": 25, "best": 0.2, "worst": 1.5, "required": true,
      "params": {"x": 0, "z": 0}},
-    {"id": "touch", "metric": "touchdown_speed", "label": "edu.m.touch", "tip": "edu.tip.touch", "weight": 10, "best": 0.5, "worst": 2.5},
-    {"id": "smooth", "metric": "smoothness", "label": "edu.m.smooth", "tip": "edu.tip.smooth", "weight": 10, "best": 1.5, "worst": 8}
+    {"id": "touch", "metric": "touchdown_speed", "label": "A soft landing", "tip": "Slow the descent in the last metre.", "weight": 10, "best": 0.5, "worst": 2.5},
+    {"id": "smooth", "metric": "smoothness", "label": "Smooth sticks", "tip": "Move the sticks slowly and a little at a time.", "weight": 10, "best": 1.5, "worst": 8}
   ]
 }

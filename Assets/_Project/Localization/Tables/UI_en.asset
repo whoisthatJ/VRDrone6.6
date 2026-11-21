@@ -2856,6 +2856,98 @@ MonoBehaviour:
     m_Localized: Autopilot
     m_Metadata:
       m_Items: []
+  - m_Id: 6761043387482112
+    m_Localized: You are scored on
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6761043458785280
+    m_Localized: required
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6761043458785281
+    m_Localized: 'Time limit: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6761043458785282
+    m_Localized: Start
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6761043458785283
+    m_Localized: Leave
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6761043458785284
+    m_Localized: 'Enter: finish'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6761043458785285
+    m_Localized: Passed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6761043458785286
+    m_Localized: Not passed yet
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6761043458785287
+    m_Localized: Fly again
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6761043458785288
+    m_Localized: "{0}\xB0"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6761043458785289
+    m_Localized: '{0}%'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6761043458785290
+    m_Localized: Take off, hover, land
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6761043458785291
+    m_Localized: Take off and climb into the blue box, 2 m up. Stay inside it for 20 seconds. Then come down and land on the pad you started from.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6761043458785292
+    m_Localized: Time inside the box
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6761043458785293
+    m_Localized: Climb until the drone is inside the blue box, then let go of the right stick and only correct small drifts.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6761043458785294
+    m_Localized: Keeping the height
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6761043458785295
+    m_Localized: 'Watch the height while you hover: small, slow moves of the left stick.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6761043458785296
+    m_Localized: Landing on the pad
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6761043458785297
+    m_Localized: Stop above the pad first, then come straight down.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6761043458785298
+    m_Localized: A soft landing
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6761043458785299
+    m_Localized: Slow the descent in the last metre.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6761043458785300
+    m_Localized: Smooth sticks
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6761043458785301
+    m_Localized: Move the sticks slowly and a little at a time.
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []
