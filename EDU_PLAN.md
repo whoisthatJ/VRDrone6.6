@@ -60,6 +60,10 @@ Items marked ❓ are my defaults; the customer should confirm them (§13). Each 
 | D31 | **Flight assist is a choice for every drone**; the default "by the drone" gives position hold on the Education Suite's drones and none on the racing quads | The flight-mode ladder of F3 without changing how the racers fly |
 | D32 | **Failures and weather are set by name and value** (`gps_lost`, `prop2`, `baro_drift` …) | One vocabulary for activity files, the teacher's screen and the attempt record |
 | D33 | **A photo and a payload drop are events of the flight**, with their place and direction | Scores come from the recording alone (the rule of F1) |
+| D34 | **An exercise is written in its own frame** (origin under its start point, +Z the way the drone first faces); a flight is scored in that frame | The same exercise in any open place; a reference flown in one scene shown in another |
+| D35 | **One step tracker guides the pilot and grades the recording** | What the screen asked for and what was scored cannot disagree; the grade still comes from the recording alone |
+| D36 | **"Steps done" is required and earns nothing below half of the steps** | A flight that did not do the exercise must not pass on its side marks (found by test: a hover passed the pirouette) |
+| D37 | **Reference flights are made by flying the exercise's own recipe** through the autopilot or the sticks | A reference of 90 or more for every exercise, re-made whenever the exercise changes |
 | D21 | **Names are compared and sorted in code, not in SQL.** SQLite folds case for Latin letters only and orders by character code, which made "7Б" and "7б" two groups and put every Kazakh letter after the Russian alphabet | Found by the store tests |
 
 ## 3. Shared foundations
@@ -681,4 +685,47 @@ altitude hold drift while position hold copes.
 - **By hand.** Everything here was flown by the autopilot or set from code. Nobody has flown the new drones with
   sticks, pressed G, L or B, or judged how the camera drone feels.
 - **Drone balls** belong to soccer (ED8).
+
+### 22 November 2026: ED3 started: an exercise runs end to end, the training hub, block A
+**How an exercise runs.** The training hub (a "TRAINING" button on the main menu) lists the blocks A to E and the
+exercises of each with the student's best score and stars; a block opens when the one before it is passed. Choosing an
+exercise opens its place with nothing in it but what the exercise brings: its drone, its assist and view, its objects
+(a see-through box to hover in, a landing pad, poles, flags, gates, targets), its weather and the failures of its
+timeline. The pilot reads the briefing and what is scored, starts, and is led through the steps on the screen. The
+attempt ends on landing, on the last step, on a crash, at the time limit or when the pilot says so; the recording is
+graded and stored, and the result shows the score, stars, every line with its measured value and points, two tips, and
+the replay with the reference flight beside it.
+
+**What an exercise is.** A file with texts, a "setup" (place, drone, assist, view, start point, objects, weather,
+timeline), a rubric, and a "reference" list that says how a good flight goes. `Tools/Edu/make_exercises.py` writes the
+files and the sheet of their texts in three languages.
+
+- **D34. An exercise is written in its own frame** (origin: the ground under its start point; +Z: the way the drone
+  first faces). The flight notes the frame it was flown in and is brought into it for scoring, so an exercise can be
+  laid out in any open place and a reference flown in one scene can be shown in another.
+- **D35. One step tracker for guiding and for grading.** The steps of a guided exercise (a stick moved, a zone or a
+  height held, a turn, a heading, a landing) are followed by the same code while flying and when the recording is
+  graded; nothing is scored from what the screen showed.
+- **D36. Half the steps or nothing.** The "steps done" line is required and earns nothing below half of the steps. A
+  test caught why: a plain hover passed the pirouette on its side marks alone.
+- **D37. A reference flight is made by flying the exercise's own recipe** through the autopilot (or the sticks, for the
+  controls check) on the same flight model, and can be made again when the exercise changes.
+
+**Block A, six exercises, all with reference flights (99.5 to 100):** controls check on the ground, take off-hover-
+land, height steps, pirouette, out and back, square tail-in.
+
+**Tests (460 pass).** Every shipped exercise has a reference that scores 90 or more; three flights that did not do the
+exercise (never took off; a plain hover; flying away) fail each one; every text of every exercise is in the three
+languages; frames, steps and the course's block order have their own tests.
+
+**Not done of ED3.**
+- **Blocks B to E:** 24 exercises. B needs circling a point and landing on a chosen pad; C needs camera targets;
+  D and E are FPV with gates.
+- **Flown by a person:** nobody has flown an exercise with sticks yet. Every flight so far was the autopilot's, so the
+  thresholds (how many metres, how many seconds) are untested against real hands, and the plan's check against an
+  instructor's ranking is not started.
+- **The demo before an exercise** (playing the reference in the briefing), a replay library, and the printable
+  certificate of exercise 30.
+- **Radio and gamepad:** the runner listens to the keyboard for start, finish, retry and leave.
+- **Unlocking everything** is a stored setting with no screen yet (the teacher console, ED4).
 
