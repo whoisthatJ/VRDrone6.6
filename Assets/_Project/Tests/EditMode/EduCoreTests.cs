@@ -285,6 +285,33 @@ namespace Ushqyr.Tests
         }
 
         [Test]
+        public void SeatProfile_NamesNoPerson_AndIsMadeOnce()
+        {
+            using (var db = new EduDatabase(Path.Combine(_dir, "class.db")))
+            {
+                var store = new EduStore(db, Path.Combine(_dir, "replays"));
+                long student = store.AddUser("Айгерім", "student", "1234");
+                long seat = store.SeatUser("PC-07");
+                Assert.AreEqual(seat, store.SeatUser("PC-07"), "asked twice, made once");
+                Assert.AreEqual(seat, store.SeatUser("  PC-07 "));
+                Assert.AreNotEqual(seat, store.SeatUser("PC-08"));
+                Assert.AreNotEqual(seat, store.SeatUser(""), "an empty name still gives a seat");
+
+                EduUser user = store.User(seat);
+                Assert.AreEqual("seat", user.Role);
+                Assert.AreEqual("PC-07", user.Name);
+                Assert.IsFalse(user.HasPin);
+                Assert.IsTrue(store.User(student).HasPin);
+                Assert.IsNull(store.User(987654), "no such user");
+
+                // A student who happens to be called like the seat is not the seat.
+                long namesake = store.AddUser("PC-07");
+                Assert.AreNotEqual(namesake, store.SeatUser("PC-07"));
+                Assert.Throws<ArgumentException>(() => store.AddUser("x", "admin"));
+            }
+        }
+
+        [Test]
         public void Attempt_IsGradedStoredWithItsRecording_AndCanBeGradedAgain()
         {
             string replays = Path.Combine(_dir, "replays");

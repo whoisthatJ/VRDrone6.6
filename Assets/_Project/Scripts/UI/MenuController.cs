@@ -69,6 +69,9 @@ namespace Ushqyr.UI
             UiKit.Button(p, "Тіл / Язык / Language:  " + L.NameOf(S.Language), new Vector2(Width - Margin - 560f, -35f), new Vector2(560f, 70f),
                 () => SetLanguage(L.Next(S.Language)), 26f);
 
+            // Who is flying: flights of the Education Suite are stored under this profile.
+            UiKit.Button(p, StudentLabel(), new Vector2(Width - Margin - 560f - 20f - 470f, -35f), new Vector2(470f, 70f), ShowStudents, 26f);
+
             float y = -260f;
             UiKit.Button(p, L.T("FLY"), new Vector2(Margin, y), new Vector2(ContentWidth, 110f), Fly, 52f);
             y -= 140f;

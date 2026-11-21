@@ -16,12 +16,43 @@ namespace Ushqyr.Edu
         private static EduStore _store;
         private static Dictionary<string, ActivityDefinition> _activities;
 
-        public static string Folder => Path.Combine(Application.persistentDataPath, "edu");
+        private static string _folder;
+
+        public static string Folder => _folder ?? Path.Combine(Application.persistentDataPath, "edu");
+
+        /// <summary>
+        /// Keeps the data somewhere else from now on (a check that must not touch the real class data; later, a
+        /// folder the school chose). Null goes back to the user's data folder. Nobody is chosen afterwards.
+        /// </summary>
+        public static void UseFolder(string folder)
+        {
+            Close();
+            _folder = string.IsNullOrEmpty(folder) ? null : folder;
+            CurrentUserId = 0;
+        }
         public static string DatabaseFile => Path.Combine(Folder, "class.db");
         public static string ReplayFolder => Path.Combine(Folder, "replays");
 
         /// <summary>The student at this seat; 0 until someone is chosen.</summary>
         public static long CurrentUserId { get; set; }
+
+        /// <summary>The profile that is flying, or null when nobody was chosen (or the chosen one was deleted).</summary>
+        public static EduUser CurrentUser
+        {
+            get
+            {
+                if (CurrentUserId == 0) return null;
+                EduUser user = Store.User(CurrentUserId);
+                if (user == null) CurrentUserId = 0;
+                return user;
+            }
+        }
+
+        /// <summary>The name of this place when nobody is named: the computer's own name.</summary>
+        public static string SeatName => SystemInfo.deviceName;
+
+        /// <summary>Flies as the seat, with no person named.</summary>
+        public static void UseSeat() => CurrentUserId = Store.SeatUser(SeatName);
 
         public static EduStore Store
         {
@@ -88,17 +119,14 @@ namespace Ushqyr.Edu
 
         /// <summary>
         /// Ends an attempt: grades the recorder's flight against the activity and stores it for the current student.
-        /// With nobody chosen yet, a local student named by the seat's computer is used, so a first flight is never lost.
+        /// With nobody chosen yet, the seat's own profile is used, so a first flight is never lost.
         /// </summary>
         public static AttemptRecord Finish(EduRecorder recorder, ActivityDefinition activity, IDictionary<string, object> flags = null, string program = null)
         {
             if (recorder == null || recorder.Recording == null) throw new ArgumentException("nothing was recorded");
             EduStore store = Store;
-            if (CurrentUserId == 0)
-            {
-                List<EduUser> users = store.Users();
-                CurrentUserId = users.Count > 0 ? users[0].Id : store.AddUser(SystemInfo.deviceName);
-            }
+            // Nobody chosen: the flight is kept under the seat's name, never under some student's.
+            if (CurrentUser == null) UseSeat();
             return ActivityAttempt.Finish(store, ReplayFolder, activity, recorder.Recording, CurrentUserId, Application.version, flags, program);
         }
     }

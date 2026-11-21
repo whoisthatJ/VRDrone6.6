@@ -2713,6 +2713,78 @@ MonoBehaviour:
     m_Key: '{0} s'
     m_Metadata:
       m_Items: []
+  - m_Id: 6734297338478592
+    m_Key: Who is flying?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6734297393004544
+    m_Key: Student
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6734297393004545
+    m_Key: not chosen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6734297393004546
+    m_Key: Seat {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6734297393004547
+    m_Key: Everyone
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6734297393004548
+    m_Key: Group
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6734297393004549
+    m_Key: New student
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6734297393004550
+    m_Key: Without a name (this seat)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6734297393004551
+    m_Key: No students yet. Add yourself, or fly without a name.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6734297393004552
+    m_Key: Enter the PIN of {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6734297393004553
+    m_Key: Wrong PIN
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6734297393004554
+    m_Key: 'Choose a PIN: 4 to 12 digits'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6734297393004555
+    m_Key: 'PIN: none'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6734297393004556
+    m_Key: 'PIN: set'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6734297393004557
+    m_Key: A PIN keeps classmates out of your results. The teacher can reset it.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6734297393004558
+    m_Key: Type your name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6734297393004559
+    m_Key: A name is needed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6734297393004560
+    m_Key: 'The class data could not be opened: {0}'
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

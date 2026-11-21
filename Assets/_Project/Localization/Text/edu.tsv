@@ -28,3 +28,21 @@ Video saved: {0}	Бейне сақталды: {0}	Видео сохранено:
 The video was not saved: {0}	Бейне сақталмады: {0}	Видео не сохранено: {0}
 The video was stopped	Бейне жазу тоқтатылды	Запись видео остановлена
 ffmpeg was not found, so a video cannot be made	ffmpeg табылмады, сондықтан бейне жасау мүмкін емес	ffmpeg не найден, поэтому видео сделать нельзя
+Who is flying?	Кім ұшады?	Кто летит?
+Student	Оқушы	Ученик
+not chosen	таңдалмаған	не выбран
+Seat {0}	{0} орны	Место {0}
+Everyone	Барлығы	Все
+Group	Топ	Группа
+New student	Жаңа оқушы	Новый ученик
+Without a name (this seat)	Атсыз (осы орын)	Без имени (это место)
+No students yet. Add yourself, or fly without a name.	Әзірге оқушылар жоқ. Өзіңізді қосыңыз немесе атсыз ұшыңыз.	Учеников пока нет. Добавьте себя или летайте без имени.
+Enter the PIN of {0}	{0} PIN кодын енгізіңіз	Введите PIN-код: {0}
+Wrong PIN	PIN коды қате	Неверный PIN-код
+Choose a PIN: 4 to 12 digits	PIN таңдаңыз: 4–12 цифр	Выберите PIN-код: от 4 до 12 цифр
+PIN: none	PIN: жоқ	PIN-код: нет
+PIN: set	PIN: орнатылған	PIN-код: задан
+A PIN keeps classmates out of your results. The teacher can reset it.	PIN сыныптастарыңызды нәтижелеріңізден қорғайды. Мұғалім оны қалпына келтіре алады.	PIN-код не пускает одноклассников к вашим результатам. Учитель может его сбросить.
+Type your name	Атыңызды жазыңыз	Введите своё имя
+A name is needed	Ат қажет	Нужно имя
+The class data could not be opened: {0}	Сынып деректері ашылмады: {0}	Не удалось открыть данные класса: {0}

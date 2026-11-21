@@ -104,11 +104,35 @@ namespace Ushqyr.Edu
             name = (name ?? "").Trim();
             if (name.Length == 0) throw new ArgumentException("a name is needed");
             if (name.Length > 80) throw new ArgumentException("the name is longer than 80 characters");
-            if (role != "student" && role != "teacher") throw new ArgumentException("the role must be student or teacher");
+            if (role != "student" && role != "teacher" && role != "seat") throw new ArgumentException("the role must be student, teacher or seat");
             _db.Sql.Execute("insert into users(name, role, created) values(?1, ?2, ?3)", name, role, Now());
             long id = LastId();
             if (!string.IsNullOrEmpty(pin)) SetPin(id, pin);
             return id;
+        }
+
+        /// <summary>
+        /// The profile of a seat (EDU_PLAN F5, "seat name only"): results are kept under the name of the place, such as
+        /// "PC-07", and no person is named at all. Made the first time it is asked for.
+        /// </summary>
+        public long SeatUser(string seatName)
+        {
+            seatName = (seatName ?? "").Trim();
+            if (seatName.Length == 0) seatName = "Seat";
+            if (seatName.Length > 80) seatName = seatName.Substring(0, 80);
+            List<object[]> rows = _db.Sql.Query("select id, name from users where role = 'seat' order by id");
+            foreach (object[] r in rows)
+                if (string.Equals((string)r[1], seatName, StringComparison.Ordinal)) return (long)r[0];
+            return AddUser(seatName, "seat");
+        }
+
+        /// <summary>One user, or null when there is none with this id (deleted, or a database from another PC).</summary>
+        public EduUser User(long id)
+        {
+            List<object[]> rows = _db.Sql.Query("select id, name, role, language, pin_hash is not null from users where id = ?1", id);
+            if (rows.Count == 0) return null;
+            object[] r = rows[0];
+            return new EduUser { Id = (long)r[0], Name = (string)r[1], Role = (string)r[2], Language = (string)r[3], HasPin = (long)r[4] != 0 };
         }
 
         public List<EduUser> Users(long? groupId = null)

@@ -65,6 +65,11 @@ namespace Ushqyr.EditorTools
             if (source == null || main == null) return "the main font or its source file was not found";
 
             string wanted = Wanted();
+            // Nothing new to bake: leave the asset as it is, so that running this again changes no file.
+            var old = AssetDatabase.LoadAssetAtPath<TMP_FontAsset>(AssetPath);
+            if (old != null && old.atlasPopulationMode == AtlasPopulationMode.Static && wanted.All(c => InTable(old, c))
+                && main.fallbackFontAssetTable != null && main.fallbackFontAssetTable.Count > 0 && main.fallbackFontAssetTable[0] == old)
+                return $"Up to date: {old.characterTable.Count} characters in {AssetPath}";
             // The same size and padding as the main asset, so letters of both stand on one line with one weight.
             int size = Mathf.RoundToInt(main.faceInfo.pointSize);
             TMP_FontAsset baked = TMP_FontAsset.CreateFontAsset(source, size, main.atlasPadding, GlyphRenderMode.SDFAA_HINTED, 1024, 1024,

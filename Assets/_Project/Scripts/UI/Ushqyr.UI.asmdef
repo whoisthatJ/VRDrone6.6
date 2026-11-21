@@ -17,7 +17,9 @@
         "UnityEngine.UI",
         "Unity.RenderPipelines.Core.Runtime",
         "Unity.RenderPipelines.Universal.Runtime",
-        "Ushqyr.Bench"
+        "Ushqyr.Bench",
+        "Ushqyr.Edu.Core",
+        "Ushqyr.Edu"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
