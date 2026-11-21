@@ -458,3 +458,44 @@ If one of these isn't built yet, build the shared piece once, in the form both p
 | Kazakh translation quality | Named native reviewer; glossary of drone terms agreed first |
 | Licence lock-outs after repairs or re-imaging | Tolerant fingerprint; grace period; a simple re-issue process |
 | Third-party licences (Blockly, Python packages, PDF and XLSX libraries, ArduPilot if used) | Every dependency and its licence recorded; nothing copyleft linked into the app |
+
+## 15. Status log
+### 21 November 2026: ED0 done; engine-free parts of ED1 and ED2; the flight layer flies in a scene
+**ED0.** Project state written (`Docs/project_state.md`), spike reports in `Docs/spikes/`, ED1 task list in
+`Docs/edu/ED1_tasks.md`, decisions D13 to D21.
+
+| Spike | Result |
+|---|---|
+| MAVLink endpoint | Works. 25 of 25 automated checks, also inside a player build and on the real flight model through the autopilot. **QGroundControl itself not tried** (not installed) |
+| Soccer collisions over LAN | Numerical model only: own-ball simulation needs prediction and "one bounce per contact"; host simulation costs 23 to 82 ms of stick delay |
+| Studio | Works in a player build: local page behind a token, Edge app window, Python program as a process, drone moved. Without Blockly and without a bundled Python (both are downloads) |
+| Reports | XLSX and PDF with Kazakh text written by a player build and read back correctly. Not opened in Excel or LibreOffice (neither is installed) |
+| Licence | RSA signature check works in a player build; ECDSA does not exist in Unity's runtime. 7 hardware identifiers readable |
+| Database | SQLite from Windows itself works in a player build |
+| Weak PCs | **Not done:** needs a Windows graphics setting changed by the owner, or a school PC |
+| FAI rules | **Not read:** fai.org refuses automated reading and offers the PDF as a download only |
+
+**Built and tested** (422 EditMode tests pass, 67 of them new; every earlier test still passes):
+
+| Piece | Where | State |
+|---|---|---|
+| Class database with numbered upgrades; students, groups, PINs, attempts, grades, backup, "delete this student's data" | `Scripts/Edu/Core/EduDatabase.cs`, `EduStore.cs` | Logic done; no screens yet |
+| Activity files, 15 metrics, rubric with pass mark, stars and tips; one sample activity | `Scoring.cs`, `StreamingAssets/Edu/Activities` | Logic done; camera, area, finds and payload metrics wait for the things they measure |
+| Flight recording file and an even-rate recorder | `FlightRecording.cs`, `FlightRecorderCore.cs`, `Runtime/EduRecorder.cs` | Records in a scene; **no viewer yet** |
+| XLSX and PDF writers | `XlsxWriter.cs`, `PdfWriter.cs` | Writers done; no report layouts yet |
+| Assisted flight (Position, Altitude hold), autopilot (take off, land, hold, go to, velocity, orbit, mission, return), failsafes (radio, battery, geofence, positioning) | `Scripts/Flight/FlightAssist.cs`, `Autopilot.cs` | Flown on the real flight model in tests and live in `Track_Field` |
+| Position sources with errors; weather (wind, gusts, blending, cold battery); motor loss | `PositionSources.cs`, `Weather.cs`, `QuadState.MotorLoss` | Logic done; rain and fog have no pictures yet |
+| The layer on a drone in a scene | `Runtime/EduFlight.cs`, `QuadVehicle.Director` | Works; nothing in the menus switches it on yet |
+| MAVLink endpoint joined to the autopilot | `Mavlink.cs`, `MavDrone.cs` | Works outside Unity; not yet wired into a scene |
+
+**Live check in `Track_Field` (3-inch quad, 127 frames a second):** take-off to 4.01 m; flight to a point 14 m away
+ended within 1 cm, facing the asked heading; 6 m/s wind with gusts moved it 4 cm (9° of lean); return to launch climbed
+to 15 m, landed 20 cm from the start in that wind and switched the motors off; the 99 s recording is 277 KB.
+
+**Measured limits, not bugs:** a 32 g whoop cannot hold position in 8 m/s wind (its test uses 4 m/s) and tops out near
+6 m/s; a quadcopter with one motor stopped falls, as a real one does.
+
+**Not started of ED1:** replay viewer, the remaining hard-coded strings and the font atlas, user-profile screens, the
+school build without cloud packages, the installer. **Not started of ED2:** the three new drone classes, gimbal and
+payloads, rain and fog pictures, the remaining failures (GPS and compass faults exist; video, IMU, gimbal do not).
+

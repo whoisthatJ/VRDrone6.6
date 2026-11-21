@@ -349,6 +349,42 @@ namespace Ushqyr.Tests
                 Assert.Throws<InvalidDataException>(() => FlightRecording.Load(new MemoryStream(data)));
         }
 
+        [Test]
+        public void Recorder_GivesAnEvenRateWhateverTheFrameRate_AndKeepsOnlyTheLastSecondsWhenAsked()
+        {
+            foreach (double fps in new[] { 30.0, 60.0, 144.0, 250.0 })
+            {
+                var rec = new FlightRecorderCore(100f);
+                for (int i = 0; i * (1.0 / fps) <= 10.0 + 1e-9; i++)
+                {
+                    double t = i / fps;
+                    var s = new Ushqyr.Flight.QuadState { Position = new Ushqyr.Flight.Vec3((float)t * 2f, 1f, 0f), Orientation = Ushqyr.Flight.Quat.Identity, Armed = true };
+                    rec.Push(5.0 + t, s, new Ushqyr.Flight.PilotInput { Throttle = 0.4f, Pitch = 0.1f }, 0.8f);
+                }
+                FlightRecording r = rec.Recording;
+                Assert.AreEqual(1001, r.Samples.Count, 1, fps + " fps: 100 samples a second for 10 s");
+                Assert.AreEqual(0f, r.Samples[0].T, 1e-6f, "time starts at zero");
+                Assert.AreEqual(0.01f, r.Samples[1].T - r.Samples[0].T, 1e-5f);
+                FlightSample mid = r.Samples[500];
+                Assert.AreEqual(mid.T * 2f, mid.X, 2e-3f, fps + " fps: positions between frames are interpolated");
+                Assert.AreEqual(0.4f, mid.Throttle);
+                Assert.AreEqual(1f, mid.Qw, 1e-5f);
+            }
+            var rolling = new FlightRecorderCore(100f, 20f);
+            for (int i = 0; i < 6000; i++)
+            {
+                if (i == 100) rolling.Event("crash");
+                if (i == 5900) rolling.Event("gate", "0");
+                rolling.Push(i * 0.01, new Ushqyr.Flight.QuadState { Orientation = Ushqyr.Flight.Quat.Identity }, default, 1f);
+            }
+            Assert.LessOrEqual(rolling.Recording.Samples.Count, 2500, "about the last 20 s of a 60 s flight (cut in blocks)");
+            Assert.GreaterOrEqual(rolling.Recording.Samples.Count, 2000);
+            Assert.AreEqual(1, rolling.Recording.Events.Count, "the old event went with its samples");
+            Assert.AreEqual("gate", rolling.Recording.Events[0].Type);
+            rolling.Restart();
+            Assert.AreEqual(0, rolling.Recording.Samples.Count);
+        }
+
         // ---------------------------------------------------------------- JSON
 
         [Test]

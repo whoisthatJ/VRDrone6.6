@@ -33,6 +33,21 @@ namespace Ushqyr.Vehicle
         public ref readonly QuadState State => ref _state;
         public ref readonly QuadProfile Profile => ref _profile;
         public PilotInput LastInput { get; private set; }
+        /// <summary>
+        /// What the flight controller was given in the last frame. The same as <see cref="LastInput"/> unless a
+        /// <see cref="Director"/> stands between the pilot and the controller (assisted modes, the autopilot).
+        /// </summary>
+        public PilotInput FlownInput { get; private set; }
+        /// <summary>
+        /// Optional layer between the pilot's sticks and the flight controller: assisted flight modes and the
+        /// autopilot of the Education Suite. Null (the default) means the sticks go straight through, as always.
+        /// It is not used with <see cref="ExternalStepping"/> (AI Bench).
+        /// </summary>
+        public IFlightDirector Director { get; set; }
+        /// <summary>Gravity, step size and wind this quad flies in.</summary>
+        public ref readonly PhysicsSettings Environment => ref _env;
+        /// <summary>Thrust lost per motor (0 = healthy), for failure scenarios. Cleared by a respawn.</summary>
+        public void SetMotorLoss(in Motor4 loss) => _state.MotorLoss = loss;
         public bool IsCrashed => _crashed;
         public float LastImpactSpeed => _collision.LastImpactSpeed;
         public int ImpactCount => _collision.ImpactCount;
@@ -203,7 +218,9 @@ namespace Ushqyr.Vehicle
                 return;
             }
 
-            QuadSimulator.Advance(ref _state, pilot, _profile, _env, ref _accumulator, Time.deltaTime, ref _collision);
+            PilotInput flown = Director != null ? Director.Direct(this, pilot, Time.deltaTime) : pilot;
+            FlownInput = flown;
+            QuadSimulator.Advance(ref _state, flown, _profile, _env, ref _accumulator, Time.deltaTime, ref _collision);
 
             if (_state.Position.y < _collision.Settings.OutOfBoundsY) _collision.Crashed = true;
 
@@ -248,5 +265,12 @@ namespace Ushqyr.Vehicle
             // The state is one sub-step ahead of render time by 'alpha'; blend from the previous sub-step.
             transform.SetPositionAndRotation(Vector3.LerpUnclamped(prev, cur, alpha), Quaternion.SlerpUnclamped(prevRot, curRot, alpha));
         }
+    }
+
+    /// <summary>Stands between the pilot's sticks and the flight controller of a <see cref="QuadVehicle"/>.</summary>
+    public interface IFlightDirector
+    {
+        /// <summary>The sticks to give the flight controller this frame, given what the pilot is doing.</summary>
+        PilotInput Direct(QuadVehicle vehicle, in PilotInput pilot, float dt);
     }
 }

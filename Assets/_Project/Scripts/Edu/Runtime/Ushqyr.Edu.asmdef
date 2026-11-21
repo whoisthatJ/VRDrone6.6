@@ -2,7 +2,11 @@
     "name": "Ushqyr.Edu",
     "rootNamespace": "Ushqyr.Edu",
     "references": [
-        "Ushqyr.Edu.Core"
+        "Ushqyr.Edu.Core",
+        "Ushqyr.Flight",
+        "Ushqyr.Vehicle",
+        "Ushqyr.Input",
+        "Ushqyr.Core"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
