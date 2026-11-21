@@ -124,3 +124,6 @@ InitTestScene*.unity*
 # Art pipeline: impostor source models (CC0, re-downloadable, too large for the repo)
 /Assets/_ArtCache/
 /Assets/_ArtCache.meta
+
+# Third-party runtimes fetched by Tools/Edu/fetch_third_party.py (not kept in the repository)
+/ThirdParty/

@@ -1,7 +1,9 @@
 # FAI F9A (drone soccer) values: NOT READ YET
 
-**Nothing in this file is checked.** The FAI rules could not be read on 21 November 2026: fai.org refuses automated
-reading, and the document is only offered as a file download, which needs the owner's go-ahead.
+**Nothing in this file is checked.** The FAI rules could not be read on 21 November 2026. The owner allowed the
+download, but fai.org refuses requests that do not come from a person's browser, and getting around that by posing as
+one is not something the agent does. **The owner has to save the PDF into this folder** (open the page below, click
+the file, save it here); the agent reads it from there.
 
 Until it is read, the soccer rules file must not be written, and the table in `EDU_PLAN.md` §6 stays "the plan
 author's reading", not a source.

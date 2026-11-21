@@ -25,5 +25,13 @@ a separate process, and have that program move a drone, with no internet?
 - **The transport.** The spike's Python helper talks HTTP to the page's server. The plan (§8) wants the `gaterush`
   package on the AI Bench transport; that is ED7 work.
 
+## After the owner allowed the downloads (same day)
+| Part | Result |
+|---|---|
+| Blockly 13.5.0 | In the repository (923 KB). Served from the local machine only, it draws blocks with Russian texts and turns a "take off, repeat 4 times: forward 5" program into `drone.takeoff(2)` and a `for` loop. Every request of the page went to 127.0.0.1 |
+| **Kazakh** | **Blockly ships English and Russian texts, not Kazakh.** Its standard blocks have about 400 texts; the Kazakh ones are ours to write and to have reviewed |
+| Python 3.11.9 with numpy, OpenCV, pymavlink | Fetched into `ThirdParty/edu/python` (not in the repository). The runtime starts and all three packages work. **237 MB**, of which OpenCV is 108 MB and pymavlink 47 MB: this is what Studio adds to the installer |
+
 ## Recommendation
-Build Studio as planned (D7). Decide the two downloads (Blockly; Python with its packages) when ED7 starts.
+Build Studio as planned (D7). Before ED7: decide whether OpenCV's size is acceptable or the image helpers should be
+our own on numpy; have pymavlink's LGPL-3.0 terms confirmed.
