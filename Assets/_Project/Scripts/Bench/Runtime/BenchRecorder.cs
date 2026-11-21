@@ -92,7 +92,7 @@ namespace Ushqyr.Bench
         private readonly string _ffmpeg;
         private readonly int _repeatWindow;
         private readonly float _fps;
-        private StreamWriter _events, _eventsCsv, _telemetry, _truth, _log;
+        private StreamWriter _events, _eventsCsv, _telemetry, _truth, _frames, _log;
         private BenchVideoPipe _onboard, _trackside;
         private readonly StringBuilder _line = new StringBuilder(256);
         private readonly List<string> _judgeLines = new List<string>();
@@ -129,6 +129,10 @@ namespace Ushqyr.Bench
             _truth = Open("truth.csv");
             // The simulator's own frame: x east, y up, z north; rotation as a quaternion in that (left-handed) frame.
             _truth.WriteLine("tick,t,x,y_up,z,qx,qy,qz,qw,vx,vy_up,vz");
+            // What the camera saw, as fingerprints: `source` is the render before the lens and the video link, `frame` is
+            // the picture the program received. Two attempts with the same commands must have the same lines.
+            _frames = Open("frames.csv");
+            _frames.WriteLine("camera_seq,t,source,frame");
             _log = Open("sim.log");
             Log($"attempt folder created; team {info.team}, track {info.track_id} ({info.track_hash}), mode {info.mode}, seed {info.seed}");
 
@@ -210,6 +214,13 @@ namespace Ushqyr.Bench
         private void F(float v, string format) => _line.Append(',').Append(v.ToString(format, Inv));
 
         public void OnboardFrame(byte[] rgbTopDown, int length) => _onboard?.Write(rgbTopDown, length);
+
+        public void FrameHashes(long seq, double t, Hash128 source, Hash128 frame)
+        {
+            if (_finishing != null) return;
+            _frames.Write(seq.ToString(Inv)); _frames.Write(','); _frames.Write(t.ToString("F3", Inv)); _frames.Write(',');
+            _frames.Write(source.ToString()); _frames.Write(','); _frames.WriteLine(frame.ToString());
+        }
         public void TracksideFrame(byte[] rgbBottomUp, int length) => _trackside?.Write(rgbBottomUp, length);
 
         /// <summary>
@@ -226,7 +237,7 @@ namespace Ushqyr.Bench
             _result.gate_passes = passes;
             _result.date_utc = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ", Inv);
             Log($"attempt ended: {status}, points {points}, time {scoreTime.ToString("F3", Inv)}");
-            _events.Close(); _eventsCsv.Close(); _telemetry.Close(); _truth.Close();
+            _events.Close(); _eventsCsv.Close(); _telemetry.Close(); _truth.Close(); _frames.Close();
             _finishing = Task.Run(Finalise);
         }
 

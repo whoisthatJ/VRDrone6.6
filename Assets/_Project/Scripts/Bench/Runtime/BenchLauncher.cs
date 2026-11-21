@@ -184,6 +184,9 @@ namespace Ushqyr.Bench
         public static string SolutionDigest => Arg("-bench-solution") ?? "";
         /// <summary><c>-bench-exit</c>: quit when the attempt is over and its files are written (server runs).</summary>
         public static bool ExitWhenDone => HasFlag("-bench-exit");
+
+        /// <summary>Diagnostics: save this many of the first camera renders (raw RGB24, bottom-up) into the attempt folder.</summary>
+        public static int DumpSource => int.TryParse(Arg("-bench-dump-source"), out int n) && n > 0 ? n : 0;
         /// <summary><c>-bench-out</c> was given: record attempts in training mode too.</summary>
         public static bool OutputGiven => Arg("-bench-out") != null;
         /// <summary><c>-bench-replay &lt;attempt folder&gt;</c>, or set from the leaderboard: open the judge replay instead of a run.</summary>

@@ -58,9 +58,14 @@ namespace Ushqyr.Bench
             _camera.cullingMask = ~hiddenLayers;
             _camera.allowHDR = false;
             _camera.allowMSAA = false;
+            // A sensor, not a view: the graphics preferences must not touch it. Post-processing would also bring URP's
+            // dithering, whose pattern follows the frame counter: the same flight would not give the same pictures.
+            Ushqyr.Core.GraphicsQuality.LeaveAlone(_camera);
             var data = _camera.GetUniversalAdditionalCameraData();
             data.renderPostProcessing = false;
             data.antialiasing = AntialiasingMode.None;
+            data.dithering = false;
+            data.stopNaN = false;
             data.renderShadows = true;
 
             Release();

@@ -974,6 +974,10 @@ namespace Ushqyr.Bench
             _watch.Restart();
             Unity.Collections.NativeArray<byte> raw = _camera.Capture();
             float captured = (float)_watch.Elapsed.TotalMilliseconds;
+            Hash128 sourceHash = _recorder != null ? Hash128.Compute(raw) : default;
+            if (_recorder != null && _cameraFrames < BenchLauncher.DumpSource)
+                System.IO.File.WriteAllBytes(System.IO.Path.Combine(_recorder.Folder,
+                    $"source_{_cameraFrames:D4}_{_camera.SourceWidth}x{_camera.SourceHeight}.rgb"), raw.ToArray());
             int frameBytes = _rules.camera_width * _rules.camera_height * 3;
             if (!_processed.IsCreated || _processed.Length != frameBytes)
             {
@@ -986,6 +990,7 @@ namespace Ushqyr.Bench
             byte[] pixels = _framePool.Count > 0 ? _framePool.Pop() : new byte[frameBytes];
             _processed.CopyTo(pixels);
             _recorder?.OnboardFrame(pixels, pixels.Length);
+            _recorder?.FrameHashes(_cameraFrames, SimTime, sourceHash, Hash128.Compute(_processed));
             CaptureMs += (captured - CaptureMs) * 0.05f;
             VideoMs += ((float)_watch.Elapsed.TotalMilliseconds - captured - VideoMs) * 0.05f;
             _framesInFlight.Enqueue(new Frame { Time = SimTime, Seq = _cameraFrames, Pixels = pixels });

@@ -581,4 +581,39 @@ does not use the camera), then the program's command changes first, with every l
 input that is not logged is the camera frame. So the physics and the referee are deterministic, the frame is not,
 bit for bit; it showed with one worker as well (the two Linux kit runs: 25.615 s and 25.539 s). The determinism rule
 ("same build, track, seed and commands give the same flight") holds; "the same program gives the same score" does
-not yet. Not investigated. First step: log a hash of every camera frame and find the first frame that differs.
+not yet. **Fixed on 21 November: see "Camera determinism" below.**
+
+### Camera determinism: the same program now gets the same pictures (21 November 2026)
+**Evidence.** A solution that replays recorded commands flies the same path every time, so its frames must be equal.
+With a fingerprint of every frame written into the attempt folder, all 1801 frames of four such runs differed, from
+frame 0 with the drone still on the pad, already in the render before the lens and the video link. In the editor on
+Windows the same still scene rendered identically frame after frame. Saved renders from the Linux server showed two
+patterns: noise in corners and creases (High preset), and plus or minus one on almost half of all pixels (Low preset).
+
+**Two causes, both in the frame counter.** In a paced run the number of window frames between two camera frames
+depends on the load of the computer, and two parts of the rendering follow that counter:
+
+| Cause | Where | Fix |
+|---|---|---|
+| Ambient occlusion with the blue-noise method moves its noise pattern with `Time.frameCount` and takes the next noise texture on every render. Only in a built player: in the editor URP switches this off, which is why the editor was stable | URP, `SSAOUtils` | The four PC renderers use the interleaved-gradient method, which depends on the pixel's place on the screen only |
+| The graphics preferences were applied to every game camera, the drone's camera included: they switched post-processing, dithering and anti-aliasing back on over the sensor's own setup. URP seeds the dither pattern from `Time.frameCount` | `GraphicsQuality.ApplyScene` | A camera can be marked as an instrument (`GraphicsQuality.LeaveAlone`); the sensor camera is, and keeps its own setup: no post-processing, no dithering, no anti-aliasing |
+
+**Verified on the Linux server, 2 workers:** two replays, 181 frames each, equal in every byte; then three copies of
+the sample on `H1_Oval`, `H2_Eight` and `P1_Columns` for the full 120 s: `telemetry.csv`, `truth.csv`, `frames.csv`
+and `events.csv` are the same files in all three copies on every track (28, 20 and 12 points).
+
+**New in the attempt folder:** `frames.csv` (frame number, time, fingerprint of the render, fingerprint of the
+delivered frame). **New diagnostic option:** `-bench-dump-source N` saves the first N renders as raw RGB.
+
+**What this changes, to know:**
+- **The camera picture is a little different from before**: no post-processing (bloom, tone mapping), no
+  anti-aliasing. This is what the sensor's code always asked for; the preferences were overriding it. The sample
+  scores 28, 20 and 12 on the three tracks (before: 28, 17 and 11 to 13). Datasets made before this date show the old
+  picture and should be made again.
+- The picture no longer depends on the post-processing and anti-aliasing preferences. It still depends on the preset
+  through shadows and ambient occlusion, so "one preset for the whole qualification" stays.
+- The ambient occlusion grain of the whole game on High and Ultra changed slightly (another noise pattern).
+- **The Team Kit archives of 20 November (v1.4) were built before this fix**: their players have the old picture and
+  no `frames.csv`. They must be built again before anything is handed out.
+- Checked on one machine only. Two different video cards or drivers may still differ in the last bit; that needs a
+  second machine to find out.

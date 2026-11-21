@@ -146,6 +146,19 @@ namespace Ushqyr.Core
             ApplyScene();
         }
 
+        private static readonly System.Collections.Generic.HashSet<Camera> s_Fixed = new System.Collections.Generic.HashSet<Camera>();
+
+        /// <summary>
+        /// This camera keeps the settings its owner gave it, whatever the graphics preferences say. For cameras that
+        /// are measuring instruments (the AI Bench drone camera): their picture must not depend on the player's
+        /// choices, and URP's dithering changes with the frame counter, so it is not the same picture twice.
+        /// </summary>
+        public static void LeaveAlone(Camera cam)
+        {
+            s_Fixed.RemoveWhere(c => c == null);
+            if (cam != null) s_Fixed.Add(cam);
+        }
+
         /// <summary>Per-scene part: camera AA / post-processing and terrain grass.</summary>
         public static void ApplyScene()
         {
@@ -154,6 +167,7 @@ namespace Ushqyr.Core
             foreach (var cam in UnityEngine.Object.FindObjectsByType<Camera>(FindObjectsInactive.Include))
             {
                 if (cam.targetTexture != null && cam.cameraType != CameraType.Game) continue;
+                if (s_Fixed.Contains(cam)) continue;
                 var data = cam.GetUniversalAdditionalCameraData();
                 if (data == null || data.renderType == CameraRenderType.Overlay) continue;
                 data.renderPostProcessing = prefs.PostProcessing;

@@ -199,6 +199,7 @@ appears beside the folder. Make one kit per platform.
 | `events.jsonl`, `events.csv` | Start, every gate pass (scored or not, with the reason), collisions, failsafes, end |
 | `telemetry.csv` | Per step: the RC packet the program sent, armed and failsafe flags, and the IMU, ToF and battery readings it was given |
 | `truth.csv` | **Judges only.** The true position, attitude and velocity per step |
+| `frames.csv` | A fingerprint of every camera frame: the render before the lens and the video link, and the picture the program received. Two attempts with the same commands have the same lines |
 | `track.benchtrack.json` | The track that was flown |
 | `onboard.mp4` | Exactly the frames the program received |
 | `trackside.mp4` | Fixed cameras around the venue, following the drone |
