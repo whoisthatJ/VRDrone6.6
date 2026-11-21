@@ -178,7 +178,7 @@ ushqyr-bench check-build <папка сборки или набора> --hidden 
 2. Соберите набор:
 
 ```
-ushqyr-bench make-kit --build Builds/TeamKit/Windows --out Builds/TeamKit/UshqyrAIBench-win-1.4 --server Builds/BenchServer --hidden D:\private
+ushqyr-bench make-kit --build Builds/TeamKit/Windows --out Builds/TeamKit/UshqyrAIBench-win-1.5 --server Builds/BenchServer --hidden D:\private
 ```
 
 `--server` добавляет серверную сборку для Linux: она нужна командам для `build-images` и `submit-check`. С ключом

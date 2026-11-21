@@ -173,7 +173,7 @@ The Team Kit is what a team downloads: the simulator, the `bench` folder and thi
 2. Put the kit together:
 
 ```
-ushqyr-bench make-kit --build Builds/TeamKit/Windows --out Builds/TeamKit/UshqyrAIBench-win-1.4 --server Builds/BenchServer --hidden D:\private
+ushqyr-bench make-kit --build Builds/TeamKit/Windows --out Builds/TeamKit/UshqyrAIBench-win-1.5 --server Builds/BenchServer --hidden D:\private
 ```
 
 `--server` adds the Linux server build, which teams need for `build-images` and `submit-check`. With `--hidden` the

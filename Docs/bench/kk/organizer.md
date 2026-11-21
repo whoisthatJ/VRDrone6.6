@@ -182,7 +182,7 @@ ushqyr-bench check-build <build or kit folder> --hidden D:\private
 2. Жинақты құрастырыңыз:
 
 ```
-ushqyr-bench make-kit --build Builds/TeamKit/Windows --out Builds/TeamKit/UshqyrAIBench-win-1.4 --server Builds/BenchServer --hidden D:\private
+ushqyr-bench make-kit --build Builds/TeamKit/Windows --out Builds/TeamKit/UshqyrAIBench-win-1.5 --server Builds/BenchServer --hidden D:\private
 ```
 
 `--server` Linux-қа арналған серверлік жинақты қосады: ол командаларға `build-images` және `submit-check` үшін қажет.

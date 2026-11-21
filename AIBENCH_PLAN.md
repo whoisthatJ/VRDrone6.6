@@ -614,6 +614,19 @@ delivered frame). **New diagnostic option:** `-bench-dump-source N` saves the fi
   through shadows and ambient occlusion, so "one preset for the whole qualification" stays.
 - The ambient occlusion grain of the whole game on High and Ultra changed slightly (another noise pattern).
 - **The Team Kit archives of 20 November (v1.4) were built before this fix**: their players have the old picture and
-  no `frames.csv`. They must be built again before anything is handed out.
+  no `frames.csv`. **Built again on 21 November as v1.5: see below.**
 - Checked on one machine only. Two different video cards or drivers may still differ in the last bit; that needs a
   second machine to find out.
+
+### Team Kit built again with the camera fix, version 1.5 (21 November 2026)
+Both kit players and the Linux Bench Server were built again as v1.5, the Docker images rebuilt, and both kits
+assembled with the server build inside (`UshqyrAIBench-win-1.5.zip` 341 MB, `UshqyrAIBench-linux-1.5.zip` 343 MB).
+
+| Check | Result |
+|---|---|
+| Windows kit by the quickstart (player with no options, the kit's own SDK and sample) | 6 of 6 gates, 25.539 s |
+| Linux kit in a container (GPU through WSL) | 6 of 6 gates, 25.539 s |
+| Two replays on the v1.5 server image | `frames.csv`, `telemetry.csv`, `truth.csv`, `events.csv` equal in every byte |
+
+Not done: no `--hidden` check (no hidden tracks exist yet, D47); the Linux kit was not tried on a real Linux desktop.
+The v1.4 archives are still in `Builds/TeamKit` and must not be handed out.
