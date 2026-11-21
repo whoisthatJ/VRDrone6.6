@@ -166,6 +166,32 @@ namespace Ushqyr.Tests
             Assert.IsEmpty(missing, string.Join("\n", missing));
         }
 
+        /// <summary>
+        /// Every character of every translation is in a font asset that does not change while the program runs: the
+        /// main (Latin) one or the baked Cyrillic and Kazakh one. Nothing is left for the asset that draws letters on
+        /// demand, so a Kazakh screen costs a weak PC nothing extra and leaves no asset changed behind it.
+        /// </summary>
+        [Test]
+        public void EveryCharacterOfTheSheets_IsInABakedFont()
+        {
+            var main = TMPro.TMP_Settings.defaultFontAsset;
+            var baked = AssetDatabase.LoadAssetAtPath<TMPro.TMP_FontAsset>(Ushqyr.EditorTools.FontBuilder.AssetPath);
+            Assert.IsNotNull(baked, "run Ushqyr > Localization > Bake Cyrillic Font");
+            Assert.AreEqual(TMPro.AtlasPopulationMode.Static, baked.atlasPopulationMode);
+            Assert.AreEqual(TMPro.AtlasPopulationMode.Static, main.atlasPopulationMode);
+            Assert.AreSame(baked, main.fallbackFontAssetTable[0], "the baked letters are asked before the changing asset");
+            Assert.AreEqual(main.atlasPadding / main.faceInfo.pointSize, baked.atlasPadding / baked.faceInfo.pointSize, 1e-4,
+                "the same padding for the same size, or the two alphabets differ in weight on one line");
+
+            var missing = new SortedSet<char>();
+            var sheets = LoadSheets(out _);
+            string all = Ushqyr.EditorTools.FontBuilder.Alphabets + string.Concat(sheets.Values.Select(t => t.En + t.Kk + t.Ru));
+            foreach (char c in all)
+                if (c > ' ' && !Ushqyr.EditorTools.FontBuilder.InTable(main, c) && !Ushqyr.EditorTools.FontBuilder.InTable(baked, c)) missing.Add(c);
+            Assert.IsEmpty(missing, "not in a baked font (run Ushqyr > Localization > Bake Cyrillic Font): "
+                                    + string.Join(" ", missing.Select(c => $"{c} U+{(int)c:X4}")));
+        }
+
         [Test]
         public void Sheets_HaveNoDuplicates_AndKeepPlaceholders()
         {

@@ -7971,6 +7971,7 @@ MonoBehaviour:
     m_MarkToMarkAdjustmentRecords: []
   m_ShouldReimportFontFeatures: 0
   m_FallbackFontAssetTable:
+  - {fileID: 11400000, guid: 71c0b75c0496b2a4a8a8a69d15196364, type: 2}
   - {fileID: 11400000, guid: 2e498d1c8094910479dc3e1b768306a4, type: 2}
   m_FontWeightTable:
   - regularTypeface: {fileID: 0}

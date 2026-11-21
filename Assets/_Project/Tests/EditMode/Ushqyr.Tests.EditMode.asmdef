@@ -23,7 +23,8 @@
         "Ushqyr.Strike",
         "Ushqyr.Bench",
         "Ushqyr.Edu.Core",
-        "Ushqyr.Edu"
+        "Ushqyr.Edu",
+        "Unity.TextMeshPro"
     ],
     "includePlatforms": [
         "Editor"
