@@ -53,6 +53,10 @@ Items marked ❓ are my defaults; the customer should confirm them (§13). Each 
 | D24 | **A flight nobody flew records the commands, not empty sticks.** With a person at the sticks the recording holds the sticks as held; with nobody there (a mission, a student's program) it holds what the flight controller was given, and the note `sticks` says which | The stick display, the throttle graph and the smoothness measure would otherwise be empty for every programmed flight |
 | D25 | **The time between two flights is measured along the path**: when the other flight was at the nearest place, searching forward only; no figure when the two are more than 5 m apart | Laps and crossings must not be confused; for a hover the figure means little, so the hub shows it only for activities with a route |
 | D26 | **Reference flights are files** `Edu/Activities/<id>.grreplay`, flown in the simulator; a test requires one for every shipped activity, scoring 90 or more | The prompt's rule "activities are data with a reference flight of 90 or more as a test", on real flights |
+| D27 | **A flight with nobody chosen is stored under the seat**, a profile of the role "seat" named after the computer, never under a student; the choice of profile is forgotten when the program closes | A shared PC must not credit one student with another's flight; "seat name only" of F5 with no personal data |
+| D28 | **PINs are typed on an on-screen keypad**: digits only, 4 to 12 | Works with a mouse alone and in a headset; a PIN only keeps classmates out |
+| D29 | **The school build is the same code built without the internet packages** (`Tools/Edu/school_manifest.py`); a define set by the package's presence decides what is compiled. The build also switches off the engine's own reporting, including "Engine Diagnostics" | One code base to test; measured: 3 connections at start before, 0 after |
+| D30 | **LAN races stay in the school build; internet races and online lap boards do not** | F5: nothing is sent to the internet; the classroom still races |
 | D21 | **Names are compared and sorted in code, not in SQL.** SQLite folds case for Latin letters only and orders by character code, which made "7Б" and "7б" two groups and put every Kazakh letter after the Russian alphabet | Found by the store tests |
 
 ## 3. Shared foundations
@@ -571,3 +575,59 @@ grab is already turned over) is written in the code.
 - **Shipping:** ffmpeg is in no build yet. 134 MB more in the school installer is the owner's call, and so is the
   licence question in `THIRD_PARTY_NOTICES.md` (LGPL text and source offer; H.264 patents).
 - **AI Bench videos:** its recorder asks for the x264 encoder, which the LGPL build lacks. Nothing there was changed.
+
+### 21 to 22 November 2026: languages, the baked font, text that fits, "Who is flying?" (ED1 tasks 1.1 to 1.4, 2.3)
+**Languages (1.1, 1.2).** The estimate of "60 to 120 hard-coded strings" was too high: the calibration wizard, the
+display modes and the catalogue already went through the tables by way of variables. Really untranslated were the
+pause overlay for a controller change, a unit, and nothing else. Two tests now guard this: one scans every place that
+puts text on the screen and refuses a literal that is not a key of the sheets (names such as "SMAA" are listed by
+hand; the two FPV-style displays stay English on purpose, as on real goggles), the other checks the texts kept in data
+(parts, quads, tracks, wizard steps, display modes, pause reasons). The Education Suite's texts are in
+`Localization/Text/edu.tsv`.
+
+**The baked font (1.3).** The main font asset held Latin only, so every Russian and Kazakh letter was drawn while the
+program ran, into an asset that was rewritten after every run. `Ushqyr > Localization > Bake Cyrillic Font` now bakes
+both alphabets and every other character of the sheets (93 characters) into a second asset that never changes; it is
+asked first. A test requires every character of the sheets to be in a baked font. Checked: the menu was shown in
+Kazakh and Russian with the changing asset emptied first, and it was still empty afterwards. Liberation Sans has no
+tenge sign; no text needs one.
+
+**Text that fits (1.4).** `Ushqyr > Localization > Check Text Fits`, in play mode, opens every screen of the main menu
+and every settings tab in the three languages and lists labels that are cut or overflow. It found 7 (Online, a
+settings tab, three settings rows); buttons and settings row labels now shrink to fit (down to 60%) instead of being
+cut. 69 screens, 1120 labels, none clipped. **Not covered:** the garage, the in-flight displays, the AI Bench panels
+and the replay viewer (they do not build their screens with "Show…" methods); they were looked at by eye only.
+
+**"Who is flying?" (2.3).** A button on the main menu opens the class list (alphabetical in the Kazakh order, ten to
+a page, a group filter). A student with a PIN types it on a keypad on the screen; "New student" takes a name and an
+optional PIN; "Without a name (this seat)" flies as the seat. Flights are stored under the chosen profile.
+
+- **D27. Nobody chosen means the seat, not a student.** A flight with no profile chosen goes to a profile of the role
+  "seat", named after the computer; before, it went to the first student in the list. The choice is forgotten when the
+  program closes: a shared school PC asks again.
+- **D28. A PIN is typed on an on-screen keypad**, digits only, 4 to 12 of them: it works with a mouse alone and in a
+  headset. It keeps classmates out; it is not strong protection, and there is no limit on wrong tries yet.
+
+**Checked.** In play mode against a scratch database: the list, a wrong and a right PIN, the new-student page, the
+seat. 436 tests pass. **Not there yet:** changing or removing one's own PIN, renaming, and the teacher's side (reset a
+PIN, import a class list on screen); they belong to the teacher console (ED4).
+
+### 22 November 2026: the school build has nothing that reaches the internet (ED1 task 2.5)
+**What exists.** `Tools/Edu/school_manifest.py strip` takes the Unity services packages and the analytics module out
+of the project; `BuildScript.BuildSchoolWindows` then builds the whole program, refusing to start while those packages
+are still there, and `restore` puts them back. The code is the same for both versions: the network assembly knows
+whether the packages are present, and without them the Online page offers LAN races only. `Docs/edu/school_build.md`
+has the steps and the measurements.
+
+**What was found on the way.** Removing the packages was not enough. A program built by this Unity version opens three
+connections at start by itself: two for the engine's statistics and one for "Engine Diagnostics", a setting that is on
+by default. The school build now switches all of that off, in the build's settings and again at start-up. Measured on
+a small build: **3 connections before, 0 after.**
+
+- **D29. One code base, two package sets.** The school build is the same code built without the internet packages,
+  not a second branch. A define set by the presence of the package (`USHQYR_CLOUD`) decides what is compiled.
+- **D30. LAN races are part of the school build; internet races and online boards are not.**
+
+**Not done.** The full school build (every scene) was not built or watched, only the small probe; a longer run and a
+traffic recorder on a second PC are for the classroom test. The AI Bench Team Kit still has Unity's default reporting;
+changing it is the owner's decision.

@@ -2788,6 +2788,10 @@ MonoBehaviour:
     m_Localized: 'The class data could not be opened: {0}'
     m_Metadata:
       m_Items: []
+  - m_Id: 6752141895794688
+    m_Localized: This build has no internet features; LAN races work.
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

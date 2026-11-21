@@ -21,6 +21,12 @@
     "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [],
-    "versionDefines": [],
+    "versionDefines": [
+        {
+            "name": "com.unity.services.multiplayer",
+            "expression": "",
+            "define": "USHQYR_CLOUD"
+        }
+    ],
     "noEngineReferences": false
 }

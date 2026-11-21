@@ -45,6 +45,9 @@ Camera, area, finds and payload metrics wait for ED2 and ED6, where the things t
 **State on 21 November 2026:** 4.1 to 4.5 are done (`EDU_PLAN.md` §15). 4.3 has no button yet: the recorder keeps the
 last ten minutes and `Save` writes them, the button comes with the training hub. 4.6 is done in the editor (not yet tried in a built program).
 
+**Tasks 1.1 to 1.4, 2.3 and 2.5** are done as well (`EDU_PLAN.md` §15, 21 and 22 November). 2.5 was checked on a small
+build only. **5.1 (installer) is not started:** it needs the Inno Setup compiler and a second PC.
+
 The AI Bench recorder stays as it is (its files are signed evidence). The new recorder shares the reader of the truth
 track where that is natural, and nothing in the AI Bench attempt folder changes.
 

@@ -99,6 +99,11 @@ namespace Ushqyr.UI
 
             float y = -190f;
             var track = OnlineTrack();
+            if (!OnlineServices.Available)
+            {
+                ShowLanOnly(p, track, y);
+                return;
+            }
             UiKit.Button(p, L.T("Quick race"), new Vector2(Margin, y), new Vector2(half, 90f), () => Go(OnlineLobby.QuickRaceAsync(track.Id, track.DisplayName), L.T("Finding a race...")));
             UiKit.Button(p, L.T("Host a race"), new Vector2(Margin + half + 30f, y), new Vector2(half, 90f), () => Go(OnlineLobby.CreateAsync(track.Id, track.DisplayName, false), L.T("Opening your race...")));
             y -= 110f;
@@ -138,6 +143,26 @@ namespace Ushqyr.UI
                 ShowMain();
             });
             UiKit.Button(p, L.T("Online leaderboards"), new Vector2(Width - Margin - 420f, -(Height - 110f)), new Vector2(420f, 70f), ShowOnlineBoards, 28f);
+        }
+
+        /// <summary>The page of a build without internet features (the school build): host or join in the classroom's network.</summary>
+        private void ShowLanOnly(RectTransform p, TrackCatalog.Entry track, float y)
+        {
+            float half = (ContentWidth - 30f) * 0.5f;
+            float codeW = half - 230f;
+            UiKit.Button(p, L.T("Host a LAN race"), new Vector2(Margin, y), new Vector2(half, 90f), () => Go(System.Threading.Tasks.Task.FromResult(OnlineLobby.HostDirect(track.Id, track.DisplayName)), L.T("Opening your race...")));
+            var ipBox = UiKit.Rect(p, "LAN address", new Vector2(Margin + half + 30f, y), new Vector2(codeW, 90f));
+            _lanField = InputField(ipBox, L.T("Host address"));
+            UiKit.Button(p, L.T("Join LAN"), new Vector2(Margin + half + 30f + codeW + 20f, y), new Vector2(210f, 90f), () => Go(System.Threading.Tasks.Task.FromResult(OnlineLobby.JoinDirect(_lanField.text)), L.T("Joining...")));
+            UiKit.Label(p, L.T("This build has no internet features; LAN races work."), new Vector2(Margin, y - 120f), new Vector2(ContentWidth, 60f), 28f,
+                TextAlignmentOptions.MidlineLeft, UiKit.DimTextColor);
+            UiKit.Label(p, L.F("Hosted races use your selected track ({0}); built-in tracks only. Up to {1} pilots.", L.T(track.DisplayName), OnlineRules.MaxPilots),
+                new Vector2(Margin, -(Height - 185f)), new Vector2(ContentWidth, 50f), 24f, TextAlignmentOptions.MidlineLeft, UiKit.DimTextColor);
+            BackButton(p, () =>
+            {
+                _onlinePage = OnlinePage.None;
+                ShowMain();
+            });
         }
 
         private async void RefreshOpenRaces()

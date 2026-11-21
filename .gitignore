@@ -127,3 +127,6 @@ InitTestScene*.unity*
 
 # Third-party runtimes fetched by Tools/Edu/fetch_third_party.py (not kept in the repository)
 /ThirdParty/
+
+# Copies kept while the school build is made (Tools/Edu/school_manifest.py)
+/Packages/*.full

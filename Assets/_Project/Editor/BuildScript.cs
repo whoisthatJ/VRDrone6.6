@@ -130,6 +130,117 @@ namespace Ushqyr.EditorTools
         public static string BuildTeamKitWindowsDeferred() => Deferred(BuildTeamKitWindows);
         public static string BuildTeamKitLinuxDeferred() => Deferred(BuildTeamKitLinux);
 
+        // ---------- the school build ----------
+
+        public const string SchoolWindowsPath = "Builds/School/Windows/Ushqyr.exe";
+        public const string SchoolProbePath = "Builds/SchoolProbe/Ushqyr.exe";
+
+        /// <summary>
+        /// The version for schools (EDU_PLAN F5): the whole program, but with nothing in it that can talk to a server
+        /// on the internet. Run <c>python -I Tools/Edu/school_manifest.py strip</c> first and wait for the editor to
+        /// finish; this refuses to build while the internet packages are still in the project. Afterwards it looks
+        /// into the built program and reports any library that should not be there.
+        /// </summary>
+        [MenuItem("Ushqyr/Build/Build School Version (Windows)")]
+        public static void BuildSchoolWindows() => BuildSchool(SchoolWindowsPath, null);
+
+        /// <summary>The same check on a small build (the start-up and AI Bench scenes only): a minute instead of an hour.</summary>
+        public static void BuildSchoolProbe() => BuildSchool(SchoolProbePath,
+            EditorBuildSettings.scenes.Where(s => s.enabled).Select(s => s.path)
+                .Where(s => s.EndsWith("/Boot.unity") || Path.GetFileName(s).StartsWith("Bench_")).ToArray());
+
+        public static string BuildSchoolWindowsDeferred() => Deferred(BuildSchoolWindows);
+        public static string BuildSchoolProbeDeferred() => Deferred(BuildSchoolProbe);
+
+        private static void BuildSchool(string path, string[] scenes)
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(ResultPath));
+            if (System.AppDomain.CurrentDomain.GetAssemblies().Any(a => a.GetName().Name.StartsWith("Unity.Services.", System.StringComparison.Ordinal)))
+            {
+                File.WriteAllText(ResultPath, "Build Failed: the internet packages are still in the project. Run \"python -I Tools/Edu/school_manifest.py strip\", wait for the editor, then build again.");
+                Debug.LogError("[Ushqyr] School build refused: the internet packages are still in the project.");
+                if (Application.isBatchMode) EditorApplication.Exit(1);
+                return;
+            }
+            PlayerSettings.fullScreenMode = FullScreenMode.FullScreenWindow;
+            PlayerSettings.defaultIsNativeResolution = true;
+            PlayerSettings.resizableWindow = true;
+            // The engine's own reporting to Unity: off for this build, and put back afterwards.
+            bool analytics = UnityEditor.Analytics.AnalyticsSettings.enabled;
+            bool crashes = UnityEditor.CrashReporting.CrashReportingSettings.enabled;
+            bool performance = UnityEditor.Analytics.PerformanceReportingSettings.enabled;
+            // The engine's own hardware statistics and its link to Unity's services have no scripting switch in this
+            // version; they are fields of the project settings.
+            bool statistics = ProjectFlag("ProjectSettings/ProjectSettings.asset", "submitAnalytics", false);
+            bool connect = ProjectFlag("ProjectSettings/UnityConnectSettings.asset", "m_Enabled", false);
+            // "Engine Diagnostics" (Project Settings > Services > Insights): on by default, it sends data about the
+            // running program to engine-data.unity3d.com.
+            bool diagnostics = ProjectFlag("ProjectSettings/UnityConnectSettings.asset", "InsightsSettings.m_EngineDiagnosticsEnabled", false);
+            bool insights = ProjectFlag("ProjectSettings/UnityConnectSettings.asset", "InsightsSettings.m_Enabled", false);
+            UnityEditor.Analytics.PerformanceReportingSettings.enabled = false;
+            UnityEditor.Analytics.AnalyticsSettings.enabled = false;
+            UnityEditor.CrashReporting.CrashReportingSettings.enabled = false;
+            try
+            {
+                Build(path, BuildTarget.StandaloneWindows64, BuildTargetGroup.Standalone, scenes, new[] { "USHQYR_SCHOOL" }, () => SchoolCheck(path));
+            }
+            finally
+            {
+                UnityEditor.Analytics.AnalyticsSettings.enabled = analytics;
+                UnityEditor.CrashReporting.CrashReportingSettings.enabled = crashes;
+                UnityEditor.Analytics.PerformanceReportingSettings.enabled = performance;
+                ProjectFlag("ProjectSettings/ProjectSettings.asset", "submitAnalytics", statistics);
+                ProjectFlag("ProjectSettings/UnityConnectSettings.asset", "m_Enabled", connect);
+                ProjectFlag("ProjectSettings/UnityConnectSettings.asset", "InsightsSettings.m_EngineDiagnosticsEnabled", diagnostics);
+                ProjectFlag("ProjectSettings/UnityConnectSettings.asset", "InsightsSettings.m_Enabled", insights);
+                AssetDatabase.SaveAssets();
+            }
+        }
+
+        /// <summary>Sets a yes/no field of a project settings file and returns what it was (true when there is no such field).</summary>
+        private static bool ProjectFlag(string settingsFile, string field, bool value)
+        {
+            Object[] assets = AssetDatabase.LoadAllAssetsAtPath(settingsFile);
+            if (assets == null || assets.Length == 0) return true;
+            var settings = new SerializedObject(assets[0]);
+            SerializedProperty property = settings.FindProperty(field);
+            if (property == null || property.propertyType != SerializedPropertyType.Boolean)
+            {
+                Debug.LogWarning($"[Ushqyr] {settingsFile} has no yes/no field '{field}'");
+                return true;
+            }
+            bool before = property.boolValue;
+            property.boolValue = value;
+            settings.ApplyModifiedPropertiesWithoutUndo();
+            return before;
+        }
+
+        /// <summary>Libraries of a built program that exist to reach the internet; the school build must have none.</summary>
+        public static string[] InternetLibraries(string exePath)
+        {
+            string managed = Path.Combine(Path.GetDirectoryName(exePath), Path.GetFileNameWithoutExtension(exePath) + "_Data", "Managed");
+            if (!Directory.Exists(managed)) return new[] { "(no Managed folder at " + managed + ")" };
+            return Directory.GetFiles(managed, "*.dll").Select(Path.GetFileName)
+                .Where(n => n.StartsWith("Unity.Services.", System.StringComparison.OrdinalIgnoreCase)
+                            || n.IndexOf("UnityAnalytics", System.StringComparison.OrdinalIgnoreCase) >= 0
+                            || n.IndexOf("UnityConnect", System.StringComparison.OrdinalIgnoreCase) >= 0
+                            || n.IndexOf("CrashReporting", System.StringComparison.OrdinalIgnoreCase) >= 0
+                            || n.IndexOf("PerformanceReporting", System.StringComparison.OrdinalIgnoreCase) >= 0)
+                .OrderBy(n => n).ToArray();
+        }
+
+        private static string SchoolCheck(string exePath)
+        {
+            string[] found = InternetLibraries(exePath);
+            string[] services = found.Where(n => n.StartsWith("Unity.Services.", System.StringComparison.OrdinalIgnoreCase)).ToArray();
+            if (services.Length > 0) return "School check FAILED: " + string.Join(", ", services);
+            // The engine's own reporting modules cannot be left out of a program built this way (they are part of the
+            // engine's managed layer); they are switched off in the settings of this build and again at start-up.
+            return "School check passed: no Unity services library in the program."
+                   + (found.Length > 0 ? " Engine reporting modules present but switched off: " + string.Join(", ", found) + "." : "")
+                   + " Confirm with a run: the program must hold no connection (Docs/edu/school_build.md).";
+        }
+
         private static string Deferred(EditorApplication.CallbackFunction build)
         {
             Directory.CreateDirectory(Path.GetDirectoryName(ResultPath));
@@ -184,7 +295,8 @@ namespace Ushqyr.EditorTools
             return ResultPath;
         }
 
-        private static void Build(string path, BuildTarget target, BuildTargetGroup targetGroup, string[] scenes = null, string[] defines = null)
+        private static void Build(string path, BuildTarget target, BuildTargetGroup targetGroup, string[] scenes = null, string[] defines = null,
+            System.Func<string> afterBuild = null)
         {
             Directory.CreateDirectory(Path.GetDirectoryName(path));
             scenes ??= EditorBuildSettings.scenes.Where(s => s.enabled).Select(s => s.path).ToArray();
@@ -208,6 +320,12 @@ namespace Ushqyr.EditorTools
             Debug.Log("[Ushqyr] " + line);
 
             var sb = new System.Text.StringBuilder(line).AppendLine();
+            if (afterBuild != null && summary.result == BuildResult.Succeeded)
+            {
+                string extra = afterBuild();
+                Debug.Log("[Ushqyr] " + extra);
+                sb.AppendLine(extra);
+            }
             foreach (var step in report.steps)
             foreach (var m in step.messages)
                 if (m.type == LogType.Error || m.type == LogType.Exception || m.type == LogType.Warning)

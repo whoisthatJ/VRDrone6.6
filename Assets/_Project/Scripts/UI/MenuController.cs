@@ -574,6 +574,7 @@ namespace Ushqyr.UI
             UiKit.StepperRow(c, L.T("Callsign"), -90f, Callsigns, index, i => { S.PilotName = Callsigns[i]; Changed(); }, ContentWidth);
             UiKit.Label(c, L.T("Shown on the leaderboard and to other pilots online."),
                 new Vector2(0f, -160f), new Vector2(ContentWidth, 60f), 26f, TextAlignmentOptions.TopLeft, UiKit.DimTextColor);
+            if (!Ushqyr.Net.OnlineServices.Available) return; // a build without internet features has nothing to post to
             UiKit.StepperRow(c, L.T("Post lap times online"), -250f, OffOn, S.Online.PostLapTimes ? 1 : 0, i => { S.Online.PostLapTimes = i == 1; Changed(); }, ContentWidth);
             UiKit.Label(c, L.T("On: the best lap of each finished race on a built-in track goes to its online leaderboard (signs in anonymously)."),
                 new Vector2(0f, -320f), new Vector2(ContentWidth, 60f), 26f, TextAlignmentOptions.TopLeft, UiKit.DimTextColor);

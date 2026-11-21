@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+#if USHQYR_CLOUD
 using Unity.Services.Multiplayer;
+#endif
 using UnityEngine;
 
 namespace Ushqyr.Net
@@ -20,6 +22,10 @@ namespace Ushqyr.Net
     /// Finding and hosting online races (up to <see cref="OnlineRules.MaxPilots"/> pilots). The host's PC runs the race
     /// and Unity brokers the connection, so it works behind home routers. Races are listed while in the lobby and
     /// locked while racing. Joining also starts the race network (<see cref="NetRace"/>).
+    /// <para>
+    /// A direct (LAN) race needs none of Unity's services. In a build without the services packages (the school
+    /// build) it is the only kind: everything that would go through the internet answers "not in this build".
+    /// </para>
     /// </summary>
     public static class OnlineLobby
     {
@@ -28,7 +34,21 @@ namespace Ushqyr.Net
         private const string KeyGame = "game", KeyState = "state", KeyTrack = "track", KeyTrackName = "trackName";
         private const string StateLobby = "lobby", StateRacing = "racing";
 
-        public static ISession Current { get; private set; }
+#if USHQYR_CLOUD
+        private static ISession Current { get; set; }
+#else
+        /// <summary>No internet race can exist in this build; the name is kept so the code below reads the same.</summary>
+        private sealed class NoSession
+        {
+            public bool IsHost => false;
+            public string Code => "";
+            public string Name => "";
+            public int PlayerCount => 0;
+            public int MaxPlayers => OnlineRules.MaxPilots;
+        }
+
+        private static NoSession Current => null;
+#endif
         /// <summary>In a direct / LAN race (P6): no Unity session, the race network connects by address.</summary>
         public static bool Direct { get; private set; }
         public static string DirectAddress { get; private set; } = "";
@@ -91,6 +111,20 @@ namespace Ushqyr.Net
 
         private static void RaiseChanged() => Changed?.Invoke();
 
+#if !USHQYR_CLOUD
+        private static Task<bool> NotInThisBuild()
+        {
+            LastError = Core.L.T("This build has no internet features; LAN races work.");
+            return Task.FromResult(false);
+        }
+
+        public static Task<bool> CreateAsync(string trackId, string trackName, bool isPrivate) => NotInThisBuild();
+        public static Task<bool> QuickRaceAsync(string trackId, string trackName) => NotInThisBuild();
+        public static Task<bool> JoinByCodeAsync(string code) => NotInThisBuild();
+        public static Task<bool> JoinAsync(string sessionId) => NotInThisBuild();
+        public static Task<List<OpenRace>> ListAsync() => Task.FromResult(new List<OpenRace>());
+        private static string Prop(string key) => "";
+#else
         public static async Task<bool> CreateAsync(string trackId, string trackName, bool isPrivate)
         {
             return await Run(async () =>
@@ -165,6 +199,7 @@ namespace Ushqyr.Net
             }
             return list;
         }
+#endif
 
         /// <summary>Host: changes the track shown in the lobby and the list.</summary>
         public static async Task SetTrackAsync(string trackId, string trackName)
@@ -176,6 +211,7 @@ namespace Ushqyr.Net
                 Changed?.Invoke();
                 return;
             }
+#if USHQYR_CLOUD
             if (!IsHost) return;
             var host = Current.AsHost();
             host.SetProperties(new Dictionary<string, SessionProperty>
@@ -184,12 +220,16 @@ namespace Ushqyr.Net
                 [KeyTrackName] = new SessionProperty(trackName ?? trackId),
             });
             await Save(host);
+#else
+            await Task.CompletedTask;
+#endif
         }
 
         /// <summary>Host: hides the race from the list and stops new pilots joining while racing.</summary>
         public static async Task SetRacingAsync(bool racing)
         {
             if (Direct) return;
+#if USHQYR_CLOUD
             if (!IsHost) return;
             var host = Current.AsHost();
             host.IsLocked = racing;
@@ -198,6 +238,9 @@ namespace Ushqyr.Net
                 [KeyState] = new SessionProperty(racing ? StateRacing : StateLobby, VisibilityPropertyOptions.Public, PropertyIndex.String2),
             });
             await Save(host);
+#else
+            await Task.CompletedTask;
+#endif
         }
 
         public static async Task LeaveAsync()
@@ -212,6 +255,7 @@ namespace Ushqyr.Net
                 }
                 return;
             }
+#if USHQYR_CLOUD
             var s = Current;
             if (s == null) return;
             Detach(s);
@@ -225,6 +269,9 @@ namespace Ushqyr.Net
                 Debug.LogWarning("[Ushqyr] Leaving the race: " + e.Message);
             }
             if (NetRace.Instance != null) NetRace.Instance.ResetState();
+#else
+            await Task.CompletedTask;
+#endif
         }
 
         /// <summary>Pilots in the session (names from the services, before the race network knows them).</summary>
@@ -236,17 +283,20 @@ namespace Ushqyr.Net
                 foreach (var p in NetRace.Instance.Pilots.Values) names.Add(p.Name);
                 return names;
             }
+#if USHQYR_CLOUD
             if (Current == null) return names;
             foreach (var p in Current.Players)
             {
                 string n = OnlineServices.DisplayName(p.GetPlayerName());
                 names.Add(string.IsNullOrEmpty(n) ? "Pilot" : n);
             }
+#endif
             return names;
         }
 
         // ---------- internals ----------
 
+#if USHQYR_CLOUD
         private static async Task<bool> Run(Func<Task<ISession>> join)
         {
             LastError = "";
@@ -353,5 +403,9 @@ namespace Ushqyr.Net
             if (NetRace.Instance != null) NetRace.Instance.ResetState();
             Ended?.Invoke(reason);
         }
+#else
+        // "Ended" is raised only by an internet race; referenced here so a build without one has no unused-event warning.
+        private static void NeverEnded() => Ended?.Invoke("");
+#endif
     }
 }

@@ -2785,6 +2785,10 @@ MonoBehaviour:
     m_Key: 'The class data could not be opened: {0}'
     m_Metadata:
       m_Items: []
+  - m_Id: 6752141895794688
+    m_Key: This build has no internet features; LAN races work.
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

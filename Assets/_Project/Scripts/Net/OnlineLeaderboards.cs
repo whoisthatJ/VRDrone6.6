@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+#if USHQYR_CLOUD
 using Unity.Services.Leaderboards;
+#endif
 using UnityEngine;
 
 namespace Ushqyr.Net
@@ -41,6 +43,7 @@ namespace Ushqyr.Net
                 LastError = OnlineServices.LastError;
                 return false;
             }
+#if USHQYR_CLOUD
             try
             {
                 var options = new AddPlayerScoreOptions { Metadata = new Dictionary<string, string> { ["quad"] = quadName ?? "" } };
@@ -55,6 +58,9 @@ namespace Ushqyr.Net
                 Debug.LogWarning("[Ushqyr] Posting the lap time failed: " + e.Message);
                 return false;
             }
+#else
+            return false;
+#endif
         }
 
         /// <summary>Top <paramref name="count"/> laps, plus this player's row when outside them.</summary>
@@ -66,6 +72,7 @@ namespace Ushqyr.Net
                 LastError = OnlineServices.LastError;
                 return rows;
             }
+#if USHQYR_CLOUD
             string me = OnlineServices.PlayerId;
             try
             {
@@ -95,6 +102,7 @@ namespace Ushqyr.Net
             {
                 LastError = OnlineServices.Describe(e);
             }
+#endif
             return rows;
         }
     }

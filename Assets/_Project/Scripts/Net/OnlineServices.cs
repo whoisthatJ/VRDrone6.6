@@ -2,8 +2,10 @@ using System;
 using System.Text;
 using System.Threading.Tasks;
 using Ushqyr.Core;
+#if USHQYR_CLOUD
 using Unity.Services.Authentication;
 using Unity.Services.Core;
+#endif
 using UnityEngine;
 
 namespace Ushqyr.Net
@@ -12,9 +14,17 @@ namespace Ushqyr.Net
     /// Unity Gaming Services start-up and anonymous sign-in. Only runs when the player opens an online feature (the
     /// game never connects by itself). <c>-online-profile NAME</c> signs in as a separate player, so two copies of the
     /// game on one PC can race each other.
+    /// <para>
+    /// The school build is made without the Unity services packages (EDU_PLAN F5: nothing leaves the classroom).
+    /// There <see cref="Available"/> is false, nothing here can connect anywhere, and only LAN races are offered.
+    /// </para>
     /// </summary>
     public static class OnlineServices
     {
+#if USHQYR_CLOUD
+        /// <summary>True when this build holds the internet features (races through Unity's servers, online boards).</summary>
+        public static readonly bool Available = true;
+
         private static Task<bool> _signIn;
 
         public static bool SignedIn => UnityServices.State == ServicesInitializationState.Initialized && AuthenticationService.Instance.IsSignedIn;
@@ -70,6 +80,19 @@ namespace Ushqyr.Net
             return true;
         }
 
+#else
+        public static readonly bool Available = false;
+        public static bool SignedIn => false;
+        public static string PlayerId => "";
+        public static string LastError { get; private set; } = "";
+
+        public static Task<bool> EnsureSignedInAsync()
+        {
+            LastError = L.T("This build has no internet features; LAN races work.");
+            return Task.FromResult(false);
+        }
+#endif
+
         /// <summary><c>-online-profile NAME</c> from the command line, cleaned to what the services accept.</summary>
         public static string Profile(string[] args)
         {
@@ -106,8 +129,10 @@ namespace Ushqyr.Net
         public static string Describe(Exception e)
         {
             string m = e.Message;
+#if USHQYR_CLOUD
             if (e is AuthenticationException || e is RequestFailedException)
                 return L.F("Online services unavailable ({0})", m);
+#endif
             return m;
         }
     }
