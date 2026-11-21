@@ -629,4 +629,4 @@ assembled with the server build inside (`UshqyrAIBench-win-1.5.zip` 341 MB, `Ush
 | Two replays on the v1.5 server image | `frames.csv`, `telemetry.csv`, `truth.csv`, `events.csv` equal in every byte |
 
 Not done: no `--hidden` check (no hidden tracks exist yet, D47); the Linux kit was not tried on a real Linux desktop.
-The v1.4 archives are still in `Builds/TeamKit` and must not be handed out.
+The v1.4 folders and archives were deleted from `Builds/TeamKit` the same day.
