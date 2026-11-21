@@ -41,6 +41,7 @@ namespace Ushqyr.Edu
         private WeatherSettings _from = WeatherSettings.Calm, _to = WeatherSettings.Calm;
         private float _blend = 1f, _groundY;
         private double _clock;
+        private float _tunedMass, _tunedThrust;
 
         /// <summary>The weather right now (on the way to the last one asked for).</summary>
         public WeatherSettings Weather => Flight.Weather.Blend(_from, _to, _blend);
@@ -105,6 +106,13 @@ namespace Ushqyr.Edu
             QuadState believed = _estimator.Estimate(truth, _groundY, Faults, dt);
 
             ref readonly QuadProfile profile = ref vehicle.Profile;
+            // The assist's limits follow the drone that is flown (and its load): a delivery drone is not a racer.
+            if (profile.Mass != _tunedMass || profile.Motors.MaxThrustPerMotor != _tunedThrust)
+            {
+                _tunedMass = profile.Mass;
+                _tunedThrust = profile.Motors.MaxThrustPerMotor;
+                Autopilot.Settings = AssistTuning.For(profile, vehicle.Gravity);
+            }
             float capacity = profile.Battery.CapacityMah;
             float left = capacity > 0f ? 1f - truth.BatteryUsedMah / capacity : 1f;
             Battery = Mathf.Clamp01(left - Mathf.Clamp01(BatteryDrop));

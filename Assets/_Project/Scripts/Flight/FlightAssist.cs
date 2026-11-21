@@ -54,6 +54,32 @@ namespace Ushqyr.Flight
         };
     }
 
+    public static class AssistTuning
+    {
+        /// <summary>
+        /// Limits that suit one drone (EDU_PLAN F3: "gains are derived from each drone's profile"): how far it may
+        /// lean and still have thrust to spare, the speed that lean gives against its own drag, and how fast it can
+        /// climb. The loop gains stay the common ones; they act on speed and position, not on the airframe.
+        /// </summary>
+        public static AssistSettings For(in QuadProfile p, float gravity = 9.81f)
+        {
+            AssistSettings c = AssistSettings.Default;
+            float twr = 4f * p.Motors.MaxThrustPerMotor / MathF.Max(p.Mass * gravity, 1e-6f);
+            // Leaning costs lift: keep 30% above hover in hand for climbing and for gusts.
+            float byThrust = MathF.Acos(MathF.Min(1f, 1.3f / MathF.Max(twr, 1.31f))) * 57.29578f;
+            float byFrame = p.AngleMode.MaxAngleDeg > 0f ? p.AngleMode.MaxAngleDeg : 30f;
+            c.MaxTiltDeg = MathF.Max(8f, MathF.Min(MathF.Min(30f, byFrame), byThrust));
+            // Top speed: where drag equals the push of 80% of that lean.
+            float push = p.Mass * gravity * MathF.Tan(0.8f * c.MaxTiltDeg / 57.29578f);
+            float quad = MathF.Max(p.Aero.QuadraticDrag.z, 1e-5f), lin = p.Aero.LinearDrag.z;
+            float speed = (-lin + MathF.Sqrt(lin * lin + 4f * quad * push)) / (2f * quad);
+            c.MaxSpeed = MathF.Max(2f, MathF.Min(speed, 20f));
+            c.MaxClimb = MathF.Max(1f, MathF.Min((twr - 1f) * 3f, 4f));
+            c.MaxDescent = MathF.Min(2f, c.MaxClimb);
+            return c;
+        }
+    }
+
     /// <summary>What the assist remembers between steps.</summary>
     public struct AssistState
     {

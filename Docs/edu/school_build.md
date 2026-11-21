@@ -26,9 +26,8 @@ shown.
 4. `python -I Tools/Edu/school_manifest.py restore`, and wait for the editor again.
 
 The build refuses to start while the internet packages are still in the project. After the build it looks into the
-program's `Managed` folder and fails the check if a library of Unity services, analytics, Unity Connect, crash reporting
-or performance reporting is there. `BuildScript.BuildSchoolProbe` does the same on a small set of scenes, for a quick
-check of the list of libraries.
+program's `Managed` folder: a Unity services library there fails the check; the engine's own reporting modules are
+listed (see below). `BuildScript.BuildSchoolProbe` does the same on a small set of scenes, in about a minute.
 
 ## What was measured (21 November 2026, Unity 6000.6.0f1, a Unity Personal licence)
 A small build with the school settings (`BuildSchoolProbe`: start-up and AI Bench scenes) was run for 30 seconds and its
@@ -66,4 +65,4 @@ Diagnostics on (Unity's default). Whether the Team Kit should also be silent is 
 - **Netcode for GameObjects and Unity Transport:** the race network inside the classroom. They open a connection only to
   the address a pilot types (or, later, the teacher's PC).
 - **UnityWebRequest modules:** used to read files shipped with the program on some platforms; no address on the internet
-  is in the code. A check of the running program's connections is in the results below.
+  is in the code (searched: only file-format names and the PC's own address 127.0.0.1).
