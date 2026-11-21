@@ -499,3 +499,9 @@ to 15 m, landed 20 cm from the start in that wind and switched the motors off; t
 school build without cloud packages, the installer. **Not started of ED2:** the three new drone classes, gimbal and
 payloads, rain and fog pictures, the remaining failures (GPS and compass faults exist; video, IMU, gimbal do not).
 
+**Later the same day: the loop "fly, grade, store" works end to end.** `ActivityAttempt` grades a recording against
+an activity, writes the recording next to the database (named by activity and content) and adds the attempt to the
+journal; `Regrade` grades a stored attempt again. Live in `Track_Field` the autopilot flew the sample exercise
+"take off, hover at 2 m, land": **99.4 of 100, three stars**, one journal row, a 44 KB recording. This is the plan's
+"reference flight must score 90 or more", flown for real instead of made up from numbers.
+

@@ -285,6 +285,46 @@ namespace Ushqyr.Tests
         }
 
         [Test]
+        public void Attempt_IsGradedStoredWithItsRecording_AndCanBeGradedAgain()
+        {
+            string replays = Path.Combine(_dir, "replays");
+            ActivityDefinition a = ActivityDefinition.Parse(HoverJson);
+            using (var db = new EduDatabase(Path.Combine(_dir, "class.db")))
+            {
+                var store = new EduStore(db, replays);
+                long student = store.AddUser("Айгерім");
+                var flags = new Dictionary<string, object> { ["weather_changed"] = true };
+                AttemptRecord saved = ActivityAttempt.Finish(store, replays, a, Hover(0.08, 0.1, 0.4, 0.02), student, "1.5", flags);
+                Assert.GreaterOrEqual(saved.Score, 90);
+                Assert.IsTrue(saved.Passed);
+                Assert.IsTrue(File.Exists(Path.Combine(replays, saved.ReplayPath)));
+                StringAssert.StartsWith("a02-hover-land-", saved.ReplayPath, "named by activity and content, not by student");
+
+                AttemptRecord read = store.Attempts(student, "a02-hover-land")[0];
+                Assert.AreEqual(saved.Score, read.Score);
+                Assert.AreEqual(a.Hash, read.ActivityHash);
+                Assert.AreEqual("1.5", read.Build);
+                StringAssert.Contains("weather_changed", read.Flags);
+                var metrics = Json.ParseObject(read.Metrics);
+                var hold = (Dictionary<string, object>)((Dictionary<string, object>)metrics["lines"])["hold"];
+                Assert.Greater((double)hold["value"], 19.0, "the measured value is kept, not only the points");
+
+                Assert.AreEqual(saved.Score, ActivityAttempt.Regrade(store, read, a).Score, "the same grade from the stored recording");
+                ActivityDefinition stricter = ActivityDefinition.Parse(HoverJson.Replace("\"best\": 0.5, \"worst\": 2.5", "\"best\": 0.1, \"worst\": 0.3"));
+                Assert.Less(ActivityAttempt.Regrade(store, read, stricter).Score, saved.Score, "a corrected rubric re-grades the old flight");
+
+                AttemptRecord never = ActivityAttempt.Finish(store, replays, a, Hover(0.08, 0.1, 0.4, 0.02, land: false), student, "1.5");
+                StringAssert.Contains("\"value\":null", never.Metrics, "a measurement with no value is written as null");
+
+                byte[] bytes = File.ReadAllBytes(Path.Combine(replays, read.ReplayPath));
+                File.WriteAllBytes(Path.Combine(replays, read.ReplayPath), bytes.Take(bytes.Length - 40).ToArray());
+                Assert.Throws<InvalidDataException>(() => ActivityAttempt.Regrade(store, read, a), "a damaged recording is not graded");
+                File.Delete(Path.Combine(replays, read.ReplayPath));
+                Assert.Throws<FileNotFoundException>(() => ActivityAttempt.Regrade(store, read, a));
+            }
+        }
+
+        [Test]
         public void Metrics_GatesCountOnlyInOrder_AndEventsAreCountedByType()
         {
             var r = new FlightRecording();
