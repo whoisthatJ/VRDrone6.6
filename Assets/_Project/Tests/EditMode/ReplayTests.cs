@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 using Ushqyr.Edu;
 
@@ -89,6 +90,95 @@ namespace Ushqyr.Tests
             StringAssert.StartsWith("0.00;2.00;6.00;0.0", back.Events[0].Data, "the place and heading of a photo come back too");
             StringAssert.Contains(";135.0;", away.Events[0].Data);
             Assert.AreSame(home, home.InOwnFrame(), "a flight with no frame is left alone");
+        }
+
+        // ---------- the steps of a guided exercise ----------
+
+        private static List<StepSpec> Steps(string json) => StepTracker.Parse((List<object>)Json.Parse(json), "test");
+
+        [Test]
+        public void Steps_AreFollowedInOrder_AndHoldingMustNotBreak()
+        {
+            List<StepSpec> steps = Steps("[{\"say\":\"up\",\"height\":3,\"tolerance\":0.3,\"for\":2},"
+                + "{\"say\":\"box\",\"zone\":{\"x\":0,\"y\":3,\"z\":10,\"radius\":1,\"tolerance\":0.5},\"for\":1},"
+                + "{\"say\":\"turn\",\"turn\":-360},{\"say\":\"land\",\"landed\":true}]");
+            var t = new StepTracker(steps);
+            var s = new FlightSample { Y = 3f, Qw = 1f, Armed = true };
+
+            for (int i = 0; i < 150; i++) t.Feed(s, 0.01);          // 1.5 s at the height
+            Assert.AreEqual(0, t.Done);
+            Assert.AreEqual(0.75f, t.Progress, 0.02f);
+            s.Y = 4f; t.Feed(s, 0.01);                              // left it: the count starts again
+            Assert.AreEqual(0f, t.Progress);
+            s.Y = 3.1f;
+            for (int i = 0; i < 205; i++) t.Feed(s, 0.01);
+            Assert.AreEqual(1, t.Done);
+            Assert.AreEqual("box", t.Current.Say);
+
+            s.Z = 10.5f;
+            for (int i = 0; i < 105; i++) t.Feed(s, 0.01);
+            Assert.AreEqual(2, t.Done);
+
+            // A full turn to the left, 2 degrees a step; a turn to the right first does not count.
+            for (int deg = 0; deg <= 90; deg += 2) { Face(ref s, deg); t.Feed(s, 0.01); }
+            Assert.AreEqual(2, t.Done);
+            for (int deg = 90; deg >= -350; deg -= 2) { Face(ref s, deg); t.Feed(s, 0.01); }
+            Assert.AreEqual(2, t.Done, "350 degrees to the left of where the step began is not yet a full turn");
+            for (int deg = -350; deg >= -362; deg -= 2) { Face(ref s, deg); t.Feed(s, 0.01); }
+            Assert.AreEqual(3, t.Done, "the turn is counted from where the step began: the wrong-way 90 had to be made up for");
+
+            s.Y = 0.05f; s.Armed = false;
+            t.Feed(s, 0.01);
+            Assert.IsTrue(t.Finished);
+            Assert.IsNull(t.Current);
+        }
+
+        private static void Face(ref FlightSample s, float headingDeg)
+        {
+            double half = headingDeg * Math.PI / 360.0;
+            s.Qx = s.Qz = 0f;
+            s.Qy = (float)Math.Sin(half);
+            s.Qw = (float)Math.Cos(half);
+        }
+
+        [Test]
+        public void StickSteps_NeedTheStickToBeMovedThere()
+        {
+            List<StepSpec> steps = Steps("[{\"say\":\"a\",\"stick\":\"throttle\",\"above\":0.8},{\"say\":\"b\",\"stick\":\"throttle\",\"below\":0.2},"
+                + "{\"say\":\"c\",\"stick\":\"roll\",\"above\":0.7},{\"say\":\"d\",\"stick\":\"pitch\",\"below\":-0.7}]");
+            var t = new StepTracker(steps);
+            var s = new FlightSample { Qw = 1f, Throttle = 1f };
+            t.Feed(s, 0.01);
+            Assert.AreEqual(0, t.Done, "a stick that already was there has not been moved");
+            s.Throttle = 0.5f; t.Feed(s, 0.01);
+            s.Throttle = 0.9f; t.Feed(s, 0.01);
+            Assert.AreEqual(1, t.Done);
+            s.Throttle = 0.1f; t.Feed(s, 0.01);
+            Assert.AreEqual(2, t.Done);
+            s.Pitch = -1f; t.Feed(s, 0.01);
+            Assert.AreEqual(2, t.Done, "the wrong stick does nothing");
+            s.Pitch = 0f; s.Roll = 0.8f; t.Feed(s, 0.01);
+            Assert.AreEqual(3, t.Done);
+            s.Pitch = -0.9f; t.Feed(s, 0.01);
+            Assert.IsTrue(t.Finished);
+        }
+
+        [Test]
+        public void StepsDone_IsMeasuredFromTheRecording_InItsOwnFrame()
+        {
+            const string json = "{\"format\":1,\"id\":\"x\",\"type\":\"exercise\",\"title\":\"t\",\"rubric\":[{\"id\":\"s\",\"metric\":\"steps_done\",\"label\":\"l\",\"best\":2,\"worst\":0,"
+                + "\"params\":{\"steps\":[{\"say\":\"go\",\"zone\":{\"x\":0,\"y\":2,\"z\":12,\"radius\":1},\"for\":0.5},{\"say\":\"on\",\"zone\":{\"x\":0,\"y\":2,\"z\":18,\"radius\":1},\"for\":0.5}]}}]}";
+            ActivityDefinition a = ActivityDefinition.Parse(json);
+            Assert.AreEqual(2, a.Steps.Count);
+            FlightRecording flight = Line(10f, 2f); // reaches z = 12 at 6 s and z = 18 at 9 s
+            Assert.AreEqual(100, Rubric.Score(a, flight).Score);
+            Assert.AreEqual(50, Rubric.Score(a, Line(7f, 2f)).Score, "half the steps, half the points");
+            // Flown somewhere else, facing another way: the same steps are found.
+            Assert.AreEqual(100, Rubric.Score(a, flight.PlacedAt(new FlightFrame { X = 80f, Y = 1f, Z = -30f, HeadingDeg = 200f })).Score);
+
+            Assert.Throws<FormatException>(() => ActivityDefinition.Parse(json.Replace("\"zone\"", "\"cloud\"")));
+            Assert.Throws<FormatException>(() => ActivityDefinition.Parse(json.Replace("\"say\":\"go\",", "")));
+            Assert.Throws<FormatException>(() => ActivityDefinition.Parse(json.Replace("\"steps\"", "\"stepz\"")));
         }
 
         [Test]

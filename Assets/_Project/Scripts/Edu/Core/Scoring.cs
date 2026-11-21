@@ -10,6 +10,8 @@ namespace Ushqyr.Edu
     public sealed class Criterion
     {
         public string Id, Metric, Label, Tip;
+        /// <summary>The steps of a guided exercise, for the metric "steps_done"; null for every other line.</summary>
+        public List<StepSpec> Steps;
         public Dictionary<string, object> Params;
         public double Weight = 1, Best, Worst;
         /// <summary>A required criterion at zero fails the attempt whatever the total is (for example "did not land").</summary>
@@ -35,6 +37,17 @@ namespace Ushqyr.Edu
         public double[] Stars = { 60, 80, 95 };
         public readonly List<Criterion> Criteria = new List<Criterion>();
         public Dictionary<string, object> Raw;
+        /// <summary>The steps the pilot is led through, when the activity has them (the first "steps_done" line of its rubric).</summary>
+        public List<StepSpec> Steps
+        {
+            get
+            {
+                foreach (Criterion c in Criteria)
+                    if (c.Steps != null) return c.Steps;
+                return null;
+            }
+        }
+
         /// <summary>How the activity is flown: place, drone, objects, weather, what ends it. Never null.</summary>
         public ActivitySetup Setup = new ActivitySetup();
 
@@ -111,6 +124,11 @@ namespace Ushqyr.Edu
                     throw new FormatException("activity " + a.Id + ", line " + cr.Id + ": \"best\" and \"worst\" must be two different numbers");
                 if (cr.Weight <= 0) throw new FormatException("activity " + a.Id + ", line " + cr.Id + ": \"weight\" must be above 0");
                 if (string.IsNullOrEmpty(cr.Label)) throw new FormatException("activity " + a.Id + ", line " + cr.Id + ": \"label\" is missing");
+                if (cr.Metric == "steps_done")
+                {
+                    cr.Steps = StepTracker.Parse(Json.Arr(cr.Params, "steps"), "activity " + a.Id + ", line " + cr.Id);
+                    if (cr.Steps.Count == 0) throw new FormatException("activity " + a.Id + ", line " + cr.Id + ": \"steps_done\" needs a list of \"steps\" in its params");
+                }
                 a.Criteria.Add(cr);
             }
             a.Setup = ActivitySetup.Parse(Json.Obj(o, "setup"), a.Id, name => Array.IndexOf(Ushqyr.Flight.FailureSet.Names, name) >= 0);
@@ -209,6 +227,7 @@ namespace Ushqyr.Edu
             ["touchdown_speed"] = TouchdownSpeed,
             ["smoothness"] = Smoothness,
             ["event_count"] = EventCount,
+            ["steps_done"] = (p, f) => StepTracker.CountDone(StepTracker.Parse(Json.Arr(p, "steps"), "steps"), f),
             ["gates_in_order"] = GatesInOrder,
             ["path_error"] = PathError,
             ["speed_in_band"] = SpeedInBand,

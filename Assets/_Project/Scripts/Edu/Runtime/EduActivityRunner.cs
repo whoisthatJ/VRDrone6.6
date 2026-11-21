@@ -50,7 +50,11 @@ namespace Ushqyr.Edu
         private bool _crashed;
         private Canvas _canvas;
         private RectTransform _panel;
-        private TextMeshProUGUI _timer;
+        private TextMeshProUGUI _timer, _prompt;
+        private RectTransform _promptBar;
+        private StepTracker _steps;
+        private int _fed;
+        private float _stepsDoneFor;
         private readonly List<UnityEngine.Object> _made = new List<UnityEngine.Object>();
 
         public ActivityDefinition Activity { get; private set; }
@@ -58,9 +62,11 @@ namespace Ushqyr.Edu
         public ScoreResult Result { get; private set; }
         public AttemptRecord Attempt { get; private set; }
         public FlightFrame Frame => _frame;
-        /// <summary>Why the last attempt ended: "landed", "crash", "time" or "pilot".</summary>
+        /// <summary>Why the last attempt ended: "landed", "steps", "crash", "time" or "pilot".</summary>
         public string EndedBy { get; private set; } = "";
         public float Clock => _clock;
+        /// <summary>The steps of a guided exercise as the attempt goes; null when the activity has none.</summary>
+        public StepTracker Steps => _steps;
 
         /// <summary>
         /// Starts <paramref name="activity"/> on the drone of the scene. The drone, its model and the view were already
@@ -171,7 +177,10 @@ namespace Ushqyr.Edu
             _crashed = false;
             _timelineNext = 0;
             _vehicle.Respawn();
-            _vehicle.HoldAtSpawn = false;
+            _vehicle.HoldAtSpawn = Activity.Setup.OnTheGround;
+            _steps = Activity.Steps != null ? new StepTracker(Activity.Steps) : null;
+            _fed = 0;
+            _stepsDoneFor = 0f;
             _vehicle.Crashed -= OnCrashed;
             _vehicle.Crashed += OnCrashed;
             _flight = _vehicle.GetComponent<EduFlight>();
@@ -187,6 +196,24 @@ namespace Ushqyr.Edu
             strip.anchoredPosition = new Vector2(0f, -150f);
             _panel = strip;
             _timer = EduUi.Text(strip, "", 0f, 0f, 760f, 40f, 22f, Color.white, TextAlignmentOptions.Center);
+            if (_steps == null) return;
+            // What to do now, large, with a bar that fills while a step's condition holds.
+            RectTransform prompt = EduUi.Panel(strip, "Prompt", -170f, 48f, 1100f, 64f, new Color(0.05f, 0.06f, 0.08f, 0.8f), false);
+            _prompt = EduUi.Text(prompt, "", 16f, 0f, 1068f, 58f, 30f, EduUi.Accent, TextAlignmentOptions.Center);
+            _promptBar = EduUi.Panel(prompt, "Progress", 0f, 58f, 0f, 6f, EduUi.Accent, false);
+        }
+
+        /// <summary>Gives the step tracker the moments recorded since last time, in the activity's own frame.</summary>
+        private void FeedSteps()
+        {
+            if (_steps == null || _recorder.Recording == null) return;
+            List<FlightSample> samples = _recorder.Recording.Samples;
+            double dt = 1.0 / _recorder.Recording.Rate;
+            for (; _fed < samples.Count && !_steps.Finished; _fed++) _steps.Feed(_frame.Local(samples[_fed]), dt);
+            if (_prompt == null) return;
+            StepSpec now = _steps.Current;
+            _prompt.text = now != null ? (_steps.Done + 1) + " / " + _steps.Count + "     " + L.T(now.Say) : L.T("All steps done");
+            _promptBar.sizeDelta = new Vector2(1100f * _steps.Progress, 6f);
         }
 
         private void OnCrashed() => _crashed = true;
@@ -261,7 +288,11 @@ namespace Ushqyr.Edu
             string left = Activity.TimeLimit > 0 ? EduUi.Clock(Mathf.Max(0f, (float)Activity.TimeLimit - _clock)) : EduUi.Clock(_clock);
             if (_timer != null) _timer.text = L.T(Activity.Title) + "     " + left + "     " + L.T("Enter: finish");
 
+            FeedSteps();
+            _stepsDoneFor = _steps != null && _steps.Finished ? _stepsDoneFor + Time.deltaTime : 0f;
+
             if (_crashed && setup.EndOnCrash) Finish("crash");
+            else if (setup.EndOnSteps && _stepsDoneFor > 1f) Finish("steps");
             else if (setup.EndOnLanding && _highest > 0.5f && _groundedFor > 1.5f) Finish("landed");
             else if (Activity.TimeLimit > 0 && _clock >= Activity.TimeLimit) Finish("time");
             else if (kb != null && kb.enterKey.wasPressedThisFrame && _clock > 1f) Finish("pilot");
@@ -367,6 +398,8 @@ namespace Ushqyr.Edu
             if (_panel != null) Destroy(_panel.gameObject);
             _panel = null;
             _timer = null;
+            _prompt = null;
+            _promptBar = null;
         }
     }
 }

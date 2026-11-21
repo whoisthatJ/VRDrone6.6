@@ -47,6 +47,22 @@ namespace Ushqyr.Edu
             z = (float)(Z - lx * s + lz * c);
         }
 
+        /// <summary>One moment of a flight, recorded in the world, as the activity's frame sees it.</summary>
+        public FlightSample Local(in FlightSample s)
+        {
+            if (IsIdentity) return s;
+            FlightSample m = s;
+            ToLocal(s.X, s.Y, s.Z, out m.X, out m.Y, out m.Z);
+            Turn(s.Vx, s.Vz, false, out m.Vx, out m.Vz);
+            double half = -HeadingDeg * Math.PI / 360.0;
+            float ry = (float)Math.Sin(half), rw = (float)Math.Cos(half);
+            m.Qx = rw * s.Qx + ry * s.Qz;
+            m.Qy = rw * s.Qy + ry * s.Qw;
+            m.Qz = rw * s.Qz - ry * s.Qx;
+            m.Qw = rw * s.Qw - ry * s.Qy;
+            return m;
+        }
+
         /// <summary>A direction (a velocity) turned into the frame, or back with <paramref name="toWorld"/>.</summary>
         public void Turn(float vx, float vz, bool toWorld, out float x, out float z)
         {
@@ -105,6 +121,10 @@ namespace Ushqyr.Edu
         public bool EndOnLanding = true;
         /// <summary>The attempt ends when the drone crashes.</summary>
         public bool EndOnCrash = true;
+        /// <summary>The attempt ends when the last step of a guided exercise is done.</summary>
+        public bool EndOnSteps = true;
+        /// <summary>The drone stays on the ground with its motors off for the whole attempt (a controls check).</summary>
+        public bool OnTheGround;
 
         /// <summary>Reads the "setup" of an activity; every fault is reported in words a content author can act on.</summary>
         public static ActivitySetup Parse(Dictionary<string, object> setup, string activityId, Func<string, bool> knownFailure)
@@ -116,6 +136,7 @@ namespace Ushqyr.Edu
             s.Drone = Json.Str(setup, "drone", "");
             s.Assist = Json.Str(setup, "assist", "");
             s.View = Json.Str(setup, "view", "");
+            s.OnTheGround = Json.Flag(setup, "on_the_ground");
             if (s.Assist.Length > 0 && Array.IndexOf(Assists, s.Assist) < 0) throw new FormatException(where + ": \"assist\" must be one of " + string.Join(", ", Assists));
             if (s.View.Length > 0 && Array.IndexOf(Views, s.View) < 0) throw new FormatException(where + ": \"view\" must be one of " + string.Join(", ", Views));
             Dictionary<string, object> start = Json.Obj(setup, "start");
@@ -130,6 +151,7 @@ namespace Ushqyr.Edu
             {
                 s.EndOnLanding = Json.Flag(end, "landing", true);
                 s.EndOnCrash = Json.Flag(end, "crash", true);
+                s.EndOnSteps = Json.Flag(end, "steps", true);
             }
             var ids = new HashSet<string>();
             foreach (object item in Json.Arr(setup, "objects") ?? new List<object>())
