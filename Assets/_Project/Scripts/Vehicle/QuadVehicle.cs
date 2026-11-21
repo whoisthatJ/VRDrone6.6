@@ -111,6 +111,9 @@ namespace Ushqyr.Vehicle
             HoverThrottle = MotorModel.HoverCommand(_profile.Motors, _profile.Mass * _env.Gravity);
         }
 
+        /// <summary>The collision settings in use now (to change the profile alone through <see cref="Configure"/>).</summary>
+        public CollisionSettings Collision => _collision.Settings;
+
         /// <summary>Collision settings from the physics asset (defaults if none), as a base for <see cref="Configure"/>.</summary>
         public CollisionSettings BaseCollision => physics != null ? physics.Collision : CollisionSettings.Default;
 

@@ -46,6 +46,13 @@ namespace Ushqyr.Cameras
 
         private void LateUpdate() => Apply();
 
+        /// <summary>Something else turned this camera or changed its lens (a gimbal): set tilt and field of view again.</summary>
+        public void Invalidate()
+        {
+            _appliedTilt = _appliedFov = _appliedAspect = -1f;
+            Apply();
+        }
+
         private void OnValidate() => Apply();
 
         public void Apply()

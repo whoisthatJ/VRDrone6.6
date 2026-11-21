@@ -411,6 +411,13 @@ namespace Ushqyr.Game
                     : entry.CameraOffset;
             // Flight assist for the person at the sticks, the recording of the last flight and its replay.
             Ushqyr.Edu.EduFreeFlight.Attach(vehicle, s.Input.FlightAssist, edu);
+            // Equipment of the drone classes: a stabilised camera on the camera drones, a box on the delivery drone.
+            bool gimbal = edu && _eduModel != null && _eduModel.Gimbal != null && fpvCamera != null;
+            if (gimbal) Ushqyr.Edu.EduGimbal.Attach(vehicle, fpvCamera, _eduModel.Gimbal);
+            else Ushqyr.Edu.EduGimbal.Detach(vehicle);
+            bool payload = edu && _eduModel != null && _eduModel.Payload != null;
+            if (payload) Ushqyr.Edu.EduPayload.Attach(vehicle, _eduModel.Payload, 1f);
+            else Ushqyr.Edu.EduPayload.Detach(vehicle);
             if (views != null) views.SetQuadScale(visualScale);
             if (quadAudio != null) quadAudio.MaxRpm = build != null ? Ushqyr.Garage.BuildComposer.FullThrottle(build.Motor, build.Prop, build.Battery).RevPerSec * 60f : entry.MotorRpm;
 
