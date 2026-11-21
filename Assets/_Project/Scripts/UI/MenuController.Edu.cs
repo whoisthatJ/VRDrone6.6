@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Ushqyr.Core;
 using Ushqyr.Edu;
+using Ushqyr.Game;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -43,6 +44,91 @@ namespace Ushqyr.UI
             try { user = EduSession.CurrentUser; } catch (Exception) { /* shown as not chosen; the page itself reports the reason */ }
             string who = user == null ? L.T("not chosen") : user.Role == "seat" ? L.F("Seat {0}", user.Name) : user.Name;
             return L.T("Student") + ":  " + who;
+        }
+
+        // ---------- the training hub ----------
+
+        private string _trainingBlock = "A";
+
+        /// <summary>
+        /// The training hub (EDU_PLAN §4): the exercises in their blocks, what the student has reached on each, and
+        /// the way into an exercise. A block opens when the one before it is passed.
+        /// </summary>
+        private void ShowTraining()
+        {
+            RectTransform p = NewPage(L.T("Training"));
+            BackButton(p);
+            EduStore store = Students(out string error);
+            long user = 0;
+            if (store != null)
+            {
+                EduUser who = EduSession.CurrentUser;
+                if (who == null)
+                {
+                    EduSession.UseSeat();
+                    who = EduSession.CurrentUser;
+                }
+                user = who != null ? who.Id : 0;
+            }
+            var course = new Course(EduSession.Activities.Values, store, user);
+            course.Progress(out int passed, out int total);
+            UiKit.Button(p, StudentLabel(), new Vector2(Width - Margin - 560f, -35f), new Vector2(560f, 70f), ShowStudents, 26f);
+            UiKit.Label(p, error != null ? L.F("The class data could not be opened: {0}", error) : L.F("Passed: {0} of {1}", passed, total),
+                new Vector2(Margin + 420f, -40f), new Vector2(500f, 60f), 28f, TextAlignmentOptions.MidlineLeft, UiKit.DimTextColor);
+
+            // The blocks.
+            float tab = (ContentWidth - 4f * 12f) / 5f;
+            for (int i = 0; i < Course.Blocks.Length; i++)
+            {
+                string block = Course.Blocks[i];
+                bool open = course.Open(block, EduSession.EverythingUnlocked);
+                Button b = UiKit.Button(p, block, new Vector2(Margin + i * (tab + 12f), -125f), new Vector2(tab, 64f), () =>
+                {
+                    _trainingBlock = block;
+                    ShowTraining();
+                }, 32f);
+                // A finished block is green, a locked one dark; the chosen one has a bar under it.
+                if (course.Done(block) && course.In(block).Count > 0) UiKit.SetButtonColor(b, new Color(0.16f, 0.36f, 0.22f, 1f));
+                else if (!open) UiKit.SetButtonColor(b, new Color(0.12f, 0.13f, 0.16f, 1f));
+                if (block == _trainingBlock)
+                    UiKit.Image(UiKit.Rect(p, "Chosen", new Vector2(Margin + i * (tab + 12f), -191f), new Vector2(tab, 6f)), UiKit.AccentColor);
+            }
+            int index = Mathf.Max(0, Array.IndexOf(Course.Blocks, _trainingBlock));
+            bool blockOpen = course.Open(_trainingBlock, EduSession.EverythingUnlocked);
+            UiKit.Label(p, _trainingBlock + ".  " + L.T(Course.BlockNames[index]) + (blockOpen ? "" : "     " + L.T("Opens when the block before it is passed")),
+                new Vector2(Margin, -200f), new Vector2(ContentWidth, 56f), 34f, TextAlignmentOptions.MidlineLeft, blockOpen ? UiKit.AccentColor : UiKit.DimTextColor);
+
+            IReadOnlyList<CourseEntry> entries = course.In(_trainingBlock);
+            if (entries.Count == 0)
+                UiKit.Label(p, L.T("The exercises of this block are not in this version yet."), new Vector2(Margin, -280f), new Vector2(ContentWidth, 60f), 30f,
+                    TextAlignmentOptions.MidlineLeft, UiKit.DimTextColor);
+            float y = -268f;
+            for (int i = 0; i < entries.Count && i < 7; i++)
+            {
+                CourseEntry e = entries[i];
+                ActivityDefinition activity = e.Activity;
+                Button row = UiKit.Button(p, "", new Vector2(Margin, y), new Vector2(ContentWidth, 76f), () => StartExercise(activity, blockOpen), 30f);
+                if (!blockOpen) UiKit.SetButtonColor(row, new Color(0.12f, 0.13f, 0.16f, 1f));
+                UiKit.Label(row.transform, activity.Number + "   " + L.T(activity.Title), new Vector2(24f, 0f), new Vector2(ContentWidth - 420f, 76f), 32f,
+                    TextAlignmentOptions.MidlineLeft, blockOpen ? UiKit.TextColor : UiKit.DimTextColor);
+                string best = e.Best == null ? L.T("not flown") : e.Best.Value.ToString("0", System.Globalization.CultureInfo.InvariantCulture);
+                UiKit.Label(row.transform, best, new Vector2(ContentWidth - 390f, 0f), new Vector2(200f, 76f), 32f, TextAlignmentOptions.MidlineRight,
+                    e.Passed ? new Color(0.4f, 0.95f, 0.5f) : UiKit.DimTextColor);
+                for (int s = 0; s < 3; s++)
+                {
+                    RectTransform star = UiKit.Rect(row.transform, "Star", new Vector2(ContentWidth - 160f + s * 44f, -21f), new Vector2(34f, 34f));
+                    UiKit.Image(star, s < e.Stars ? new Color(1f, 0.8f, 0.15f) : new Color(1f, 1f, 1f, 0.12f));
+                }
+                y -= 86f;
+            }
+        }
+
+        private void StartExercise(ActivityDefinition activity, bool open)
+        {
+            if (!open) return;
+            CommitIfDirty();
+            EduActivityRunner.SetPending(activity);
+            if (!GameFlow.Activity(tracks, activity.Setup.Place)) EduActivityRunner.SetPending(null);
         }
 
         private void ShowStudents()

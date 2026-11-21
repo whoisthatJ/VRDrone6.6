@@ -25,6 +25,12 @@ namespace Ushqyr.Edu
     {
         public const int Format = 1;
         public string Id, Type, Title, Briefing, Hash;
+        /// <summary>
+        /// Where the activity stands in a course: its block ("A" to "E" in training) and its number. Given as "block"
+        /// and "number", or read from an id like "a02-hover-land". Empty and 0 for an activity outside any course.
+        /// </summary>
+        public string Block = "";
+        public int Number;
         public double PassMark = 60, TimeLimit;
         public double[] Stars = { 60, 80, 95 };
         public readonly List<Criterion> Criteria = new List<Criterion>();
@@ -51,6 +57,18 @@ namespace Ushqyr.Edu
                 TimeLimit = Json.Num(o, "time_limit", 0),
             };
             if (string.IsNullOrEmpty(a.Id)) throw new FormatException("activity: \"id\" is missing");
+            a.Block = Json.Str(o, "block", "");
+            a.Number = (int)Json.Num(o, "number", 0);
+            if (a.Block.Length == 0 && a.Id.Length >= 3 && a.Id[0] >= 'a' && a.Id[0] <= 'z' && char.IsDigit(a.Id[1]))
+            {
+                int end = 1;
+                while (end < a.Id.Length && char.IsDigit(a.Id[end])) end++;
+                if (end < a.Id.Length && a.Id[end] == '-' && int.TryParse(a.Id.Substring(1, end - 1), out int n))
+                {
+                    a.Block = a.Id.Substring(0, 1).ToUpperInvariant();
+                    if (a.Number == 0) a.Number = n;
+                }
+            }
             foreach (char c in a.Id)
                 if (!(c >= 'a' && c <= 'z' || c >= '0' && c <= '9' || c == '-' || c == '_' || c == '.'))
                     throw new FormatException("activity " + a.Id + ": \"id\" may hold only a-z, 0-9, '-', '_' and '.'");

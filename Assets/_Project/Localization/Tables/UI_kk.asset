@@ -2930,6 +2930,46 @@ MonoBehaviour:
     m_Localized: "\u0421\u0442\u0438\u043A\u0442\u0435\u0440\u0434\u0456 \u0431\u0430\u044F\u0443 \u04D9\u0440\u0456 \u0430\u0437-\u0430\u0437\u0434\u0430\u043D \u049B\u043E\u0437\u0493\u0430\u04A3\u044B\u0437."
     m_Metadata:
       m_Items: []
+  - m_Id: 6763106829860864
+    m_Localized: "\u0416\u0430\u0442\u0442\u044B\u0493\u0443"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6763106905358336
+    m_Localized: "\u04E8\u0442\u0456\u043B\u0433\u0435\u043D\u0456: {1} \u0456\u0448\u0456\u043D\u0435\u043D {0}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6763106905358337
+    m_Localized: "\u0410\u043B\u0434\u044B\u04A3\u0493\u044B \u0431\u043B\u043E\u043A \u04E9\u0442\u0456\u043B\u0433\u0435\u043D\u0434\u0435 \u0430\u0448\u044B\u043B\u0430\u0434\u044B"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6763106905358338
+    m_Localized: "\u0411\u04B1\u043B \u0431\u043B\u043E\u043A\u0442\u044B\u04A3 \u0436\u0430\u0442\u0442\u044B\u0493\u0443\u043B\u0430\u0440\u044B \u043E\u0441\u044B \u043D\u04B1\u0441\u049B\u0430\u0434\u0430 \u04D9\u043B\u0456 \u0436\u043E\u049B."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6763106905358339
+    m_Localized: "\u04B1\u0448\u044B\u043B\u043C\u0430\u0493\u0430\u043D"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6763106905358340
+    m_Localized: "\u0410\u043B\u0493\u0430\u0448\u049B\u044B \u04B1\u0448\u0443\u043B\u0430\u0440"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6763106905358341
+    m_Localized: "\u0411\u0430\u0493\u0434\u0430\u0440\u043B\u0430\u0443 \u0436\u04D9\u043D\u0435 \u0434\u04D9\u043B\u0434\u0456\u043A"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6763106905358342
+    m_Localized: "\u041A\u0430\u043C\u0435\u0440\u0430\u043B\u044B \u0434\u0440\u043E\u043D\u0434\u044B \u043C\u0435\u04A3\u0433\u0435\u0440\u0443"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6763106905358343
+    m_Localized: "FPV \u043D\u0435\u0433\u0456\u0437\u0434\u0435\u0440\u0456"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6763106905358344
+    m_Localized: "\u0416\u0430\u0440\u044B\u0441 \u0436\u04D9\u043D\u0435 \u0444\u0440\u0438\u0441\u0442\u0430\u0439\u043B \u0442\u0435\u0445\u043D\u0438\u043A\u0430\u0441\u044B"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

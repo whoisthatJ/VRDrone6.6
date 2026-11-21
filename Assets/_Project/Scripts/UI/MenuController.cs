@@ -73,7 +73,9 @@ namespace Ushqyr.UI
             UiKit.Button(p, StudentLabel(), new Vector2(Width - Margin - 560f - 20f - 470f, -35f), new Vector2(470f, 70f), ShowStudents, 26f);
 
             float y = -260f;
-            UiKit.Button(p, L.T("FLY"), new Vector2(Margin, y), new Vector2(ContentWidth, 110f), Fly, 52f);
+            float flyWidth = ContentWidth * 0.6f - 15f;
+            UiKit.Button(p, L.T("FLY"), new Vector2(Margin, y), new Vector2(flyWidth, 110f), Fly, 52f);
+            UiKit.Button(p, L.T("TRAINING"), new Vector2(Margin + flyWidth + 30f, y), new Vector2(ContentWidth - flyWidth - 30f, 110f), ShowTraining, 44f);
             y -= 140f;
             float half = (ContentWidth - 30f) * 0.5f;
             UiKit.Button(p, L.T("Choose quad"), new Vector2(Margin, y), new Vector2(half, 90f), () =>

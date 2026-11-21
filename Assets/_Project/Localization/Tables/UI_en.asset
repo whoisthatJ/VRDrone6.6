@@ -2948,6 +2948,46 @@ MonoBehaviour:
     m_Localized: Move the sticks slowly and a little at a time.
     m_Metadata:
       m_Items: []
+  - m_Id: 6763106829860864
+    m_Localized: Training
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6763106905358336
+    m_Localized: 'Passed: {0} of {1}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6763106905358337
+    m_Localized: Opens when the block before it is passed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6763106905358338
+    m_Localized: The exercises of this block are not in this version yet.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6763106905358339
+    m_Localized: not flown
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6763106905358340
+    m_Localized: First flights
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6763106905358341
+    m_Localized: Orientation and precision
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6763106905358342
+    m_Localized: Camera-drone proficiency
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6763106905358343
+    m_Localized: FPV basics
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6763106905358344
+    m_Localized: Racing and freestyle technique
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

@@ -85,3 +85,13 @@ A soft landing	Жұмсақ қону	Мягкая посадка
 Slow the descent in the last metre.	Соңғы метрде төмендеуді баяулатыңыз.	Замедлите снижение на последнем метре.
 Smooth sticks	Стиктерді бірқалыпты қозғау	Плавная работа стиками
 Move the sticks slowly and a little at a time.	Стиктерді баяу әрі аз-аздан қозғаңыз.	Двигайте стики медленно и понемногу.
+Training	Жаттығу	Обучение
+Passed: {0} of {1}	Өтілгені: {1} ішінен {0}	Зачтено: {0} из {1}
+Opens when the block before it is passed	Алдыңғы блок өтілгенде ашылады	Откроется, когда пройден предыдущий блок
+The exercises of this block are not in this version yet.	Бұл блоктың жаттығулары осы нұсқада әлі жоқ.	Упражнений этого блока в этой версии пока нет.
+not flown	ұшылмаған	не выполнялось
+First flights	Алғашқы ұшулар	Первые полёты
+Orientation and precision	Бағдарлау және дәлдік	Ориентация и точность
+Camera-drone proficiency	Камералы дронды меңгеру	Мастерство управления дроном с камерой
+FPV basics	FPV негіздері	Основы FPV
+Racing and freestyle technique	Жарыс және фристайл техникасы	Техника гонок и фристайла

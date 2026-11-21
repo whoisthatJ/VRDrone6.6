@@ -285,6 +285,52 @@ namespace Ushqyr.Tests
         }
 
         [Test]
+        public void Course_OpensBlocksInOrder_AndKeepsTheBestResult()
+        {
+            ActivityDefinition Make(string id) => ActivityDefinition.Parse(HoverJson.Replace("a02-hover-land", id));
+            var all = new List<ActivityDefinition> { Make("b07-square"), Make("a02-hover-land"), Make("a01-controls"), Make("c13-position"), Make("x-other") };
+            Assert.AreEqual("A", all[1].Block);
+            Assert.AreEqual(2, all[1].Number);
+            Assert.AreEqual("", all[4].Block, "an id without a number is in no block");
+
+            using (var db = new EduDatabase(Path.Combine(_dir, "class.db")))
+            {
+                var store = new EduStore(db, Path.Combine(_dir, "replays"));
+                long student = store.AddUser("Айгерім");
+                var fresh = new Course(all, store, student);
+                Assert.AreEqual("a01-controls", fresh.In("A")[0].Activity.Id, "in order of their numbers");
+                Assert.AreEqual(2, fresh.In("A").Count);
+                Assert.IsTrue(fresh.Open("A"));
+                Assert.IsFalse(fresh.Open("B"), "block B waits for block A");
+                Assert.IsTrue(fresh.Open("B", everythingUnlocked: true), "unless the teacher opened everything");
+                Assert.IsFalse(fresh.Open("Z"));
+                Assert.IsNull(fresh.In("A")[1].Best);
+
+                string replays = Path.Combine(_dir, "replays");
+                ActivityAttempt.Finish(store, replays, all[1], Hover(1.4, 0.1, 0.4, 0.02), student, "1.5");  // a poor flight first
+                ActivityAttempt.Finish(store, replays, all[1], Hover(0.08, 0.1, 0.4, 0.02), student, "1.5"); // then a good one
+                var half = new Course(all, store, student);
+                CourseEntry hover = half.In("A")[1];
+                Assert.AreEqual(2, hover.Attempts);
+                Assert.IsTrue(hover.Passed);
+                Assert.GreaterOrEqual(hover.Best.Value, 90);
+                Assert.GreaterOrEqual(hover.Stars, 2);
+                Assert.IsFalse(half.Open("B"), "one exercise of block A is still open");
+
+                ActivityAttempt.Finish(store, replays, all[2], Hover(0.08, 0.1, 0.4, 0.02), student, "1.5");
+                var done = new Course(all, store, student);
+                Assert.IsTrue(done.Done("A"));
+                Assert.IsTrue(done.Open("B"));
+                Assert.IsFalse(done.Open("C"));
+                done.Progress(out int passed, out int total);
+                Assert.AreEqual(2, passed);
+                Assert.AreEqual(4, total, "the activity outside the course is not counted");
+
+                Assert.IsFalse(new Course(all, store, store.AddUser("Тимур")).In("A")[1].Passed, "another student starts from nothing");
+            }
+        }
+
+        [Test]
         public void SeatProfile_NamesNoPerson_AndIsMadeOnce()
         {
             using (var db = new EduDatabase(Path.Combine(_dir, "class.db")))

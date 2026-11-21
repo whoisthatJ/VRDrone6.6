@@ -48,6 +48,16 @@ namespace Ushqyr.Edu
             }
         }
 
+        /// <summary>
+        /// The teacher opened every block of the course (EDU_PLAN §4). Kept in the class data, so it holds for the
+        /// lesson and after a restart.
+        /// </summary>
+        public static bool EverythingUnlocked
+        {
+            get => Store != null && _db.Setting("unlock_all") == "1";
+            set { if (Store != null) _db.SetSetting("unlock_all", value ? "1" : "0"); }
+        }
+
         /// <summary>The name of this place when nobody is named: the computer's own name.</summary>
         public static string SeatName => SystemInfo.deviceName;
 
