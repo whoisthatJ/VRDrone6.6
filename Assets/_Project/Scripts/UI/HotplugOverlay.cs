@@ -1,3 +1,4 @@
+using Ushqyr.Core;
 using Ushqyr.Game;
 using TMPro;
 using UnityEngine;
@@ -26,7 +27,8 @@ namespace Ushqyr.UI
         {
             if (panel != null) panel.SetActive(paused);
             if (paused && text != null)
-                text.SetText($"<b>PAUSED</b>\n{guard.Reason}\n<size=70%>Centre the sticks and arm to continue.\nRadio not working? Menu > Radio setup.</size>");
+                text.SetText("<b>" + L.T("PAUSED") + "</b>\n" + L.T(guard.Reason) + "\n<size=70%>"
+                             + L.T("Centre the sticks and arm to continue.\nRadio not working? Menu > Radio setup.") + "</size>");
         }
     }
 }

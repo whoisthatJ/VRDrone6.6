@@ -63,6 +63,109 @@ namespace Ushqyr.Tests
             Assert.IsEmpty(missing, string.Join("\n", missing));
         }
 
+        // ---------- text that does not reach L.T as a literal ----------
+
+        /// <summary>Where text is put on the screen: assignments to a label and the code-built UI helpers.</summary>
+        private static readonly Regex Sink = new Regex(
+            @"\.text\s*\+?=|\bSetText\(|\bUiKit\.(Label|Button|SliderRow|StepperRow|SetButtonText)\(|\bBenchUi\.(Text|Button|SetLabel)\(|\bEduUi\.(Text|Button|SetLabel)\(",
+            RegexOptions.Compiled);
+        private static readonly Regex Literal = new Regex("\\$?\"((?:[^\"\\\\]|\\\\.)*)\"", RegexOptions.Compiled);
+
+        /// <summary>
+        /// Literals on those lines that are allowed to stay as they are: names of products and techniques, the keys of
+        /// the keyboard, and words that are arguments of something else on the same line (not text).
+        /// </summary>
+        private static readonly HashSet<string> NotText = new HashSet<string>
+        {
+            "AI BENCH", "AI BENCH  ·  ", "USHQYR", "Ushqyr", "Betaflight", "Actual", "SMAA", "MSAA 2x", "MSAA 4x",
+            "Тіл / Язык / Language:  ", "Space  ← →  C  − +", "  V  Esc",
+            "hall", "parking", "blink", "front", " label",
+        };
+
+        /// <summary>
+        /// Files whose text is an on-screen display in the style of real FPV goggles (THR, MAH, KM/H) or a developer's
+        /// overlay: abbreviations that pilots read in English on real equipment too.
+        /// </summary>
+        private static readonly string[] EnglishByDesign = { "OsdHud.cs", "FlightDebugOverlay.cs" };
+
+        [Test]
+        public void NoTextIsPutOnScreen_WithoutTheLanguageTable()
+        {
+            var sheets = LoadSheets(out _);
+            var found = new List<string>();
+            foreach (string path in Directory.GetFiles("Assets/_Project/Scripts", "*.cs", SearchOption.AllDirectories))
+            {
+                if (EnglishByDesign.Contains(Path.GetFileName(path))) continue;
+                string[] lines = File.ReadAllLines(path);
+                for (int i = 0; i < lines.Length; i++)
+                {
+                    string line = lines[i];
+                    if (line.TrimStart().StartsWith("//") || !Sink.IsMatch(line)) continue;
+                    foreach (Match m in Literal.Matches(line))
+                    {
+                        // A literal used as an index (_buttons["snap"]) is a name, not text.
+                        if (m.Index > 0 && line[m.Index - 1] == '[') continue;
+                        string text = Regex.Unescape(m.Groups[1].Value);
+                        if (sheets.ContainsKey(text) || NotText.Contains(text)) continue;
+                        // What is left after the placeholders and rich-text tags: is there a word in it?
+                        string plain = Regex.Replace(text, @"\{[^}]*\}|<[^>]*>", " ");
+                        if (!Regex.IsMatch(plain, "[A-Za-zА-Яа-яӘәҒғҚқҢңӨөҰұҮүҺһІі]{3,}")) continue;
+                        found.Add($"{Path.GetFileName(path)}:{i + 1} \"{text}\"");
+                    }
+                }
+            }
+            Assert.IsEmpty(found, "text on screen that is not a key of the sheets (wrap it in L.T, or add it to NotText if it is a name):\n" + string.Join("\n", found));
+        }
+
+        [Test]
+        public void TextKeptInData_IsTranslated()
+        {
+            var sheets = LoadSheets(out _);
+            var missing = new List<string>();
+            void Need(string where, string text)
+            {
+                if (!string.IsNullOrEmpty(text) && !sheets.ContainsKey(text)) missing.Add(where + ": \"" + text + "\"");
+            }
+
+            foreach (string mode in ScreenDisplay.Modes) Need("display mode", mode);
+            foreach (string reason in Ushqyr.Game.ControllerHotplugGuard.Reasons) Need("pause reason", reason);
+            foreach (Ushqyr.Garage.SizeClass size in System.Enum.GetValues(typeof(Ushqyr.Garage.SizeClass)))
+                Need("size", Ushqyr.Garage.PartCatalog.SizeLabel(size));
+
+            // The calibration wizard keeps its instructions as plain literals (its assembly does not know the tables).
+            string wizard = File.ReadAllText("Assets/_Project/Scripts/Input/CalibrationWizard.cs");
+            int steps = 0;
+            foreach (Match m in Regex.Matches(wizard, "return\\s+\"((?:[^\"\\\\]|\\\\.)*)\";"))
+            {
+                Need("calibration wizard", Regex.Unescape(m.Groups[1].Value));
+                steps++;
+            }
+            Assert.Greater(steps, 5, "the wizard's instructions were found");
+
+            // Parts: every description, and every name that is a description in itself ("Action camera"). Product
+            // names with a number in them and bare battery figures stay as they are in every language.
+            foreach (Ushqyr.Garage.PartDef part in Ushqyr.Garage.PartCatalog.All)
+            {
+                if (!Regex.IsMatch(part.Name ?? "", "[0-9]")) Need("part name", part.Name);
+                if (!Regex.IsMatch(part.Description ?? "", @"^\dS \d+ mAh, \d+C\.$")) Need("part description", part.Description);
+            }
+
+            var quads = AssetDatabase.LoadAssetAtPath<Ushqyr.Game.QuadCatalog>("Assets/_Project/Data/QuadCatalog.asset");
+            var tracks = AssetDatabase.LoadAssetAtPath<Ushqyr.Game.TrackCatalog>("Assets/_Project/Data/TrackCatalog.asset");
+            Assert.IsNotNull(quads);
+            Assert.IsNotNull(tracks);
+            foreach (var q in quads.Quads) { Need("quad", q.DisplayName); Need("quad", q.Description); }
+            foreach (var t in tracks.Tracks) { Need("track", t.DisplayName); Need("track", t.Description); Need("track", t.Variation); }
+            foreach (var e in tracks.Environments) { Need("place", e.DisplayName); Need("place", e.Description); }
+
+            // The Education Suite's lists of names shown through L.T.
+            foreach (string name in System.Enum.GetNames(typeof(Ushqyr.Flight.FlightMode))) Need("flight mode", name);
+            foreach (string name in new[] { "Chase", "Onboard", "Fixed", "From above", "Free", "Height", "Speed", "Throttle", "crash", "respawn", "gate" })
+                Need("replay viewer", name);
+
+            Assert.IsEmpty(missing, string.Join("\n", missing));
+        }
+
         [Test]
         public void Sheets_HaveNoDuplicates_AndKeepPlaceholders()
         {

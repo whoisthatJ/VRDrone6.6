@@ -2674,6 +2674,48 @@ MonoBehaviour:
     m_Localized: ffmpeg was not found, so a video cannot be made
     m_Metadata:
       m_Items: []
+  - m_Id: 6729885060694016
+    m_Localized: PAUSED
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6729885119414272
+    m_Localized: 'Centre the sticks and arm to continue.
+
+      Radio not working? Menu > Radio setup.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6729885123608576
+    m_Localized: Radio disconnected
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6729885123608577
+    m_Localized: Gamepad disconnected
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6729885123608578
+    m_Localized: Controller disconnected
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6729885123608579
+    m_Localized: Radio connected
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6729885123608580
+    m_Localized: Gamepad connected
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6729885123608581
+    m_Localized: Controller connected
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6729885123608582
+    m_Localized: Controller changed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6729885123608583
+    m_Localized: '{0} s'
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

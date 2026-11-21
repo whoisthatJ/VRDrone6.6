@@ -23,7 +23,15 @@ namespace Ushqyr.Game
 
         public bool Paused { get; private set; }
         /// <summary>Why we paused, for the overlay.</summary>
+        /// <summary>Why the race is paused, in English: a key of the language table (see <see cref="Reasons"/>).</summary>
         public string Reason { get; private set; } = "";
+
+        /// <summary>Every text <see cref="Reason"/> can hold, for the check that each is translated.</summary>
+        public static readonly string[] Reasons =
+        {
+            "Radio disconnected", "Gamepad disconnected", "Controller disconnected",
+            "Radio connected", "Gamepad connected", "Controller connected", "Controller changed",
+        };
         /// <summary>0..1 progress of the "centred and armed" hold that resumes.</summary>
         public float ResumeProgress => Mathf.Clamp01(_held / resumeHoldSeconds);
 
@@ -46,9 +54,8 @@ namespace Ushqyr.Game
             bool racing = race != null && (race.Phase == RacePhase.Racing || race.Phase == RacePhase.Countdown);
             if (!racing) return;
 
-            string reason = !previous.IsConnected
-                ? $"{Describe(previous)} disconnected"
-                : next != null ? $"{Describe(next)} connected" : "Controller changed";
+            // Whole sentences, so each can be translated as one (they are keys of the language table).
+            string reason = !previous.IsConnected ? Disconnected(previous) : next != null ? Connected(next) : "Controller changed";
             SetPaused(true, reason);
         }
 
@@ -77,13 +84,23 @@ namespace Ushqyr.Game
             PausedChanged?.Invoke(paused);
         }
 
-        private static string Describe(PilotInputSource s)
+        private static string Disconnected(PilotInputSource s)
         {
             switch (s)
             {
-                case RcRadioSource _: return "Radio";
-                case KeyboardGamepadSource _: return "Gamepad";
-                default: return "Controller";
+                case RcRadioSource _: return "Radio disconnected";
+                case KeyboardGamepadSource _: return "Gamepad disconnected";
+                default: return "Controller disconnected";
+            }
+        }
+
+        private static string Connected(PilotInputSource s)
+        {
+            switch (s)
+            {
+                case RcRadioSource _: return "Radio connected";
+                case KeyboardGamepadSource _: return "Gamepad connected";
+                default: return "Controller connected";
             }
         }
     }

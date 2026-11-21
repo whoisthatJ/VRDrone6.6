@@ -97,3 +97,13 @@ Ring road	Айналма жол	Кольцевая дорога
 RACE	ЖАРЫС	ГОНКА
 racing	ұшуда	в гонке
 Watch winner replay: R  /  gamepad Y	Жеңімпаз қайталауы: R  /  геймпад Y	Повтор победителя: R  /  геймпад Y
+PAUSED	КІДІРТІЛДІ	ПАУЗА
+Centre the sticks and arm to continue.\nRadio not working? Menu > Radio setup.	Стиктерді ортаға қойып, қозғалтқыштарды қосыңыз.\nПульт жұмыс істемей ме? Мәзір > Пультті баптау.	Поставьте стики в центр и включите моторы, чтобы продолжить.\nПульт не работает? Меню > Настройка пульта.
+Radio disconnected	Пульт ажыратылды	Пульт отключён
+Gamepad disconnected	Геймпад ажыратылды	Геймпад отключён
+Controller disconnected	Контроллер ажыратылды	Контроллер отключён
+Radio connected	Пульт қосылды	Пульт подключён
+Gamepad connected	Геймпад қосылды	Геймпад подключён
+Controller connected	Контроллер қосылды	Контроллер подключён
+Controller changed	Контроллер ауыстырылды	Контроллер сменился
+{0} s	{0} с	{0} с

@@ -303,7 +303,7 @@ namespace Ushqyr.UI
             {
                 string colour = r.IsMe ? "#fa3" : "#fff";
                 UiKit.Label(body, $"<color={colour}>{r.Rank,3}.  {r.Pilot}</color>", new Vector2(0f, y), new Vector2(ContentWidth - 300f, 50f), 30f);
-                UiKit.Label(body, $"<color={colour}>{r.LapTime.ToString("0.000", CultureInfo.InvariantCulture)} s</color>", new Vector2(ContentWidth - 300f, y), new Vector2(300f, 50f), 30f, TextAlignmentOptions.MidlineRight);
+                UiKit.Label(body, $"<color={colour}>" + L.F("{0} s", r.LapTime.ToString("0.000", CultureInfo.InvariantCulture)) + "</color>", new Vector2(ContentWidth - 300f, y), new Vector2(300f, 50f), 30f, TextAlignmentOptions.MidlineRight);
                 y -= 46f;
             }
         }
