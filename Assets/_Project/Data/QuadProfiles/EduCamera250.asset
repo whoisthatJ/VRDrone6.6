@@ -1,0 +1,89 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 63a57d5e8701c864f9bed683e7db753f, type: 3}
+  m_Name: EduCamera250
+  m_EditorClassIdentifier: Ushqyr.Vehicle::Ushqyr.Vehicle.QuadProfileAsset
+  Profile:
+    Name: Camera 250
+    Mass: 0.249
+    Inertia:
+      x: 0.0011
+      y: 0.002
+      z: 0.0011
+    ArmX: 0.075
+    ArmZ: 0.075
+    Motors:
+      MaxThrustPerMotor: 1.25
+      YawTorquePerThrust: 0.02
+      TimeConstantUp: 0.05
+      TimeConstantDown: 0.065
+      IdleFraction: 0.06
+      PropPitchSpeed: 22
+      ThrottleCurveExpo: 1
+    Aero:
+      LinearDrag:
+        x: 0.05
+        y: 0.05
+        z: 0.05
+      QuadraticDrag:
+        x: 0.008
+        y: 0.016
+        z: 0.007
+      AngularDrag:
+        x: 0.000275
+        y: 0.0005
+        z: 0.000275
+    Pid:
+      Pitch:
+        P: 0.088
+        I: 0.264
+        D: 0.0010266666
+        FF: 0
+      Yaw:
+        P: 0.36000004
+        I: 0.7200001
+        D: 0
+        FF: 0
+      Roll:
+        P: 0.088
+        I: 0.264
+        D: 0.0010266666
+        FF: 0
+      ITermLimit: 0.15
+      DTermLowpassHz: 60
+      OutputLimit: 1
+      AirMode: 1
+      LowThrottleCutoff: 0.05
+    AngleMode:
+      MaxAngleDeg: 30
+      AngleGain: 6
+      MaxOuterRateDegPerSec: 200
+    Rates:
+      Type: 1
+      Roll:
+        RcRate: 60
+        Rate: 200
+        Expo: 0.3
+      Pitch:
+        RcRate: 60
+        Rate: 200
+        Expo: 0.3
+      Yaw:
+        RcRate: 60
+        Rate: 120
+        Expo: 0.3
+    Battery:
+      Cells: 2
+      CapacityMah: 2400
+      InternalResistance: 0.06
+      MaxCurrent: 14
+      IdleCurrent: 0.5

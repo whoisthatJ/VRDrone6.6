@@ -37,3 +37,35 @@ MonoBehaviour:
     CollisionRadius: 0.045
     CameraOffset: {x: 0, y: 0.012, z: 0.028}
     MotorRpm: 45000
+  - Id: edu-camera900
+    DisplayName: Camera drone 900 g
+    Description: Folding camera drone with a stabilised camera. Holds its place by itself, steady in wind, half an hour in the air.
+    Profile: {fileID: 11400000, guid: dad700c6022570243a512f452f043a28, type: 2}
+    VisualScale: 1
+    CollisionRadius: 0.28
+    CameraOffset: {x: 0, y: -0.035, z: 0.115}
+    MotorRpm: 9000
+  - Id: edu-camera250
+    DisplayName: Camera drone 250 g
+    Description: The small camera drone, under 250 g. Light and quiet; wind moves it sooner.
+    Profile: {fileID: 11400000, guid: f2160b7ef862b3e4294826744a896e8c, type: 2}
+    VisualScale: 1
+    CollisionRadius: 0.17
+    CameraOffset: {x: 0, y: -0.021, z: 0.069}
+    MotorRpm: 12000
+  - Id: edu-delivery
+    DisplayName: Delivery drone
+    Description: 2.5 kg, built to carry a 1 kg box and to set it down where it is needed.
+    Profile: {fileID: 11400000, guid: c93cee6bae2708c45b2e0cec86b30ffa, type: 2}
+    VisualScale: 1
+    CollisionRadius: 0.54
+    CameraOffset: {x: 0, y: 0, z: 0.16}
+    MotorRpm: 6000
+  - Id: edu-small
+    DisplayName: Education drone
+    Description: 'A small drone with propeller guards, two cameras and distance sensors: the one that is programmed.'
+    Profile: {fileID: 11400000, guid: 0a77a09a5e4b63b4397de454c2dd31c1, type: 2}
+    VisualScale: 1
+    CollisionRadius: 0.11
+    CameraOffset: {x: 0, y: 0.004, z: 0.054}
+    MotorRpm: 20000

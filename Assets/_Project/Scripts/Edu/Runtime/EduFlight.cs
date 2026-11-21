@@ -42,6 +42,7 @@ namespace Ushqyr.Edu
         private float _blend = 1f, _groundY;
         private double _clock;
         private float _tunedMass, _tunedThrust;
+        private bool _ownsWind;
 
         /// <summary>The weather right now (on the way to the last one asked for).</summary>
         public WeatherSettings Weather => Flight.Weather.Blend(_from, _to, _blend);
@@ -52,12 +53,27 @@ namespace Ushqyr.Edu
         /// <summary>Battery left, 0..1, after any injected drop.</summary>
         public float Battery { get; private set; } = 1f;
 
+        /// <summary>Names of the values <see cref="ModeCode"/> gives, in order (keys of the language table).</summary>
+        public static readonly string[] ModeNames = { "Acro", "Angle", "Horizon", "Altitude hold", "Position hold", "Autopilot" };
+
+        /// <summary>
+        /// How the drone is being flown, as one number for recordings and displays: 0 to 2 are the flight
+        /// controller's own modes (as the pilot's switch says), 3 altitude hold, 4 position hold, 5 the autopilot.
+        /// </summary>
+        public byte ModeCode(FlightMode sticks)
+        {
+            if (!enabled) return (byte)sticks;
+            if (Autopilot.Mode != GuidedMode.Manual) return 5;
+            return PilotAssist == AssistMode.Position ? (byte)4 : PilotAssist == AssistMode.AltitudeHold ? (byte)3 : (byte)sticks;
+        }
+
         /// <summary>Changes the weather; it comes in over <see cref="WeatherBlendSeconds"/>. Pass true for "now" (the start of an activity).</summary>
         public void SetWeather(in WeatherSettings weather, bool atOnce = false)
         {
             _from = Weather;
             _to = weather;
             _blend = atOnce ? 1f : 0f;
+            _ownsWind = true;
         }
 
         private void OnEnable()
@@ -78,7 +94,7 @@ namespace Ushqyr.Edu
             if (_vehicle != null && ReferenceEquals(_vehicle.Director, this))
             {
                 _vehicle.Director = null;
-                _vehicle.SetWind(Vector3.zero);
+                if (_ownsWind) _vehicle.SetWind(Vector3.zero);
                 _vehicle.SetMotorLoss(default);
             }
         }
@@ -89,7 +105,8 @@ namespace Ushqyr.Edu
             if (_blend < 1f) _blend = Mathf.Min(1f, _blend + dt / Mathf.Max(WeatherBlendSeconds, 0.01f));
             WeatherSettings weather = Weather;
             Vec3 wind = Flight.Weather.WindAt(weather, Seed, _clock);
-            vehicle.SetWind(new Vector3(wind.x, wind.y, wind.z));
+            // Until it is given weather of its own it leaves the scene's wind alone (the Strike Range has one).
+            if (_ownsWind) vehicle.SetWind(new Vector3(wind.x, wind.y, wind.z));
             vehicle.SetMotorLoss(MotorLoss);
 
             Vector3 p = transform.position;

@@ -42,6 +42,7 @@ namespace Ushqyr.Edu
         private readonly List<Canvas> _canvases = new List<Canvas>();
         private readonly List<UnityEngine.Object> _made = new List<UnityEngine.Object>();
         private Transform _model, _ghost;
+        private MaterialPropertyBlock _block;
         private LineRenderer _path, _referencePath;
         private string _title;
         private TextMeshProUGUI _titleText;
@@ -223,8 +224,18 @@ namespace Ushqyr.Edu
                 part.transform.localScale = new Vector3(a.x / b.x, a.y / b.y, a.z / b.z);
                 part.AddComponent<MeshFilter>().sharedMesh = filter.sharedMesh;
                 var copy = part.AddComponent<MeshRenderer>();
-                if (tint == null) copy.sharedMaterials = r.sharedMaterials;
-                else
+                if (tint == null)
+                {
+                    copy.sharedMaterials = r.sharedMaterials;
+                    // A model coloured through property blocks keeps its colours in the copy.
+                    if (r.HasPropertyBlock())
+                    {
+                        _block ??= new MaterialPropertyBlock();
+                        r.GetPropertyBlock(_block);
+                        copy.SetPropertyBlock(_block);
+                    }
+                }
+                if (tint != null)
                 {
                     if (ghost == null && r.sharedMaterial != null) ghost = GhostMaterial(r.sharedMaterial, tint.Value);
                     var all = new Material[r.sharedMaterials.Length];
@@ -595,7 +606,7 @@ namespace Ushqyr.Edu
 
             float height = s.Y - _groundY;
             _readout.text = L.T("Height") + " " + L.F("{0} m", height.ToString("0.0", inv)) + "     " + L.T("Speed") + " " + L.F("{0} m/s", s.Speed.ToString("0.0", inv));
-            _state.text = L.T("Mode") + " " + L.T(((FlightMode)s.Mode).ToString()) + "     " + L.T("Battery") + " " + Mathf.RoundToInt(s.Battery * 100f) + "%"
+            _state.text = L.T("Mode") + " " + L.T(EduFlight.ModeNames[Mathf.Min(s.Mode, EduFlight.ModeNames.Length - 1)]) + "     " + L.T("Battery") + " " + Mathf.RoundToInt(s.Battery * 100f) + "%"
                           + (s.Armed ? "" : "     " + L.T("motors off"));
 
             // The last thing that happened, shown for three seconds of the flight.

@@ -15,7 +15,9 @@
         "Ushqyr.Strike",
         "Unity.InputSystem",
         "Unity.TextMeshPro",
-        "UnityEngine.UI"
+        "UnityEngine.UI",
+        "Ushqyr.Edu.Core",
+        "Ushqyr.Edu"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -34,6 +34,11 @@ namespace Ushqyr.UI
         private const string ModeAcro = "ACRO";
         private const string ModeAngle = "ANGL";
         private const string ModeHorizon = "HOR";
+        private const string ModeAltitude = "ALT HOLD";
+        private const string ModePosition = "POS HOLD";
+        private const string ModeAuto = "AUTO";
+
+        private Ushqyr.Edu.EduFlight _edu;
 
         private string _modeShown, _warningShown;
         private float _armedTime;
@@ -51,7 +56,11 @@ namespace Ushqyr.UI
             float cell = volts / cells;
             if (battery != null) battery.SetText("{0:1}V {1:2}\n{2:0}MAH", volts, cell, s.BatteryUsedMah);
 
-            string m = !s.Armed ? L.T("DISARMED") : input.Mode == FlightMode.Angle ? ModeAngle : input.Mode == FlightMode.Horizon ? ModeHorizon : ModeAcro;
+            // An assist or the autopilot is what really flies the drone when one is on: show that, as a real display would.
+            if (_edu == null && Time.frameCount % 30 == 0) _edu = vehicle.GetComponent<Ushqyr.Edu.EduFlight>();
+            int code = _edu != null ? _edu.ModeCode(input.Mode) : (int)input.Mode;
+            string m = !s.Armed ? L.T("DISARMED") : code == 5 ? ModeAuto : code == 4 ? ModePosition : code == 3 ? ModeAltitude
+                : input.Mode == FlightMode.Angle ? ModeAngle : input.Mode == FlightMode.Horizon ? ModeHorizon : ModeAcro;
             SetIfChanged(mode, m, ref _modeShown);
 
             if (timer != null)

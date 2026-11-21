@@ -2789,6 +2789,70 @@ MonoBehaviour:
     m_Key: This build has no internet features; LAN races work.
     m_Metadata:
       m_Items: []
+  - m_Id: 6753576771387392
+    m_Key: Flight assist
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6753576817524736
+    m_Key: By the drone
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6753576817524737
+    m_Key: Altitude hold
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6753576817524738
+    m_Key: Position hold
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6753576817524739
+    m_Key: 'Position hold: let go of the sticks and the drone stays where it is. In flight, G switches the assist and L replays the last flight.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6753576817524740
+    m_Key: Nothing recorded yet
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6753576817524741
+    m_Key: Last flight
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6753576817524742
+    m_Key: Camera drone 900 g
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6753576817524743
+    m_Key: Camera drone 250 g
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6753576817524744
+    m_Key: Delivery drone
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6753576817524745
+    m_Key: Education drone
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6753576817524746
+    m_Key: Folding camera drone with a stabilised camera. Holds its place by itself, steady in wind, half an hour in the air.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6753576817524747
+    m_Key: The small camera drone, under 250 g. Light and quiet; wind moves it sooner.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6753576817524748
+    m_Key: 2.5 kg, built to carry a 1 kg box and to set it down where it is needed.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6753576817524749
+    m_Key: 'A small drone with propeller guards, two cameras and distance sensors: the one that is programmed.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6754224556474368
+    m_Key: Autopilot
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

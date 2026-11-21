@@ -455,6 +455,10 @@ namespace Ushqyr.UI
             UiKit.SliderRow(c, L.T("Stick expo"), -180f, 0f, 1f, input.Expo, v => F(v, "0.00"), v => { input.Expo = v; Changed(); }, ContentWidth);
             UiKit.StepperRow(c, L.T("Invert pitch (right stick)"), -270f, OffOn, input.InvertPitch ? 1 : 0, i => { input.InvertPitch = i == 1; Changed(); }, ContentWidth);
             UiKit.StepperRow(c, L.T("Invert roll (right stick)"), -360f, OffOn, input.InvertRoll ? 1 : 0, i => { input.InvertRoll = i == 1; Changed(); }, ContentWidth);
+            UiKit.StepperRow(c, L.T("Flight assist"), -450f, System.Array.ConvertAll(Ushqyr.Edu.EduFreeFlight.SettingNames, L.T),
+                Mathf.Clamp(input.FlightAssist, 0, 3), i => { input.FlightAssist = i; Changed(); }, ContentWidth);
+            UiKit.Label(c, L.T("Position hold: let go of the sticks and the drone stays where it is. In flight, G switches the assist and L replays the last flight."),
+                new Vector2(0f, -530f), new Vector2(ContentWidth, 60f), 26f, TextAlignmentOptions.TopLeft, UiKit.DimTextColor);
         }
 
         private void BuildGraphics(RectTransform c)

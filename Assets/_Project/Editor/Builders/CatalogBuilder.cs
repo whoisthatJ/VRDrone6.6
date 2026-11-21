@@ -49,6 +49,31 @@ namespace Ushqyr.EditorTools.Builders
                 Description = "32 g ducted tiny whoop, ~3:1. Slow, floaty and forgiving: great indoors and for learning.",
                 VisualScale = 0.3f, CollisionRadius = 0.045f, CameraOffset = new Vector3(0f, 0.012f, 0.028f), MotorRpm = 45000f,
             });
+            // The Education Suite's drone classes (EDU_PLAN F3); their models are built by EduDroneModel.
+            catalog.Quads.Add(new QuadCatalog.Entry
+            {
+                Id = "edu-camera900", DisplayName = "Camera drone 900 g", Profile = Profile("EduCamera900", EduDrones.Camera900),
+                Description = "Folding camera drone with a stabilised camera. Holds its place by itself, steady in wind, half an hour in the air.",
+                VisualScale = 1f, CollisionRadius = 0.28f, CameraOffset = new Vector3(0f, -0.035f, 0.115f), MotorRpm = 9000f,
+            });
+            catalog.Quads.Add(new QuadCatalog.Entry
+            {
+                Id = "edu-camera250", DisplayName = "Camera drone 250 g", Profile = Profile("EduCamera250", EduDrones.Camera250),
+                Description = "The small camera drone, under 250 g. Light and quiet; wind moves it sooner.",
+                VisualScale = 1f, CollisionRadius = 0.17f, CameraOffset = new Vector3(0f, -0.021f, 0.069f), MotorRpm = 12000f,
+            });
+            catalog.Quads.Add(new QuadCatalog.Entry
+            {
+                Id = "edu-delivery", DisplayName = "Delivery drone", Profile = Profile("EduDelivery", EduDrones.Delivery),
+                Description = "2.5 kg, built to carry a 1 kg box and to set it down where it is needed.",
+                VisualScale = 1f, CollisionRadius = 0.54f, CameraOffset = new Vector3(0f, 0f, 0.16f), MotorRpm = 6000f,
+            });
+            catalog.Quads.Add(new QuadCatalog.Entry
+            {
+                Id = "edu-small", DisplayName = "Education drone", Profile = Profile("EduSmall", EduDrones.EduSmall),
+                Description = "A small drone with propeller guards, two cameras and distance sensors: the one that is programmed.",
+                VisualScale = 1f, CollisionRadius = 0.11f, CameraOffset = new Vector3(0f, 0.004f, 0.054f), MotorRpm = 20000f,
+            });
             EditorUtility.SetDirty(catalog);
             return catalog;
         }

@@ -46,3 +46,19 @@ A PIN keeps classmates out of your results. The teacher can reset it.	PIN сын
 Type your name	Атыңызды жазыңыз	Введите своё имя
 A name is needed	Ат қажет	Нужно имя
 The class data could not be opened: {0}	Сынып деректері ашылмады: {0}	Не удалось открыть данные класса: {0}
+Flight assist	Ұшу көмекшісі	Помощь в полёте
+By the drone	Дронға қарай	По дрону
+Altitude hold	Биіктікті ұстау	Удержание высоты
+Position hold	Орынды ұстау	Удержание позиции
+Position hold: let go of the sticks and the drone stays where it is. In flight, G switches the assist and L replays the last flight.	Орынды ұстау: стиктерді жіберсеңіз, дрон орнында қалады. Ұшу кезінде G көмекшіні ауыстырады, L соңғы ұшуды қайта көрсетеді.	Удержание позиции: отпустите стики, и дрон останется на месте. В полёте G переключает помощь, L показывает запись последнего полёта.
+Nothing recorded yet	Әзірге ештеңе жазылмаған	Пока ничего не записано
+Last flight	Соңғы ұшу	Последний полёт
+Camera drone 900 g	Камералы дрон 900 г	Дрон с камерой 900 г
+Camera drone 250 g	Камералы дрон 250 г	Дрон с камерой 250 г
+Delivery drone	Жеткізу дроны	Дрон-доставщик
+Education drone	Оқу дроны	Учебный дрон
+Folding camera drone with a stabilised camera. Holds its place by itself, steady in wind, half an hour in the air.	Тұрақтандырылған камерасы бар жиналмалы дрон. Орнын өзі ұстайды, желде орнықты, ауада жарты сағат.	Складной дрон со стабилизированной камерой. Сам держит место, устойчив на ветру, полчаса в воздухе.
+The small camera drone, under 250 g. Light and quiet; wind moves it sooner.	Камерасы бар шағын дрон, 250 г-нан жеңіл. Жеңіл әрі тыныш; жел оны тезірек қозғайды.	Маленький дрон с камерой, легче 250 г. Лёгкий и тихий; ветер сносит его раньше.
+2.5 kg, built to carry a 1 kg box and to set it down where it is needed.	2,5 кг, 1 кг қорапты тасып, қажетті жерге қоюға арналған.	2,5 кг, рассчитан нести коробку весом 1 кг и опускать её там, где нужно.
+A small drone with propeller guards, two cameras and distance sensors: the one that is programmed.	Винт қорғанышы, екі камерасы және қашықтық датчиктері бар шағын дрон: оны бағдарламалайды.	Маленький дрон с защитой винтов, двумя камерами и датчиками расстояния: именно его программируют.
+Autopilot	Автопилот	Автопилот

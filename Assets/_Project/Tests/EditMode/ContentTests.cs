@@ -37,11 +37,15 @@ namespace Ushqyr.Tests
         }
 
         [Test]
-        public void QuadCatalog_HasThreeClassesWithProfiles()
+        public void QuadCatalog_HasTheRacingAndEducationClassesWithProfiles()
         {
             var catalog = Quads;
             Assert.IsNotNull(catalog);
-            CollectionAssert.AreEquivalent(new[] { "race5", "freestyle5", "whoop65" }, catalog.Quads.Select(q => q.Id).ToArray());
+            CollectionAssert.AreEquivalent(new[] { "race5", "freestyle5", "whoop65", "edu-camera900", "edu-camera250", "edu-delivery", "edu-small" },
+                catalog.Quads.Select(q => q.Id).ToArray());
+            // Every Education Suite drone in the catalogue has a model of its own.
+            foreach (var q in catalog.Quads.Where(q => q.Id.StartsWith("edu-")))
+                Assert.IsTrue(Ushqyr.Garage.EduDroneModel.TryKind(q.Id, out _), q.Id);
             foreach (var q in catalog.Quads)
             {
                 Assert.IsNotNull(q.Profile, q.Id);

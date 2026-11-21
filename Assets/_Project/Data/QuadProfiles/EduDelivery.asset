@@ -1,0 +1,89 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 63a57d5e8701c864f9bed683e7db753f, type: 3}
+  m_Name: EduDelivery
+  m_EditorClassIdentifier: Ushqyr.Vehicle::Ushqyr.Vehicle.QuadProfileAsset
+  Profile:
+    Name: Delivery
+    Mass: 2.5
+    Inertia:
+      x: 0.06
+      y: 0.11
+      z: 0.06
+    ArmX: 0.25
+    ArmZ: 0.25
+    Motors:
+      MaxThrustPerMotor: 15.5
+      YawTorquePerThrust: 0.02
+      TimeConstantUp: 0.09
+      TimeConstantDown: 0.12
+      IdleFraction: 0.06
+      PropPitchSpeed: 24
+      ThrottleCurveExpo: 1
+    Aero:
+      LinearDrag:
+        x: 0.25
+        y: 0.25
+        z: 0.25
+      QuadraticDrag:
+        x: 0.05
+        y: 0.1
+        z: 0.05
+      AngularDrag:
+        x: 0.015
+        y: 0.0275
+        z: 0.015
+    Pid:
+      Pitch:
+        P: 0.08516129
+        I: 0.25548387
+        D: 0.0013548386
+        FF: 0
+      Yaw:
+        P: 1.1709678
+        I: 2.3419356
+        D: 0
+        FF: 0
+      Roll:
+        P: 0.08516129
+        I: 0.25548387
+        D: 0.0013548386
+        FF: 0
+      ITermLimit: 0.15
+      DTermLowpassHz: 60
+      OutputLimit: 1
+      AirMode: 1
+      LowThrottleCutoff: 0.05
+    AngleMode:
+      MaxAngleDeg: 30
+      AngleGain: 4.5
+      MaxOuterRateDegPerSec: 150
+    Rates:
+      Type: 1
+      Roll:
+        RcRate: 60
+        Rate: 150
+        Expo: 0.3
+      Pitch:
+        RcRate: 60
+        Rate: 150
+        Expo: 0.3
+      Yaw:
+        RcRate: 60
+        Rate: 90
+        Expo: 0.3
+    Battery:
+      Cells: 6
+      CapacityMah: 10000
+      InternalResistance: 0.012
+      MaxCurrent: 120
+      IdleCurrent: 1.5

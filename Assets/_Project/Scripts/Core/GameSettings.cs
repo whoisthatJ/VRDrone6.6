@@ -28,6 +28,8 @@ namespace Ushqyr.Core
         public bool InvertRoll;
         /// <summary>Ushqyr.Input.RadioBackend: 0 = auto, 1 = Input System, 2 = Android raw reader, 3 = Windows HID.</summary>
         public int RadioBackend;
+        /// <summary>Flight assist: 0 = by the drone (the Education Suite's drones hold position, the racers do not), 1 = off, 2 = altitude hold, 3 = position hold.</summary>
+        public int FlightAssist;
     }
 
     [Serializable]

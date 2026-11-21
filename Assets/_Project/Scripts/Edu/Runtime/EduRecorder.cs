@@ -22,6 +22,8 @@ namespace Ushqyr.Edu
         private FlightRecorderCore _core;
         private double _clock;
         private bool _pilotSticks = true;
+        private string _droneNoted;
+        private bool _keepEverything;
 
         public FlightRecording Recording => _core?.Recording;
         public bool Paused { get; set; }
@@ -51,6 +53,8 @@ namespace Ushqyr.Edu
         /// <summary>Starts a new recording: the whole flight for an activity, the rolling last ten minutes otherwise.</summary>
         public void Begin(bool keepEverything)
         {
+            _keepEverything = keepEverything;
+            _droneNoted = null;
             _core = new FlightRecorderCore(100f, keepEverything ? 0f : FreeFlightSeconds);
             _clock = 0;
             Note("build", Application.version);
@@ -84,7 +88,20 @@ namespace Ushqyr.Edu
                 _pilotSticks = pilot;
                 Note("sticks", pilot ? "pilot" : "commands");
             }
-            _core.Push(_clock, s, pilot ? _vehicle.LastInput : _vehicle.FlownInput, battery);
+            PilotInput sticks = pilot ? _vehicle.LastInput : _vehicle.FlownInput;
+            // The mode kept with each sample is how the drone was really flown: an assist or the autopilot, if one was on.
+            if (_flight == null) _flight = GetComponent<EduFlight>();
+            if (_flight != null) sticks.Mode = (FlightMode)_flight.ModeCode(_vehicle.LastInput.Mode);
+            // The drone can be changed after the recording began (another drone chosen in the menu).
+            string drone = _vehicle.Profile.Name ?? "";
+            if (!ReferenceEquals(drone, _droneNoted) && drone != _droneNoted)
+            {
+                // Another drone is another flight: what the first one flew is not part of it.
+                if (_droneNoted != null && !_keepEverything) Begin(false);
+                _droneNoted = drone;
+                Note("drone", drone);
+            }
+            _core.Push(_clock, s, sticks, battery);
         }
 
         /// <summary>Writes the recording so far to a `.grreplay` file and returns its hash.</summary>

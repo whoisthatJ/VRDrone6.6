@@ -1,0 +1,89 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 63a57d5e8701c864f9bed683e7db753f, type: 3}
+  m_Name: EduSmall
+  m_EditorClassIdentifier: Ushqyr.Vehicle::Ushqyr.Vehicle.QuadProfileAsset
+  Profile:
+    Name: Edu
+    Mass: 0.087
+    Inertia:
+      x: 0.00012
+      y: 0.0002
+      z: 0.00012
+    ArmX: 0.045
+    ArmZ: 0.045
+    Motors:
+      MaxThrustPerMotor: 0.47
+      YawTorquePerThrust: 0.02
+      TimeConstantUp: 0.03
+      TimeConstantDown: 0.04
+      IdleFraction: 0.06
+      PropPitchSpeed: 14
+      ThrottleCurveExpo: 1
+    Aero:
+      LinearDrag:
+        x: 0.03
+        y: 0.03
+        z: 0.03
+      QuadraticDrag:
+        x: 0.004
+        y: 0.008
+        z: 0.004
+      AngularDrag:
+        x: 0.00003
+        y: 0.00005
+        z: 0.00003
+    Pid:
+      Pitch:
+        P: 0.056737587
+        I: 0.17021276
+        D: 0.0004964539
+        FF: 0
+      Yaw:
+        P: 0.12765957
+        I: 0.25531915
+        D: 0
+        FF: 0
+      Roll:
+        P: 0.056737587
+        I: 0.17021276
+        D: 0.0004964539
+        FF: 0
+      ITermLimit: 0.15
+      DTermLowpassHz: 60
+      OutputLimit: 1
+      AirMode: 1
+      LowThrottleCutoff: 0.05
+    AngleMode:
+      MaxAngleDeg: 25
+      AngleGain: 6
+      MaxOuterRateDegPerSec: 250
+    Rates:
+      Type: 1
+      Roll:
+        RcRate: 60
+        Rate: 250
+        Expo: 0.3
+      Pitch:
+        RcRate: 60
+        Rate: 250
+        Expo: 0.3
+      Yaw:
+        RcRate: 60
+        Rate: 150
+        Expo: 0.3
+    Battery:
+      Cells: 1
+      CapacityMah: 1100
+      InternalResistance: 0.08
+      MaxCurrent: 9
+      IdleCurrent: 0.3

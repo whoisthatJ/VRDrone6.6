@@ -380,6 +380,8 @@ namespace Ushqyr.Game
             var entry = build != null ? quads.Find(build.Size == Ushqyr.Garage.SizeClass.Whoop ? "whoop65" : "race5") : quads.Find(s.QuadId);
             if (entry == null || entry.Profile == null || vehicle == null) return;
             string quadKey = build != null ? s.QuadId + "|" + build.ToJson().GetHashCode() : entry.Id;
+            // The Education Suite's drones (camera, delivery, education) bring their own model.
+            bool edu = build == null && Ushqyr.Garage.EduDroneModel.TryKind(entry.Id, out _eduKind);
 
             QuadProfile p = build != null ? Ushqyr.Garage.BuildComposer.Compose(build) : entry.Profile.Profile;
             if (s.UseCustomRates) p.Rates = s.Rates;
@@ -390,19 +392,25 @@ namespace Ushqyr.Game
 
             var collision = vehicle.BaseCollision;
             collision.Radius = build != null ? build.Frame.WheelbaseMm * 0.0005f + build.Prop.DiameterIn * 0.0254f * 0.25f : entry.CollisionRadius;
+            if (edu && _appliedQuadId != quadKey) ApplyEduVisual(_eduKind);
+            if (edu && _eduModel != null) collision.Radius = _eduModel.Radius;
             collision.CrashSpeed = s.Physics.CrashSpeed;
             vehicle.Configure(p, collision);
 
             float visualScale = entry.VisualScale;
             if (build != null && _appliedQuadId != quadKey) ApplyBuildVisual(build);
-            else if (build == null && _buildModel != null) RestoreStockVisual();
+            else if (build == null && !edu && _buildModel != null) RestoreStockVisual();
             if (build != null) visualScale = build.Frame.WheelbaseMm / 220f;
-            if (quadVisual != null && build == null) quadVisual.localScale = Vector3.one * entry.VisualScale;
+            if (quadVisual != null && build == null && !edu) quadVisual.localScale = Vector3.one * entry.VisualScale;
+            if (edu && _eduModel != null) visualScale = _eduModel.Radius / 0.16f;
             if (ghostVisual != null) ghostVisual.localScale = Vector3.one * visualScale;
             if (fpvCamera != null)
                 fpvCamera.transform.localPosition = build != null
                     ? new Vector3(0f, 0.004f, build.Frame.BodyLengthMm * 0.0005f + 0.005f) // front of the stack (model is centred on it)
+                    : edu && _eduModel != null && _eduModel.Lens != null ? quadVisual.InverseTransformPoint(_eduModel.Lens.position)
                     : entry.CameraOffset;
+            // Flight assist for the person at the sticks, the recording of the last flight and its replay.
+            Ushqyr.Edu.EduFreeFlight.Attach(vehicle, s.Input.FlightAssist, edu);
             if (views != null) views.SetQuadScale(visualScale);
             if (quadAudio != null) quadAudio.MaxRpm = build != null ? Ushqyr.Garage.BuildComposer.FullThrottle(build.Motor, build.Prop, build.Battery).RevPerSec * 60f : entry.MotorRpm;
 
@@ -416,6 +424,27 @@ namespace Ushqyr.Game
         }
 
         private GameObject _buildModel;
+        private Ushqyr.Garage.EduDroneKind _eduKind;
+        private Ushqyr.Garage.EduDroneModel.Result _eduModel;
+
+        /// <summary>Hides the stock quad model and shows one of the Education Suite's drones in its place.</summary>
+        private void ApplyEduVisual(Ushqyr.Garage.EduDroneKind kind)
+        {
+            if (quadVisual == null || buildMaterials == null || buildMaterials.Plastic == null) return;
+            if (_buildModel != null) Destroy(_buildModel);
+            quadVisual.localScale = Vector3.one;
+            foreach (var r in quadVisual.GetComponentsInChildren<Renderer>(true)) r.enabled = false;
+            _eduModel = Ushqyr.Garage.EduDroneModel.Build(kind, buildMaterials, quadVisual, quadVisual.gameObject.layer);
+            _buildModel = _eduModel.Root;
+            var spinner = vehicle != null ? vehicle.GetComponentInChildren<Ushqyr.Vehicle.PropVisuals>(true) : null;
+            if (spinner == null) spinner = FindAnyObjectByType<Ushqyr.Vehicle.PropVisuals>();
+            if (spinner != null)
+            {
+                _stockProps ??= spinner.Props;
+                _stockDiscs ??= spinner.BlurDiscs;
+                spinner.Configure(_eduModel.Props, null);
+            }
+        }
         private Transform[] _stockProps;
         private Renderer[] _stockDiscs;
 
@@ -423,6 +452,7 @@ namespace Ushqyr.Game
         {
             Destroy(_buildModel);
             _buildModel = null;
+            _eduModel = null;
             foreach (var r in quadVisual.GetComponentsInChildren<Renderer>(true)) r.enabled = true;
             var spinner = FindAnyObjectByType<Ushqyr.Vehicle.PropVisuals>();
             if (spinner != null && _stockProps != null) spinner.Configure(_stockProps, _stockDiscs);
