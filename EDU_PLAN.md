@@ -729,3 +729,17 @@ languages; frames, steps and the course's block order have their own tests.
 - **Radio and gamepad:** the runner listens to the keyboard for start, finish, retry and leave.
 - **Unlocking everything** is a stored setting with no screen yet (the teacher console, ED4).
 
+### 22 November 2026, later: block B of the training course
+Six more exercises, flown from where the pilot stands: square nose forward, circling a pole with the nose on it (both
+ways), a figure of eight round two poles, nose-in hover and landing (the drone starts facing the pilot), a circuit of
+four pads of shrinking size, and a square without position hold in a 3 m/s wind. New for them: a step for circling a
+point (only the way flown at the right distance counts) and for landing on a chosen pad; measures of the distance from
+a circle and of the nose staying on a target, which look only at the part of the flight on the circle, however long the
+way there and back takes. References: 99 to 100. 463 tests pass.
+
+Two faults found by flying the references, both mine: the figure of eight's first pole stood on the straight line from
+the pad to the middle box (the reference flew into it; the poles now stand side by side), and an exercise with two
+objects of the same name was refused by the file check, as it should be.
+
+**Twelve of thirty exercises exist.** Blocks C (camera targets), D and E (FPV with gates) are not started.
+
