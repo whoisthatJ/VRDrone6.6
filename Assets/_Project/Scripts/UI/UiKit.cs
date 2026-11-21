@@ -79,6 +79,11 @@ namespace Ushqyr.UI
             b.colors = colors;
             if (onClick != null) b.onClick.AddListener(onClick);
             var label = Label(rt, text, Vector2.zero, size, fontSize, TextAlignmentOptions.Center);
+            // A button's text is fixed once shown, and its length depends on the language: let it shrink to fit
+            // (down to 60%) instead of being cut with "…".
+            label.enableAutoSizing = true;
+            label.fontSizeMax = fontSize;
+            label.fontSizeMin = fontSize * 0.6f;
             var lrt = label.rectTransform;
             lrt.anchorMin = Vector2.zero;
             lrt.anchorMax = Vector2.one;
@@ -98,7 +103,7 @@ namespace Ushqyr.UI
             // Label | slider | value, proportional so half-width rows still get a usable slider.
             float labelW = Mathf.Min(420f, width * 0.34f);
             float valueW = Mathf.Min(240f, width * 0.16f);
-            Label(parent, label, new Vector2(0f, y), new Vector2(labelW, 60f), 30f);
+            Fit(Label(parent, label, new Vector2(0f, y), new Vector2(labelW, 60f), 30f));
             var valueText = Label(parent, format(value), new Vector2(width - valueW, y), new Vector2(valueW, 60f), 30f, TextAlignmentOptions.MidlineRight);
 
             var root = Rect(parent, "Slider " + label, new Vector2(labelW + 20f, y - 14f), new Vector2(width - labelW - valueW - 40f, 32f));
@@ -138,7 +143,7 @@ namespace Ushqyr.UI
         /// <summary>Label, then "&lt;  value  &gt;" buttons cycling through options.</summary>
         public static void StepperRow(Transform parent, string label, float y, string[] options, int index, Action<int> onChange, float width = 1400f)
         {
-            Label(parent, label, new Vector2(0f, y), new Vector2(420f, 60f), 30f);
+            Fit(Label(parent, label, new Vector2(0f, y), new Vector2(420f, 60f), 30f));
             int current = Mathf.Clamp(index, 0, options.Length - 1);
             var valueText = Label(parent, options[current], new Vector2(540f, y), new Vector2(width - 780f, 60f), 30f, TextAlignmentOptions.Center);
             Button(parent, "<", new Vector2(440f, y), new Vector2(90f, 60f), () =>
@@ -153,6 +158,18 @@ namespace Ushqyr.UI
                 valueText.text = options[current];
                 onChange(current);
             });
+        }
+
+        /// <summary>
+        /// For a label whose text is fixed once shown: a longer translation shrinks (down to 60%) instead of being cut
+        /// with "…". Not for text that changes while it is on screen.
+        /// </summary>
+        public static TextMeshProUGUI Fit(TextMeshProUGUI label)
+        {
+            label.enableAutoSizing = true;
+            label.fontSizeMax = label.fontSize;
+            label.fontSizeMin = label.fontSize * 0.6f;
+            return label;
         }
 
         public static void Clear(Transform t)

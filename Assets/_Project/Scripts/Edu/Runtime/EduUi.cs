@@ -89,6 +89,11 @@ namespace Ushqyr.Edu
                 onClick();
             });
             TextMeshProUGUI label = Text(rt, text, 6f, 0f, w - 12f, h, size, Color.white, TextAlignmentOptions.Center);
+            // A button's text is fixed once shown, and its length depends on the language: let it shrink to fit
+            // (down to 60%) instead of being cut with "…".
+            label.enableAutoSizing = true;
+            label.fontSizeMax = size;
+            label.fontSizeMin = size * 0.6f;
             label.name = "Label";
             return button;
         }

@@ -75,6 +75,11 @@ namespace Ushqyr.Bench
             button.colors = colors;
             button.onClick.AddListener(() => onClick());
             var label = Text(rt, text, 8f, 0f, w - 16f, h, size, Color.white, TextAlignmentOptions.MidlineLeft);
+            // A button's text is fixed once shown, and its length depends on the language: let it shrink to fit
+            // (down to 60%) instead of being cut with "…".
+            label.enableAutoSizing = true;
+            label.fontSizeMax = size;
+            label.fontSizeMin = size * 0.6f;
             label.name = "Label";
             return button;
         }
