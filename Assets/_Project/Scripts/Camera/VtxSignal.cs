@@ -39,6 +39,12 @@ namespace Ushqyr.Cameras
         /// <summary>Link quality 0..1 (1 = perfect), for the OSD.</summary>
         public float LinkQuality { get; private set; } = 1f;
 
+        /// <summary>
+        /// A fault of the video link, 0..1 (1 = no picture): added to what distance and obstacles do, and shown even
+        /// when the player switched the everyday noise off, because it is part of an exercise.
+        /// </summary>
+        public float Fault { get; set; }
+
         public VtxNoiseLevel Level
         {
             get => level;
@@ -81,12 +87,12 @@ namespace Ushqyr.Cameras
                 _obstruction = n * obstaclePenalty;
             }
 
-            float loss = Mathf.Clamp01(Mathf.Max(0f, distance - cleanRange) / fadeRange + _obstruction);
+            float loss = Mathf.Clamp01(Mathf.Max(Mathf.Max(0f, distance - cleanRange) / fadeRange + _obstruction, Fault));
             _crashStatic = Mathf.MoveTowards(_crashStatic, 0f, Time.deltaTime * 1.5f);
             _smoothed = Mathf.Lerp(_smoothed, loss, 1f - Mathf.Exp(-6f * Time.deltaTime));
             LinkQuality = 1f - Mathf.Max(_smoothed, _crashStatic * 0.8f);
 
-            float scale = level == VtxNoiseLevel.Off ? 0f : level == VtxNoiseLevel.Light ? 0.5f : 1f;
+            float scale = Fault > 0f ? 1f : level == VtxNoiseLevel.Off ? 0f : level == VtxNoiseLevel.Light ? 0.5f : 1f;
             float noise = scale * Mathf.Clamp01(0.04f + _smoothed * 1.2f + _crashStatic);
             float breakup = scale * Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.45f, 1f, Mathf.Max(_smoothed, _crashStatic)));
 

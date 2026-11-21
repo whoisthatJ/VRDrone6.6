@@ -57,6 +57,9 @@ Items marked ❓ are my defaults; the customer should confirm them (§13). Each 
 | D28 | **PINs are typed on an on-screen keypad**: digits only, 4 to 12 | Works with a mouse alone and in a headset; a PIN only keeps classmates out |
 | D29 | **The school build is the same code built without the internet packages** (`Tools/Edu/school_manifest.py`); a define set by the package's presence decides what is compiled. The build also switches off the engine's own reporting, including "Engine Diagnostics" | One code base to test; measured: 3 connections at start before, 0 after |
 | D30 | **LAN races stay in the school build; internet races and online lap boards do not** | F5: nothing is sent to the internet; the classroom still races |
+| D31 | **Flight assist is a choice for every drone**; the default "by the drone" gives position hold on the Education Suite's drones and none on the racing quads | The flight-mode ladder of F3 without changing how the racers fly |
+| D32 | **Failures and weather are set by name and value** (`gps_lost`, `prop2`, `baro_drift` …) | One vocabulary for activity files, the teacher's screen and the attempt record |
+| D33 | **A photo and a payload drop are events of the flight**, with their place and direction | Scores come from the recording alone (the rule of F1) |
 | D21 | **Names are compared and sorted in code, not in SQL.** SQLite folds case for Latin letters only and orders by character code, which made "7Б" and "7б" two groups and put every Kazakh letter after the Russian alphabet | Found by the store tests |
 
 ## 3. Shared foundations
@@ -631,3 +634,51 @@ a small build: **3 connections before, 0 after.**
 **Not done.** The full school build (every scene) was not built or watched, only the small probe; a longer run and a
 traffic recorder on a second PC are for the classroom test. The AI Bench Team Kit still has Unity's default reporting;
 changing it is the owner's decision.
+
+### 22 November 2026: ED2, the drone classes, their equipment, weather and failures
+**Drone classes.** Four profiles in `Flight/EduDrones.cs`, sized like typical aircraft of each class: a 900 g and a
+249 g camera drone, a 2.5 kg delivery drone, and an 87 g education drone. They are in the quad catalogue ("Choose
+quad") with models of their own, built from simple shapes at run time. The assist's limits (lean, speed, climb) are
+worked out from each drone's profile. Tested on the flight model for every class, and for the delivery drone with its
+1 kg box: a stick step (90% of the angle within 0.6 s, overshoot under 15%), hover drift under 0.3 m, a stop at a point
+25 m away without flying past, a hold in wind (8 m/s for the 900 g camera drone and the delivery drone, 5 for the
+small camera drone, 3 for the education drone), a landing, and 8 to 60 minutes of hover on the battery.
+
+**For the person flying.** A setting "Flight assist" (by the drone, off, altitude hold, position hold) and key G in
+flight. The Education Suite's drones hold position unless told otherwise; the racing quads do not. Key L opens the
+replay viewer on the last flight, which gives the viewer its first way in from the game. The on-screen display and the
+recording show the assist or the autopilot as the flight mode.
+
+**Equipment.** The camera drones have a stabilised gimbal: the picture stays level while the drone leans (measured:
+drone leaning 5.6°, picture 0.0°), tilts from straight down to 30° up, zooms to four times, takes photos (an event of
+the flight with place, heading, tilt and zoom, and a picture file in the user's data folder) and carries a light. The
+delivery drone flies heavier with its 1 kg box (3.5 kg, more inertia); key B releases it, the box falls as an ordinary
+body, and where it comes to rest is an event of the flight. Checked live: flown 11.7 m by the autopilot, released at
+4 m, the box rested 1 cm from the point under the drone.
+
+**Weather to look at.** Rain around the viewer, slanted by the wind, and fog by the visibility in metres; the scene's
+own fog settings come back when the weather clears. Every change of weather is an event of the flight.
+
+**Failures by name.** `EduFlight.SetFailure("gps_lost", 1)`: a weak or stopped motor, a damaged propeller (thrust loss
+and a shake), a battery drop, GPS lost or degraded, compass interference, radio loss, video noise or loss, a wrong
+attitude sensor, a barometer that runs away, a jammed release, a stuck gimbal. Each change is an event of the flight.
+Tested: the names, a damaged propeller that can still be flown and landed, and a wrong attitude sensor that makes
+altitude hold drift while position hold copes.
+
+- **D31. Assist is a choice for every drone**, with "by the drone" as the default: position hold on the Education
+  Suite's drones, none on the racing quads. The flight layer is on a drone only while an assist or the autopilot is.
+- **D32. Failures and weather are set by name and value**, the same words in an activity file, on the teacher's screen
+  and in the attempt record.
+- **D33. A photo and a payload drop are events of the flight**, with their place: exercises are scored from them.
+
+**Not done of ED2.**
+- **Thermal view and a winch.** The plan lists both; the scenarios that need them are in ED6.
+- **Time of day.** Only the lighting presets a location already has; nothing new.
+- **The gimbal in the replay.** The recording does not hold the camera's tilt, so the replay's on-board view looks
+  straight ahead.
+- **Keys only.** Gimbal, photo, light and release are on the keyboard; a gamepad or radio has no control for them yet.
+- **Fog in a built program.** Seen in the editor only; Unity can leave fog out of a build when no scene uses it.
+- **By hand.** Everything here was flown by the autopilot or set from code. Nobody has flown the new drones with
+  sticks, pressed G, L or B, or judged how the camera drone feels.
+- **Drone balls** belong to soccer (ED8).
+

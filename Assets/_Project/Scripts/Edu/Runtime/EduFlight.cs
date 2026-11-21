@@ -43,6 +43,8 @@ namespace Ushqyr.Edu
         private double _clock;
         private float _tunedMass, _tunedThrust;
         private bool _ownsWind;
+        private float _baroFault;
+        private Ushqyr.Cameras.VtxSignal _video;
 
         /// <summary>The weather right now (on the way to the last one asked for).</summary>
         public WeatherSettings Weather => Flight.Weather.Blend(_from, _to, _blend);
@@ -52,6 +54,49 @@ namespace Ushqyr.Edu
         public bool PositionOk => _estimator == null || _estimator.PositionOk;
         /// <summary>Battery left, 0..1, after any injected drop.</summary>
         public float Battery { get; private set; } = 1f;
+
+        /// <summary>
+        /// Failures set by name (EDU_PLAN F4), by an activity's timeline or by the teacher. They add to the separate
+        /// fields above (<see cref="MotorLoss"/>, <see cref="Faults"/>, <see cref="RadioOk"/>, <see cref="BatteryDrop"/>).
+        /// </summary>
+        public FailureSet Failures;
+
+        /// <summary>
+        /// Sets one failure by its name (see <see cref="FailureSet.Names"/>); 0 mends it. The change is written into
+        /// the flight's recording. False for a name that is not known.
+        /// </summary>
+        public bool SetFailure(string name, float value)
+        {
+            if (!Failures.Set(name, value)) return false;
+            if (name == "baro_drift" && value == 0f) _baroFault = 0f;
+            EduRecorder recorder = GetComponent<EduRecorder>();
+            if (recorder != null)
+                recorder.Event("failure", name + "=" + Failures.Get(name).ToString("0.###", System.Globalization.CultureInfo.InvariantCulture));
+            ApplyEquipmentFailures();
+            return true;
+        }
+
+        /// <summary>Mends everything set through <see cref="SetFailure"/>.</summary>
+        public void ClearFailures()
+        {
+            if (Failures.Healthy) return;
+            Failures = default;
+            _baroFault = 0f;
+            EduRecorder recorder = GetComponent<EduRecorder>();
+            if (recorder != null) recorder.Event("failure", "none");
+            ApplyEquipmentFailures();
+        }
+
+        /// <summary>The failures that live in other parts of the drone: the gimbal, the payload release, the picture.</summary>
+        private void ApplyEquipmentFailures()
+        {
+            EduGimbal gimbal = GetComponent<EduGimbal>();
+            if (gimbal != null) gimbal.Stuck = Failures.GimbalStuck;
+            EduPayload payload = GetComponent<EduPayload>();
+            if (payload != null) payload.Jammed = Failures.PayloadJam;
+            if (_video == null) _video = FindAnyObjectByType<Ushqyr.Cameras.VtxSignal>();
+            if (_video != null) _video.Fault = Failures.VideoLost ? 1f : Failures.VideoNoise;
+        }
 
         /// <summary>Names of the values <see cref="ModeCode"/> gives, in order (keys of the language table).</summary>
         public static readonly string[] ModeNames = { "Acro", "Angle", "Horizon", "Altitude hold", "Position hold", "Autopilot" };
@@ -74,6 +119,11 @@ namespace Ushqyr.Edu
             _to = weather;
             _blend = atOnce ? 1f : 0f;
             _ownsWind = true;
+            // Every change of weather is written into the flight's recording (F4).
+            EduRecorder recorder = GetComponent<EduRecorder>();
+            if (recorder != null)
+                recorder.Event("weather", string.Format(System.Globalization.CultureInfo.InvariantCulture, "wind={0:0.#};from={1:0};gusts={2:0.##};rain={3:0.##};visibility={4:0};temperature={5:0.#}",
+                    weather.Wind, weather.WindFromDeg, weather.Gusts, weather.Rain, weather.Visibility, weather.TemperatureC));
         }
 
         private void OnEnable()
@@ -106,8 +156,17 @@ namespace Ushqyr.Edu
             WeatherSettings weather = Weather;
             Vec3 wind = Flight.Weather.WindAt(weather, Seed, _clock);
             // Until it is given weather of its own it leaves the scene's wind alone (the Strike Range has one).
-            if (_ownsWind) vehicle.SetWind(new Vector3(wind.x, wind.y, wind.z));
-            vehicle.SetMotorLoss(MotorLoss);
+            if (_ownsWind)
+            {
+                vehicle.SetWind(new Vector3(wind.x, wind.y, wind.z));
+                EduWeatherVisuals.Ensure().Show(weather, wind);
+            }
+            Motor4 lost = Failures.MotorLossAt(_clock);
+            vehicle.SetMotorLoss(new Motor4
+            {
+                M0 = Mathf.Max(MotorLoss.M0, lost.M0), M1 = Mathf.Max(MotorLoss.M1, lost.M1),
+                M2 = Mathf.Max(MotorLoss.M2, lost.M2), M3 = Mathf.Max(MotorLoss.M3, lost.M3),
+            });
 
             Vector3 p = transform.position;
             if (Physics.Raycast(p + Vector3.up * 0.05f, Vector3.down, out RaycastHit hit, 1000f, ~0, QueryTriggerInteraction.Ignore))
@@ -120,7 +179,15 @@ namespace Ushqyr.Edu
                 _estimatorSeed = Seed;
             }
             ref readonly QuadState truth = ref vehicle.State;
-            QuadState believed = _estimator.Estimate(truth, _groundY, Faults, dt);
+            PositionFaults faults = Faults;
+            faults.Lost |= Failures.GpsLost;
+            faults.Degraded = Mathf.Max(faults.Degraded, Failures.GpsDegraded);
+            faults.HeadingOffsetDeg += Failures.CompassOffsetDeg;
+            QuadState believed = _estimator.Estimate(truth, _groundY, faults, dt);
+            // A barometer that runs away: the drone believes it is higher and higher, and so sinks.
+            _baroFault += Failures.BaroDriftRate * dt;
+            if (_baroFault != 0f) believed.Position = new Vec3(believed.Position.x, believed.Position.y + _baroFault, believed.Position.z);
+            bool radioOk = RadioOk && !Failures.RadioLost;
 
             ref readonly QuadProfile profile = ref vehicle.Profile;
             // The assist's limits follow the drone that is flown (and its load): a delivery drone is not a racer.
@@ -132,26 +199,27 @@ namespace Ushqyr.Edu
             }
             float capacity = profile.Battery.CapacityMah;
             float left = capacity > 0f ? 1f - truth.BatteryUsedMah / capacity : 1f;
-            Battery = Mathf.Clamp01(left - Mathf.Clamp01(BatteryDrop));
+            Battery = Mathf.Clamp01(left - Mathf.Clamp01(Mathf.Max(BatteryDrop, Failures.BatteryDrop)));
             var sensors = new AutopilotSensors
             {
                 GroundY = _groundY,
                 Battery = capacity > 0f ? Battery : -1f,
-                RadioOk = RadioOk,
+                RadioOk = radioOk,
                 PositionOk = _estimator.PositionOk,
             };
             PilotInput sticks = pilot;
             if (!PilotPresent) sticks = new PilotInput { Arm = ArmRequested, Throttle = 0.5f, Mode = FlightMode.Angle };
             else if (ArmRequested) sticks.Arm = true;
             if (Autopilot.Landed && ArmRequested && !truth.Armed) ArmRequested = false; // it landed by itself: the request is spent
-            if (!RadioOk && Autopilot.Mode == GuidedMode.Manual)
+            if (!radioOk && Autopilot.Mode == GuidedMode.Manual)
             {
                 // No radio: the last thing the pilot did no longer reaches the drone. It holds level until the failsafe acts.
                 sticks.Pitch = sticks.Roll = sticks.Yaw = 0f;
                 sticks.Throttle = 0.5f;
             }
-            AssistMode assist = !RadioOk && PilotAssist == AssistMode.Off ? AssistMode.AltitudeHold : PilotAssist;
-            return Autopilot.Update(believed, sticks, assist, sensors, profile, vehicle.Environment, dt);
+            AssistMode assist = !radioOk && PilotAssist == AssistMode.Off ? AssistMode.AltitudeHold : PilotAssist;
+            PilotInput flown = Autopilot.Update(believed, sticks, assist, sensors, profile, vehicle.Environment, dt);
+            return Failures.WithImuError(flown, profile);
         }
     }
 }

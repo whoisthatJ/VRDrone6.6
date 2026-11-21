@@ -163,6 +163,107 @@ namespace Ushqyr.Tests
             Assert.IsFalse(float.IsNaN(AssistTuning.For(default).MaxSpeed));
         }
 
+        // ---------- failures (EDU_PLAN F4) ----------
+
+        [Test]
+        public void Failures_AreSetAndReadByName()
+        {
+            var f = new FailureSet();
+            Assert.IsTrue(f.Healthy);
+            foreach (string name in FailureSet.Names)
+            {
+                Assert.IsTrue(f.Set(name, 0.5f), name);
+                Assert.AreNotEqual(0f, f.Get(name), name);
+            }
+            Assert.IsFalse(f.Healthy);
+            Assert.IsFalse(f.Set("wings_fall_off", 1f), "an unknown name is refused");
+            Assert.IsTrue(float.IsNaN(f.Get("wings_fall_off")));
+            Assert.IsFalse(f.Set("motor0", float.NaN));
+
+            Assert.IsTrue(f.Set("motor2", 7f));
+            Assert.AreEqual(1f, f.Get("motor2"), "a share stays between 0 and 1");
+            Assert.IsTrue(f.Set("compass", -400f));
+            Assert.AreEqual(-180f, f.Get("compass"));
+            Assert.IsTrue(f.GpsLost && f.RadioLost && f.PayloadJam && f.GimbalStuck);
+            foreach (string name in FailureSet.Names) f.Set(name, 0f);
+            Assert.IsTrue(f.Healthy, "0 mends every failure");
+        }
+
+        [Test]
+        public void DamagedPropeller_LosesThrustAndShakes_AHealthyOneDoesNot()
+        {
+            var f = new FailureSet();
+            f.Set("prop1", 1f);
+            float low = 1f, high = 0f;
+            for (int i = 0; i < 2000; i++)
+            {
+                Motor4 loss = f.MotorLossAt(i * 0.001);
+                Assert.AreEqual(0f, loss.M0, "the other motors are untouched");
+                low = MathF.Min(low, loss.M1);
+                high = MathF.Max(high, loss.M1);
+            }
+            Assert.That(low, Is.InRange(0.1f, 0.2f));
+            Assert.That(high, Is.InRange(0.5f, 0.6f));
+            f.Set("motor1", 0.9f);
+            Assert.AreEqual(1f, f.MotorLossAt(0.03).M1, 0.2f, "never more than all of it");
+        }
+
+        [Test]
+        public void ADamagedPropeller_CanStillBeFlownAndLanded_OnTheCameraDrone()
+        {
+            var w = new World(EduDrones.Camera900);
+            var f = new FailureSet();
+            w.Ap.Takeoff(w.S, 4f, 0f);
+            w.Run(8);
+            f.Set("prop3", 0.6f);
+            Vec3 at = w.S.Position;
+            float drift = 0f, lean = 0f;
+            // The loss is applied the way the flight layer applies it: on the motors, every control step.
+            w.Run(15, x =>
+            {
+                x.S.MotorLoss = f.MotorLossAt(x.T);
+                drift = MathF.Max(drift, Flat(x.S.Position, at));
+                lean = MathF.Max(lean, MathF.Abs(RollDeg(x.S)));
+            });
+            Assert.Less(drift, 1.5f, "it shakes but stays near its place in position hold");
+            Assert.Greater(lean, 0.2f, "the damage is felt");
+            w.Ap.Land();
+            w.Run(15, x => x.S.MotorLoss = f.MotorLossAt(x.T));
+            Assert.IsTrue(w.Ap.Landed, "and can be landed");
+        }
+
+        [Test]
+        public void AWrongAttitudeSensor_MakesAltitudeHoldDrift_AndPositionHoldCopes()
+        {
+            var f = new FailureSet();
+            f.Set("imu_roll", 4f);
+            QuadProfile p = EduDrones.Camera900;
+
+            // Acro does not level itself: nothing changes.
+            var acro = new PilotInput { Roll = 0.1f, Mode = FlightMode.Acro };
+            Assert.AreEqual(0.1f, f.WithImuError(acro, p).Roll);
+            var angle = new PilotInput { Roll = 0f, Mode = FlightMode.Angle };
+            Assert.AreEqual(4f / p.AngleMode.MaxAngleDeg, f.WithImuError(angle, p).Roll, 1e-5f);
+
+            float Drift(AssistMode mode)
+            {
+                var w = new World(p);
+                w.Ap.Takeoff(w.S, 4f, 0f);
+                w.Run(8);
+                w.Ap.Manual();
+                Vec3 at = w.S.Position;
+                PilotInput input = default;
+                for (int i = 0; i < 12000; i++)
+                {
+                    if (i % 4 == 0) input = f.WithImuError(w.Ap.Update(w.S, w.Sticks, mode, w.Sens, w.P, w.Env, 0.004f), p);
+                    QuadSimulator.Step(ref w.S, input, w.P, w.Env, 0.001f);
+                }
+                return Flat(w.S.Position, at);
+            }
+            Assert.Greater(Drift(AssistMode.AltitudeHold), 3f, "with nothing watching its position the drone slides away");
+            Assert.Less(Drift(AssistMode.Position), 1f, "position hold leans against the error");
+        }
+
         [Test]
         public void EveryClass_StaysInTheAirLongEnoughForALesson()
         {
