@@ -228,6 +228,7 @@ namespace Ushqyr.Edu
             ["landing_distance"] = LandingDistance,
             ["touchdown_speed"] = TouchdownSpeed,
             ["smoothness"] = Smoothness,
+            ["height_in_band"] = HeightInBand,
             ["radius_error"] = RadiusError,
             ["aim_error"] = AimError,
             ["event_count"] = EventCount,
@@ -263,6 +264,7 @@ namespace Ushqyr.Edu
                 case "aim_error":
                     return "{0}°";
                 case "battery_left":
+                case "height_in_band":
                 case "speed_in_band":
                     return "{0}%";
                 default:
@@ -404,6 +406,25 @@ namespace Ushqyr.Edu
                 n++;
             }
             return n > 0 ? Math.Sqrt(sum / n) : double.NaN;
+        }
+
+        /// <summary>
+        /// The share (percent) of the time in the air with the height between "low" and "high". With "zmin" and "zmax"
+        /// only the part of the flight between those two lines across the course is looked at (the run-in and the
+        /// landing are left out).
+        /// </summary>
+        private static double HeightInBand(Dictionary<string, object> p, FlightRecording f)
+        {
+            double ground = Ground(p), low = Json.Num(p, "low", 0), high = Json.Num(p, "high", double.PositiveInfinity);
+            double zmin = Json.Num(p, "zmin", double.NegativeInfinity), zmax = Json.Num(p, "zmax", double.PositiveInfinity);
+            int n = 0, inside = 0;
+            foreach (FlightSample s in f.Samples)
+            {
+                if (!InWindow(s, p, f) || !InAir(s, ground) || s.Z < zmin || s.Z > zmax) continue;
+                n++;
+                if (s.Y >= low && s.Y <= high) inside++;
+            }
+            return n > 0 ? 100.0 * inside / n : double.NaN;
         }
 
         /// <summary>

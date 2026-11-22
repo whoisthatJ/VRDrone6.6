@@ -31,6 +31,11 @@ namespace Ushqyr.Edu
         public bool ArmRequested;
         /// <summary>False when nobody holds the sticks (a programming task): then only <see cref="ArmRequested"/> arms the drone.</summary>
         public bool PilotPresent = true;
+        /// <summary>
+        /// The flight controller's mode the pilot flies in whatever their switch says (an exercise that teaches acro is
+        /// flown in acro); null leaves the switch in charge.
+        /// </summary>
+        public FlightMode? ForcedMode;
         /// <summary>A battery fault: this share of the charge is gone (0 = none).</summary>
         public float BatteryDrop;
 
@@ -208,6 +213,7 @@ namespace Ushqyr.Edu
                 PositionOk = _estimator.PositionOk,
             };
             PilotInput sticks = pilot;
+            if (ForcedMode.HasValue) sticks.Mode = ForcedMode.Value;
             if (!PilotPresent) sticks = new PilotInput { Arm = ArmRequested, Throttle = 0.5f, Mode = FlightMode.Angle };
             else if (ArmRequested) sticks.Arm = true;
             if (Autopilot.Landed && ArmRequested && !truth.Armed) ArmRequested = false; // it landed by itself: the request is spent

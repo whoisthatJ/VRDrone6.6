@@ -65,6 +65,7 @@ Items marked ❓ are my defaults; the customer should confirm them (§13). Each 
 | D36 | **"Steps done" is required and earns nothing below half of the steps** | A flight that did not do the exercise must not pass on its side marks (found by test: a hover passed the pirouette) |
 | D37 | **Reference flights are made by flying the exercise's own recipe** through the autopilot or the sticks | A reference of 90 or more for every exercise, re-made whenever the exercise changes |
 | D38 | **A failure or a change of weather can follow a step of a guided exercise** instead of the clock | The pilot sets the pace; the emergency comes when the drone is where the drill needs it |
+| D39 | **FPV exercises: the autopilot flies the reference along the same course; the exercise holds the flight mode on the pilot** | The autopilot cannot fly acro, and the rubric measures gates, height, path and time, which are the same either way |
 | D21 | **Names are compared and sorted in code, not in SQL.** SQLite folds case for Latin letters only and orders by character code, which made "7Б" and "7б" two groups and put every Kazakh letter after the Russian alphabet | Found by the store tests |
 
 ## 3. Shared foundations
@@ -761,4 +762,31 @@ drill needs either a reference flown by a person or a way to record one; block B
 teaches the same handling meanwhile.
 
 **Eighteen of thirty exercises exist.** Blocks D and E (FPV: gates, flags, acro) are not started.
+
+### 22 November 2026, night: four exercises of block D, and two faults found by flying them
+**Block D so far (19 to 22):** three gates in a line, an oval round two flags, a slalom, and low flight through four
+low gates. They are flown from the drone's own camera on the 5" freestyle quad with no assist, in the flight mode the
+exercise fixes (Angle, Horizon for the low flight). New for them: a step for flying through a gate (through the
+opening, the right way), the share of time inside a height band, and a flight mode the exercise holds whatever the
+pilot's switch says. References: 95.6 to 100. 467 tests pass.
+
+**Two faults, both found because a reference flight scored badly.**
+- **A waypoint was counted without being reached.** A zone, height or heading step with no holding time was accepted
+  at once, wherever the drone was. The oval's reference hovered on the spot and was credited with two laps. Fixed,
+  with a test; every earlier reference was graded again with the fixed tracker and still scores 90 or more.
+- **The scene could take an exercise's assist away.** When a radio finishes being detected, or a setting changes, the
+  scene applies the pilot's own "flight assist" setting again. In an exercise that switched the flight layer off (the
+  first two block D references never left the ground) and could have replaced an exercise's assist with the pilot's.
+  While an exercise runs, assist and flight mode are now the exercise's, and the free-flight keys G and L do nothing.
+
+- **D39. Reference flights of the FPV exercises are flown by the autopilot along the same course;** the flight mode is
+  held on the pilot by the exercise, not checked in the score. The autopilot cannot fly acro, and what the rubric
+  measures (gates, height, path, time) is the same either way.
+
+**Twenty-two of thirty exercises exist.** Left: 23 acro hover, 24 acro circuit, 25 racing line, 26 split-S, 27 power
+loop, 28 roll and flip, 29 proximity gaps, 30 check ride. Of these 26 to 28 are manoeuvres the autopilot cannot fly,
+so their reference flights need scripted stick work (or a person): not started.
+
+**Also during this session** the Unity editor closed and reopened once while a reference was being flown (a shell on
+this PC ran out of resources at the same moment). Nothing was lost; the flight was flown again.
 

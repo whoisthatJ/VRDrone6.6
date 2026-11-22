@@ -1,0 +1,290 @@
+{
+  "format": 1,
+  "id": "d21-slalom",
+  "type": "exercise",
+  "title": "Slalom",
+  "briefing": "Six flags in a line. Weave through them: the first on its right, the next on its left, and so on, then land on the far pad. Start each turn early; the drone keeps sliding after you level it.",
+  "pass": 60,
+  "time_limit": 180,
+  "setup": {
+    "place": "field",
+    "drone": "freestyle5",
+    "assist": "off",
+    "view": "fpv",
+    "mode": "angle",
+    "objects": [
+      {
+        "type": "pad",
+        "id": "home",
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "size": 1.5
+      },
+      {
+        "type": "pad",
+        "id": "finish",
+        "x": 0,
+        "y": 0,
+        "z": 46,
+        "size": 3
+      },
+      {
+        "type": "flag",
+        "id": "f1",
+        "x": 0,
+        "y": 0,
+        "z": 8,
+        "size": 1,
+        "height": 3
+      },
+      {
+        "type": "flag",
+        "id": "f2",
+        "x": 0,
+        "y": 0,
+        "z": 14,
+        "size": 1,
+        "height": 3
+      },
+      {
+        "type": "flag",
+        "id": "f3",
+        "x": 0,
+        "y": 0,
+        "z": 20,
+        "size": 1,
+        "height": 3
+      },
+      {
+        "type": "flag",
+        "id": "f4",
+        "x": 0,
+        "y": 0,
+        "z": 26,
+        "size": 1,
+        "height": 3
+      },
+      {
+        "type": "flag",
+        "id": "f5",
+        "x": 0,
+        "y": 0,
+        "z": 32,
+        "size": 1,
+        "height": 3
+      },
+      {
+        "type": "flag",
+        "id": "f6",
+        "x": 0,
+        "y": 0,
+        "z": 38,
+        "size": 1,
+        "height": 3
+      }
+    ]
+  },
+  "rubric": [
+    {
+      "id": "steps",
+      "metric": "steps_done",
+      "label": "Steps done",
+      "tip": "Do the steps in the order shown at the top of the screen; each one counts only when the one before it is done.",
+      "weight": 55,
+      "best": 7,
+      "worst": 3,
+      "required": true,
+      "params": {
+        "steps": [
+          {
+            "say": "Pass flag 1 on its right",
+            "zone": {
+              "x": 2,
+              "y": 2,
+              "z": 8,
+              "radius": 1.6,
+              "tolerance": 1.0
+            }
+          },
+          {
+            "say": "Pass flag 2 on its left",
+            "zone": {
+              "x": -2,
+              "y": 2,
+              "z": 14,
+              "radius": 1.6,
+              "tolerance": 1.0
+            }
+          },
+          {
+            "say": "Pass flag 3 on its right",
+            "zone": {
+              "x": 2,
+              "y": 2,
+              "z": 20,
+              "radius": 1.6,
+              "tolerance": 1.0
+            }
+          },
+          {
+            "say": "Pass flag 4 on its left",
+            "zone": {
+              "x": -2,
+              "y": 2,
+              "z": 26,
+              "radius": 1.6,
+              "tolerance": 1.0
+            }
+          },
+          {
+            "say": "Pass flag 5 on its right",
+            "zone": {
+              "x": 2,
+              "y": 2,
+              "z": 32,
+              "radius": 1.6,
+              "tolerance": 1.0
+            }
+          },
+          {
+            "say": "Pass flag 6 on its left",
+            "zone": {
+              "x": -2,
+              "y": 2,
+              "z": 38,
+              "radius": 1.6,
+              "tolerance": 1.0
+            }
+          },
+          {
+            "say": "Land on the far pad and switch the motors off",
+            "landed": true,
+            "pad": {
+              "x": 0,
+              "z": 46,
+              "radius": 1.5
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "time",
+      "metric": "duration",
+      "label": "Time taken",
+      "tip": "You have the moves; now do them without long pauses.",
+      "weight": 20,
+      "best": 50,
+      "worst": 130
+    },
+    {
+      "id": "band",
+      "metric": "height_in_band",
+      "label": "Time at the right height",
+      "tip": "The throttle holds the height: tiny moves, and look far ahead, not at the ground under you.",
+      "weight": 10,
+      "best": 97,
+      "worst": 60,
+      "params": {
+        "low": 1.2,
+        "high": 2.8,
+        "zmin": 4,
+        "zmax": 42
+      }
+    },
+    {
+      "id": "landing",
+      "metric": "landing_distance",
+      "label": "Landing on the pad",
+      "tip": "Stop above the pad first, then come straight down.",
+      "weight": 15,
+      "best": 0.25,
+      "worst": 2.0,
+      "required": true,
+      "params": {
+        "x": 0,
+        "z": 46
+      }
+    }
+  ],
+  "reference": [
+    {
+      "takeoff": 2,
+      "wait": 4
+    },
+    {
+      "goto": [
+        2,
+        2,
+        8
+      ],
+      "face": true,
+      "speed": 3,
+      "until_step": 1
+    },
+    {
+      "goto": [
+        -2,
+        2,
+        14
+      ],
+      "face": true,
+      "speed": 3,
+      "until_step": 2
+    },
+    {
+      "goto": [
+        2,
+        2,
+        20
+      ],
+      "face": true,
+      "speed": 3,
+      "until_step": 3
+    },
+    {
+      "goto": [
+        -2,
+        2,
+        26
+      ],
+      "face": true,
+      "speed": 3,
+      "until_step": 4
+    },
+    {
+      "goto": [
+        2,
+        2,
+        32
+      ],
+      "face": true,
+      "speed": 3,
+      "until_step": 5
+    },
+    {
+      "goto": [
+        -2,
+        2,
+        38
+      ],
+      "face": true,
+      "speed": 3,
+      "until_step": 6
+    },
+    {
+      "goto": [
+        0,
+        2,
+        46
+      ],
+      "heading": 0,
+      "wait": 7
+    },
+    {
+      "land": true,
+      "until_landed": true
+    }
+  ]
+}

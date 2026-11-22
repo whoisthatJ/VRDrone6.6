@@ -593,6 +593,119 @@ EXERCISES.append({
 })
 
 
+# ================================================================ Block D: FPV basics
+# Flown from the drone's own camera on a 5" quad, with no position or altitude hold: the pilot holds the height with
+# the throttle. The flight controller's mode is fixed by the exercise.
+FPV = {'place': 'field', 'drone': 'freestyle5', 'assist': 'off', 'view': 'fpv'}
+
+
+def gate(id, x, y, z, width=2.5, height=2, heading=0):
+    return {'type': 'gate', 'id': id, 'x': x, 'y': y, 'z': z, 'size': width, 'height': height, 'heading': heading}
+
+
+def through(x, y, z, width=2.5, height=2, heading=0):
+    return {'x': x, 'y': y, 'z': z, 'width': width, 'height': height, 'heading': heading}
+
+
+def band_line(weight, low, high, zmin, zmax, best=97, worst=60):
+    return {'id': 'band', 'metric': 'height_in_band', 'label': t('Time at the right height', 'Дұрыс биіктіктегі уақыт', 'Время на нужной высоте'),
+            'tip': t('The throttle holds the height: tiny moves, and look far ahead, not at the ground under you.', 'Биіктікті газ ұстайды: аз-аздан қозғап, астыңыздағы жерге емес, алысқа қараңыз.',
+                     'Высоту держит газ: совсем малые движения, и смотрите далеко вперёд, а не под себя.'),
+            'weight': weight, 'best': best, 'worst': worst, 'params': {'low': low, 'high': high, 'zmin': zmin, 'zmax': zmax}}
+
+
+def far_pad(z):
+    return {'type': 'pad', 'id': 'finish', 'x': 0, 'y': 0, 'z': z, 'size': 3}
+
+
+def land_far(z):
+    return {'say': t('Land on the far pad and switch the motors off', 'Алыс алаңшаға қонып, қозғалтқыштарды өшіріңіз', 'Сядьте на дальнюю площадку и выключите моторы'),
+            'landed': True, 'pad': {'x': 0, 'z': z, 'radius': 1.5}}
+
+
+# ---------------------------------------------------------------- D19
+zs = [12, 22, 32]
+steps = [{'say': t('Take off and hover in the box for 3 seconds', 'Ұшып көтеріліп, қорапта 3 секунд қалықтаңыз', 'Взлетите и зависните в кубе на 3 секунды'), 'zone': zone(0, 2, 4, 1.2), 'for': 3}]
+steps += [{'say': t('Fly through gate %d' % (i + 1), '%d-қақпа арқылы ұшып өтіңіз' % (i + 1), 'Пролетите через ворота %d' % (i + 1)), 'gate': through(0, 1, z)} for i, z in enumerate(zs)]
+steps.append(land_far(40))
+EXERCISES.append({
+    'format': 1, 'id': 'd19-three-gates', 'type': 'exercise',
+    'title': t('Hover, then three gates in a line', 'Қалықтау, содан кейін бір қатардағы үш қақпа', 'Висение, затем трое ворот по прямой'),
+    'briefing': t('Your first flight through the drone\'s own camera. The drone levels itself, but nothing holds its height or its place: that is your job now. Hover in the box, then fly straight through the three gates and land on the far pad.',
+                  'Дронның өз камерасы арқылы алғашқы ұшуыңыз. Дрон өзін түзулейді, бірақ биіктігі мен орнын ештеңе ұстамайды: енді бұл сіздің жұмысыңыз. Қорапта қалықтап, үш қақпа арқылы тура ұшып өтіп, алыс алаңшаға қоныңыз.',
+                  'Ваш первый полёт через камеру самого дрона. Дрон выравнивается сам, но высоту и место уже ничто не держит: теперь это ваша работа. Зависните в кубе, затем пролетите прямо через трое ворот и сядьте на дальнюю площадку.'),
+    'pass': 60, 'time_limit': 180,
+    'setup': dict(FPV, mode='angle', objects=[PAD, box('hover', 0, 2, 4, 2.4, 1.2), far_pad(40)] + [gate('g%d' % (i + 1), 0, 1, z) for i, z in enumerate(zs)]),
+    'rubric': [steps_line(steps, 55), band_line(15, 1.2, 2.8, 8, 34), path_line(15, [[0, 2, 0], [0, 2, 40]], 0.5, 2.0), dict(landing_line(15, 0, 40), worst=2.0)],
+    'reference': [{'takeoff': 2, 'wait': 4}, {'goto': [0, 2, 4], 'heading': 0, 'until_step': 1}, {'goto': [0, 2, 36], 'heading': 0, 'speed': 4, 'until_step': 4},
+                  {'goto': [0, 2, 40], 'heading': 0, 'wait': 5}, {'land': True, 'until_landed': True}],
+})
+
+# ---------------------------------------------------------------- D20
+oval = [(0, 4), (5, 10), (5, 30), (0, 36), (-5, 30), (-5, 10)]
+steps, ref = [], [{'takeoff': 2, 'wait': 4}]
+for lap in range(2):
+    for i in range(6):
+        x, z = oval[(i + 1) % 6]
+        steps.append({'say': t('Lap %d: follow the oval round the two flags' % (lap + 1), '%d-айналым: екі жалауды айнала сопақша бойымен ұшыңыз' % (lap + 1), 'Круг %d: летите по овалу вокруг двух флагов' % (lap + 1)),
+                      'zone': zone(x, 2, z, 2.5, 1.0)})
+        ref.append({'goto': [x, 2, z], 'face': True, 'speed': 4, 'until_step': len(steps)})
+steps.append(LAND_HOME)
+ref += [{'goto': [0, 2, 0], 'heading': 0, 'wait': 7}, {'land': True, 'until_landed': True}]
+loop = [[x, 2, z] for x, z in oval] + [[0, 2, 4]]
+EXERCISES.append({
+    'format': 1, 'id': 'd20-oval', 'type': 'exercise',
+    'title': t('Oval round two flags', 'Екі жалауды айнала сопақша', 'Овал вокруг двух флагов'),
+    'briefing': t('Fly two laps of an oval round the two flags, at one height. Turn the way an aeroplane does: lean into the turn and turn the nose at the same time, so the camera always looks where you are going.',
+                  'Екі жалауды айнала бір биіктікте сопақша бойымен екі айналым ұшыңыз. Ұшақ сияқты бұрылыңыз: бұрылысқа қарай еңкейіп, бір мезгілде тұмсықты бұрыңыз, сонда камера әрдайым ұшу бағытына қарайды.',
+                  'Пролетите два круга по овалу вокруг двух флагов на одной высоте. Поворачивайте как самолёт: наклоняйтесь в поворот и одновременно доворачивайте нос, чтобы камера всегда смотрела по ходу движения.'),
+    'pass': 60, 'time_limit': 240,
+    'setup': dict(FPV, mode='angle', objects=[PAD, {'type': 'flag', 'id': 'near', 'x': 0, 'y': 0, 'z': 10, 'size': 1, 'height': 3}, {'type': 'flag', 'id': 'far', 'x': 0, 'y': 0, 'z': 30, 'size': 1, 'height': 3}]),
+    'rubric': [steps_line(steps, 50), band_line(20, 1.4, 2.6, 3, 100), path_line(15, loop + loop[1:], 0.7, 3.0), landing_line(15)],
+    'reference': ref,
+})
+
+# ---------------------------------------------------------------- D21
+flags = [8, 14, 20, 26, 32, 38]
+steps, ref = [], [{'takeoff': 2, 'wait': 4}]
+for i, z in enumerate(flags):
+    side = 2 if i % 2 == 0 else -2
+    steps.append({'say': t('Pass flag %d on its right' % (i + 1), '%d-жалаудың оң жағынан өтіңіз' % (i + 1), 'Обойдите флаг %d справа' % (i + 1)) if side > 0 else
+                         t('Pass flag %d on its left' % (i + 1), '%d-жалаудың сол жағынан өтіңіз' % (i + 1), 'Обойдите флаг %d слева' % (i + 1)),
+                  'zone': zone(side, 2, z, 1.6, 1.0)})
+    ref.append({'goto': [side, 2, z], 'face': True, 'speed': 3, 'until_step': len(steps)})
+steps.append(land_far(46))
+ref += [{'goto': [0, 2, 46], 'heading': 0, 'wait': 7}, {'land': True, 'until_landed': True}]
+EXERCISES.append({
+    'format': 1, 'id': 'd21-slalom', 'type': 'exercise',
+    'title': t('Slalom', 'Слалом', 'Слалом'),
+    'briefing': t('Six flags in a line. Weave through them: the first on its right, the next on its left, and so on, then land on the far pad. Start each turn early; the drone keeps sliding after you level it.',
+                  'Бір қатарда алты жалау тұр. Олардың арасымен ирелеңдеп өтіңіз: біріншісінің оң жағынан, келесісінің сол жағынан, осылай жалғастырып, алыс алаңшаға қоныңыз. Әр бұрылысты ертерек бастаңыз; дрон түзулегеннен кейін де сырғи береді.',
+                  'Шесть флагов в ряд. Пройдите между ними змейкой: первый справа, следующий слева и так далее, затем сядьте на дальнюю площадку. Начинайте каждый поворот заранее: дрон продолжает скользить и после выравнивания.'),
+    'pass': 60, 'time_limit': 180,
+    'setup': dict(FPV, mode='angle', objects=[PAD, far_pad(46)] + [{'type': 'flag', 'id': 'f%d' % (i + 1), 'x': 0, 'y': 0, 'z': z, 'size': 1, 'height': 3} for i, z in enumerate(flags)]),
+    'rubric': [steps_line(steps, 55), time_line(20, 50, 130), band_line(10, 1.2, 2.8, 4, 42), dict(landing_line(15, 0, 46), worst=2.0)],
+    'reference': ref,
+})
+
+# ---------------------------------------------------------------- D22
+lows = [10, 20, 30, 40]
+steps = [{'say': t('Stay low: through gate %d' % (i + 1), 'Төмен ұшыңыз: %d-қақпа арқылы' % (i + 1), 'Держитесь низко: через ворота %d' % (i + 1)), 'gate': through(0, 0.4, z, 3, 1.2)} for i, z in enumerate(lows)]
+steps.append(land_far(48))
+EXERCISES.append({
+    'format': 1, 'id': 'd22-low-flight', 'type': 'exercise',
+    'title': t('Low flight', 'Төмен биіктікте ұшу', 'Полёт на малой высоте'),
+    'briefing': t('Fly the whole course between half a metre and a metre and a half above the ground, through four low gates. The ground comes up fast in this view: hold the height with small moves of the throttle and do not chase it.',
+                  'Бүкіл жолды жерден жарты метр мен бір жарым метр аралығында, төрт аласа қақпа арқылы ұшыңыз. Бұл көріністе жер тез жақындайды: биіктікті газды аз-аздан қозғап ұстаңыз, оны қуаламаңыз.',
+                  'Пролетите весь маршрут на высоте от полуметра до полутора метров, через четверо низких ворот. В этом виде земля приближается быстро: держите высоту малыми движениями газа и не гонитесь за ней.'),
+    'pass': 60, 'time_limit': 180,
+    'setup': dict(FPV, mode='horizon', objects=[PAD, far_pad(48)] + [gate('g%d' % (i + 1), 0, 0.4, z, 3, 1.2) for i, z in enumerate(lows)]),
+    'rubric': [steps_line(steps, 50), band_line(30, 0.5, 1.5, 6, 44, 95, 50), dict(landing_line(10, 0, 48), worst=2.0), time_line(10, 45, 110)],
+    'reference': [{'takeoff': 1, 'wait': 4}, {'goto': [0, 1, 44], 'heading': 0, 'speed': 3, 'until_step': 4}, {'goto': [0, 1, 48], 'heading': 0, 'wait': 5},
+                  {'land': True, 'until_landed': True}],
+})
+
+
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
     for e in EXERCISES:

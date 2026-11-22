@@ -10,7 +10,7 @@ namespace Ushqyr.Edu
 
         /// <summary>What the pilot is told (a key of the language table).</summary>
         public string Say = "";
-        /// <summary>"stick", "zone", "height", "turn", "heading", "circle", "photo" or "landed".</summary>
+        /// <summary>"stick", "zone", "height", "turn", "heading", "circle", "gate", "photo" or "landed".</summary>
         public string Kind = "";
         public string Stick = "";
         /// <summary>Stick: the value to go above (or below, when <see cref="Below"/>).</summary>
@@ -27,6 +27,11 @@ namespace Ushqyr.Edu
         public double Degrees;
         /// <summary>Circle: only flying at a distance between these from the point counts (m).</summary>
         public double Near, Far = 1000;
+        /// <summary>
+        /// Gate: an opening <see cref="Width"/> wide and <see cref="Height"/> tall whose bottom middle is at (X, Y, Z);
+        /// it is flown through along <see cref="Degrees"/> (a heading). Flying through it backwards does not count.
+        /// </summary>
+        public double Width = 2, Height = 2;
         /// <summary>Landed: true when the landing must be inside the circle (X, Z, Radius).</summary>
         public bool OnPad;
         /// <summary>
@@ -72,7 +77,8 @@ namespace Ushqyr.Edu
         private readonly List<StepSpec> _steps;
         private double _held, _turned;
         private float _lastHeading;
-        private bool _hasHeading, _wasAway;
+        private bool _hasHeading, _wasAway, _hasBefore;
+        private FlightSample _before;
 
         public StepTracker(List<StepSpec> steps)
         {
@@ -113,7 +119,8 @@ namespace Ushqyr.Edu
                         inside = dx * dx + dz * dz <= step.Radius * step.Radius;
                     }
                     _held = inside ? _held + dt : 0;
-                    met = _held >= step.For;
+                    // Being there is what counts; with no holding time asked for, one moment inside is enough.
+                    met = inside && _held >= step.For;
                     Progress = step.For > 0 ? (float)Math.Min(1.0, _held / step.For) : inside ? 1f : 0f;
                     break;
                 }
@@ -121,7 +128,7 @@ namespace Ushqyr.Edu
                 {
                     double off = Math.Abs(((s.Heading - step.Degrees) % 360 + 540) % 360 - 180);
                     _held = off <= step.Tolerance ? _held + dt : 0;
-                    met = _held >= step.For;
+                    met = off <= step.Tolerance && _held >= step.For;
                     Progress = step.For > 0 ? (float)Math.Min(1.0, _held / step.For) : off <= step.Tolerance ? 1f : 0f;
                     break;
                 }
@@ -137,6 +144,27 @@ namespace Ushqyr.Edu
                     double share = step.Degrees != 0 ? _turned / step.Degrees : 1;
                     met = share >= 1;
                     Progress = (float)Math.Max(0.0, Math.Min(1.0, share));
+                    break;
+                }
+                case "gate":
+                {
+                    // The plane of the gate, crossed from behind it to in front of it, inside the opening.
+                    const double rad = Math.PI / 180.0;
+                    double fx = Math.Sin(step.Degrees * rad), fz = Math.Cos(step.Degrees * rad);
+                    double along = (s.X - step.X) * fx + (s.Z - step.Z) * fz;
+                    met = false;
+                    if (_hasBefore)
+                    {
+                        double alongBefore = (_before.X - step.X) * fx + (_before.Z - step.Z) * fz;
+                        if (alongBefore < 0 && along >= 0)
+                        {
+                            double k = alongBefore / (alongBefore - along);
+                            double x = _before.X + (s.X - _before.X) * k, y = _before.Y + (s.Y - _before.Y) * k, z = _before.Z + (s.Z - _before.Z) * k;
+                            double across = (x - step.X) * fz - (z - step.Z) * fx;
+                            met = Math.Abs(across) <= step.Width * 0.5 && y >= step.Y && y <= step.Y + step.Height;
+                        }
+                    }
+                    Progress = 0f;
                     break;
                 }
                 case "circle":
@@ -166,6 +194,8 @@ namespace Ushqyr.Edu
                     met = false;
                     break;
             }
+            _before = s;
+            _hasBefore = true;
             if (!met) return;
             Done++;
             _held = _turned = 0;
@@ -262,6 +292,15 @@ namespace Ushqyr.Edu
                     step.Degrees = Json.Num(o, "heading", 0);
                     step.Tolerance = Json.Num(o, "tolerance", 15);
                 }
+                else if (o.ContainsKey("gate"))
+                {
+                    Dictionary<string, object> g = Json.Obj(o, "gate") ?? throw new FormatException(where + ": \"gate\" must be an object {x, y, z, heading, width, height}");
+                    step.Kind = "gate";
+                    step.X = Json.Num(g, "x", 0); step.Y = Json.Num(g, "y", 0); step.Z = Json.Num(g, "z", 0);
+                    step.Degrees = Json.Num(g, "heading", 0);
+                    step.Width = Json.Num(g, "width", 2); step.Height = Json.Num(g, "height", 2);
+                    if (step.Width <= 0 || step.Height <= 0) throw new FormatException(where + ": a gate's width and height must be above 0");
+                }
                 else if (o.ContainsKey("photo"))
                 {
                     Dictionary<string, object> t = Json.Obj(o, "photo") ?? throw new FormatException(where + ": \"photo\" must be an object {x, y, z, heading, tilt, cone, aim, near, far}");
@@ -294,7 +333,7 @@ namespace Ushqyr.Edu
                         if (step.Radius <= 0) throw new FormatException(where + ": a pad's radius must be above 0");
                     }
                 }
-                else throw new FormatException(where + ": a step needs one of \"stick\", \"zone\", \"height\", \"turn\", \"heading\", \"circle\", \"photo\" or \"landed\"");
+                else throw new FormatException(where + ": a step needs one of \"stick\", \"zone\", \"height\", \"turn\", \"heading\", \"circle\", \"gate\", \"photo\" or \"landed\"");
                 steps.Add(step);
             }
             return steps;

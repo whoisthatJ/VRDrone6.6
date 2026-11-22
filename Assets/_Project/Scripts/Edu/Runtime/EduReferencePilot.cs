@@ -97,6 +97,8 @@ namespace Ushqyr.Edu
                     flight.PilotPresent = false;
                     flight.ArmRequested = true;
                     if (c.ContainsKey("heading")) heading = frame.HeadingDeg + (float)Json.Num(c, "heading", 0);
+                    // "face": the nose follows the way the drone is going (a coordinated turn), until a heading is given again.
+                    if (Json.Flag(c, "face")) heading = float.NaN;
                     if (c.ContainsKey("takeoff"))
                     {
                         float height = (float)Json.Num(c, "takeoff", 2);

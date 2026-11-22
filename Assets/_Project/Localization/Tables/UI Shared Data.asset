@@ -3517,6 +3517,114 @@ MonoBehaviour:
     m_Key: 'With a weak motor the drone sinks faster: add throttle earlier than usual.'
     m_Metadata:
       m_Items: []
+  - m_Id: 6782631453392896
+    m_Key: Take off and hover in the box for 3 seconds
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6782631549861888
+    m_Key: Fly through gate 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6782631549861889
+    m_Key: Fly through gate 2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6782631549861890
+    m_Key: Fly through gate 3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6782631549861891
+    m_Key: Land on the far pad and switch the motors off
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6782631549861892
+    m_Key: Hover, then three gates in a line
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6782631549861893
+    m_Key: 'Your first flight through the drone''s own camera. The drone levels itself, but nothing holds its height or its place: that is your job now. Hover in the box, then fly straight through the three gates and land on the far pad.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6782631549861894
+    m_Key: Time at the right height
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6782631549861895
+    m_Key: 'The throttle holds the height: tiny moves, and look far ahead, not at the ground under you.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6782631549861896
+    m_Key: 'Lap 1: follow the oval round the two flags'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6782631549861897
+    m_Key: 'Lap 2: follow the oval round the two flags'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6782631549861898
+    m_Key: Oval round two flags
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6782631549861899
+    m_Key: 'Fly two laps of an oval round the two flags, at one height. Turn the way an aeroplane does: lean into the turn and turn the nose at the same time, so the camera always looks where you are going.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6782631549861900
+    m_Key: Pass flag 1 on its right
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6782631549861901
+    m_Key: Pass flag 2 on its left
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6782631549861902
+    m_Key: Pass flag 3 on its right
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6782631549861903
+    m_Key: Pass flag 4 on its left
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6782631549861904
+    m_Key: Pass flag 5 on its right
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6782631549861905
+    m_Key: Pass flag 6 on its left
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6782631549861906
+    m_Key: Slalom
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6782631549861907
+    m_Key: 'Six flags in a line. Weave through them: the first on its right, the next on its left, and so on, then land on the far pad. Start each turn early; the drone keeps sliding after you level it.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6782631549861908
+    m_Key: 'Stay low: through gate 1'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6782631549861909
+    m_Key: 'Stay low: through gate 2'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6782631549861910
+    m_Key: 'Stay low: through gate 3'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6782631549861911
+    m_Key: 'Stay low: through gate 4'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6782631549861912
+    m_Key: Low flight
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6782631549861913
+    m_Key: 'Fly the whole course between half a metre and a metre and a half above the ground, through four low gates. The ground comes up fast in this view: hold the height with small moves of the throttle and do not chase it.'
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

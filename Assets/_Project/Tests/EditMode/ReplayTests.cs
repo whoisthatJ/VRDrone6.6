@@ -143,6 +143,28 @@ namespace Ushqyr.Tests
         }
 
         [Test]
+        public void AZoneWithNoHoldingTime_StillHasToBeEntered()
+        {
+            // Found by a reference flight that hovered on the spot and was credited with a whole lap of waypoints.
+            List<StepSpec> lap = Steps("[{\"say\":\"a\",\"zone\":{\"x\":5,\"y\":2,\"z\":10,\"radius\":2}},{\"say\":\"b\",\"zone\":{\"x\":0,\"y\":2,\"z\":20,\"radius\":2}},"
+                + "{\"say\":\"c\",\"heading\":90,\"tolerance\":10},{\"say\":\"d\",\"height\":8}]");
+            var t = new StepTracker(lap);
+            var s = new FlightSample { Y = 2f, Qw = 1f, Armed = true };
+            for (int i = 0; i < 500; i++) t.Feed(s, 0.01);
+            Assert.AreEqual(0, t.Done, "hovering at the start is none of the waypoints");
+            s.X = 5f; s.Z = 10f; t.Feed(s, 0.01);
+            Assert.AreEqual(1, t.Done, "one moment inside is enough when no time is asked for");
+            s.X = 0f; s.Z = 20f; t.Feed(s, 0.01);
+            Assert.AreEqual(2, t.Done);
+            t.Feed(s, 0.01);
+            Assert.AreEqual(2, t.Done, "facing north is not facing east");
+            Face(ref s, 92f); t.Feed(s, 0.01);
+            Assert.AreEqual(3, t.Done);
+            t.Feed(s, 0.01);
+            Assert.AreEqual(3, t.Done, "2 m is not 8 m");
+        }
+
+        [Test]
         public void StickSteps_NeedTheStickToBeMovedThere()
         {
             List<StepSpec> steps = Steps("[{\"say\":\"a\",\"stick\":\"throttle\",\"above\":0.8},{\"say\":\"b\",\"stick\":\"throttle\",\"below\":0.2},"
@@ -228,6 +250,46 @@ namespace Ushqyr.Tests
             Assert.AreEqual(1, setup.Timeline[1].AfterStep);
             Assert.AreEqual(0, setup.Timeline[1].T, "no delay given: at once");
             Assert.AreEqual(3, setup.Timeline[2].T);
+        }
+
+        [Test]
+        public void GateStep_IsFlownThroughTheOpening_TheRightWay()
+        {
+            // An opening 2 m wide and 2 m tall, its bottom 1 m up, at z = 10, flown northwards (+Z).
+            List<StepSpec> gate = Steps("[{\"say\":\"g\",\"gate\":{\"x\":0,\"y\":1,\"z\":10,\"heading\":0,\"width\":2,\"height\":2}}]");
+            Assert.AreEqual(1, StepTracker.CountDone(gate, Line(10f, 2f)), "straight through the middle at 2 m");
+            Assert.AreEqual(0, StepTracker.CountDone(gate, Line(10f, 2f, x: 1.5f)), "past the post");
+            Assert.AreEqual(0, StepTracker.CountDone(gate, Line(4f, 2f)), "stopped short of it");
+
+            FlightRecording back = Line(10f, 2f);
+            for (int i = 0; i < back.Samples.Count; i++)
+            {
+                FlightSample s = back.Samples[i];
+                s.Z = 20f - s.Z; // the same line flown southwards
+                back.Samples[i] = s;
+            }
+            Assert.AreEqual(0, StepTracker.CountDone(gate, back), "through the opening, but backwards");
+
+            FlightRecording over = Line(10f, 2f);
+            for (int i = 0; i < over.Samples.Count; i++)
+            {
+                FlightSample s = over.Samples[i];
+                s.Y = 3.5f;
+                over.Samples[i] = s;
+            }
+            Assert.AreEqual(0, StepTracker.CountDone(gate, over), "over the top bar");
+
+            // Height band: 2 m is inside 1.5 to 2.5 all the way; only the stretch between the two lines is looked at.
+            var p = new Dictionary<string, object> { ["low"] = 1.5, ["high"] = 2.5, ["zmin"] = 5.0, ["zmax"] = 15.0 };
+            Assert.AreEqual(0.0, Metrics.Measure("height_in_band", p, over), 1e-6);
+            for (int i = 0; i < over.Samples.Count; i++)
+            {
+                FlightSample s = over.Samples[i];
+                if (s.Z >= 5f && s.Z < 10f) s.Y = 2f; // half of the stretch at the right height
+                s.Armed = true;
+                over.Samples[i] = s;
+            }
+            Assert.AreEqual(50.0, Metrics.Measure("height_in_band", p, over), 1.0);
         }
 
         [Test]

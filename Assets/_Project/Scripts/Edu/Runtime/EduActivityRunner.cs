@@ -110,15 +110,28 @@ namespace Ushqyr.Edu
             _start.SetPositionAndRotation(at + Vector3.up * above, Quaternion.Euler(0f, heading, 0f));
             _vehicle.SpawnPoint = _start;
 
-            _free = EduFreeFlight.Attach(_vehicle, 0, true);
-            if (setup.Assist.Length > 0)
-                _free.Set(setup.Assist == "position" ? AssistMode.Position : setup.Assist == "altitude" ? AssistMode.AltitudeHold : AssistMode.Off, false);
+            ApplyFlightSetup();
             _recorder = _vehicle.GetComponent<EduRecorder>();
             _objects = EduActivityObjects.Build(setup.Objects, _frame, transform, _vehicle.Collision.TrackGeometry, _made);
             _canvas = EduUi.Canvas("Activity Screen", 600);
             _canvas.transform.SetParent(transform, false);
             L.Changed += Redraw;
             ShowBriefing();
+        }
+
+        /// <summary>
+        /// Puts the activity's assist and flight mode on the drone. Called at the start, and again whenever the scene
+        /// has re-applied the pilot's settings (a radio plugged in, a setting changed), which must not undo them.
+        /// </summary>
+        public void ApplyFlightSetup()
+        {
+            ActivitySetup setup = Activity.Setup;
+            _free = EduFreeFlight.Attach(_vehicle, 0, true);
+            if (setup.Assist.Length > 0)
+                _free.Set(setup.Assist == "position" ? AssistMode.Position : setup.Assist == "altitude" ? AssistMode.AltitudeHold : AssistMode.Off, false);
+            // The mode the exercise is flown in, whatever the pilot's switch says.
+            if (setup.Mode.Length > 0)
+                Flight().ForcedMode = setup.Mode == "acro" ? FlightMode.Acro : setup.Mode == "horizon" ? FlightMode.Horizon : FlightMode.Angle;
         }
 
         private void OnDestroy()
@@ -130,7 +143,11 @@ namespace Ushqyr.Edu
                 _vehicle.Crashed -= OnCrashed;
                 _vehicle.HoldAtSpawn = false;
                 if (_oldSpawn != null) _vehicle.SpawnPoint = _oldSpawn;
-                if (_flight != null) _flight.ClearFailures();
+                if (_flight != null)
+                {
+                    _flight.ClearFailures();
+                    _flight.ForcedMode = null;
+                }
             }
             if (Current == this) Current = null;
         }

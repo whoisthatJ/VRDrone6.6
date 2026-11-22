@@ -111,6 +111,7 @@ namespace Ushqyr.Edu
     {
         public static readonly string[] Assists = { "off", "altitude", "position" };
         public static readonly string[] Views = { "fpv", "chase", "los" };
+        public static readonly string[] Modes = { "acro", "angle", "horizon" };
         public static readonly string[] WeatherNames = { "wind", "wind_from", "gusts", "rain", "visibility", "temperature" };
 
         /// <summary>The place by the name of its environment in the track catalogue ("field", "hangar" …); empty = wherever the pilot is.</summary>
@@ -119,6 +120,11 @@ namespace Ushqyr.Edu
         public string Drone = "";
         public string Assist = "";
         public string View = "";
+        /// <summary>
+        /// The flight controller's mode the pilot must fly in ("acro", "angle", "horizon"); empty = whatever the
+        /// pilot's own switch says. An exercise that teaches acro is flown in acro.
+        /// </summary>
+        public string Mode = "";
         /// <summary>The start point relative to the place's own start, and the way the drone faces.</summary>
         public double StartX, StartZ, StartHeadingDeg;
         public readonly List<ActivityObject> Objects = new List<ActivityObject>();
@@ -144,6 +150,8 @@ namespace Ushqyr.Edu
             s.Assist = Json.Str(setup, "assist", "");
             s.View = Json.Str(setup, "view", "");
             s.OnTheGround = Json.Flag(setup, "on_the_ground");
+            s.Mode = Json.Str(setup, "mode", "");
+            if (s.Mode.Length > 0 && Array.IndexOf(Modes, s.Mode) < 0) throw new FormatException(where + ": \"mode\" must be one of " + string.Join(", ", Modes));
             if (s.Assist.Length > 0 && Array.IndexOf(Assists, s.Assist) < 0) throw new FormatException(where + ": \"assist\" must be one of " + string.Join(", ", Assists));
             if (s.View.Length > 0 && Array.IndexOf(Views, s.View) < 0) throw new FormatException(where + ": \"view\" must be one of " + string.Join(", ", Views));
             Dictionary<string, object> start = Json.Obj(setup, "start");

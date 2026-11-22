@@ -449,7 +449,9 @@ namespace Ushqyr.Game
                     : edu && _eduModel != null && _eduModel.Lens != null ? quadVisual.InverseTransformPoint(_eduModel.Lens.position)
                     : entry.CameraOffset;
             // Flight assist for the person at the sticks, the recording of the last flight and its replay.
-            Ushqyr.Edu.EduFreeFlight.Attach(vehicle, s.Input.FlightAssist, edu);
+            // While an activity runs, the assist and the flight mode are the activity's, not the pilot's setting.
+            if (_activity == null) Ushqyr.Edu.EduFreeFlight.Attach(vehicle, s.Input.FlightAssist, edu);
+            else if (Ushqyr.Edu.EduActivityRunner.Current != null) Ushqyr.Edu.EduActivityRunner.Current.ApplyFlightSetup();
             // Equipment of the drone classes: a stabilised camera on the camera drones, a box on the delivery drone.
             bool gimbal = edu && _eduModel != null && _eduModel.Gimbal != null && fpvCamera != null;
             if (gimbal) Ushqyr.Edu.EduGimbal.Attach(vehicle, fpvCamera, _eduModel.Gimbal);

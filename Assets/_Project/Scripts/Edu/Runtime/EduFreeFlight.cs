@@ -65,7 +65,8 @@ namespace Ushqyr.Edu
             if (mode == AssistMode.Off)
             {
                 // Leave an autopilot that is flying (a mission, a return) alone.
-                if (_flight != null && _flight.Autopilot.Mode == GuidedMode.Manual && !_flight.ArmRequested) _flight.enabled = false;
+                // …and one that holds an exercise's flight mode.
+                if (_flight != null && _flight.Autopilot.Mode == GuidedMode.Manual && !_flight.ArmRequested && !_flight.ForcedMode.HasValue) _flight.enabled = false;
                 else if (_flight != null) _flight.PilotAssist = AssistMode.Off;
             }
             else
@@ -107,6 +108,8 @@ namespace Ushqyr.Edu
             }
             Keyboard kb = Keyboard.current;
             if (kb == null || EduReplayViewer.Current != null) return;
+            // In an exercise the assist is part of the exercise: the keys of free flight do nothing.
+            if (EduActivityRunner.Current != null) return;
             if (kb.gKey.wasPressedThisFrame)
                 Set(Assist == AssistMode.Off ? AssistMode.AltitudeHold : Assist == AssistMode.AltitudeHold ? AssistMode.Position : AssistMode.Off, true);
             if (kb.lKey.wasPressedThisFrame) WatchLastFlight();
