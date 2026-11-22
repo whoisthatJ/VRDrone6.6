@@ -78,6 +78,11 @@ namespace Ushqyr.Core
         public bool BotCollisions = true;
         /// <summary>The track showdown before a race.</summary>
         public bool TrackIntro = true;
+        /// <summary>
+        /// The start of FAI drone racing (F9U.6.2): "arm" call, one tone after 2 to 4 seconds, no countdown, and the
+        /// model is not held: leaving the start before the tone and going through the first gate is a false start.
+        /// </summary>
+        public bool FaiStart = false;
     }
 
     /// <summary>P5 Strike Range lobby choices.</summary>

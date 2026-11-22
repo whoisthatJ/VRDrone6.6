@@ -24,7 +24,7 @@ namespace Ushqyr.UI
         [SerializeField] private float lapFlashSeconds = 2f;
         [SerializeField] private float goSeconds = 1f;
 
-        private enum CentreMode { None, ArmToStart, Countdown, Go, Hold, MissedGate, Lap, Finish, Boundary, FreeFlight, RimTouched }
+        private enum CentreMode { None, ArmToStart, Countdown, Go, Hold, MissedGate, Lap, Finish, Boundary, FreeFlight, RimTouched, ArmCall, FalseStart }
 
         private CentreMode _centreMode = (CentreMode)(-1);
         private int _shownCount = -1;
@@ -111,9 +111,16 @@ namespace Ushqyr.UI
             switch (session.Phase)
             {
                 case RacePhase.Idle:
-                    SetCentre(CentreMode.ArmToStart, L.T("ARM TO START"));
+                    if (now < session.FalseStartUntil) SetCentre(CentreMode.FalseStart, L.T("<color=#ff4a3d>FALSE START - DISQUALIFIED</color>"));
+                    else SetCentre(CentreMode.ArmToStart, L.T("ARM TO START"));
                     break;
                 case RacePhase.Countdown:
+                    // FAI start: the arm call, and no countdown; the tone comes when it comes.
+                    if (session.FaiStart)
+                    {
+                        SetCentre(CentreMode.ArmCall, L.T("PILOTS, ARM YOUR QUADS"));
+                        break;
+                    }
                     int n = Mathf.CeilToInt(session.CountdownRemaining);
                     if (_centreMode != CentreMode.Countdown || n != _shownCount)
                     {

@@ -156,12 +156,32 @@ namespace Ushqyr.Race
         /// </summary>
         public bool ExternalStart { get; set; }
 
+        /// <summary>
+        /// The start of FAI drone racing (F9U.6.2) instead of 3-2-1: after the "arm" call the tone comes at a moment
+        /// nobody can foresee, 2 to 4 seconds later, and the model is free on its start position meanwhile.
+        /// </summary>
+        public bool FaiStart { get; set; }
+        /// <summary>The model was not on its start position when the tone sounded (the first half of a false start).</summary>
+        public bool LeftStartEarly { get; private set; }
+        /// <summary>Left the start before the tone and went through the first gate: disqualified from the race (F9U.6.2).</summary>
+        public bool FalseStart { get; private set; }
+        /// <summary>Until when the HUD says "false start".</summary>
+        public double FalseStartUntil { get; private set; }
+        /// <summary>How far from its start position a model may be and still count as standing on it, metres.</summary>
+        public const float StartPositionRadius = 0.35f;
+        /// <summary>The tone: the time of the start signal on the <see cref="Now"/> clock.</summary>
+        public event Action<double> StartSignal;
+        /// <summary>Any gate flown through the right way, in turn or not, with its sub-frame time: for a timing that keeps its own rules.</summary>
+        public event Action<int, double> GateCrossed;
+        /// <summary>A false start happened (online, the race goes on for the others; alone, the race is set up again).</summary>
+        public event Action FalseStarted;
+
         /// <summary>Starts the countdown so that GO is at <paramref name="goTime"/> (<see cref="Now"/> clock).</summary>
         public void ScheduleStart(double goTime)
         {
             Restart();
             _countdownEnd = goTime;
-            vehicle.HoldAtSpawn = true;
+            vehicle.HoldAtSpawn = !FaiStart;
             SetPhase(RacePhase.Countdown);
         }
 
@@ -273,8 +293,9 @@ namespace Ushqyr.Race
                 case RacePhase.Idle:
                     if (!ExternalStart && armed && !vehicle.IsCrashed)
                     {
-                        _countdownEnd = now + countdownSeconds;
-                        vehicle.HoldAtSpawn = true;
+                        // FAI: the tone comes 2 to 4 seconds after the arm call, and the model is not held.
+                        _countdownEnd = now + (FaiStart ? UnityEngine.Random.Range(2f, 4f) : countdownSeconds);
+                        vehicle.HoldAtSpawn = !FaiStart;
                         SetPhase(RacePhase.Countdown);
                     }
                     break;
@@ -288,6 +309,10 @@ namespace Ushqyr.Race
                     else if (now >= _countdownEnd)
                     {
                         vehicle.HoldAtSpawn = false;
+                        var at = vehicle.State.Position;
+                        LeftStartEarly = FaiStart && startPad != null && Vector3.Distance(new Vector3(at.x, at.y, at.z), startPad.position) > StartPositionRadius;
+                        FalseStart = false;
+                        StartSignal?.Invoke(_countdownEnd);
                         _timer.Start(_countdownEnd);
                         if (ghosts != null) ghosts.BeginLap(_countdownEnd);
                         _hasPrev = false;
@@ -343,13 +368,28 @@ namespace Ushqyr.Race
             int next = _timer.NextCheckpoint;
             if (gates[next].TryCross(_prevPos, cur, out float f))
             {
-                OnPass(next, _prevTime + f * (now - _prevTime));
+                double at = _prevTime + f * (now - _prevTime);
+                GateCrossed?.Invoke(next, at);
+                // A false start: not on the start position at the tone, and now through the first gate.
+                if (FaiStart && LeftStartEarly && !FalseStart && _timer.LastCheckpoint < 0 && next == 0)
+                {
+                    FalseStart = true;
+                    FalseStartUntil = now + 4.0;
+                    FalseStarted?.Invoke();
+                    if (!ExternalStart)
+                    {
+                        Restart();
+                        return;
+                    }
+                }
+                OnPass(next, at);
                 return;
             }
 
             for (int i = 0; i < gates.Length; i++)
             {
-                if (i == next || !gates[i].TryCross(_prevPos, cur, out _)) continue;
+                if (i == next || !gates[i].TryCross(_prevPos, cur, out float fw)) continue;
+                GateCrossed?.Invoke(i, _prevTime + fw * (now - _prevTime));
                 WrongGateUntil = now + wrongGateHintSeconds;
                 GatePassed?.Invoke(i, PassResult.WrongGate);
                 return;

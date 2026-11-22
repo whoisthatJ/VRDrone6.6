@@ -108,3 +108,7 @@ Controller connected	Контроллер қосылды	Контроллер п
 Controller changed	Контроллер ауыстырылды	Контроллер сменился
 {0} s	{0} с	{0} с
 This build has no internet features; LAN races work.	Бұл жинақта интернет мүмкіндіктері жоқ; жергілікті желідегі жарыстар жұмыс істейді.	В этой сборке нет интернет-функций; гонки по локальной сети работают.
+PILOTS, ARM YOUR QUADS	ҰШҚЫШТАР, ҚОЗҒАЛТҚЫШТАРДЫ ҚОСЫҢЫЗДАР	ПИЛОТЫ, ВКЛЮЧИТЕ МОТОРЫ
+<color=#ff4a3d>FALSE START - DISQUALIFIED</color>	<color=#ff4a3d>ФАЛЬСТАРТ - ШЕТТЕТІЛДІ</color>	<color=#ff4a3d>ФАЛЬСТАРТ - ДИСКВАЛИФИКАЦИЯ</color>
+Countdown 3-2-1	Кері санақ 3-2-1	Обратный отсчёт 3-2-1
+FAI: one tone after 2-4 s	FAI: 2-4 с кейін бір дыбыс	FAI: один сигнал через 2-4 с

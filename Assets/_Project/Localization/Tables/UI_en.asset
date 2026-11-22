@@ -4756,6 +4756,22 @@ MonoBehaviour:
     m_Localized: 'Penalty: {0} s'
     m_Metadata:
       m_Items: []
+  - m_Id: 6954426592657408
+    m_Localized: PILOTS, ARM YOUR QUADS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6954426647183360
+    m_Localized: <color=#ff4a3d>FALSE START - DISQUALIFIED</color>
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6954426647183361
+    m_Localized: Countdown 3-2-1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6954426647183362
+    m_Localized: 'FAI: one tone after 2-4 s'
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

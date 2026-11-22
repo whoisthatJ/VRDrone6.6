@@ -1035,3 +1035,20 @@ lap timer), nor to the LAN, nor to any screen. 497 tests pass.
 1, 8 and 9), as the FAI note says for a missing place; the three sheets were written from the console.
 **Not yet:** results come from typing, not from a race flown over the LAN; a time typed by hand is the sum of the
 laps (the holeshot of an elimination race is not asked for). 498 tests pass.
+
+### 22 November 2026, night, the FAI start in the game's own race
+
+- **Settings, Race, "Start":** "Countdown 3-2-1" (as before, and still the default) or "FAI: one tone after 2-4 s".
+  With the FAI start the screen says "PILOTS, ARM YOUR QUADS" and shows no numbers; the tone comes 2 to 4 seconds
+  after arming; the quad is **not held** on the pad meanwhile.
+- **False start:** a quad that is more than 0.35 m from its start position when the tone sounds, and then goes
+  through the first gate, is disqualified: alone, the race is set up again and the screen says so; in a race started
+  from outside (LAN) the race goes on and the event is raised for the host.
+- The race session now reports every gate flown through the right way, in turn or not, with its sub-frame time, so
+  the FAI timing can be fed from the game.
+
+**Checked in the editor, flown by the race autopilot on the field track:** the tone came 3.86 s, 3.43 s, 2.65 s and
+2.37 s after arming in four starts; with a normal start no false start was called and the gates were reported; with
+the throttle opened during the arm call the quad was off its position at the tone, and the false start was called
+when it went through the first gate. **Not yet:** the FAI timing is not shown on the HUD (the old lap timer still
+is); races over the LAN do not use any of this yet. 498 tests pass.

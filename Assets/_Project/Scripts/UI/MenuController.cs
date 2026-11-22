@@ -557,8 +557,9 @@ namespace Ushqyr.UI
                 Mathf.Clamp(race.BotLevel, 0, 5), i => { race.BotLevel = i; Changed(); }, ContentWidth);
             UiKit.StepperRow(c, L.T("Midair collisions"), -180f, OffOn, race.BotCollisions ? 1 : 0, i => { race.BotCollisions = i == 1; Changed(); }, ContentWidth);
             UiKit.StepperRow(c, L.T("Track intro"), -270f, OffOn, race.TrackIntro ? 1 : 0, i => { race.TrackIntro = i == 1; Changed(); }, ContentWidth);
+            UiKit.StepperRow(c, L.T("Start"), -360f, new[] { L.T("Countdown 3-2-1"), L.T("FAI: one tone after 2-4 s") }, race.FaiStart ? 1 : 0, i => { race.FaiStart = i == 1; Changed(); }, ContentWidth);
             UiKit.Label(c, L.T("Bots fly the same quad class and physics as you. Adaptive bots follow your recent lap times. With collisions off they are ghosts."),
-                new Vector2(0f, -360f), new Vector2(ContentWidth, 60f), 26f, TextAlignmentOptions.TopLeft, UiKit.DimTextColor);
+                new Vector2(0f, -450f), new Vector2(ContentWidth, 60f), 26f, TextAlignmentOptions.TopLeft, UiKit.DimTextColor);
         }
 
         private void BuildPhysics(RectTransform c)

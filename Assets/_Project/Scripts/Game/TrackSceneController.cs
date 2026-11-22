@@ -363,6 +363,7 @@ namespace Ushqyr.Game
         {
             s = ForActivity(s);
             ApplyQuad(s);
+            if (race != null) race.FaiStart = s.Race.FaiStart;
 
             if (fpvCamera != null)
             {
