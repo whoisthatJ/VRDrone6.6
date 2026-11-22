@@ -4528,6 +4528,94 @@ MonoBehaviour:
     m_Localized: not in the task
     m_Metadata:
       m_Items: []
+  - m_Id: 6950312030765056
+    m_Localized: Classification
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6950312089485312
+    m_Localized: Qualification
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6950312089485313
+    m_Localized: Races
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6950312089485314
+    m_Localized: Place
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6950312089485315
+    m_Localized: Time
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6950312089485316
+    m_Localized: Best lap
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6950312089485317
+    m_Localized: Note
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6950312089485318
+    m_Localized: Result
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6950312089485319
+    m_Localized: disqualified
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6950312089485320
+    m_Localized: did not fly
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6950312089485321
+    m_Localized: penalty {0} s
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6950312089485322
+    m_Localized: disqualified from the event
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6950312089485323
+    m_Localized: Qualifying round {0}, race {1}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6950312089485324
+    m_Localized: Round {0}, race {1}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6950312089485325
+    m_Localized: Elimination race {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6950312089485326
+    m_Localized: Semi-final {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6950312089485327
+    m_Localized: Small final
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6950312089485328
+    m_Localized: Final
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6950312089485329
+    m_Localized: Final, race {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6950312089485330
+    m_Localized: Best three laps
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6950312089485331
+    m_Localized: Average of the three best laps
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6950312089485332
+    m_Localized: Bracket
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

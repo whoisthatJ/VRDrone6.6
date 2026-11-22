@@ -996,3 +996,23 @@ elimination bracket has exactly the pilots the annex names, and the final classi
 order place by place. The plan's own test at the level of the engine: 16 pilots from qualification to the final,
 with a disqualification that changes who goes on and a final flown again. **Not yet:** timing from the gates, the
 FAI start, the screens, the LAN, the result sheets. 489 tests pass.
+
+### 22 November 2026, night, later: race timing and the result sheets
+
+- **Timing** (`RaceTiming.cs`, no engine code, 7 tests): from gate passes alone it gives the holeshot, lap times, a
+  split at every gate, the best lap, the best three laps in a row, the time for the race, live positions and the gap
+  to the leader, to a thousandth of a second. Elimination and final races are timed from the start signal,
+  qualification from the timing gate. It ends at three minutes of flight, and can disqualify for an extra lap.
+- **Result sheets** (`RaceReports.cs`): the classification, the qualification ranking and every race with its lap
+  times as XLSX; every race as CSV; a PDF with the classification and the bracket, one box a race, a column a round.
+  Three languages; checked by eye in Russian with Kazakh names.
+
+- **D57. A missed gate, as the simulator reads F9U.7.2:** a gate passed out of turn does not count; the pilot may go
+  back through the missed gate, and then the lap counts with the time the detour took. Crossing the line with a gate
+  still missing voids the lap. The race clock runs on, so a void lap costs all its time, and "three laps in a row"
+  does not span a void lap. The FAI text says only that the lap "will not be validated"; the rest is ours.
+- **D58. A false start is two things together,** as in F9U.6.2: the model left its start position before the signal,
+  and it went through the first gate. A model that dropped back to the ground before the signal is not disqualified.
+
+**Not yet:** these are not joined to the game's own race (its countdown is still 3-2-1, its gates still feed the old
+lap timer), nor to the LAN, nor to any screen. 497 tests pass.

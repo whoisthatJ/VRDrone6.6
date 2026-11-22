@@ -249,6 +249,79 @@ namespace Ushqyr.Tests
         }
 
         [Test]
+        public void ResultSheets_AreWrittenInEveryLanguage()
+        {
+            var names = new List<string> { "Әлия Нұрланқызы", "Болат Сейітов", "=Хакер;x", "Gülnar", "Дәурен", "Ерлан", "Жанна", "Зере", "Илья" };
+            Tournament t = Tournament.Create("Күзгі кубок 2026", names, new TournamentSettings { Seed = 2 });
+            for (int guard = 0; guard < 100 && t.Next != null; guard++)
+            {
+                RaceHeat next = t.Next;
+                var results = new List<RaceEntry>();
+                for (int i = 0; i < next.Pilots.Count; i++)
+                {
+                    double lap = 20 + names.IndexOf(next.Pilots[i]) * 0.37;
+                    results.Add(next.Id == "S1" && i == 0 ? new RaceEntry { Pilot = next.Pilots[i], Disqualified = true } : Flew(next.Pilots[i], lap + 0.4, lap, lap + 61.5));
+                }
+                t.Record(next.Id, results);
+            }
+            Assert.IsTrue(t.Finished);
+            t.Exclude("Илья");
+
+            Assert.AreEqual("9.120", RaceReports.Clock(9.12));
+            Assert.AreEqual("1:02.345", RaceReports.Clock(62.345));
+            Assert.AreEqual("3:00.000", RaceReports.Clock(179.9996));
+            Assert.AreEqual("", RaceReports.Clock(double.NaN));
+
+            var sheet = new Dictionary<string, string[]>();
+            foreach (string path in System.IO.Directory.GetFiles(System.IO.Path.Combine(UnityEngine.Application.dataPath, "_Project/Localization/Text"), "*.tsv"))
+                foreach (string line in System.IO.File.ReadAllLines(path))
+                {
+                    string[] cells = line.Split('\t');
+                    if (cells.Length == 3 && !line.StartsWith("#")) sheet[cells[0]] = cells;
+                }
+            foreach (string key in RaceReports.Texts) Assert.IsTrue(sheet.ContainsKey(key), "not in the language sheets: " + key);
+            byte[] font = System.IO.File.ReadAllBytes(System.IO.Path.Combine(UnityEngine.Application.streamingAssetsPath, "Edu/LiberationSans-Regular.ttf"));
+            for (int language = 0; language < 3; language++)
+            {
+                int column = language;
+                Func<string, string> text = key => sheet[key][column];
+                Assert.AreEqual(sheet["Semi-final {0}"][column].Replace("{0}", "2"), RaceReports.HeatName(t.Heat("S2"), text));
+                Assert.AreEqual(sheet["Final"][column], RaceReports.HeatName(t.Heat("F"), text));
+                StringAssert.Contains("3", RaceReports.HeatName(t.Heat("Q3-1"), text));
+
+                var xlsx = new System.IO.MemoryStream();
+                RaceReports.Workbook(t, text, "№ 12 мектеп", new DateTime(2026, 11, 22)).Save(xlsx);
+                Assert.Greater(xlsx.Length, 2500);
+
+                string csv = RaceReports.Csv(t, text);
+                string[] lines = csv.Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+                int races = 0;
+                foreach (RaceHeat h in t.Heats) races += h.Done ? h.Results.Count : 0;
+                Assert.AreEqual(1 + races, lines.Length, "a heading and a line for every pilot of every race");
+                StringAssert.Contains("\"'=Хакер;x\"", csv, "a name that looks like a formula is given as text");
+                StringAssert.Contains(text("disqualified"), csv);
+                StringAssert.Contains("1:", csv, "a lap of over a minute is written as minutes and seconds");
+
+                PdfWriter pdf = RaceReports.Pdf(t, font, text, "№ 12 мектеп", new DateTime(2026, 11, 22));
+                Assert.AreEqual(2, pdf.PageCount, "the classification, and the bracket");
+                string every = "";
+                foreach (string key in RaceReports.Texts) every += text(key);
+                Assert.AreEqual("", pdf.Missing(every + string.Join("", names) + "…№"));
+                var bytes = new System.IO.MemoryStream();
+                pdf.Save(bytes);
+                Assert.Greater(bytes.Length, 20000);
+            }
+            // The qualification figure: the average of the three best laps (option 2), or the best time for the laps (option 1).
+            Assert.AreEqual((20.0 + 20.0 + 20.0) / 3.0, RaceReports.QualificationFigure(t, names[0]), 1e-9);
+
+            // A points event has no bracket: one page.
+            Tournament small = Tournament.Create("x", Names(5), new TournamentSettings { Format = "points", PointsRounds = 2 });
+            FlyAll(small);
+            Assert.AreEqual(1, RaceReports.Pdf(small, font, key => key, "", DateTime.Now).PageCount);
+            StringAssert.Contains("Round 2, race 1", RaceReports.Csv(small, key => key));
+        }
+
+        [Test]
         public void APilotDisqualifiedFromTheEvent_FliesNoMore_AndIsPlacedLast()
         {
             Tournament t = Tournament.Create("x", Names(8), null);

@@ -4525,6 +4525,94 @@ MonoBehaviour:
     m_Key: not in the task
     m_Metadata:
       m_Items: []
+  - m_Id: 6950312030765056
+    m_Key: Classification
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6950312089485312
+    m_Key: Qualification
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6950312089485313
+    m_Key: Races
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6950312089485314
+    m_Key: Place
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6950312089485315
+    m_Key: Time
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6950312089485316
+    m_Key: Best lap
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6950312089485317
+    m_Key: Note
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6950312089485318
+    m_Key: Result
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6950312089485319
+    m_Key: disqualified
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6950312089485320
+    m_Key: did not fly
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6950312089485321
+    m_Key: penalty {0} s
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6950312089485322
+    m_Key: disqualified from the event
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6950312089485323
+    m_Key: Qualifying round {0}, race {1}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6950312089485324
+    m_Key: Round {0}, race {1}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6950312089485325
+    m_Key: Elimination race {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6950312089485326
+    m_Key: Semi-final {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6950312089485327
+    m_Key: Small final
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6950312089485328
+    m_Key: Final
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6950312089485329
+    m_Key: Final, race {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6950312089485330
+    m_Key: Best three laps
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6950312089485331
+    m_Key: Average of the three best laps
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6950312089485332
+    m_Key: Bracket
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:
