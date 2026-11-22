@@ -183,6 +183,43 @@ namespace Ushqyr.Edu
                 return Convert.ToBase64String(kdf.GetBytes(32));
         }
 
+        // ------------------------------------------------------------ the teacher
+
+        /// <summary>True when a teacher's password has been set on this PC.</summary>
+        public bool HasTeacherPassword => !string.IsNullOrEmpty(_db.Setting("teacher_hash"));
+
+        /// <summary>
+        /// Sets the password of the teacher's console (4 to 64 characters). Like a PIN, only a salted, slowed hash is
+        /// kept. It keeps students out of the journal on a shared PC; whoever can replace the database file can still
+        /// get round it, and the school's own Windows accounts are the real protection.
+        /// </summary>
+        public void SetTeacherPassword(string password)
+        {
+            if (password == null || password.Length < 4 || password.Length > 64) throw new ArgumentException("the teacher's password has 4 to 64 characters");
+            var salt = new byte[16];
+            using (var rng = RandomNumberGenerator.Create()) rng.GetBytes(salt);
+            _db.SetSetting("teacher_salt", Convert.ToBase64String(salt));
+            _db.SetSetting("teacher_hash", PinHash(password, salt));
+        }
+
+        /// <summary>True when the password is the teacher's. False when none has been set.</summary>
+        public bool CheckTeacherPassword(string password)
+        {
+            string expected = _db.Setting("teacher_hash"), salt = _db.Setting("teacher_salt");
+            if (string.IsNullOrEmpty(expected) || string.IsNullOrEmpty(salt)) return false;
+            string got = PinHash(password ?? "", Convert.FromBase64String(salt));
+            int diff = expected.Length ^ got.Length;
+            for (int i = 0; i < expected.Length && i < got.Length; i++) diff |= expected[i] ^ got[i];
+            return diff == 0;
+        }
+
+        /// <summary>The school's name, printed at the top of the reports; empty when not set.</summary>
+        public string SchoolName
+        {
+            get => _db.Setting("school_name") ?? "";
+            set => _db.SetSetting("school_name", (value ?? "").Trim());
+        }
+
         // ------------------------------------------------------------ groups
 
         public long AddGroup(string name)

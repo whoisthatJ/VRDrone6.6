@@ -3916,6 +3916,54 @@ MonoBehaviour:
     m_Localized: Show me
     m_Metadata:
       m_Items: []
+  - m_Id: 6931874877014016
+    m_Localized: Gradebook
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6931874927345664
+    m_Localized: Exercises
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6931874927345665
+    m_Localized: Attempts
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6931874927345666
+    m_Localized: Time, min
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6931874927345667
+    m_Localized: Exercise
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6931874927345668
+    m_Localized: Flown by
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6931874927345669
+    m_Localized: Passed by
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6931874927345670
+    m_Localized: Average attempts
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6931874927345671
+    m_Localized: Student progress
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6931874927345672
+    m_Localized: Best
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6931874927345673
+    m_Localized: yes
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6931874927345674
+    m_Localized: no
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

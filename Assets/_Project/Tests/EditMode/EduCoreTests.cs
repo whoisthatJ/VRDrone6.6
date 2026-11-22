@@ -410,6 +410,126 @@ namespace Ushqyr.Tests
             Assert.AreEqual(1, Certificate.From(course, "", DateTime.Now).Write(font, key => key).PageCount);
         }
 
+        /// <summary>The language sheets: English key → the three columns.</summary>
+        private static Dictionary<string, string[]> Sheets()
+        {
+            var sheet = new Dictionary<string, string[]>();
+            foreach (string path in Directory.GetFiles(Path.Combine(Application.dataPath, "_Project/Localization/Text"), "*.tsv"))
+                foreach (string line in File.ReadAllLines(path))
+                {
+                    string[] cells = line.Split('\t');
+                    if (cells.Length == 3 && !line.StartsWith("#")) sheet[cells[0]] = cells;
+                }
+            return sheet;
+        }
+
+        [Test]
+        public void Journal_Gradebook_AndStudentReport()
+        {
+            ActivityDefinition Make(string id) => ActivityDefinition.Parse(HoverJson.Replace("a02-hover-land", id));
+            var all = new List<ActivityDefinition> { Make("b07-square"), Make("a02-hover-land"), Make("a01-controls") };
+            using (var db = new EduDatabase(Path.Combine(_dir, "class.db")))
+            {
+                var store = new EduStore(db, Path.Combine(_dir, "replays"));
+                string replays = Path.Combine(_dir, "replays");
+                long group = store.AddGroup("7Ә");
+                long aliya = store.AddUser("Әлия"), bolat = store.AddUser("Болат"), odd = store.AddUser("=Хакер;\"x\""), other = store.AddUser("Зере");
+                foreach (long id in new[] { aliya, bolat, odd }) store.AddToGroup(group, id);
+                long seat = store.SeatUser("PC-07");
+                ActivityAttempt.Finish(store, replays, all[1], Hover(1.4, 0.1, 0.4, 0.02), aliya, "1.5");
+                ActivityAttempt.Finish(store, replays, all[1], Hover(0.08, 0.1, 0.4, 0.02), aliya, "1.5");
+                ActivityAttempt.Finish(store, replays, all[2], Hover(0.08, 0.1, 0.4, 0.02), bolat, "1.5");
+                ActivityAttempt.Finish(store, replays, all[2], Hover(0.08, 0.1, 0.4, 0.02), seat, "1.5");
+                ActivityAttempt.Finish(store, replays, all[0], Hover(0.08, 0.1, 0.4, 0.02), other, "1.5");
+
+                Journal j = Journal.Build(store, all, group);
+                Assert.AreEqual("7Ә", j.Group);
+                Assert.AreEqual(new[] { "a01-controls", "a02-hover-land", "b07-square" }, j.Activities.ConvertAll(x => x.Id).ToArray(), "in the order of the course");
+                Assert.AreEqual(3, j.Rows.Count, "the group's students only");
+                JournalRow a = j.Rows.Find(r => r.User.Id == aliya), b = j.Rows.Find(r => r.User.Id == bolat);
+                Assert.AreEqual(2, a.Cells[1].Attempts);
+                Assert.IsTrue(a.Cells[1].Passed);
+                Assert.GreaterOrEqual(a.Cells[1].Best.Value, 90);
+                Assert.AreEqual(2, a.Cells[1].All.Count);
+                Assert.AreEqual(1, a.Passed);
+                Assert.AreEqual(1, a.Flown);
+                Assert.AreEqual(a.Cells[1].Best.Value, a.Average, 1e-9);
+                Assert.Greater(a.Seconds, 0);
+                Assert.IsNull(a.Cells[0].Best);
+                ActivityStats hover = j.Stats(1);
+                Assert.AreEqual(1, hover.Flown);
+                Assert.AreEqual(2, hover.AverageAttempts, 1e-9);
+                Assert.AreEqual(0, j.Stats(2).Flown);
+
+                // The teacher's own mark replaces the computed one, and decides the pass.
+                Assert.IsTrue(b.Cells[0].Passed);
+                store.Grade(store.Attempts(bolat)[0].Id, 40, "landed beside the pad");
+                b = Journal.Build(store, all, group).Rows.Find(r => r.User.Id == bolat);
+                Assert.AreEqual(40, b.Cells[0].Best.Value, 1e-9);
+                Assert.IsFalse(b.Cells[0].Passed);
+
+                // Everyone: the fourth student too, and the seat after the students because something was flown on it.
+                Journal everyone = Journal.Build(store, all);
+                Assert.AreEqual(5, everyone.Rows.Count);
+                Assert.AreEqual("seat", everyone.Rows[4].User.Role);
+                Assert.AreEqual("", everyone.Group);
+
+                // The reports, in each language.
+                Dictionary<string, string[]> sheet = Sheets();
+                foreach (string key in Reports.Texts) Assert.IsTrue(sheet.ContainsKey(key), "not in the language sheets: " + key);
+                byte[] font = File.ReadAllBytes(Path.Combine(Application.streamingAssetsPath, "Edu/LiberationSans-Regular.ttf"));
+                j = Journal.Build(store, all, group);
+                for (int language = 0; language < 3; language++)
+                {
+                    int column = language;
+                    Func<string, string> text = key => sheet.TryGetValue(key, out string[] cells) ? cells[column] : key;
+                    var xlsx = new MemoryStream();
+                    Reports.Gradebook(j, text, "№ 12 мектеп", new DateTime(2026, 11, 22)).Save(xlsx);
+                    byte[] zip = xlsx.ToArray();
+                    Assert.AreEqual((byte)'P', zip[0]);
+                    Assert.AreEqual((byte)'K', zip[1]);
+                    Assert.Greater(zip.Length, 1500);
+
+                    string csv = Reports.GradebookCsv(j, text);
+                    string[] lines = csv.Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+                    Assert.AreEqual(4, lines.Length, "a heading and three students");
+                    StringAssert.StartsWith(text("Student") + ";", lines[0]);
+                    StringAssert.Contains("\"'=Хакер;\"\"x\"\"\"", csv, "a name that looks like a formula is given as text, and quoted");
+                    string hers = Array.Find(lines, l => l.StartsWith("Әлия;"));
+                    Assert.AreEqual(lines[0].Split(';').Length, hers.Split(';').Length, "as many cells as headings");
+                    StringAssert.DoesNotContain(".", hers, "numbers are written with a comma");
+                    StringAssert.Contains(",", Reports.GradebookCsv(j, text, false).Split('\n')[0]);
+
+                    PdfWriter pdf = Reports.StudentProgress(j, j.Rows.Find(r => r.User.Id == aliya), font, text, "№ 12 мектеп", new DateTime(2026, 11, 22));
+                    Assert.AreEqual(1, pdf.PageCount);
+                    var bytes = new MemoryStream();
+                    pdf.Save(bytes);
+                    Assert.Greater(bytes.Length, 20000);
+                    string every = "";
+                    foreach (string key in Reports.Texts) every += text(key);
+                    Assert.AreEqual("", pdf.Missing(every + "—…№"));
+                }
+                // A long course runs onto a second page.
+                var many = new List<ActivityDefinition>();
+                for (int i = 1; i <= 60; i++) many.Add(Make("a" + i.ToString("00") + "-x"));
+                Journal big = Journal.Build(store, many, group);
+                Assert.AreEqual(2, Reports.StudentProgress(big, big.Rows[0], font, key => key, "", DateTime.Now).PageCount);
+
+                // The teacher's password and the school's name.
+                Assert.IsFalse(store.HasTeacherPassword);
+                Assert.IsFalse(store.CheckTeacherPassword(""), "no password set: nothing opens the console");
+                Assert.Throws<ArgumentException>(() => store.SetTeacherPassword("abc"));
+                store.SetTeacherPassword("ұстаз2026");
+                Assert.IsTrue(store.HasTeacherPassword);
+                Assert.IsTrue(store.CheckTeacherPassword("ұстаз2026"));
+                Assert.IsFalse(store.CheckTeacherPassword("ұстаз2027"));
+                Assert.IsFalse(store.CheckTeacherPassword(null));
+                Assert.AreEqual("", store.SchoolName);
+                store.SchoolName = "  № 12 мектеп ";
+                Assert.AreEqual("№ 12 мектеп", store.SchoolName);
+            }
+        }
+
         [Test]
         public void SeatProfile_NamesNoPerson_AndIsMadeOnce()
         {
