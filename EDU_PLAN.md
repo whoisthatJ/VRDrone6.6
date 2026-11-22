@@ -967,3 +967,32 @@ attendance, alerts). **Open, and said so:** a trial between two real PCs and on 
 PC); watching a seat's flight with a free camera and stick overlay; a seat map shaped like the room; assists and
 weather as settings of an assignment; a school logo on reports; the XLSX opened in Excel or LibreOffice;
 the "5 seconds to start" figure on real seats. 479 tests pass.
+
+### 22 November 2026, night: ED5 started: the FAI racing rules read, the tournament engine
+
+**The rules.** FAI F9U (drone racing) was read from the same volume as the soccer rules and written into
+`Docs/reference/fai/f9u_values.md`, with paragraph numbers: the race (three laps, four pilots, three minutes), the
+start (arm call, one tone after 2 to 4 s, no countdown, the false start), faults (a missed gate voids the lap unless
+corrected at once), the two qualification options with their tie-breaks, placing in a race, the 16-pilot bracket
+with and without double elimination (Annex C, read from the page), the final classification, successive finals, and
+the points format for small events.
+
+**The tournament engine** (`Tournament.cs`, no engine code, 10 tests): blind draws that differ each round and repeat
+for the same seed; the ranking by either FAI option; the elimination of scenario C with and without double
+elimination; a single final or successive finals; the points format; a race flown again; a disqualification or a
+penalty set after the race (what followed from that race is dropped and laid out again); a pilot disqualified from
+the event; the whole state written to text and read back in the middle of an event.
+
+- **D54. Racing follows FAI F9U, 2026 Edition, Version 2,** as read into `f9u_values.md`. Where that page and the
+  list in section 5 differ, the page wins.
+- **D55. Brackets for 32 and 64 pilots are not built:** Annexes A and B were not read. Sixteen pilots is the size the
+  plan's own test asks for, and a class is at most thirty.
+- **D56. Outside the FAI text, and marked as ours:** with 5 to 8 pilots the elimination starts at the semi-finals
+  (places 1, 4, 5, 8 and 2, 3, 6, 7), with 4 or fewer at the final; a tie in the points format goes to the faster
+  best lap; "races of up to 8 with the top half advancing" is a preset of ours still to be built.
+
+**Checked by test against the FAI page:** with the faster qualifier always ahead, every race of the double
+elimination bracket has exactly the pilots the annex names, and the final classification returns the qualification
+order place by place. The plan's own test at the level of the engine: 16 pilots from qualification to the final,
+with a disqualification that changes who goes on and a final flown again. **Not yet:** timing from the gates, the
+FAI start, the screens, the LAN, the result sheets. 489 tests pass.
