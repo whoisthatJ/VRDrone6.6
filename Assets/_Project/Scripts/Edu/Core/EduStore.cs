@@ -47,6 +47,27 @@ namespace Ushqyr.Edu
     /// Students, groups and attempts on top of <see cref="EduDatabase"/>. Everything stays in the one local file and the
     /// replay folder next to it; nothing here opens a network connection.
     /// </summary>
+    /// <summary>An activity given to a group, to one student, or (neither named) to everyone.</summary>
+    public sealed class Assignment
+    {
+        public long Id;
+        public string ActivityId, Created;
+        public long? GroupId, UserId;
+        /// <summary>How many attempts are allowed from the moment it was given; 0 for as many as the student likes.</summary>
+        public int AttemptLimit;
+        /// <summary>The lesson plan it came from (its name), and its place in that plan; empty and 0 when given on its own.</summary>
+        public string Lesson = "";
+        public int Position;
+    }
+
+    /// <summary>A lesson plan: activities in the order they are to be done.</summary>
+    public sealed class LessonPlan
+    {
+        public long Id;
+        public string Name;
+        public readonly List<string> Activities = new List<string>();
+    }
+
     public sealed class EduStore
     {
         private readonly EduDatabase _db;
@@ -181,6 +202,162 @@ namespace Ushqyr.Edu
         {
             using (var kdf = new Rfc2898DeriveBytes(Encoding.UTF8.GetBytes(pin), salt, 20000, HashAlgorithmName.SHA256))
                 return Convert.ToBase64String(kdf.GetBytes(32));
+        }
+
+        // ------------------------------------------------------------ assignments and lesson plans
+
+        /// <summary>
+        /// Gives an activity to a group, to one student, or to everyone (neither named). Given again to the same
+        /// people, it replaces the earlier one (the attempt count starts afresh). A copy of the activity is kept with
+        /// it, so the class database says exactly what was assigned.
+        /// </summary>
+        public long Assign(ActivityDefinition activity, long? groupId, long? userId, int attemptLimit = 0, string lesson = null, int position = 0)
+        {
+            if (activity == null) throw new ArgumentNullException(nameof(activity));
+            if (groupId != null && userId != null) throw new ArgumentException("an assignment is for a group or for one student, not both");
+            if (attemptLimit < 0 || attemptLimit > 99) throw new ArgumentException("the attempt limit is 0 (no limit) to 99");
+            _db.Sql.Execute("begin");
+            try
+            {
+                _db.Sql.Execute("insert into activities(id, hash, type, title, json) values(?1, ?2, ?3, ?4, ?5)" +
+                                " on conflict(id) do update set hash = excluded.hash, type = excluded.type, title = excluded.title, json = excluded.json",
+                    activity.Id, activity.Hash ?? "", activity.Type ?? "", activity.Title ?? "", activity.Raw != null ? Json.Write(activity.Raw) : "{}");
+                foreach (Assignment old in Assignments())
+                    if (old.ActivityId == activity.Id && old.GroupId == groupId && old.UserId == userId)
+                        _db.Sql.Execute("delete from assignments where id = ?1", old.Id);
+                var settings = new Dictionary<string, object> { ["attempts"] = (double)attemptLimit, ["lesson"] = lesson ?? "", ["position"] = (double)position };
+                _db.Sql.Execute("insert into assignments(activity_id, group_id, user_id, settings, created) values(?1, ?2, ?3, ?4, ?5)",
+                    activity.Id, groupId, userId, Json.Write(settings), Now());
+                long id = LastId();
+                _db.Sql.Execute("commit");
+                return id;
+            }
+            catch
+            {
+                _db.Sql.Execute("rollback");
+                throw;
+            }
+        }
+
+        private static Assignment ReadAssignment(object[] r)
+        {
+            var a = new Assignment
+            {
+                Id = (long)r[0], ActivityId = (string)r[1], GroupId = r[2] == null ? (long?)null : (long)r[2], UserId = r[3] == null ? (long?)null : (long)r[3],
+                Created = (string)r[5],
+            };
+            if (r[4] is string json && json.Length > 0)
+            {
+                Dictionary<string, object> s = Json.ParseObject(json);
+                a.AttemptLimit = (int)Json.Num(s, "attempts", 0);
+                a.Lesson = Json.Str(s, "lesson", "");
+                a.Position = (int)Json.Num(s, "position", 0);
+            }
+            return a;
+        }
+
+        /// <summary>Every assignment, oldest first: in the order of a lesson plan where it came from one.</summary>
+        public List<Assignment> Assignments()
+        {
+            var list = new List<Assignment>();
+            foreach (object[] r in _db.Sql.Query("select id, activity_id, group_id, user_id, settings, created from assignments order by id"))
+                list.Add(ReadAssignment(r));
+            return list;
+        }
+
+        /// <summary>The assignments given to this group (null: those given to everyone).</summary>
+        public List<Assignment> AssignmentsOf(long? groupId)
+        {
+            List<Assignment> list = Assignments();
+            list.RemoveAll(a => a.UserId != null || a.GroupId != groupId);
+            return list;
+        }
+
+        /// <summary>
+        /// What this student has been given: to them, to a group they are in, or to everyone. One line per activity
+        /// (the one given most directly: to the student, then to a group, then to everyone).
+        /// </summary>
+        public List<Assignment> AssignmentsFor(long userId)
+        {
+            var groups = new HashSet<long>();
+            foreach (object[] r in _db.Sql.Query("select group_id from group_members where user_id = ?1", userId)) groups.Add((long)r[0]);
+            int Rank(Assignment a) => a.UserId != null ? 0 : a.GroupId != null ? 1 : 2;
+            var best = new Dictionary<string, Assignment>();
+            var order = new List<string>();
+            foreach (Assignment a in Assignments())
+            {
+                bool mine = a.UserId == userId || (a.UserId == null && (a.GroupId == null || groups.Contains(a.GroupId.Value)));
+                if (!mine) continue;
+                if (!best.TryGetValue(a.ActivityId, out Assignment have)) order.Add(a.ActivityId);
+                else if (Rank(have) <= Rank(a)) continue;
+                best[a.ActivityId] = a;
+            }
+            var list = new List<Assignment>();
+            foreach (string id in order) list.Add(best[id]);
+            return list;
+        }
+
+        public void Unassign(long assignmentId) => _db.Sql.Execute("delete from assignments where id = ?1", assignmentId);
+
+        /// <summary>Attempts the student has made on the assignment since it was given.</summary>
+        public int AttemptsUsed(Assignment a, long userId)
+        {
+            int n = 0;
+            foreach (AttemptRecord attempt in Attempts(userId, a.ActivityId))
+                if (string.CompareOrdinal(attempt.Started, a.Created) >= 0) n++;
+            return n;
+        }
+
+        /// <summary>True when the student may still fly the assignment (no limit, or attempts left).</summary>
+        public bool MayFly(Assignment a, long userId) => a.AttemptLimit <= 0 || AttemptsUsed(a, userId) < a.AttemptLimit;
+
+        /// <summary>Saves a lesson plan (a new one when <paramref name="id"/> is 0) and returns its id.</summary>
+        public long SaveLesson(string name, IList<string> activityIds, long id = 0)
+        {
+            name = (name ?? "").Trim();
+            if (name.Length == 0) throw new ArgumentException("a name is needed");
+            if (name.Length > 80) throw new ArgumentException("the name is longer than 80 characters");
+            if (activityIds == null || activityIds.Count == 0) throw new ArgumentException("a lesson plan needs at least one activity");
+            var ids = new List<object>();
+            foreach (string a in activityIds) ids.Add(a);
+            if (id == 0)
+            {
+                _db.Sql.Execute("insert into lessons(name, activities, created) values(?1, ?2, ?3)", name, Json.Write(ids), Now());
+                return LastId();
+            }
+            _db.Sql.Execute("update lessons set name = ?2, activities = ?3 where id = ?1", id, name, Json.Write(ids));
+            return id;
+        }
+
+        public List<LessonPlan> Lessons()
+        {
+            var list = new List<LessonPlan>();
+            foreach (object[] r in _db.Sql.Query("select id, name, activities from lessons order by id"))
+            {
+                var plan = new LessonPlan { Id = (long)r[0], Name = (string)r[1] };
+                if (Json.Parse((string)r[2]) is List<object> ids)
+                    foreach (object a in ids) plan.Activities.Add(a as string ?? "");
+                list.Add(plan);
+            }
+            return list;
+        }
+
+        public void DeleteLesson(long id) => _db.Sql.Execute("delete from lessons where id = ?1", id);
+
+        /// <summary>
+        /// Gives every activity of a lesson plan, in its order, to a group, a student or everyone. Activities this
+        /// version of the program no longer ships are left out. Returns how many were given.
+        /// </summary>
+        public int AssignLesson(LessonPlan plan, IReadOnlyDictionary<string, ActivityDefinition> known, long? groupId, long? userId, int attemptLimit = 0)
+        {
+            int n = 0;
+            for (int i = 0; i < plan.Activities.Count; i++)
+            {
+                if (!known.TryGetValue(plan.Activities[i], out ActivityDefinition activity)) continue;
+                Assign(activity, groupId, userId, attemptLimit, plan.Name, i + 1);
+                n++;
+            }
+            return n;
         }
 
         // ------------------------------------------------------------ the teacher

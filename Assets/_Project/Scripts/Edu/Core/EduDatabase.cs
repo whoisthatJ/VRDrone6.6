@@ -37,6 +37,13 @@ namespace Ushqyr.Edu
                 "create index attempts_by_user on attempts(user_id, activity_id)",
                 "create table settings(key text primary key, value text)",
             },
+            // 2: lesson plans (an ordered list of activities under a name), and finding a student's assignments quickly.
+            new[]
+            {
+                "create table lessons(id integer primary key, name text not null, activities text not null, created text not null)",
+                "create index assignments_by_group on assignments(group_id)",
+                "create index assignments_by_user on assignments(user_id)",
+            },
         };
 
         private readonly SqliteDb _db;

@@ -531,6 +531,80 @@ namespace Ushqyr.Tests
         }
 
         [Test]
+        public void Assignments_AndLessonPlans()
+        {
+            ActivityDefinition Make(string id) => ActivityDefinition.Parse(HoverJson.Replace("a02-hover-land", id));
+            var known = new Dictionary<string, ActivityDefinition>();
+            foreach (string id in new[] { "a01-controls", "a02-hover-land", "b07-square" }) known[id] = Make(id);
+            using (var db = new EduDatabase(Path.Combine(_dir, "class.db")))
+            {
+                var store = new EduStore(db, Path.Combine(_dir, "replays"));
+                string replays = Path.Combine(_dir, "replays");
+                long seventh = store.AddGroup("7Ә"), eighth = store.AddGroup("8Б");
+                long aliya = store.AddUser("Әлия"), bolat = store.AddUser("Болат"), zere = store.AddUser("Зере");
+                store.AddToGroup(seventh, aliya);
+                store.AddToGroup(seventh, bolat);
+                store.AddToGroup(eighth, zere);
+                Assert.AreEqual(0, store.AssignmentsFor(aliya).Count);
+
+                long toGroup = store.Assign(known["a02-hover-land"], seventh, null, 2);
+                store.Assign(known["b07-square"], null, null);
+                Assert.Throws<ArgumentException>(() => store.Assign(known["a01-controls"], seventh, aliya));
+                Assert.Throws<ArgumentException>(() => store.Assign(known["a01-controls"], seventh, null, -1));
+                Assert.AreEqual(new[] { "a02-hover-land", "b07-square" }, store.AssignmentsFor(aliya).ConvertAll(x => x.ActivityId).ToArray());
+                Assert.AreEqual(new[] { "b07-square" }, store.AssignmentsFor(zere).ConvertAll(x => x.ActivityId).ToArray(), "another group gets only what everyone gets");
+                Assert.AreEqual(1, store.AssignmentsOf(seventh).Count);
+                Assert.AreEqual(1, store.AssignmentsOf(null).Count);
+
+                // Two attempts allowed: the third is refused; another student's attempts do not count.
+                Assignment hover = store.AssignmentsFor(aliya)[0];
+                Assert.AreEqual(2, hover.AttemptLimit);
+                Assert.IsTrue(store.MayFly(hover, aliya));
+                ActivityAttempt.Finish(store, replays, known["a02-hover-land"], Hover(1.4, 0.1, 0.4, 0.02), aliya, "1.5");
+                ActivityAttempt.Finish(store, replays, known["a02-hover-land"], Hover(0.08, 0.1, 0.4, 0.02), aliya, "1.5");
+                Assert.AreEqual(2, store.AttemptsUsed(hover, aliya));
+                Assert.IsFalse(store.MayFly(hover, aliya));
+                Assert.IsTrue(store.MayFly(hover, bolat));
+                Assert.IsTrue(store.MayFly(store.AssignmentsFor(aliya)[1], aliya), "no limit on the other one");
+
+                // Given to the student herself, it takes the place of the group's for her only.
+                store.Assign(known["a02-hover-land"], null, aliya, 5);
+                Assert.AreEqual(5, store.AssignmentsFor(aliya)[0].AttemptLimit);
+                Assert.AreEqual(2, store.AssignmentsFor(bolat)[0].AttemptLimit);
+                // Given again to the same group, it replaces the earlier one.
+                long again = store.Assign(known["a02-hover-land"], seventh, null, 3);
+                Assert.AreNotEqual(toGroup, again);
+                Assert.AreEqual(1, store.AssignmentsOf(seventh).Count);
+                Assert.AreEqual(3, store.AssignmentsFor(bolat).Find(x => x.ActivityId == "a02-hover-land").AttemptLimit);
+                store.Unassign(again);
+                Assert.AreEqual(0, store.AssignmentsOf(seventh).Count);
+
+                // A lesson plan keeps its order; an activity no longer shipped is left out when it is given.
+                Assert.Throws<ArgumentException>(() => store.SaveLesson("", new[] { "a01-controls" }));
+                Assert.Throws<ArgumentException>(() => store.SaveLesson("Бос сабақ", new string[0]));
+                long lesson = store.SaveLesson("1-сабақ", new[] { "b07-square", "gone-activity", "a01-controls" });
+                LessonPlan plan = store.Lessons()[0];
+                Assert.AreEqual("1-сабақ", plan.Name);
+                Assert.AreEqual(3, plan.Activities.Count);
+                Assert.AreEqual(2, store.AssignLesson(plan, known, eighth, null, 1));
+                List<Assignment> forZere = store.AssignmentsFor(zere);
+                Assert.AreEqual(new[] { "b07-square", "a01-controls" }, forZere.ConvertAll(x => x.ActivityId).ToArray(), "her group's plan, in its order");
+                Assert.AreEqual("1-сабақ", forZere[0].Lesson);
+                Assert.AreEqual(3, forZere[1].Position);
+                store.SaveLesson("Бірінші сабақ", new[] { "a01-controls" }, lesson);
+                Assert.AreEqual("Бірінші сабақ", store.Lessons()[0].Name);
+                Assert.AreEqual(1, store.Lessons()[0].Activities.Count);
+                store.DeleteLesson(lesson);
+                Assert.AreEqual(0, store.Lessons().Count);
+                Assert.AreEqual(2, store.AssignmentsOf(eighth).Count, "what was given stays given");
+
+                // A deleted group takes its assignments with it; a deleted student, theirs.
+                store.DeleteUser(aliya);
+                Assert.IsFalse(store.Assignments().Exists(x => x.UserId == aliya));
+            }
+        }
+
+        [Test]
         public void SeatProfile_NamesNoPerson_AndIsMadeOnce()
         {
             using (var db = new EduDatabase(Path.Combine(_dir, "class.db")))
