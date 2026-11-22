@@ -1,0 +1,311 @@
+{
+  "format": 1,
+  "id": "e29-proximity",
+  "type": "exercise",
+  "title": "Proximity: five gaps",
+  "briefing": "Five openings in a line, each smaller than the one before: from 3 m wide down to 1 m. Fly through the middle of each. Touching a frame hard ends the attempt.",
+  "pass": 60,
+  "time_limit": 180,
+  "setup": {
+    "place": "field",
+    "drone": "race5",
+    "assist": "off",
+    "view": "fpv",
+    "mode": "acro",
+    "objects": [
+      {
+        "type": "pad",
+        "id": "home",
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "size": 1.5
+      },
+      {
+        "type": "pad",
+        "id": "finish",
+        "x": 0,
+        "y": 0,
+        "z": 50,
+        "size": 3
+      },
+      {
+        "type": "gate",
+        "id": "g1",
+        "x": 0,
+        "y": 0.5,
+        "z": 10,
+        "size": 3.0,
+        "height": 2.2,
+        "heading": 0
+      },
+      {
+        "type": "gate",
+        "id": "g2",
+        "x": 0,
+        "y": 0.7,
+        "z": 18,
+        "size": 2.4,
+        "height": 1.8,
+        "heading": 0
+      },
+      {
+        "type": "gate",
+        "id": "g3",
+        "x": 0,
+        "y": 0.9,
+        "z": 26,
+        "size": 1.8,
+        "height": 1.4,
+        "heading": 0
+      },
+      {
+        "type": "gate",
+        "id": "g4",
+        "x": 0,
+        "y": 1.0,
+        "z": 34,
+        "size": 1.4,
+        "height": 1.2,
+        "heading": 0
+      },
+      {
+        "type": "gate",
+        "id": "g5",
+        "x": 0,
+        "y": 1.1,
+        "z": 42,
+        "size": 1.0,
+        "height": 1.0,
+        "heading": 0
+      }
+    ]
+  },
+  "rubric": [
+    {
+      "id": "steps",
+      "metric": "steps_done",
+      "label": "Steps done",
+      "tip": "Do the steps in the order shown at the top of the screen; each one counts only when the one before it is done.",
+      "weight": 70,
+      "best": 6,
+      "worst": 2,
+      "required": true,
+      "params": {
+        "steps": [
+          {
+            "say": "Gate 1",
+            "gate": {
+              "x": 0,
+              "y": 0.5,
+              "z": 10,
+              "width": 3.0,
+              "height": 2.2,
+              "heading": 0
+            }
+          },
+          {
+            "say": "Gate 2",
+            "gate": {
+              "x": 0,
+              "y": 0.7,
+              "z": 18,
+              "width": 2.4,
+              "height": 1.8,
+              "heading": 0
+            }
+          },
+          {
+            "say": "Gate 3",
+            "gate": {
+              "x": 0,
+              "y": 0.9,
+              "z": 26,
+              "width": 1.8,
+              "height": 1.4,
+              "heading": 0
+            }
+          },
+          {
+            "say": "Gate 4",
+            "gate": {
+              "x": 0,
+              "y": 1.0,
+              "z": 34,
+              "width": 1.4,
+              "height": 1.2,
+              "heading": 0
+            }
+          },
+          {
+            "say": "Gate 5",
+            "gate": {
+              "x": 0,
+              "y": 1.1,
+              "z": 42,
+              "width": 1.0,
+              "height": 1.0,
+              "heading": 0
+            }
+          },
+          {
+            "say": "Land on the far pad and switch the motors off",
+            "landed": true,
+            "pad": {
+              "x": 0,
+              "z": 50,
+              "radius": 1.5
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "time",
+      "metric": "duration",
+      "label": "Time taken",
+      "tip": "You have the moves; now do them without long pauses.",
+      "weight": 15,
+      "best": 40,
+      "worst": 120
+    },
+    {
+      "id": "landing",
+      "metric": "landing_distance",
+      "label": "Landing on the pad",
+      "tip": "Stop above the pad first, then come straight down.",
+      "weight": 15,
+      "best": 0.25,
+      "worst": 2.0,
+      "required": true,
+      "params": {
+        "x": 0,
+        "z": 50
+      }
+    }
+  ],
+  "reference": [
+    {
+      "takeoff": 2,
+      "wait": 4
+    },
+    {
+      "goto": [
+        0.0,
+        1.6,
+        7.0
+      ],
+      "heading": 0,
+      "speed": 3,
+      "wait": 0,
+      "until_near": true
+    },
+    {
+      "goto": [
+        0.0,
+        1.6,
+        13.0
+      ],
+      "heading": 0,
+      "speed": 3,
+      "until_step": 1
+    },
+    {
+      "goto": [
+        0.0,
+        1.6,
+        15.0
+      ],
+      "heading": 0,
+      "speed": 3,
+      "wait": 0,
+      "until_near": true
+    },
+    {
+      "goto": [
+        0.0,
+        1.6,
+        21.0
+      ],
+      "heading": 0,
+      "speed": 3,
+      "until_step": 2
+    },
+    {
+      "goto": [
+        0.0,
+        1.6,
+        23.0
+      ],
+      "heading": 0,
+      "speed": 3,
+      "wait": 0,
+      "until_near": true
+    },
+    {
+      "goto": [
+        0.0,
+        1.6,
+        29.0
+      ],
+      "heading": 0,
+      "speed": 3,
+      "until_step": 3
+    },
+    {
+      "goto": [
+        0.0,
+        1.6,
+        31.0
+      ],
+      "heading": 0,
+      "speed": 3,
+      "wait": 0,
+      "until_near": true
+    },
+    {
+      "goto": [
+        0.0,
+        1.6,
+        37.0
+      ],
+      "heading": 0,
+      "speed": 3,
+      "until_step": 4
+    },
+    {
+      "goto": [
+        0.0,
+        1.6,
+        39.0
+      ],
+      "heading": 0,
+      "speed": 3,
+      "wait": 0,
+      "until_near": true
+    },
+    {
+      "goto": [
+        0.0,
+        1.6,
+        45.0
+      ],
+      "heading": 0,
+      "speed": 3,
+      "until_step": 5
+    },
+    {
+      "goto": [
+        0,
+        2,
+        50
+      ],
+      "heading": 0,
+      "wait": 6
+    },
+    {
+      "land": true,
+      "until_landed": true
+    }
+  ]
+}

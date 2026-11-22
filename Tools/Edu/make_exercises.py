@@ -706,6 +706,106 @@ EXERCISES.append({
 })
 
 
+# ---------------------------------------------------------------- D23
+ACRO = dict(FPV, mode='acro')
+steps = [
+    {'say': t('Take off and hold the drone inside the box for 20 seconds', 'Ұшып көтеріліп, дронды қорап ішінде 20 секунд ұстаңыз', 'Взлетите и удерживайте дрон внутри куба 20 секунд'), 'zone': zone(0, 3, 6, 1.5, 1.5), 'for': 20},
+    LAND_HOME,
+]
+EXERCISES.append({
+    'format': 1, 'id': 'd23-acro-hover', 'type': 'exercise',
+    'title': t('Acro hover', 'Акро режимінде қалықтау', 'Висение в акро'),
+    'briefing': t('Acro mode: the drone no longer levels itself. It stays at whatever angle you leave it, so every lean must be taken out again by hand. Hold it inside the 3 m box for 20 seconds, then land.',
+                  'Акро режимі: дрон енді өзін түзулемейді. Ол сіз қалдырған бұрышта қалады, сондықтан әр еңкеюді қолмен қайтару керек. Оны 3 м қораптың ішінде 20 секунд ұстап, содан кейін қоныңыз.',
+                  'Режим акро: дрон больше не выравнивается сам. Он остаётся под тем углом, под которым вы его оставили, поэтому каждый наклон нужно убирать вручную. Удержите его в кубе 3 м в течение 20 секунд, затем сядьте.'),
+    'pass': 60, 'time_limit': 180,
+    'setup': dict(ACRO, objects=[PAD, box('hover', 0, 3, 6, 3, 3)]),
+    'rubric': [dict(steps_line(steps, 50), worst=0),
+               {'id': 'hold', 'metric': 'hold_time', 'label': t('Longest stay inside the box', 'Қорап ішінде ең ұзақ болған уақыт', 'Самое долгое пребывание в кубе'),
+                'tip': t('Make each correction half as big as you think it needs, and take it out at once.', 'Әр түзетуді өзіңіз ойлағаннан екі есе аз жасап, оны бірден қайтарыңыз.', 'Делайте каждую поправку вдвое меньше, чем кажется нужным, и сразу убирайте её.'),
+                'weight': 20, 'best': 20, 'worst': 3, 'params': {'x': 0, 'z': 6, 'radius': 1.5, 'y': 3, 'height_tolerance': 1.5}},
+               landing_line(15), smooth_line(15)],
+    'reference': [{'takeoff': 3, 'wait': 4}, {'goto': [0, 3, 6], 'heading': 0, 'until_step': 1}, {'goto': [0, 2, 0], 'heading': 0, 'wait': 7}, {'land': True, 'until_landed': True}],
+})
+
+
+def course(gates, laps=1, speed=4, run=4.0):
+    """Steps and a reference for a course of gates given as (x, bottom, z, heading, width, height)."""
+    import math
+    steps, ref = [], [{'takeoff': 2, 'wait': 4}]
+    for lap in range(laps):
+        for i, (x, y, z, h, w, hh) in enumerate(gates):
+            say = (t('Lap %d, gate %d' % (lap + 1, i + 1), '%d-айналым, %d-қақпа' % (lap + 1, i + 1), 'Круг %d, ворота %d' % (lap + 1, i + 1)) if laps > 1 else
+                   t('Gate %d' % (i + 1), '%d-қақпа' % (i + 1), 'Ворота %d' % (i + 1)))
+            steps.append({'say': say, 'gate': through(x, y, z, w, hh, h)})
+            dx, dz = math.sin(math.radians(h)), math.cos(math.radians(h))
+            mid = y + hh / 2
+            # Line up in front of the gate, then fly out the other side of it.
+            ref.append({'goto': [round(x - dx * run, 2), mid, round(z - dz * run, 2)], 'heading': h, 'speed': speed, 'wait': 0})
+            ref[-1]['until_near'] = True
+            ref.append({'goto': [round(x + dx * run, 2), mid, round(z + dz * run, 2)], 'heading': h, 'speed': speed, 'until_step': len(steps)})
+    return steps, ref
+
+
+# ---------------------------------------------------------------- D24
+diamond = [(-8, 1, 20, 0, 3, 2), (0, 1, 32, 90, 3, 2), (8, 1, 20, 180, 3, 2), (0, 1, 8, 270, 3, 2)]
+steps, ref = course(diamond, laps=2)
+steps.append(LAND_HOME)
+ref += [{'goto': [0, 2, 0], 'heading': 0, 'wait': 9}, {'land': True, 'until_landed': True}]
+EXERCISES.append({
+    'format': 1, 'id': 'd24-acro-circuit', 'type': 'exercise',
+    'title': t('Acro circuit', 'Акро айналымы', 'Круг в акро'),
+    'briefing': t('Four gates in a ring, two laps, in acro mode. Fly the ring to the right: west gate, north gate, east gate, south gate. Keep a steady, easy speed: a clean lap matters more than a fast one.',
+                  'Шеңбер бойында төрт қақпа, екі айналым, акро режимінде. Шеңберді оңға қарай ұшыңыз: батыс, солтүстік, шығыс, оңтүстік қақпа. Бірқалыпты, жеңіл жылдамдықты ұстаңыз: таза айналым жылдам айналымнан маңыздырақ.',
+                  'Четверо ворот по кольцу, два круга, в режиме акро. Летите по кольцу вправо: западные, северные, восточные, южные ворота. Держите ровную, спокойную скорость: чистый круг важнее быстрого.'),
+    'pass': 60, 'time_limit': 240,
+    'setup': dict(ACRO, objects=[PAD] + [gate('g%d' % (i + 1), x, y, z, w, hh, h) for i, (x, y, z, h, w, hh) in enumerate(diamond)]),
+    'rubric': [steps_line(steps, 60), time_line(20, 70, 200), band_line(10, 1.0, 3.2, -100, 100, 95, 55), landing_line(10)],
+    'reference': ref,
+})
+
+# ================================================================ Block E: racing and freestyle technique
+RACE = {'place': 'field', 'drone': 'race5', 'assist': 'off', 'view': 'fpv', 'mode': 'acro'}
+
+# ---------------------------------------------------------------- E25
+line = [(0, 1, 12, 0, 3, 2), (5, 1, 22, 0, 3, 2), (-5, 1, 32, 0, 3, 2), (0, 1, 44, 90, 3, 2), (8, 1, 34, 180, 3, 2), (8, 1, 14, 180, 3, 2)]
+steps, ref = course(line, speed=6)
+steps.append({'say': t('Land on the finish pad', 'Мәре алаңшасына қоныңыз', 'Сядьте на финишную площадку'), 'landed': True, 'pad': {'x': 8, 'z': 4, 'radius': 1.5}})
+ref += [{'goto': [8, 2, 4], 'heading': 180, 'wait': 7}, {'land': True, 'until_landed': True}]
+EXERCISES.append({
+    'format': 1, 'id': 'e25-racing-line', 'type': 'exercise',
+    'title': t('Racing line: chicane and hairpin', 'Жарыс сызығы: шикана мен шұғыл бұрылыс', 'Гоночная траектория: шикана и шпилька'),
+    'briefing': t('Six gates: a chicane, then a hairpin back the way you came. The time decides the stars. Go wide into a turn and close to the inside of it, and look at the gate after the one you are flying through.',
+                  'Алты қақпа: шикана, содан кейін келген жаққа қарай шұғыл бұрылыс. Жұлдыздарды уақыт шешеді. Бұрылысқа кеңінен кіріп, оның ішкі жағына жақын өтіңіз, әрі өтіп жатқан қақпадан кейінгі қақпаға қараңыз.',
+                  'Шесть ворот: шикана, затем шпилька обратно. Звёзды решает время. Входите в поворот широко и проходите ближе к внутренней стороне, а смотрите на ворота, следующие за теми, через которые летите.'),
+    'pass': 60, 'time_limit': 180, 'stars': [60, 78, 92],
+    'setup': dict(RACE, objects=[PAD, {'type': 'pad', 'id': 'finish', 'x': 8, 'y': 0, 'z': 4, 'size': 3}] + [gate('g%d' % (i + 1), x, y, z, w, hh, h) for i, (x, y, z, h, w, hh) in enumerate(line)]),
+    'rubric': [steps_line(steps, 50),
+               {'id': 'time', 'metric': 'duration', 'label': t('Time: gold 40 s, silver 55 s, bronze 75 s', 'Уақыт: алтын 40 с, күміс 55 с, қола 75 с', 'Время: золото 40 с, серебро 55 с, бронза 75 с'),
+                'tip': t('Time is lost in the turns: brake less, and start turning before the gate, not in it.', 'Уақыт бұрылыстарда жоғалады: азырақ тежеп, қақпаның ішінде емес, оған жетпей бұрыла бастаңыз.', 'Время теряется в поворотах: тормозите меньше и начинайте поворот до ворот, а не в них.'),
+                'weight': 40, 'best': 40, 'worst': 110},
+               dict(landing_line(10, 8, 4), worst=2.0)],
+    'reference': ref,
+})
+
+# ---------------------------------------------------------------- E29
+gaps = [(0, 0.5, 10, 0, 3.0, 2.2), (0, 0.7, 18, 0, 2.4, 1.8), (0, 0.9, 26, 0, 1.8, 1.4), (0, 1.0, 34, 0, 1.4, 1.2), (0, 1.1, 42, 0, 1.0, 1.0)]
+steps, ref = course(gaps, speed=3, run=3.0)
+steps.append(land_far(50))
+ref += [{'goto': [0, 2, 50], 'heading': 0, 'wait': 6}, {'land': True, 'until_landed': True}]
+EXERCISES.append({
+    'format': 1, 'id': 'e29-proximity', 'type': 'exercise',
+    'title': t('Proximity: five gaps', 'Жақын ұшу: бес саңылау', 'Пролёты: пять проёмов'),
+    'briefing': t('Five openings in a line, each smaller than the one before: from 3 m wide down to 1 m. Fly through the middle of each. Touching a frame hard ends the attempt.',
+                  'Бір қатарда бес саңылау, әрқайсысы алдыңғысынан кішірек: ені 3 м-ден 1 м-ге дейін. Әрқайсысының ортасынан ұшып өтіңіз. Жақтауға қатты соғылу әрекетті аяқтайды.',
+                  'Пять проёмов по прямой, каждый меньше предыдущего: от 3 м шириной до 1 м. Пролетите через середину каждого. Сильный удар о раму заканчивает попытку.'),
+    'pass': 60, 'time_limit': 180,
+    'setup': dict(RACE, objects=[PAD, far_pad(50)] + [gate('g%d' % (i + 1), x, y, z, w, hh, h) for i, (x, y, z, h, w, hh) in enumerate(gaps)]),
+    'rubric': [dict(steps_line(steps, 70), worst=2), time_line(15, 40, 120), dict(landing_line(15, 0, 50), worst=2.0)],
+    'reference': ref,
+})
+
+
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
     for e in EXERCISES:

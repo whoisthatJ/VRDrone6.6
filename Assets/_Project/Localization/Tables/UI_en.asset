@@ -3628,6 +3628,118 @@ MonoBehaviour:
     m_Localized: 'Fly the whole course between half a metre and a metre and a half above the ground, through four low gates. The ground comes up fast in this view: hold the height with small moves of the throttle and do not chase it.'
     m_Metadata:
       m_Items: []
+  - m_Id: 6918525032333312
+    m_Localized: Take off and hold the drone inside the box for 20 seconds
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6918525095247872
+    m_Localized: Acro hover
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6918525095247873
+    m_Localized: 'Acro mode: the drone no longer levels itself. It stays at whatever angle you leave it, so every lean must be taken out again by hand. Hold it inside the 3 m box for 20 seconds, then land.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6918525095247874
+    m_Localized: Longest stay inside the box
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6918525095247875
+    m_Localized: Make each correction half as big as you think it needs, and take it out at once.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6918525095247876
+    m_Localized: Lap 1, gate 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6918525095247877
+    m_Localized: Lap 1, gate 2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6918525095247878
+    m_Localized: Lap 1, gate 3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6918525095247879
+    m_Localized: Lap 1, gate 4
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6918525095247880
+    m_Localized: Lap 2, gate 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6918525095247881
+    m_Localized: Lap 2, gate 2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6918525095247882
+    m_Localized: Lap 2, gate 3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6918525095247883
+    m_Localized: Lap 2, gate 4
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6918525095247884
+    m_Localized: Acro circuit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6918525095247885
+    m_Localized: 'Four gates in a ring, two laps, in acro mode. Fly the ring to the right: west gate, north gate, east gate, south gate. Keep a steady, easy speed: a clean lap matters more than a fast one.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6918525095247886
+    m_Localized: Gate 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6918525095247887
+    m_Localized: Gate 2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6918525095247888
+    m_Localized: Gate 3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6918525095247889
+    m_Localized: Gate 4
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6918525095247890
+    m_Localized: Gate 5
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6918525095247891
+    m_Localized: Gate 6
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6918525095247892
+    m_Localized: Land on the finish pad
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6918525095247893
+    m_Localized: 'Racing line: chicane and hairpin'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6918525099442176
+    m_Localized: 'Six gates: a chicane, then a hairpin back the way you came. The time decides the stars. Go wide into a turn and close to the inside of it, and look at the gate after the one you are flying through.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6918525099442177
+    m_Localized: 'Time: gold 40 s, silver 55 s, bronze 75 s'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6918525099442178
+    m_Localized: 'Time is lost in the turns: brake less, and start turning before the gate, not in it.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6918525099442179
+    m_Localized: 'Proximity: five gaps'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6918525099442180
+    m_Localized: 'Five openings in a line, each smaller than the one before: from 3 m wide down to 1 m. Fly through the middle of each. Touching a frame hard ends the attempt.'
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

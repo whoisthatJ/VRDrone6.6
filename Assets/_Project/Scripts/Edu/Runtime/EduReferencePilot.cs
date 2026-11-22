@@ -16,7 +16,7 @@ namespace Ushqyr.Edu
     /// <c>heading</c> and <c>speed</c>), <c>heading</c> alone (turn on the spot), <c>orbit</c> ([x, z] with
     /// <c>radius</c> and <c>speed</c>), <c>land</c>, <c>gimbal</c> (tilt), <c>zoom</c>, <c>photo</c>, <c>sticks</c>
     /// ({throttle, yaw, pitch, roll}). Each waits for <c>wait</c> seconds, <c>until_step</c> N steps are done, or
-    /// <c>until_landed</c>, and gives up after a minute.</para>
+    /// <c>until_landed</c> or <c>until_near</c> (within a metre of the point), and gives up after a minute.</para>
     /// </summary>
     public sealed class EduReferencePilot : MonoBehaviour
     {
@@ -128,7 +128,7 @@ namespace Ushqyr.Edu
                 // Wait for what the command says, at most a minute.
                 float waited = 0f, wait = (float)Json.Num(c, "wait", 0);
                 int untilStep = (int)Json.Num(c, "until_step", -1);
-                bool untilLanded = Json.Flag(c, "until_landed");
+                bool untilLanded = Json.Flag(c, "until_landed"), untilNear = Json.Flag(c, "until_near");
                 while (_runner != null && _runner.State == EduActivityRunner.Phase.Flying && waited < 60f)
                 {
                     if (untilStep >= 0)
@@ -138,6 +138,11 @@ namespace Ushqyr.Edu
                     else if (untilLanded)
                     {
                         if (flight != null && flight.Autopilot.Landed) break;
+                    }
+                    else if (untilNear)
+                    {
+                        // Close enough to the point to turn for the next one (lining up in front of a gate).
+                        if ((_vehicle.State.Position - target).Magnitude < 1f) break;
                     }
                     else if (waited >= wait) break;
                     waited += Time.deltaTime;

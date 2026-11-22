@@ -1,0 +1,138 @@
+{
+  "format": 1,
+  "id": "d23-acro-hover",
+  "type": "exercise",
+  "title": "Acro hover",
+  "briefing": "Acro mode: the drone no longer levels itself. It stays at whatever angle you leave it, so every lean must be taken out again by hand. Hold it inside the 3 m box for 20 seconds, then land.",
+  "pass": 60,
+  "time_limit": 180,
+  "setup": {
+    "place": "field",
+    "drone": "freestyle5",
+    "assist": "off",
+    "view": "fpv",
+    "mode": "acro",
+    "objects": [
+      {
+        "type": "pad",
+        "id": "home",
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "size": 1.5
+      },
+      {
+        "type": "box",
+        "id": "hover",
+        "x": 0,
+        "y": 3,
+        "z": 6,
+        "size": 3,
+        "height": 3
+      }
+    ]
+  },
+  "rubric": [
+    {
+      "id": "steps",
+      "metric": "steps_done",
+      "label": "Steps done",
+      "tip": "Do the steps in the order shown at the top of the screen; each one counts only when the one before it is done.",
+      "weight": 50,
+      "best": 2,
+      "worst": 0,
+      "required": true,
+      "params": {
+        "steps": [
+          {
+            "say": "Take off and hold the drone inside the box for 20 seconds",
+            "zone": {
+              "x": 0,
+              "y": 3,
+              "z": 6,
+              "radius": 1.5,
+              "tolerance": 1.5
+            },
+            "for": 20
+          },
+          {
+            "say": "Fly back, land on the pad and switch the motors off",
+            "landed": true,
+            "pad": {
+              "x": 0,
+              "z": 0,
+              "radius": 0.75
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "hold",
+      "metric": "hold_time",
+      "label": "Longest stay inside the box",
+      "tip": "Make each correction half as big as you think it needs, and take it out at once.",
+      "weight": 20,
+      "best": 20,
+      "worst": 3,
+      "params": {
+        "x": 0,
+        "z": 6,
+        "radius": 1.5,
+        "y": 3,
+        "height_tolerance": 1.5
+      }
+    },
+    {
+      "id": "landing",
+      "metric": "landing_distance",
+      "label": "Landing on the pad",
+      "tip": "Stop above the pad first, then come straight down.",
+      "weight": 15,
+      "best": 0.25,
+      "worst": 1.5,
+      "required": true,
+      "params": {
+        "x": 0,
+        "z": 0
+      }
+    },
+    {
+      "id": "smooth",
+      "metric": "smoothness",
+      "label": "Smooth sticks",
+      "tip": "Move the sticks slowly and a little at a time.",
+      "weight": 15,
+      "best": 1.5,
+      "worst": 8
+    }
+  ],
+  "reference": [
+    {
+      "takeoff": 3,
+      "wait": 4
+    },
+    {
+      "goto": [
+        0,
+        3,
+        6
+      ],
+      "heading": 0,
+      "until_step": 1
+    },
+    {
+      "goto": [
+        0,
+        2,
+        0
+      ],
+      "heading": 0,
+      "wait": 7
+    },
+    {
+      "land": true,
+      "until_landed": true
+    }
+  ]
+}

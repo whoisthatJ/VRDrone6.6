@@ -1,0 +1,404 @@
+{
+  "format": 1,
+  "id": "d24-acro-circuit",
+  "type": "exercise",
+  "title": "Acro circuit",
+  "briefing": "Four gates in a ring, two laps, in acro mode. Fly the ring to the right: west gate, north gate, east gate, south gate. Keep a steady, easy speed: a clean lap matters more than a fast one.",
+  "pass": 60,
+  "time_limit": 240,
+  "setup": {
+    "place": "field",
+    "drone": "freestyle5",
+    "assist": "off",
+    "view": "fpv",
+    "mode": "acro",
+    "objects": [
+      {
+        "type": "pad",
+        "id": "home",
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "size": 1.5
+      },
+      {
+        "type": "gate",
+        "id": "g1",
+        "x": -8,
+        "y": 1,
+        "z": 20,
+        "size": 3,
+        "height": 2,
+        "heading": 0
+      },
+      {
+        "type": "gate",
+        "id": "g2",
+        "x": 0,
+        "y": 1,
+        "z": 32,
+        "size": 3,
+        "height": 2,
+        "heading": 90
+      },
+      {
+        "type": "gate",
+        "id": "g3",
+        "x": 8,
+        "y": 1,
+        "z": 20,
+        "size": 3,
+        "height": 2,
+        "heading": 180
+      },
+      {
+        "type": "gate",
+        "id": "g4",
+        "x": 0,
+        "y": 1,
+        "z": 8,
+        "size": 3,
+        "height": 2,
+        "heading": 270
+      }
+    ]
+  },
+  "rubric": [
+    {
+      "id": "steps",
+      "metric": "steps_done",
+      "label": "Steps done",
+      "tip": "Do the steps in the order shown at the top of the screen; each one counts only when the one before it is done.",
+      "weight": 60,
+      "best": 9,
+      "worst": 4,
+      "required": true,
+      "params": {
+        "steps": [
+          {
+            "say": "Lap 1, gate 1",
+            "gate": {
+              "x": -8,
+              "y": 1,
+              "z": 20,
+              "width": 3,
+              "height": 2,
+              "heading": 0
+            }
+          },
+          {
+            "say": "Lap 1, gate 2",
+            "gate": {
+              "x": 0,
+              "y": 1,
+              "z": 32,
+              "width": 3,
+              "height": 2,
+              "heading": 90
+            }
+          },
+          {
+            "say": "Lap 1, gate 3",
+            "gate": {
+              "x": 8,
+              "y": 1,
+              "z": 20,
+              "width": 3,
+              "height": 2,
+              "heading": 180
+            }
+          },
+          {
+            "say": "Lap 1, gate 4",
+            "gate": {
+              "x": 0,
+              "y": 1,
+              "z": 8,
+              "width": 3,
+              "height": 2,
+              "heading": 270
+            }
+          },
+          {
+            "say": "Lap 2, gate 1",
+            "gate": {
+              "x": -8,
+              "y": 1,
+              "z": 20,
+              "width": 3,
+              "height": 2,
+              "heading": 0
+            }
+          },
+          {
+            "say": "Lap 2, gate 2",
+            "gate": {
+              "x": 0,
+              "y": 1,
+              "z": 32,
+              "width": 3,
+              "height": 2,
+              "heading": 90
+            }
+          },
+          {
+            "say": "Lap 2, gate 3",
+            "gate": {
+              "x": 8,
+              "y": 1,
+              "z": 20,
+              "width": 3,
+              "height": 2,
+              "heading": 180
+            }
+          },
+          {
+            "say": "Lap 2, gate 4",
+            "gate": {
+              "x": 0,
+              "y": 1,
+              "z": 8,
+              "width": 3,
+              "height": 2,
+              "heading": 270
+            }
+          },
+          {
+            "say": "Fly back, land on the pad and switch the motors off",
+            "landed": true,
+            "pad": {
+              "x": 0,
+              "z": 0,
+              "radius": 0.75
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "time",
+      "metric": "duration",
+      "label": "Time taken",
+      "tip": "You have the moves; now do them without long pauses.",
+      "weight": 20,
+      "best": 70,
+      "worst": 200
+    },
+    {
+      "id": "band",
+      "metric": "height_in_band",
+      "label": "Time at the right height",
+      "tip": "The throttle holds the height: tiny moves, and look far ahead, not at the ground under you.",
+      "weight": 10,
+      "best": 95,
+      "worst": 55,
+      "params": {
+        "low": 1.0,
+        "high": 3.2,
+        "zmin": -100,
+        "zmax": 100
+      }
+    },
+    {
+      "id": "landing",
+      "metric": "landing_distance",
+      "label": "Landing on the pad",
+      "tip": "Stop above the pad first, then come straight down.",
+      "weight": 10,
+      "best": 0.25,
+      "worst": 1.5,
+      "required": true,
+      "params": {
+        "x": 0,
+        "z": 0
+      }
+    }
+  ],
+  "reference": [
+    {
+      "takeoff": 2,
+      "wait": 4
+    },
+    {
+      "goto": [
+        -8.0,
+        2.0,
+        16.0
+      ],
+      "heading": 0,
+      "speed": 4,
+      "wait": 0,
+      "until_near": true
+    },
+    {
+      "goto": [
+        -8.0,
+        2.0,
+        24.0
+      ],
+      "heading": 0,
+      "speed": 4,
+      "until_step": 1
+    },
+    {
+      "goto": [
+        -4.0,
+        2.0,
+        32.0
+      ],
+      "heading": 90,
+      "speed": 4,
+      "wait": 0,
+      "until_near": true
+    },
+    {
+      "goto": [
+        4.0,
+        2.0,
+        32.0
+      ],
+      "heading": 90,
+      "speed": 4,
+      "until_step": 2
+    },
+    {
+      "goto": [
+        8.0,
+        2.0,
+        24.0
+      ],
+      "heading": 180,
+      "speed": 4,
+      "wait": 0,
+      "until_near": true
+    },
+    {
+      "goto": [
+        8.0,
+        2.0,
+        16.0
+      ],
+      "heading": 180,
+      "speed": 4,
+      "until_step": 3
+    },
+    {
+      "goto": [
+        4.0,
+        2.0,
+        8.0
+      ],
+      "heading": 270,
+      "speed": 4,
+      "wait": 0,
+      "until_near": true
+    },
+    {
+      "goto": [
+        -4.0,
+        2.0,
+        8.0
+      ],
+      "heading": 270,
+      "speed": 4,
+      "until_step": 4
+    },
+    {
+      "goto": [
+        -8.0,
+        2.0,
+        16.0
+      ],
+      "heading": 0,
+      "speed": 4,
+      "wait": 0,
+      "until_near": true
+    },
+    {
+      "goto": [
+        -8.0,
+        2.0,
+        24.0
+      ],
+      "heading": 0,
+      "speed": 4,
+      "until_step": 5
+    },
+    {
+      "goto": [
+        -4.0,
+        2.0,
+        32.0
+      ],
+      "heading": 90,
+      "speed": 4,
+      "wait": 0,
+      "until_near": true
+    },
+    {
+      "goto": [
+        4.0,
+        2.0,
+        32.0
+      ],
+      "heading": 90,
+      "speed": 4,
+      "until_step": 6
+    },
+    {
+      "goto": [
+        8.0,
+        2.0,
+        24.0
+      ],
+      "heading": 180,
+      "speed": 4,
+      "wait": 0,
+      "until_near": true
+    },
+    {
+      "goto": [
+        8.0,
+        2.0,
+        16.0
+      ],
+      "heading": 180,
+      "speed": 4,
+      "until_step": 7
+    },
+    {
+      "goto": [
+        4.0,
+        2.0,
+        8.0
+      ],
+      "heading": 270,
+      "speed": 4,
+      "wait": 0,
+      "until_near": true
+    },
+    {
+      "goto": [
+        -4.0,
+        2.0,
+        8.0
+      ],
+      "heading": 270,
+      "speed": 4,
+      "until_step": 8
+    },
+    {
+      "goto": [
+        0,
+        2,
+        0
+      ],
+      "heading": 0,
+      "wait": 9
+    },
+    {
+      "land": true,
+      "until_landed": true
+    }
+  ]
+}
