@@ -99,6 +99,16 @@ namespace Ushqyr.Edu
             return Send(seat, c);
         }
 
+        /// <summary>
+        /// Sends a race track built in the track editor to every seat (or one), and optionally starts a race on it
+        /// there. The seat keeps it among its own tracks under the name given.
+        /// </summary>
+        public int SendTrack(string seat, string name, string trackJson, bool race)
+        {
+            if (string.IsNullOrEmpty(trackJson) || trackJson.Length > 512 * 1024) return 0;
+            return Send(seat, new Dictionary<string, object> { ["do"] = "track", ["name"] = name ?? "", ["json"] = trackJson, ["race"] = race });
+        }
+
         /// <summary>The names of the teacher's commands.</summary>
         public const string DoPause = "pause", DoResume = "resume", DoRestart = "restart", DoLeave = "leave", DoAttention = "attention", DoMessage = "message",
             DoWeather = "weather", DoFailure = "failure";
@@ -261,6 +271,12 @@ namespace Ushqyr.Edu
         public bool HandUp { get; private set; }
         /// <summary>The teacher asked for this activity to be started; the game's own code loads its scene.</summary>
         public static event Action<ActivityDefinition, Assignment, bool> StartRequested;
+        /// <summary>
+        /// The teacher sent a race track (its name and its JSON); the game's own code checks and stores it, and
+        /// returns the id it now has on this seat, or null when it was not a track. The last argument asks for a
+        /// race on it at once.
+        /// </summary>
+        public static event Func<string, string, bool, string> TrackReceived;
         /// <summary>The teacher sent everyone back to the menu.</summary>
         public static event Action LeaveRequested;
 
@@ -509,6 +525,17 @@ namespace Ushqyr.Edu
                     case "failure":
                         if (r != null) r.TeacherFailure(Json.Str(c, "name", ""), (float)Json.Num(c, "value", 0));
                         break;
+                    case "track":
+                    {
+                        string trackName = Json.Str(c, "name", "");
+                        string id = TrackReceived != null ? TrackReceived.Invoke(trackName, Json.Str(c, "json", ""), Json.Flag(c, "race")) : null;
+                        if (id != null && !Json.Flag(c, "race"))
+                        {
+                            _message = L.F("New track from the teacher: {0}", trackName);
+                            _messageUntil = Time.unscaledTime + 15f;
+                        }
+                        break;
+                    }
                     // A PC that is itself holding a class keeps its own lists and tasks.
                     case "roster":
                         if (Host == null) TakeRoster(c);

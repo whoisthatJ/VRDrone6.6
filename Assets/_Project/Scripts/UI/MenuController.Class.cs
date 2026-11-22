@@ -245,7 +245,40 @@ namespace Ushqyr.UI
                 y -= 76f;
                 if (y < -(Height - 190f)) break;
             }
+            UiKit.Button(p, L.T("Race tracks"), new Vector2(Width - Margin - 300f, -(Height - 110f)), new Vector2(300f, 70f), () => { _tPage = 0; ShowClassTracks(); }, 26f);
             TeacherNote(p);
+        }
+
+        /// <summary>The teacher's own tracks from the track editor: send one to the seats, or send it and race on it.</summary>
+        private void ShowClassTracks()
+        {
+            RectTransform p = TeacherPage(ShowClassStart);
+            List<Ushqyr.Track.TrackData> tracksOfMine = Ushqyr.Track.TrackLibrary.Default.LoadAll();
+            UiKit.Label(p, tracksOfMine.Count == 0 ? L.T("No tracks of your own yet. Build one in the track editor.")
+                    : _classTarget.Length > 0 ? L.F("Tracks from the track editor, for the seat {0}", _classTarget) : L.T("Tracks from the track editor, for every seat"),
+                new Vector2(Margin, -125f), new Vector2(ContentWidth, 60f), 28f, TextAlignmentOptions.MidlineLeft, UiKit.DimTextColor);
+            const int rows = 7;
+            int pages = Mathf.Max(1, (tracksOfMine.Count + rows - 1) / rows);
+            _tPage = Mathf.Clamp(_tPage, 0, pages - 1);
+            float y = -205f;
+            for (int i = _tPage * rows; i < tracksOfMine.Count && i < (_tPage + 1) * rows; i++)
+            {
+                Ushqyr.Track.TrackData track = tracksOfMine[i];
+                RectTransform row = UiKit.Rect(p, "Track", new Vector2(Margin, y), new Vector2(ContentWidth, 76f));
+                UiKit.Image(row, new Color(1f, 1f, 1f, 0.05f));
+                UiKit.Label(row, track.Name, new Vector2(20f, 0f), new Vector2(ContentWidth - 760f, 76f), 28f, TextAlignmentOptions.MidlineLeft);
+                void Send(bool race)
+                {
+                    int n = EduClassroom.Instance.SendTrack(_classTarget.Length > 0 ? _classTarget : null, track.Name, track.ToJson(false), race);
+                    _tMessage = L.F("Sent to {0} seats: {1}", n, track.Name);
+                    ShowClassTracks();
+                }
+                UiKit.Button(row, L.T("Send"), new Vector2(ContentWidth - 720f, -8f), new Vector2(280f, 60f), () => Send(false), 24f);
+                UiKit.Button(row, L.T("Send and start a race"), new Vector2(ContentWidth - 430f, -8f), new Vector2(420f, 60f), () => Send(true), 24f);
+                y -= 86f;
+            }
+            TeacherNote(p);
+            TeacherPager(p, pages, ShowClassTracks);
         }
 
         /// <summary>One seat: its picture, what it is doing, and what the teacher can do to it.</summary>

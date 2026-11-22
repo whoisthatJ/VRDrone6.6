@@ -4769,6 +4769,34 @@ MonoBehaviour:
     m_Key: 'FAI: one tone after 2-4 s'
     m_Metadata:
       m_Items: []
+  - m_Id: 6957357576486912
+    m_Key: Race tracks
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6957357631012864
+    m_Key: No tracks of your own yet. Build one in the track editor.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6957357631012865
+    m_Key: Tracks from the track editor, for the seat {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6957357631012866
+    m_Key: Tracks from the track editor, for every seat
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6957357631012867
+    m_Key: 'Sent to {0} seats: {1}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6957357631012868
+    m_Key: Send and start a race
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6957357631012869
+    m_Key: 'New track from the teacher: {0}'
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

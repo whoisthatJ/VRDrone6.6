@@ -1052,3 +1052,21 @@ laps (the holeshot of an elimination race is not asked for). 498 tests pass.
 the throttle opened during the arm call the quad was off its position at the tone, and the false start was called
 when it went through the first gate. **Not yet:** the FAI timing is not shown on the HUD (the old lap timer still
 is); races over the LAN do not use any of this yet. 498 tests pass.
+
+### 22 November 2026, night: a track sent to the seats over the class link
+
+In the teacher's Class tab, "Start an exercise" has a **Race tracks** button: the teacher's own tracks from the track
+editor, each with **Send** and **Send and start a race**, for every seat or the one chosen. A seat checks the track,
+keeps it among its own tracks under the teacher's name for it (the same name again replaces the earlier one) and
+either says "New track from the teacher" or starts a race on it at once.
+
+**Checked** in the editor with this PC as teacher and seat: a track of 8 gates was sent, stored on the seat, and the
+race started on it. **What this is not:** each seat races alone on the track; it is not yet a race of several pilots
+who see each other, and its times do not come back to the teacher's PC.
+
+**Where ED5 stands.** Built: the FAI rules as a reference page; the tournament engine; the timing; the result
+sheets; tournaments in the console with results typed in; the FAI start and false start in the game's own race; a
+track sent to the seats. **Not built:** a LAN race of up to 8 that uses the FAI timing and feeds a tournament by
+itself (it needs a decision on how such a race is carried, and more than one PC to try); the ten tracks with medal
+times, bot lines and ghosts; the race director's and spectators' views; the big-screen mode; brackets for 32 and 64.
+498 tests pass.

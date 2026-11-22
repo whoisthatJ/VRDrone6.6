@@ -16,6 +16,38 @@ namespace Ushqyr.Game
             EduClassroom.StartRequested += Start;
             EduClassroom.LeaveRequested -= Leave;
             EduClassroom.LeaveRequested += Leave;
+            EduClassroom.TrackReceived -= TakeTrack;
+            EduClassroom.TrackReceived += TakeTrack;
+        }
+
+        /// <summary>
+        /// Stores a track the teacher sent among this seat's own tracks (the same name again replaces the earlier
+        /// one) and, when asked, starts a race on it. Returns the track's id here, or null when it could not be read.
+        /// </summary>
+        private static string TakeTrack(string name, string json, bool race)
+        {
+            try
+            {
+                Ushqyr.Track.TrackData track = Ushqyr.Track.TrackData.FromJson(json);
+                if (!string.IsNullOrWhiteSpace(name)) track.Name = name;
+                var safe = new System.Text.StringBuilder();
+                foreach (char c in track.Name ?? "")
+                    if (safe.Length < 40) safe.Append(char.IsLetterOrDigit(c) ? char.ToLowerInvariant(c) : '-');
+                track.Id = Ushqyr.Track.TrackLibrary.UserPrefix + "class-" + (safe.Length > 0 ? safe.ToString() : "track");
+                Ushqyr.Track.TrackLibrary.Default.Save(track);
+                if (race && GameFlow.Catalog != null)
+                {
+                    Time.timeScale = 1f;
+                    EduActivityRunner.LeaveBlocked = false;
+                    GameFlow.Race(GameFlow.Catalog, track.Id);
+                }
+                return track.Id;
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogWarning("[Edu] the track the teacher sent could not be stored: " + e.Message);
+                return null;
+            }
         }
 
         private static void Start(ActivityDefinition activity, Assignment given, bool locked)
