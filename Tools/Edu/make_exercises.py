@@ -764,6 +764,9 @@ EXERCISES.append({
     'reference': ref,
 })
 
+# The right stick pulled fully back (nose up), as the reference flights give it.
+PITCH_BACK = -1
+
 # ================================================================ Block E: racing and freestyle technique
 RACE = {'place': 'field', 'drone': 'race5', 'assist': 'off', 'view': 'fpv', 'mode': 'acro'}
 
@@ -786,6 +789,96 @@ EXERCISES.append({
                 'weight': 40, 'best': 40, 'worst': 110},
                dict(landing_line(10, 8, 4), worst=2.0)],
     'reference': ref,
+})
+
+# Freestyle moves are flown on the sticks in the reference too: the autopilot only carries the drone to the start and
+# catches it afterwards. PULL is the right stick pulled fully back.
+PULL = PITCH_BACK
+HOME_AGAIN = [{'goto': [0, 6, 0], 'heading': 0, 'until_near': True}, {'goto': [0, 2, 0], 'heading': 0, 'until_near': True}, {'goto': [0, 2, 0], 'heading': 0, 'wait': 3},
+              {'land': True, 'until_landed': True}]
+HEIGHT_TIP = t('Height is your safety: start every new move high, and throttle down while the drone is upside down.',
+               'Биіктік - сіздің қауіпсіздігіңіз: әр жаңа қимылды биіктен бастаңыз, ал дрон төңкеріліп тұрғанда газды азайтыңыз.',
+               'Высота - ваша безопасность: каждый новый элемент начинайте высоко, а пока дрон перевёрнут, убирайте газ.')
+
+
+def trick_time(weight, best, worst):
+    return dict(time_line(weight, best, worst), tip=HEIGHT_TIP)
+
+
+# ---------------------------------------------------------------- E26
+steps = [
+    {'say': t('Climb to 20 m', '20 м биіктікке көтеріліңіз', 'Наберите высоту 20 м'), 'height': 20, 'tolerance': 4},
+    {'say': t('Half roll: turn the drone onto its back', 'Жарты бөшке: дронды арқасына аударыңыз', 'Полубочка: переверните дрон на спину'), 'roll': 180},
+    {'say': t('Pull the right stick back until the drone is level again', 'Дрон қайта түзелгенше оң стикті өзіңізге тартыңыз', 'Тяните правый стик на себя, пока дрон снова не выровняется'), 'flip': 180},
+    {'say': t('Fly level, back the way you came', 'Келген жағыңызға қарай түзу ұшыңыз', 'Летите ровно в обратную сторону'), 'heading': 180, 'tolerance': 35, 'for': 1.5},
+    LAND_HOME,
+]
+EXERCISES.append({
+    'format': 1, 'id': 'e26-split-s', 'type': 'exercise',
+    'title': t('Split-S', 'Сплит-S', 'Сплит-S'),
+    'briefing': t('The split-S turns the drone round and trades height for speed. Climb to 20 m and fly forward. Roll onto your back, lower the throttle, then pull the right stick back: the nose drops through straight down and comes up facing the way you came. The move costs height, so never start it low.',
+                  'Сплит-S дронды кері бұрып, биіктікті жылдамдыққа айырбастайды. 20 м-ге көтеріліп, алға ұшыңыз. Арқаңызға аударылып, газды азайтыңыз, содан кейін оң стикті өзіңізге тартыңыз: тұмсық тік төмен арқылы өтіп, келген жағыңызға қарап көтеріледі. Бұл қимыл биіктікті алады, сондықтан оны ешқашан төменнен бастамаңыз.',
+                  'Сплит-S разворачивает дрон и меняет высоту на скорость. Наберите 20 м и летите вперёд. Перевернитесь на спину, уберите газ, затем потяните правый стик на себя: нос пройдёт через вертикаль вниз и поднимется уже в обратную сторону. Элемент стоит высоты, поэтому никогда не начинайте его низко.'),
+    'pass': 60, 'time_limit': 180,
+    'setup': dict(RACE, drone='freestyle5', objects=[PAD]),
+    'rubric': [steps_line(steps, 70), trick_time(15, 50, 150), landing_line(15)],
+    'reference': [{'takeoff': 20, 'until_step': 1}, {'goto': [0, 20, 40], 'heading': 0, 'speed': 5, 'wait': 2.5},
+                  {'sticks': {'throttle': 0.3, 'roll': 1}, 'until_step': 2},
+                  {'sticks': {'throttle': 0.1, 'pitch': PULL}, 'until_step': 3},
+                  {'hold': True, 'heading': 180, 'until_step': 4}] + HOME_AGAIN,
+})
+
+# ---------------------------------------------------------------- E27
+loop_gate = (0, 1, 20, 0, 3, 2)
+GATE_STEP = {'gate': through(0, 1, 20, 3, 2, 0)}
+steps = [
+    dict(GATE_STEP, say=t('Fly through the gate with good speed', 'Қақпадан жақсы жылдамдықпен ұшып өтіңіз', 'Пролетите ворота на хорошей скорости')),
+    {'say': t('Throttle up and pull back until the nose points at the sky', 'Газды қосып, тұмсық аспанға қарағанша стикті тартыңыз', 'Добавьте газ и тяните стик на себя, пока нос не будет смотреть в небо'), 'flip': 90},
+    {'say': t('Go over the top of the gate', 'Қақпаның үстінен асып өтіңіз', 'Пройдите над воротами'), 'zone': zone(0, 9, 20, 8, 3.5)},
+    {'say': t('Lower the throttle and keep pulling until the drone is level again', 'Газды азайтып, дрон қайта түзелгенше тартуды жалғастырыңыз', 'Уберите газ и продолжайте тянуть, пока дрон снова не выровняется'), 'flip': 240},
+    dict(GATE_STEP, say=t('Come through the same gate again', 'Сол қақпадан қайта өтіңіз', 'Пройдите те же ворота ещё раз')),
+    land_far(40),
+]
+EXERCISES.append({
+    'format': 1, 'id': 'e27-power-loop', 'type': 'exercise',
+    'title': t('Power loop', 'Күш тұзағы', 'Силовая петля'),
+    'briefing': t('A power loop goes through a gate, up and over the top of it on its back, and down through the gate again. Come through fast, add throttle and pull back. Over the top, lower the throttle and keep pulling, and look for the gate as the nose comes down. A wide loop is easier than a tight one.',
+                  'Күш тұзағында дрон қақпадан өтіп, оның үстінен арқасымен асып, қайтадан қақпадан төмен өтеді. Жылдам өтіп, газды қосып, стикті тартыңыз. Жоғарғы нүктеде газды азайтып, тартуды жалғастырыңыз да, тұмсық төмендегенде қақпаны іздеңіз. Кең тұзақ тар тұзақтан оңайырақ.',
+                  'В силовой петле дрон проходит ворота, уходит вверх и через них на спине, и снова проходит ворота сверху вниз. Пройдите быстро, добавьте газ и тяните на себя. В верхней точке уберите газ и продолжайте тянуть, а когда нос пойдёт вниз, ищите ворота взглядом. Широкая петля легче тесной.'),
+    'pass': 60, 'time_limit': 180,
+    'setup': dict(RACE, drone='freestyle5', objects=[PAD, far_pad(40), gate('g1', 0, 1, 20, 3, 2, 0)]),
+    'rubric': [steps_line(steps, 70), trick_time(15, 45, 150), dict(landing_line(15, 0, 40), worst=2.0)],
+    'reference': [{'takeoff': 2, 'wait': 4}, {'goto': [0, 2, 8], 'heading': 0, 'until_near': True}, {'goto': [0, 2, 30], 'heading': 0, 'speed': 7, 'until_step': 1},
+                  {'sticks': {'throttle': 0.8, 'pitch': 0.5 * PULL}, 'until_step': 3},
+                  {'sticks': {'throttle': 0.2, 'pitch': 0.5 * PULL}, 'until_step': 4},
+                  {'hold': True, 'heading': 0, 'wait': 3}, {'goto': [0, 7, 10], 'heading': 0, 'until_near': True}, {'goto': [0, 2, 12], 'heading': 0, 'until_near': True},
+                  {'goto': [0, 2, 28], 'heading': 0, 'speed': 4, 'until_step': 5},
+                  {'goto': [0, 2, 40], 'heading': 0, 'until_near': True}, {'goto': [0, 2, 40], 'heading': 0, 'wait': 3}, {'land': True, 'until_landed': True}],
+})
+
+# ---------------------------------------------------------------- E28
+UP = {'say': t('Climb to 12 m', '12 м биіктікке көтеріліңіз', 'Наберите высоту 12 м'), 'height': 12, 'tolerance': 3}
+steps = [
+    UP,
+    {'say': t('Roll: right stick fully to one side until the drone has gone right round', 'Бөшке: дрон толық айналғанша оң стикті бір жаққа толық итеріңіз', 'Бочка: правый стик до упора в сторону, пока дрон не сделает полный оборот'), 'roll': 360},
+    dict(UP, say=t('Level out and climb back to 12 m', 'Түзеліп, қайтадан 12 м-ге көтеріліңіз', 'Выровняйтесь и снова наберите 12 м'), **{'for': 1}),
+    {'say': t('Flip: right stick fully forward or back until the drone has gone right over', 'Сальто: дрон толық айналғанша оң стикті алға немесе артқа толық итеріңіз', 'Флип: правый стик до упора вперёд или назад, пока дрон не сделает полный оборот'), 'flip': 360},
+    LAND_HOME,
+]
+EXERCISES.append({
+    'format': 1, 'id': 'e28-roll-and-flip', 'type': 'exercise',
+    'title': t('Roll and flip', 'Бөшке және сальто', 'Бочка и флип'),
+    'briefing': t('The two moves every freestyle trick is built from. Climb to 12 m. For each move: a short burst of throttle, then lower the throttle, push the right stick fully over and hold it until the horizon comes round again, then centre the stick and catch the drone with the throttle.',
+                  'Фристайлдың барлық трюктері осы екі қимылдан құралады. 12 м-ге көтеріліңіз. Әр қимыл үшін: газды қысқа уақытқа қосыңыз, содан кейін азайтыңыз, оң стикті толық итеріп, көкжиек қайта оралғанша ұстаңыз, содан соң стикті ортаға қойып, дронды газбен ұстап алыңыз.',
+                  'Два элемента, из которых складывается любой трюк фристайла. Наберите 12 м. Для каждого элемента: короткий импульс газа, затем уберите газ, отклоните правый стик до упора и держите, пока горизонт не вернётся, затем верните стик в центр и поймайте дрон газом.'),
+    'pass': 60, 'time_limit': 180,
+    'setup': dict(RACE, drone='freestyle5', objects=[PAD]),
+    'rubric': [steps_line(steps, 70), trick_time(15, 45, 150), landing_line(15)],
+    'reference': [{'takeoff': 12, 'until_step': 1}, {'goto': [0, 12, 0], 'heading': 0, 'wait': 2},
+                  {'sticks': {'throttle': 0.25, 'roll': 1}, 'until_step': 2},
+                  {'hold': True, 'heading': 0, 'wait': 2}, {'goto': [0, 12, 0], 'heading': 0, 'until_step': 3}, {'goto': [0, 12, 0], 'heading': 0, 'wait': 2},
+                  {'sticks': {'throttle': 0.25, 'pitch': PULL}, 'until_step': 4},
+                  {'hold': True, 'heading': 0, 'wait': 2}] + HOME_AGAIN,
 })
 
 # ---------------------------------------------------------------- E29

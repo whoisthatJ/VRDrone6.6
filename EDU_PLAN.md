@@ -790,3 +790,23 @@ so their reference flights need scripted stick work (or a person): not started.
 **Also during this session** the Unity editor closed and reopened once while a reference was being flown (a shell on
 this PC ran out of resources at the same moment). Nothing was lost; the flight was flown again.
 
+
+### 22 November 2026, late night: the rest of blocks D and E except the check ride
+
+**Exercises 23, 24, 25 and 29** (acro hover, acro circuit, racing line, proximity gaps): references flown by the
+autopilot along the course, all 100.
+
+**Exercises 26, 27 and 28** (split-S, power loop, roll and flip) are judged by two new step kinds, `roll` and `flip`:
+how far the drone has turned about its own nose-to-tail or wing-to-wing axis since the step began, either way round,
+whichever way it faces. Rocking back and forth cancels out, and a flip is not counted as a roll (tested).
+
+- **D40. The references of the three manoeuvres are flown on the sticks, by a script.** The reference pilot gained
+  stick commands that take the drone from the autopilot, and `hold`, which gives it back wherever it is. The
+  autopilot carries the drone to the start and lands it; the manoeuvre itself is stick positions held until a step is
+  done, on the same flight model in acro. References: 100 each.
+- **D41. The power loop is judged in four parts,** not as one 360 degree flip: through the gate, nose to the sky,
+  over the top of the gate (a zone 5.5 to 12.5 m up), round to level, and through the same gate again. The first
+  reference flipped on the spot beside the gate and passed a plain "flip 360"; that is not a power loop.
+
+**Twenty-nine of thirty exercises exist.** Left in ED3: 30 check ride with its certificate, a demonstration of the
+reference in the briefing, the replay library, and gamepad or radio control of the exercise screens. 467 tests pass.

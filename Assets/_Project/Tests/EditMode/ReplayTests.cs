@@ -293,6 +293,39 @@ namespace Ushqyr.Tests
         }
 
         [Test]
+        public void RollAndFlip_AreCountedAboutTheDronesOwnAxes()
+        {
+            // Turning about the nose-to-tail axis (a roll) at 600 degrees a second, then about the wing-to-wing axis.
+            FlightSample Turned(char axis, float deg, float headingDeg)
+            {
+                double h = headingDeg * Math.PI / 360.0, a = deg * Math.PI / 360.0;
+                // heading (about Y) × the turn about the drone's own Z or X
+                float yw = (float)Math.Cos(h), yy = (float)Math.Sin(h), tw = (float)Math.Cos(a), t = (float)Math.Sin(a);
+                var s = new FlightSample { Y = 10f, Armed = true };
+                if (axis == 'z') { s.Qx = yy * t; s.Qy = yy * tw; s.Qz = yw * t; s.Qw = yw * tw; }
+                else { s.Qx = yw * t; s.Qy = yy * tw; s.Qz = -yy * t; s.Qw = yw * tw; }
+                return s;
+            }
+            foreach (float heading in new[] { 0f, 135f })
+            {
+                var roll = new StepTracker(Steps("[{\"say\":\"r\",\"roll\":360},{\"say\":\"f\",\"flip\":360}]"));
+                for (int deg = 0; deg <= 300; deg += 6) roll.Feed(Turned('z', deg, heading), 0.01);
+                Assert.AreEqual(0, roll.Done, "300 degrees is not a roll");
+                Assert.AreEqual(300f / 360f, roll.Progress, 0.03f);
+                for (int deg = 306; deg <= 366; deg += 6) roll.Feed(Turned('z', deg, heading), 0.01);
+                Assert.AreEqual(1, roll.Done, "a full roll, whichever way the drone faces");
+                for (int deg = 0; deg >= -366; deg -= 6) roll.Feed(Turned('x', deg, heading), 0.01);
+                Assert.AreEqual(2, roll.Done, "a flip backwards counts as a flip");
+            }
+            // A flip is not a roll, and rocking back and forth is neither.
+            var only = new StepTracker(Steps("[{\"say\":\"r\",\"roll\":360}]"));
+            for (int deg = 0; deg <= 720; deg += 6) only.Feed(Turned('x', deg, 0f), 0.01);
+            Assert.AreEqual(0, only.Done);
+            for (int i = 0; i < 400; i++) only.Feed(Turned('z', 40f * (float)Math.Sin(i * 0.3), 0f), 0.01);
+            Assert.AreEqual(0, only.Done);
+        }
+
+        [Test]
         public void LandingStep_CanAskForAPad()
         {
             List<StepSpec> steps = Steps("[{\"say\":\"l\",\"landed\":true,\"pad\":{\"x\":5,\"z\":5,\"radius\":0.5}}]");

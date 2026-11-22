@@ -3737,6 +3737,86 @@ MonoBehaviour:
     m_Key: 'Five openings in a line, each smaller than the one before: from 3 m wide down to 1 m. Fly through the middle of each. Touching a frame hard ends the attempt.'
     m_Metadata:
       m_Items: []
+  - m_Id: 6924680404140032
+    m_Key: 'Height is your safety: start every new move high, and throttle down while the drone is upside down.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6924680492220416
+    m_Key: Climb to 20 m
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6924680492220417
+    m_Key: 'Half roll: turn the drone onto its back'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6924680492220418
+    m_Key: Pull the right stick back until the drone is level again
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6924680492220419
+    m_Key: Fly level, back the way you came
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6924680492220420
+    m_Key: Split-S
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6924680492220421
+    m_Key: 'The split-S turns the drone round and trades height for speed. Climb to 20 m and fly forward. Roll onto your back, lower the throttle, then pull the right stick back: the nose drops through straight down and comes up facing the way you came. The move costs height, so never start it low.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6924680492220422
+    m_Key: Fly through the gate with good speed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6924680492220423
+    m_Key: Throttle up and pull back until the nose points at the sky
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6924680492220424
+    m_Key: Go over the top of the gate
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6924680492220425
+    m_Key: Lower the throttle and keep pulling until the drone is level again
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6924680492220426
+    m_Key: Come through the same gate again
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6924680492220427
+    m_Key: Power loop
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6924680492220428
+    m_Key: A power loop goes through a gate, up and over the top of it on its back, and down through the gate again. Come through fast, add throttle and pull back. Over the top, lower the throttle and keep pulling, and look for the gate as the nose comes down. A wide loop is easier than a tight one.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6924680492220429
+    m_Key: Climb to 12 m
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6924680492220430
+    m_Key: 'Roll: right stick fully to one side until the drone has gone right round'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6924680492220431
+    m_Key: Level out and climb back to 12 m
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6924680492220432
+    m_Key: 'Flip: right stick fully forward or back until the drone has gone right over'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6924680492220433
+    m_Key: Roll and flip
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6924680492220434
+    m_Key: 'The two moves every freestyle trick is built from. Climb to 12 m. For each move: a short burst of throttle, then lower the throttle, push the right stick fully over and hold it until the horizon comes round again, then centre the stick and catch the drone with the throttle.'
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

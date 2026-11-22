@@ -1,0 +1,181 @@
+{
+  "format": 1,
+  "id": "e28-roll-and-flip",
+  "type": "exercise",
+  "title": "Roll and flip",
+  "briefing": "The two moves every freestyle trick is built from. Climb to 12 m. For each move: a short burst of throttle, then lower the throttle, push the right stick fully over and hold it until the horizon comes round again, then centre the stick and catch the drone with the throttle.",
+  "pass": 60,
+  "time_limit": 180,
+  "setup": {
+    "place": "field",
+    "drone": "freestyle5",
+    "assist": "off",
+    "view": "fpv",
+    "mode": "acro",
+    "objects": [
+      {
+        "type": "pad",
+        "id": "home",
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "size": 1.5
+      }
+    ]
+  },
+  "rubric": [
+    {
+      "id": "steps",
+      "metric": "steps_done",
+      "label": "Steps done",
+      "tip": "Do the steps in the order shown at the top of the screen; each one counts only when the one before it is done.",
+      "weight": 70,
+      "best": 5,
+      "worst": 2,
+      "required": true,
+      "params": {
+        "steps": [
+          {
+            "say": "Climb to 12 m",
+            "height": 12,
+            "tolerance": 3
+          },
+          {
+            "say": "Roll: right stick fully to one side until the drone has gone right round",
+            "roll": 360
+          },
+          {
+            "say": "Level out and climb back to 12 m",
+            "height": 12,
+            "tolerance": 3,
+            "for": 1
+          },
+          {
+            "say": "Flip: right stick fully forward or back until the drone has gone right over",
+            "flip": 360
+          },
+          {
+            "say": "Fly back, land on the pad and switch the motors off",
+            "landed": true,
+            "pad": {
+              "x": 0,
+              "z": 0,
+              "radius": 0.75
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "time",
+      "metric": "duration",
+      "label": "Time taken",
+      "tip": "Height is your safety: start every new move high, and throttle down while the drone is upside down.",
+      "weight": 15,
+      "best": 45,
+      "worst": 150
+    },
+    {
+      "id": "landing",
+      "metric": "landing_distance",
+      "label": "Landing on the pad",
+      "tip": "Stop above the pad first, then come straight down.",
+      "weight": 15,
+      "best": 0.25,
+      "worst": 1.5,
+      "required": true,
+      "params": {
+        "x": 0,
+        "z": 0
+      }
+    }
+  ],
+  "reference": [
+    {
+      "takeoff": 12,
+      "until_step": 1
+    },
+    {
+      "goto": [
+        0,
+        12,
+        0
+      ],
+      "heading": 0,
+      "wait": 2
+    },
+    {
+      "sticks": {
+        "throttle": 0.25,
+        "roll": 1
+      },
+      "until_step": 2
+    },
+    {
+      "hold": true,
+      "heading": 0,
+      "wait": 2
+    },
+    {
+      "goto": [
+        0,
+        12,
+        0
+      ],
+      "heading": 0,
+      "until_step": 3
+    },
+    {
+      "goto": [
+        0,
+        12,
+        0
+      ],
+      "heading": 0,
+      "wait": 2
+    },
+    {
+      "sticks": {
+        "throttle": 0.25,
+        "pitch": -1
+      },
+      "until_step": 4
+    },
+    {
+      "hold": true,
+      "heading": 0,
+      "wait": 2
+    },
+    {
+      "goto": [
+        0,
+        6,
+        0
+      ],
+      "heading": 0,
+      "until_near": true
+    },
+    {
+      "goto": [
+        0,
+        2,
+        0
+      ],
+      "heading": 0,
+      "until_near": true
+    },
+    {
+      "goto": [
+        0,
+        2,
+        0
+      ],
+      "heading": 0,
+      "wait": 3
+    },
+    {
+      "land": true,
+      "until_landed": true
+    }
+  ]
+}

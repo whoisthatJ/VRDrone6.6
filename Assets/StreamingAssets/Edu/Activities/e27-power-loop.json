@@ -1,0 +1,226 @@
+{
+  "format": 1,
+  "id": "e27-power-loop",
+  "type": "exercise",
+  "title": "Power loop",
+  "briefing": "A power loop goes through a gate, up and over the top of it on its back, and down through the gate again. Come through fast, add throttle and pull back. Over the top, lower the throttle and keep pulling, and look for the gate as the nose comes down. A wide loop is easier than a tight one.",
+  "pass": 60,
+  "time_limit": 180,
+  "setup": {
+    "place": "field",
+    "drone": "freestyle5",
+    "assist": "off",
+    "view": "fpv",
+    "mode": "acro",
+    "objects": [
+      {
+        "type": "pad",
+        "id": "home",
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "size": 1.5
+      },
+      {
+        "type": "pad",
+        "id": "finish",
+        "x": 0,
+        "y": 0,
+        "z": 40,
+        "size": 3
+      },
+      {
+        "type": "gate",
+        "id": "g1",
+        "x": 0,
+        "y": 1,
+        "z": 20,
+        "size": 3,
+        "height": 2,
+        "heading": 0
+      }
+    ]
+  },
+  "rubric": [
+    {
+      "id": "steps",
+      "metric": "steps_done",
+      "label": "Steps done",
+      "tip": "Do the steps in the order shown at the top of the screen; each one counts only when the one before it is done.",
+      "weight": 70,
+      "best": 6,
+      "worst": 3,
+      "required": true,
+      "params": {
+        "steps": [
+          {
+            "gate": {
+              "x": 0,
+              "y": 1,
+              "z": 20,
+              "width": 3,
+              "height": 2,
+              "heading": 0
+            },
+            "say": "Fly through the gate with good speed"
+          },
+          {
+            "say": "Throttle up and pull back until the nose points at the sky",
+            "flip": 90
+          },
+          {
+            "say": "Go over the top of the gate",
+            "zone": {
+              "x": 0,
+              "y": 9,
+              "z": 20,
+              "radius": 8,
+              "tolerance": 3.5
+            }
+          },
+          {
+            "say": "Lower the throttle and keep pulling until the drone is level again",
+            "flip": 240
+          },
+          {
+            "gate": {
+              "x": 0,
+              "y": 1,
+              "z": 20,
+              "width": 3,
+              "height": 2,
+              "heading": 0
+            },
+            "say": "Come through the same gate again"
+          },
+          {
+            "say": "Land on the far pad and switch the motors off",
+            "landed": true,
+            "pad": {
+              "x": 0,
+              "z": 40,
+              "radius": 1.5
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "time",
+      "metric": "duration",
+      "label": "Time taken",
+      "tip": "Height is your safety: start every new move high, and throttle down while the drone is upside down.",
+      "weight": 15,
+      "best": 45,
+      "worst": 150
+    },
+    {
+      "id": "landing",
+      "metric": "landing_distance",
+      "label": "Landing on the pad",
+      "tip": "Stop above the pad first, then come straight down.",
+      "weight": 15,
+      "best": 0.25,
+      "worst": 2.0,
+      "required": true,
+      "params": {
+        "x": 0,
+        "z": 40
+      }
+    }
+  ],
+  "reference": [
+    {
+      "takeoff": 2,
+      "wait": 4
+    },
+    {
+      "goto": [
+        0,
+        2,
+        8
+      ],
+      "heading": 0,
+      "until_near": true
+    },
+    {
+      "goto": [
+        0,
+        2,
+        30
+      ],
+      "heading": 0,
+      "speed": 7,
+      "until_step": 1
+    },
+    {
+      "sticks": {
+        "throttle": 0.8,
+        "pitch": -0.5
+      },
+      "until_step": 3
+    },
+    {
+      "sticks": {
+        "throttle": 0.2,
+        "pitch": -0.5
+      },
+      "until_step": 4
+    },
+    {
+      "hold": true,
+      "heading": 0,
+      "wait": 3
+    },
+    {
+      "goto": [
+        0,
+        7,
+        10
+      ],
+      "heading": 0,
+      "until_near": true
+    },
+    {
+      "goto": [
+        0,
+        2,
+        12
+      ],
+      "heading": 0,
+      "until_near": true
+    },
+    {
+      "goto": [
+        0,
+        2,
+        28
+      ],
+      "heading": 0,
+      "speed": 4,
+      "until_step": 5
+    },
+    {
+      "goto": [
+        0,
+        2,
+        40
+      ],
+      "heading": 0,
+      "until_near": true
+    },
+    {
+      "goto": [
+        0,
+        2,
+        40
+      ],
+      "heading": 0,
+      "wait": 3
+    },
+    {
+      "land": true,
+      "until_landed": true
+    }
+  ]
+}

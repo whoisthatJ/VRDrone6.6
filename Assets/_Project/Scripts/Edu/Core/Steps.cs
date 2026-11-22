@@ -10,7 +10,7 @@ namespace Ushqyr.Edu
 
         /// <summary>What the pilot is told (a key of the language table).</summary>
         public string Say = "";
-        /// <summary>"stick", "zone", "height", "turn", "heading", "circle", "gate", "photo" or "landed".</summary>
+        /// <summary>"stick", "zone", "height", "turn", "heading", "circle", "gate", "roll", "flip", "photo" or "landed".</summary>
         public string Kind = "";
         public string Stick = "";
         /// <summary>Stick: the value to go above (or below, when <see cref="Below"/>).</summary>
@@ -142,6 +142,26 @@ namespace Ushqyr.Edu
                     _lastHeading = s.Heading;
                     _hasHeading = true;
                     double share = step.Degrees != 0 ? _turned / step.Degrees : 1;
+                    met = share >= 1;
+                    Progress = (float)Math.Max(0.0, Math.Min(1.0, share));
+                    break;
+                }
+                case "roll":
+                case "flip":
+                {
+                    // How far the drone has turned about its own nose-to-tail axis (a roll) or wing-to-wing axis (a
+                    // flip) since the step began, either way round; small turns back and forth cancel out.
+                    if (_hasBefore)
+                    {
+                        // The turn from the moment before to now, seen from the drone: conj(before) × now.
+                        float bx = -_before.Qx, by = -_before.Qy, bz = -_before.Qz, bw = _before.Qw;
+                        float rx = bw * s.Qx + bx * s.Qw + by * s.Qz - bz * s.Qy;
+                        float rz = bw * s.Qz + bx * s.Qy - by * s.Qx + bz * s.Qw;
+                        float rw = bw * s.Qw - bx * s.Qx - by * s.Qy - bz * s.Qz;
+                        float sign = rw < 0f ? -1f : 1f;
+                        _turned += 2.0 * Math.Asin(Math.Max(-1.0, Math.Min(1.0, sign * (step.Kind == "roll" ? rz : rx)))) * 180.0 / Math.PI;
+                    }
+                    double share = step.Degrees != 0 ? Math.Abs(_turned) / Math.Abs(step.Degrees) : 1;
                     met = share >= 1;
                     Progress = (float)Math.Max(0.0, Math.Min(1.0, share));
                     break;
@@ -292,6 +312,12 @@ namespace Ushqyr.Edu
                     step.Degrees = Json.Num(o, "heading", 0);
                     step.Tolerance = Json.Num(o, "tolerance", 15);
                 }
+                else if (o.ContainsKey("roll") || o.ContainsKey("flip"))
+                {
+                    step.Kind = o.ContainsKey("roll") ? "roll" : "flip";
+                    step.Degrees = Json.Num(o, step.Kind, 360);
+                    if (step.Degrees <= 0 || step.Degrees > 3600) throw new FormatException(where + ": \"" + step.Kind + "\" needs degrees between 1 and 3600");
+                }
                 else if (o.ContainsKey("gate"))
                 {
                     Dictionary<string, object> g = Json.Obj(o, "gate") ?? throw new FormatException(where + ": \"gate\" must be an object {x, y, z, heading, width, height}");
@@ -333,7 +359,7 @@ namespace Ushqyr.Edu
                         if (step.Radius <= 0) throw new FormatException(where + ": a pad's radius must be above 0");
                     }
                 }
-                else throw new FormatException(where + ": a step needs one of \"stick\", \"zone\", \"height\", \"turn\", \"heading\", \"circle\", \"gate\", \"photo\" or \"landed\"");
+                else throw new FormatException(where + ": a step needs one of \"stick\", \"zone\", \"height\", \"turn\", \"heading\", \"circle\", \"gate\", \"roll\", \"flip\", \"photo\" or \"landed\"");
                 steps.Add(step);
             }
             return steps;
