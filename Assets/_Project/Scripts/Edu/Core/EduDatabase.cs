@@ -50,6 +50,12 @@ namespace Ushqyr.Edu
                 "create table attendance(day text not null, user_id integer not null references users(id) on delete cascade," +
                 " seat text, first text not null, primary key(day, user_id))",
             },
+            // 4: racing tournaments, each kept whole as text and saved again after every race.
+            new[]
+            {
+                "create table tournaments(id integer primary key, name text not null, track text, json text not null, finished integer not null default 0," +
+                " created text not null, updated text not null)",
+            },
         };
 
         private readonly SqliteDb _db;

@@ -77,6 +77,29 @@ namespace Ushqyr.Edu
             return n;
         }
 
+        /// <summary>Writes a tournament's result sheet and returns the file: 0 the PDF with the bracket, 1 the XLSX, 2 the CSV.</summary>
+        public static string SaveRaceSheet(Tournament t, int kind)
+        {
+            Directory.CreateDirectory(ReportsFolder);
+            string stem = Path.Combine(ReportsFolder, "tournament-" + Safe(t.Name) + "-" + Stamp);
+            string school = EduSession.Store.SchoolName;
+            if (kind == 0)
+            {
+                string pdf = Free(stem + ".pdf");
+                RaceReports.Pdf(t, Font(), L.T, school, DateTime.Now).Save(pdf);
+                return pdf;
+            }
+            if (kind == 1)
+            {
+                string xlsx = Free(stem + ".xlsx");
+                RaceReports.Workbook(t, L.T, school, DateTime.Now).Save(xlsx);
+                return xlsx;
+            }
+            string csv = Free(stem + ".csv");
+            File.WriteAllText(csv, RaceReports.Csv(t, L.T), new UTF8Encoding(true));
+            return csv;
+        }
+
         /// <summary>Copies the class database into the backups folder and returns the file.</summary>
         public static string Backup(string prefix = "class")
         {

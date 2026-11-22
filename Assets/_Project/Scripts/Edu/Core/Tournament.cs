@@ -76,6 +76,9 @@ namespace Ushqyr.Edu
     /// </summary>
     public sealed class Tournament
     {
+        /// <summary>The mark FAI F9U.9.2 gives a pilot disqualified from the event; the same in every language.</summary>
+        public const string DisqMark = "DISQ";
+
         public string Name = "";
         public TournamentSettings Settings = new TournamentSettings();
         public readonly List<string> Pilots = new List<string>();

@@ -278,3 +278,38 @@ Final, race {0}	Финал, {0}-жарыс	Финал, заезд {0}
 Best three laps	Үздік үш айналым	Лучшие три круга
 Average of the three best laps	Үздік үш айналымның орташасы	Среднее трёх лучших кругов
 Bracket	Турнир кестесі	Турнирная сетка
+Racing	Жарыс	Гонки
+New tournament	Жаңа турнир	Новый турнир
+No tournaments yet.	Әзірге турнирлер жоқ.	Турниров пока нет.
+Tournaments	Турнирлер	Турниры
+finished	аяқталды	завершён
+under way	жүріп жатыр	идёт
+Pilots: {0}	Ұшқыштар: {0}	Пилоты: {0}
+Name of the tournament	Турнирдің атауы	Название турнира
+Format: points over a fixed number of rounds	Формат: белгіленген турлар бойынша ұпайлар	Формат: очки за фиксированное число туров
+Format: FAI (qualification, elimination, final)	Формат: FAI (іріктеу, іріктеп шығару, финал)	Формат: FAI (квалификация, выбывание, финал)
+Rounds: {0}	Турлар: {0}	Туры: {0}
+Qualifying rounds: {0}	Іріктеу турлары: {0}	Квалификационные туры: {0}
+Ranking: average of the three best laps	Рейтинг: үздік үш айналымның орташасы	Рейтинг: среднее трёх лучших кругов
+Ranking: best time for the three laps	Рейтинг: үш айналымның үздік уақыты	Рейтинг: лучшее время трёх кругов
+Double elimination: yes	Қосарлы іріктеп шығару: иә	Двойное выбывание: да
+Double elimination: no	Қосарлы іріктеп шығару: жоқ	Двойное выбывание: нет
+Final: races until someone has won two	Финал: біреу екі рет жеңгенше жарыстар	Финал: заезды, пока кто-то не выиграет два
+Final: one race	Финал: бір жарыс	Финал: один заезд
+With fewer than 16 pilots the FAI rules suggest the points format.	16-дан аз ұшқыш болса, FAI ережелері ұпай форматын ұсынады.	Если пилотов меньше 16, правила FAI предлагают формат на очки.
+Create	Құру	Создать
+A tournament needs a name and at least two pilots. Choose a group with students.	Турнирге атау және кемінде екі ұшқыш қажет. Оқушылары бар топты таңдаңыз.	Турниру нужны название и не менее двух пилотов. Выберите группу с учениками.
+Next race	Келесі жарыс	Следующий заезд
+The tournament is finished	Турнир аяқталды	Турнир завершён
+Enter the result	Нәтижені енгізу	Ввести результат
+Races flown	Өткен жарыстар	Проведённые заезды
+Results and bracket (PDF)	Нәтижелер мен кесте (PDF)	Результаты и сетка (PDF)
+Results (XLSX)	Нәтижелер (XLSX)	Результаты (XLSX)
+Results (CSV)	Нәтижелер (CSV)	Результаты (CSV)
+Delete the tournament	Турнирді жою	Удалить турнир
+For each pilot type the lap times, with spaces between them: 20.5 21.3 19.8 or 1:02.3 1:01.9 1:00.4	Әр ұшқыш үшін айналым уақыттарын бос орынмен бөліп теріңіз: 20.5 21.3 19.8 немесе 1:02.3 1:01.9 1:00.4	Для каждого пилота введите времена кругов через пробел: 20.5 21.3 19.8 или 1:02.3 1:01.9 1:00.4
+The lap times of {0} could not be read	{0} ұшқышының айналым уақыттарын оқу мүмкін болмады	Не удалось прочитать времена кругов: {0}
+No race has been flown yet.	Әзірге бірде-бір жарыс өткен жоқ.	Пока не проведено ни одного заезда.
+Correct	Түзету	Исправить
+A change here places the race again; the races that followed from it are flown again.	Мұндағы өзгеріс жарыс орындарын қайта есептейді; одан кейінгі жарыстар қайта өткізіледі.	Изменение здесь пересчитывает места в заезде; заезды, которые из него следовали, проводятся заново.
+Penalty: {0} s	Айып: {0} с	Штраф: {0} с

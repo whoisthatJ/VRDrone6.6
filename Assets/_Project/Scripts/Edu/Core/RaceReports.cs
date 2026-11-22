@@ -111,7 +111,7 @@ namespace Ushqyr.Edu
             foreach (string pilot in t.Classification())
             {
                 bool out_ = t.Excluded.Contains(pilot);
-                x.AddRow(out_ ? (object)"DISQ" : place++, pilot, out_ ? text("disqualified from the event") : points ? (object)sum[pilot] : "");
+                x.AddRow(out_ ? (object)Tournament.DisqMark : place++, pilot, out_ ? text("disqualified from the event") : points ? (object)sum[pilot] : "");
             }
 
             if (!points)
@@ -223,7 +223,7 @@ namespace Ushqyr.Edu
                 bool out_ = t.Excluded.Contains(pilot);
                 // The first three stand out.
                 bool podium = !out_ && place <= 3;
-                pdf.Text(left, y, 11, out_ ? "DISQ" : place.ToString(inv), podium);
+                pdf.Text(left, y, 11, out_ ? Tournament.DisqMark : place.ToString(inv), podium);
                 pdf.Text(left + 60, y, 11, Cut(pdf, pilot, 11, 260), podium);
                 if (!out_) place++;
                 pdf.Text(left + 330, y, 10, out_ ? text("disqualified from the event") : points ? sum[pilot].ToString(inv) : "");

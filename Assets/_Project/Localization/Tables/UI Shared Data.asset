@@ -4613,6 +4613,146 @@ MonoBehaviour:
     m_Key: Bracket
     m_Metadata:
       m_Items: []
+  - m_Id: 6952365121601536
+    m_Key: Racing
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6952365180321792
+    m_Key: New tournament
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6952365180321793
+    m_Key: No tournaments yet.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6952365180321794
+    m_Key: Tournaments
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6952365180321795
+    m_Key: finished
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6952365180321796
+    m_Key: under way
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6952365180321797
+    m_Key: 'Pilots: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6952365180321798
+    m_Key: Name of the tournament
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6952365180321799
+    m_Key: 'Format: points over a fixed number of rounds'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6952365180321800
+    m_Key: 'Format: FAI (qualification, elimination, final)'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6952365180321801
+    m_Key: 'Rounds: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6952365180321802
+    m_Key: 'Qualifying rounds: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6952365180321803
+    m_Key: 'Ranking: average of the three best laps'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6952365180321804
+    m_Key: 'Ranking: best time for the three laps'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6952365180321805
+    m_Key: 'Double elimination: yes'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6952365180321806
+    m_Key: 'Double elimination: no'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6952365180321807
+    m_Key: 'Final: races until someone has won two'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6952365180321808
+    m_Key: 'Final: one race'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6952365180321809
+    m_Key: With fewer than 16 pilots the FAI rules suggest the points format.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6952365180321810
+    m_Key: Create
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6952365180321811
+    m_Key: A tournament needs a name and at least two pilots. Choose a group with students.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6952365180321812
+    m_Key: Next race
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6952365180321813
+    m_Key: The tournament is finished
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6952365180321814
+    m_Key: Enter the result
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6952365180321815
+    m_Key: Races flown
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6952365180321816
+    m_Key: Results and bracket (PDF)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6952365180321817
+    m_Key: Results (XLSX)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6952365180321818
+    m_Key: Results (CSV)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6952365180321819
+    m_Key: Delete the tournament
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6952365180321820
+    m_Key: 'For each pilot type the lap times, with spaces between them: 20.5 21.3 19.8 or 1:02.3 1:01.9 1:00.4'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6952365180321821
+    m_Key: The lap times of {0} could not be read
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6952365180321822
+    m_Key: No race has been flown yet.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6952365184516096
+    m_Key: Correct
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6952365184516097
+    m_Key: A change here places the race again; the races that followed from it are flown again.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6952365184516098
+    m_Key: 'Penalty: {0} s'
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

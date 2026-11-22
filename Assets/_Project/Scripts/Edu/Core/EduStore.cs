@@ -68,6 +68,14 @@ namespace Ushqyr.Edu
         public readonly List<string> Activities = new List<string>();
     }
 
+    /// <summary>A tournament as the list shows it.</summary>
+    public sealed class TournamentInfo
+    {
+        public long Id;
+        public string Name = "", Track = "", Updated = "";
+        public bool Finished;
+    }
+
     public sealed class EduStore
     {
         private readonly EduDatabase _db;
@@ -359,6 +367,44 @@ namespace Ushqyr.Edu
             }
             return n;
         }
+
+        // ------------------------------------------------------------ tournaments
+
+        /// <summary>
+        /// Saves a tournament (a new one when <paramref name="id"/> is 0) and returns its id. It is saved after every
+        /// race, so an event goes on from where it was after a power cut.
+        /// </summary>
+        public long SaveTournament(Tournament t, long id = 0, string track = null)
+        {
+            if (t == null) throw new ArgumentNullException(nameof(t));
+            if (id == 0)
+            {
+                _db.Sql.Execute("insert into tournaments(name, track, json, finished, created, updated) values(?1, ?2, ?3, ?4, ?5, ?5)",
+                    t.Name, track ?? "", t.ToJson(), t.Finished ? 1L : 0L, Now());
+                return LastId();
+            }
+            if (track == null) _db.Sql.Execute("update tournaments set name = ?2, json = ?3, finished = ?4, updated = ?5 where id = ?1", id, t.Name, t.ToJson(), t.Finished ? 1L : 0L, Now());
+            else _db.Sql.Execute("update tournaments set name = ?2, json = ?3, finished = ?4, updated = ?5, track = ?6 where id = ?1", id, t.Name, t.ToJson(), t.Finished ? 1L : 0L, Now(), track);
+            return id;
+        }
+
+        /// <summary>The tournaments, the one touched last first.</summary>
+        public List<TournamentInfo> Tournaments()
+        {
+            var list = new List<TournamentInfo>();
+            foreach (object[] r in _db.Sql.Query("select id, name, track, finished, updated from tournaments order by updated desc, id desc"))
+                list.Add(new TournamentInfo { Id = (long)r[0], Name = (string)r[1], Track = (string)r[2] ?? "", Finished = (long)r[3] != 0, Updated = (string)r[4] });
+            return list;
+        }
+
+        /// <summary>Reads a tournament back, or null when there is none with this id.</summary>
+        public Tournament LoadTournament(long id)
+        {
+            List<object[]> rows = _db.Sql.Query("select json from tournaments where id = ?1", id);
+            return rows.Count > 0 ? Tournament.FromJson((string)rows[0][0]) : null;
+        }
+
+        public void DeleteTournament(long id) => _db.Sql.Execute("delete from tournaments where id = ?1", id);
 
         // ------------------------------------------------------------ attendance
 

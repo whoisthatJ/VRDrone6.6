@@ -623,6 +623,43 @@ namespace Ushqyr.Tests
         }
 
         [Test]
+        public void ATournament_IsKeptInTheClassDatabase_AndGoesOnAfterItIsReadBack()
+        {
+            string file = Path.Combine(_dir, "class.db");
+            long id;
+            using (var db = new EduDatabase(file))
+            {
+                var store = new EduStore(db, Path.Combine(_dir, "replays"));
+                Tournament t = Tournament.Create("Күзгі кубок", new[] { "Әлия", "Болат", "Зере", "Илья" }, new TournamentSettings { QualificationRounds = 1 });
+                id = store.SaveTournament(t, 0, "field");
+                var e = new List<RaceEntry>();
+                foreach (string pilot in t.Next.Pilots)
+                {
+                    var entry = new RaceEntry { Pilot = pilot, Time = 60 + e.Count };
+                    for (int i = 0; i < 3; i++) entry.Laps.Add(20 + e.Count / 3.0);
+                    e.Add(entry);
+                }
+                t.Record(t.Next.Id, e);
+                Assert.AreEqual(id, store.SaveTournament(t, id));
+                Assert.AreEqual(1, store.Tournaments().Count);
+                Assert.AreEqual("field", store.Tournaments()[0].Track, "saving again keeps the track");
+                Assert.IsFalse(store.Tournaments()[0].Finished);
+            }
+            // The program was closed (or the power went): the event is where it was.
+            using (var db = new EduDatabase(file))
+            {
+                var store = new EduStore(db, Path.Combine(_dir, "replays"));
+                Tournament t = store.LoadTournament(id);
+                Assert.AreEqual("Күзгі кубок", t.Name);
+                Assert.AreEqual("F", t.Next.Id, "qualification is done: the final is next");
+                Assert.AreEqual(4, t.Next.Pilots.Count);
+                Assert.IsNull(store.LoadTournament(id + 1));
+                store.DeleteTournament(id);
+                Assert.AreEqual(0, store.Tournaments().Count);
+            }
+        }
+
+        [Test]
         public void SeatProfile_NamesNoPerson_AndIsMadeOnce()
         {
             using (var db = new EduDatabase(Path.Combine(_dir, "class.db")))

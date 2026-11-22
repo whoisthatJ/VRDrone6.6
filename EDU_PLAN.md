@@ -1016,3 +1016,22 @@ FAI start, the screens, the LAN, the result sheets. 489 tests pass.
 
 **Not yet:** these are not joined to the game's own race (its countdown is still 3-2-1, its gates still feed the old
 lap timer), nor to the LAN, nor to any screen. 497 tests pass.
+
+### 22 November 2026, night, later still: tournaments in the teacher's console
+
+- **Racing** is the console's seventh tab. A tournament is made from a group: its name, the format (FAI, or points
+  for small classes), the number of rounds, the ranking option, double elimination, one final or finals until
+  someone has won two.
+- **The tournament's page** shows the race to fly next with its pilots, the classification as far as it is known,
+  the races flown, and the sheets (PDF with the bracket, XLSX, CSV).
+- **A result is entered by hand** for now: each pilot's lap times typed with spaces between them (seconds, or
+  minutes:seconds), "disqualified" and "did not fly". A flown race can be **flown again** (pressed twice) or
+  **corrected**: a pilot disqualified from it, or a penalty of 1, 2, 5 or 10 seconds; the races that followed from it
+  are laid out again.
+- The tournament is saved in the class database after every change (layout 4), so it goes on from where it was after
+  the program is closed or the power goes.
+
+**Checked** in the editor on the made-up class: with 11 pilots the first elimination race is flown by three (places
+1, 8 and 9), as the FAI note says for a missing place; the three sheets were written from the console.
+**Not yet:** results come from typing, not from a race flown over the LAN; a time typed by hand is the sum of the
+laps (the holeshot of an elimination race is not asked for). 498 tests pass.
