@@ -159,7 +159,12 @@ namespace Ushqyr.Edu
                 pdf.Line(left, y + 5, right, y + 5, 0.2f);
                 y += 18;
             }
-            if (y > PdfWriter.PageHeight - 110) Head(false);
+            // The line for the signature goes under the table, or alone on a new page when the table filled this one.
+            if (y > PdfWriter.PageHeight - 75)
+            {
+                pdf.AddPage();
+                y = 40;
+            }
             y += 30;
             string teacher = text("Teacher") + ":";
             pdf.Text(left, y, 11, teacher);

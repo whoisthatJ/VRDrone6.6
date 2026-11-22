@@ -3961,6 +3961,230 @@ MonoBehaviour:
     m_Key: no
     m_Metadata:
       m_Items: []
+  - m_Id: 6933236520058880
+    m_Key: Journal
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584832
+    m_Key: Students
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584833
+    m_Key: Reports
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584834
+    m_Key: Type the teacher's password
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584835
+    m_Key: 'Choose the teacher''s password: 4 characters or more'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584836
+    m_Key: 'The password keeps students out of the journal on this PC. Write it down: it cannot be read back.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584837
+    m_Key: Wrong password
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584838
+    m_Key: No students yet. Add them on the Students tab.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584839
+    m_Key: Score {0}, teacher's mark {1}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584840
+    m_Key: Score {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584841
+    m_Key: Mark
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584842
+    m_Key: The teacher's mark, 0 to 100 (leave empty to keep the computed score)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584843
+    m_Key: Comment for the student
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584844
+    m_Key: The mark is a number from 0 to 100
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584845
+    m_Key: Progress report (PDF)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584846
+    m_Key: 'Not saved: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584847
+    m_Key: Remove the PIN
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584848
+    m_Key: The PIN is removed. The student can choose a new one.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584849
+    m_Key: Take out of the group {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584850
+    m_Key: 'Press again: the profile, the results and the recordings will be deleted for good'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584851
+    m_Key: Delete this student's data
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584852
+    m_Key: Deleted, with {0} recordings.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584853
+    m_Key: New group
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584854
+    m_Key: Import a list
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584855
+    m_Key: Nobody here yet. Add students one by one, or import the class list.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584856
+    m_Key: Name of the new group
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584857
+    m_Key: Name of the new student of the group {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584858
+    m_Key: Name of the new student
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584859
+    m_Key: 'Paste the list of the group {0}: one name on a line'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584860
+    m_Key: Choose a group on the Students tab first
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584861
+    m_Key: Copy the names from a spreadsheet or a document and press Ctrl+V. Names already in the group are skipped.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584862
+    m_Key: Group {0} is added.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584863
+    m_Key: '{0} is added.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584864
+    m_Key: 'Students added: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584865
+    m_Key: A group with this name already exists
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584866
+    m_Key: School (printed at the top of the reports)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584867
+    m_Key: Gradebook of the group (XLSX)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584868
+    m_Key: Gradebook of the group (CSV)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584869
+    m_Key: Progress report for every student (PDF)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584870
+    m_Key: Open the reports folder
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584871
+    m_Key: 'All exercises open: yes'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584872
+    m_Key: 'All exercises open: no'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584873
+    m_Key: Otherwise a block opens when the block before it is passed.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584874
+    m_Key: Back up the class data
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584875
+    m_Key: A copy of the students, groups and results, kept on this PC.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584876
+    m_Key: Restore from a backup
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584877
+    m_Key: The class data as it is now is saved first.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584878
+    m_Key: Change the teacher's password
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584879
+    m_Key: Leave the teacher's console
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584880
+    m_Key: The password is asked for again next time.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584881
+    m_Key: The password is changed.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584882
+    m_Key: There are no backups on this PC yet.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584883
+    m_Key: Choose the backup to put back. Press it twice.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584884
+    m_Key: 'Press again: today''s class data will be replaced by this backup'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584885
+    m_Key: Restored. The data it replaced is kept as {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584886
+    m_Key: 'Not restored: {0}'
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

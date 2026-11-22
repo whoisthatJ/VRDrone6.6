@@ -228,6 +228,13 @@ namespace Ushqyr.UI
                 return;
             }
 
+            // The teacher's console, behind the teacher's password.
+            UiKit.Button(p, L.T("Teacher"), new Vector2(Width - Margin - 300f, -35f), new Vector2(300f, 70f), () =>
+            {
+                _tMessage = "";
+                ShowTeacher();
+            }, 28f);
+
             List<EduGroup> groups = store.Groups();
             if (_eduGroup > groups.Count) _eduGroup = 0;
             float y = -130f;

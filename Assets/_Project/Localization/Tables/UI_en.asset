@@ -3964,6 +3964,230 @@ MonoBehaviour:
     m_Localized: no
     m_Metadata:
       m_Items: []
+  - m_Id: 6933236520058880
+    m_Localized: Journal
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584832
+    m_Localized: Students
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584833
+    m_Localized: Reports
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584834
+    m_Localized: Type the teacher's password
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584835
+    m_Localized: 'Choose the teacher''s password: 4 characters or more'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584836
+    m_Localized: 'The password keeps students out of the journal on this PC. Write it down: it cannot be read back.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584837
+    m_Localized: Wrong password
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584838
+    m_Localized: No students yet. Add them on the Students tab.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584839
+    m_Localized: Score {0}, teacher's mark {1}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584840
+    m_Localized: Score {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584841
+    m_Localized: Mark
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584842
+    m_Localized: The teacher's mark, 0 to 100 (leave empty to keep the computed score)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584843
+    m_Localized: Comment for the student
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584844
+    m_Localized: The mark is a number from 0 to 100
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584845
+    m_Localized: Progress report (PDF)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584846
+    m_Localized: 'Not saved: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584847
+    m_Localized: Remove the PIN
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584848
+    m_Localized: The PIN is removed. The student can choose a new one.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584849
+    m_Localized: Take out of the group {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584850
+    m_Localized: 'Press again: the profile, the results and the recordings will be deleted for good'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584851
+    m_Localized: Delete this student's data
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584852
+    m_Localized: Deleted, with {0} recordings.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584853
+    m_Localized: New group
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584854
+    m_Localized: Import a list
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584855
+    m_Localized: Nobody here yet. Add students one by one, or import the class list.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584856
+    m_Localized: Name of the new group
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584857
+    m_Localized: Name of the new student of the group {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584858
+    m_Localized: Name of the new student
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584859
+    m_Localized: 'Paste the list of the group {0}: one name on a line'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584860
+    m_Localized: Choose a group on the Students tab first
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584861
+    m_Localized: Copy the names from a spreadsheet or a document and press Ctrl+V. Names already in the group are skipped.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584862
+    m_Localized: Group {0} is added.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584863
+    m_Localized: '{0} is added.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584864
+    m_Localized: 'Students added: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584865
+    m_Localized: A group with this name already exists
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584866
+    m_Localized: School (printed at the top of the reports)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584867
+    m_Localized: Gradebook of the group (XLSX)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584868
+    m_Localized: Gradebook of the group (CSV)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584869
+    m_Localized: Progress report for every student (PDF)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584870
+    m_Localized: Open the reports folder
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584871
+    m_Localized: 'All exercises open: yes'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584872
+    m_Localized: 'All exercises open: no'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584873
+    m_Localized: Otherwise a block opens when the block before it is passed.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584874
+    m_Localized: Back up the class data
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584875
+    m_Localized: A copy of the students, groups and results, kept on this PC.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584876
+    m_Localized: Restore from a backup
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584877
+    m_Localized: The class data as it is now is saved first.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584878
+    m_Localized: Change the teacher's password
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584879
+    m_Localized: Leave the teacher's console
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584880
+    m_Localized: The password is asked for again next time.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584881
+    m_Localized: The password is changed.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584882
+    m_Localized: There are no backups on this PC yet.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584883
+    m_Localized: Choose the backup to put back. Press it twice.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584884
+    m_Localized: 'Press again: today''s class data will be replaced by this backup'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584885
+    m_Localized: Restored. The data it replaced is kept as {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6933236574584886
+    m_Localized: 'Not restored: {0}'
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

@@ -847,3 +847,38 @@ that open in order; briefing, guided steps, result with tips; the demonstration;
 it; the library; the certificate. **Not done, and said so:** the loss-of-positioning drill has no automatic reference
 (left out); nothing has been flown by a person yet, so the pass marks and the star times are guesses to be set in the
 classroom pilot (ED10); the Kazakh texts need a native review. 469 tests pass.
+
+### 22 November 2026, afternoon: ED4 started: the teacher's console on one PC
+
+**What exists.** "Who is flying?" has a **Teacher** button. The first time it asks for a password to be chosen (4
+characters or more; kept only as a salted, slowed hash); after that it asks for it. Behind it, four tabs:
+
+- **Journal:** students down, the exercises of one block across, the best grade in each cell (green passed, red
+  flown but not passed), with "passed n of 30" and the average. A cell opens that student's attempts on that
+  exercise: date, computed score, time, **Replay** (the stored flight beside the reference) and **Mark** (the
+  teacher's own mark from 0 to 100 and a comment; an empty mark gives the computed score back). The teacher's mark
+  decides the pass as well as the grade.
+- **Students:** groups, a new group, a new student, **Import a list** (paste the names, one on a line; names already
+  in the group are skipped). A student's page: progress report, remove the PIN, take out of the group, and "delete
+  this student's data", which must be pressed twice and removes the profile, the results and the recordings.
+- **Reports:** the school's name; the group's gradebook as XLSX (best grades as numbers, a second sheet with how the
+  group did on each exercise) and as CSV; a progress report (PDF) for one student or for every student of the group.
+  Files go to `reports` in the class data folder.
+- **Settings:** all exercises open or opening in order; back up the class data; restore from a backup; change the
+  password; leave the console.
+
+- **D44. CSV is written for a spreadsheet set up for Russian or Kazakh:** semicolons between cells, a comma in
+  numbers, UTF-8 with a byte-order mark. A cell that begins like a formula is written as text.
+- **D45. Restoring a backup first saves what it replaces** as `before-restore-…` in the same folder, so the step can
+  be undone. The file is checked before anything is touched. Recordings are files beside the database and stay.
+- **D46. The teacher's password is a lock on a shared PC, not security:** whoever can replace the database file gets
+  round it. The school's Windows accounts are the real protection; the installer's notes for school IT will say so.
+
+**Checked:** in the editor on a made-up class of 11 students and 66 attempts: every screen drawn; the XLSX is a
+well-formed workbook of two sheets; the CSV and the PDF read correctly with Kazakh names; backup, a change, restore
+gives the class back. **Not checked:** the XLSX in Excel or LibreOffice (neither is installed here); typing into the
+boxes by hand (they were filled by code); a school logo in the header is not done (the PDF writer has no pictures).
+
+**Still to build in ED4:** assignments and lesson plans; the classroom link over the LAN (seats, "start on all
+seats", live control, the grid with small pictures, messages); attendance; simulated seats to reach thirty.
+470 tests pass.
