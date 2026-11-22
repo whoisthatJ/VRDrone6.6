@@ -96,6 +96,43 @@ namespace Ushqyr.Edu
         /// <summary>Why the last attempt ended: "landed", "steps", "crash", "time" or "pilot".</summary>
         public string EndedBy { get; private set; } = "";
         public float Clock => _clock;
+        public QuadVehicle Vehicle => _vehicle;
+        /// <summary>True once the drone has crashed in the attempt being flown.</summary>
+        public bool Crashed => _crashed;
+        /// <summary>
+        /// Lock mode of the class link: while set, the pilot cannot leave the activity the teacher started (inside
+        /// this program only; nothing outside it is touched).
+        /// </summary>
+        public static bool LeaveBlocked { get; set; }
+
+        /// <summary>The teacher starts the attempt again from the beginning.</summary>
+        public void TeacherRestart()
+        {
+            if (Watching) return;
+            if (State == Phase.Flying)
+            {
+                _vehicle.Crashed -= OnCrashed;
+                State = Phase.Briefing;
+            }
+            ShowBriefing();
+            StartFlying();
+        }
+
+        /// <summary>The teacher changes the weather in the middle of a flight ("wind", "gusts", "rain", "fog" …).</summary>
+        public void TeacherWeather(string name, float value)
+        {
+            if (Array.IndexOf(ActivitySetup.WeatherNames, name) < 0) return;
+            SetWeatherValue(name, value);
+            Flight().SetWeather(_weather);
+            _recorder.Event("teacher", name + "=" + value.ToString("0.##", CultureInfo.InvariantCulture));
+        }
+
+        /// <summary>The teacher sets or clears a failure ("gps_lost", "prop1", "video" …; 0 clears it).</summary>
+        public void TeacherFailure(string name, float value)
+        {
+            Flight().SetFailure(name, value);
+            _recorder.Event("teacher", name + "=" + value.ToString("0.##", CultureInfo.InvariantCulture));
+        }
         /// <summary>The steps of a guided exercise as the attempt goes; null when the activity has none.</summary>
         public StepTracker Steps => _steps;
 
@@ -410,6 +447,8 @@ namespace Ushqyr.Edu
             {
                 Attempt = EduSession.Finish(_recorder, Activity, flags);
                 Result = Rubric.Score(Activity, _recorder.Recording);
+                // In a class, the attempt also goes to the teacher's PC (and waits in the outbox until it has arrived).
+                EduClassroom.AttemptFinished(Attempt, Activity, endedBy);
             }
             catch (Exception e)
             {
@@ -490,8 +529,12 @@ namespace Ushqyr.Edu
             }
         }
 
+        private bool _pendingReplayShown;
+
         private bool Watch(FlightRecording flight, bool withReference, Action closed)
         {
+            // Shown from the library (closing it leaves): leaving is then always allowed.
+            _pendingReplayShown = closed != null;
             if (flight == null || flight.Samples.Count < 2) return false;
             FlightRecording reference = withReference ? EduSession.Reference(Activity) : null;
             // The reference was flown somewhere of its own: bring it to where this activity is laid out.
@@ -511,6 +554,8 @@ namespace Ushqyr.Edu
 
         public void Leave()
         {
+            // Lock mode: the teacher's activity is not left (a stored replay being watched always can be).
+            if (LeaveBlocked && _pendingReplayShown == false) return;
             Action leave = _leave;
             Destroy(gameObject);
             leave?.Invoke();

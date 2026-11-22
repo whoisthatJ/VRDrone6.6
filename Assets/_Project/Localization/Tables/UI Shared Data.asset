@@ -4285,6 +4285,230 @@ MonoBehaviour:
     m_Key: My tasks
     m_Metadata:
       m_Items: []
+  - m_Id: 6941224035155968
+    m_Key: Class
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487616
+    m_Key: not connected
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487617
+    m_Key: flying
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487618
+    m_Key: crashed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487619
+    m_Key: 'finished: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487620
+    m_Key: reading the task
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487621
+    m_Key: in the menu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487622
+    m_Key: Open the class to see the seats, start an exercise on all of them at once and collect their results here.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487623
+    m_Key: Open the class
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487624
+    m_Key: 'The class could not be opened: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487625
+    m_Key: 'Seats join over the school''s network with the code shown here. Windows may ask once to let the program use the network: allow it for private networks.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487626
+    m_Key: 'Code: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487627
+    m_Key: 'Address: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487628
+    m_Key: 'Seats: {0} of {1}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487629
+    m_Key: 'Results received: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487630
+    m_Key: Start an exercise
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487631
+    m_Key: Pause all
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487632
+    m_Key: Resume all
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487633
+    m_Key: 'Attention: on'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487634
+    m_Key: 'Attention: off'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487635
+    m_Key: Everyone to the menu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487636
+    m_Key: Close the class
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487637
+    m_Key: 'No seat has joined yet. On each seat: Student, then Join the class.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487638
+    m_Key: HAND UP
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487639
+    m_Key: 'Leaving: not allowed'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487640
+    m_Key: 'Leaving: allowed'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487641
+    m_Key: Press an exercise to start it on the seat {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487642
+    m_Key: Press an exercise to start it on every seat
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487643
+    m_Key: 'Started on {0} seats: {1}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487644
+    m_Key: Start again
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487645
+    m_Key: Resume
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487646
+    m_Key: To the menu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487647
+    m_Key: Hand seen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487648
+    m_Key: 'Wind: {0} m/s'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487649
+    m_Key: 'Failure: positioning lost'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487650
+    m_Key: 'Failure: one motor weak'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487651
+    m_Key: 'Failure: video lost'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487652
+    m_Key: Clear the failures
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487653
+    m_Key: Send
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487654
+    m_Key: Join the class
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487655
+    m_Key: 'Joined: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224089681920
+    m_Key: "Joining\u2026"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224089681921
+    m_Key: "The teacher's PC does not answer. Trying again\u2026"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224089681922
+    m_Key: The teacher can now start exercises on this seat and sees a small picture of the simulator, never of anything else on this PC. F2 raises your hand.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224089681923
+    m_Key: Lower my hand
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224089681924
+    m_Key: Raise my hand
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224089681925
+    m_Key: Leave the class
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224089681926
+    m_Key: Wrong code
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224089681927
+    m_Key: This is not the class this seat joined before. Ask the teacher.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224089681928
+    m_Key: 'Classes found on the network: press yours'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224089681929
+    m_Key: "Looking for classes on the network\u2026"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224089681930
+    m_Key: Or type the address the teacher's screen shows
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224089681931
+    m_Key: Type the code on the teacher's screen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224089681932
+    m_Key: Look at the teacher
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224089681933
+    m_Key: Paused by the teacher
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224089681934
+    m_Key: Hand raised (F2 to lower)
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

@@ -4288,6 +4288,230 @@ MonoBehaviour:
     m_Localized: My tasks
     m_Metadata:
       m_Items: []
+  - m_Id: 6941224035155968
+    m_Localized: Class
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487616
+    m_Localized: not connected
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487617
+    m_Localized: flying
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487618
+    m_Localized: crashed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487619
+    m_Localized: 'finished: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487620
+    m_Localized: reading the task
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487621
+    m_Localized: in the menu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487622
+    m_Localized: Open the class to see the seats, start an exercise on all of them at once and collect their results here.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487623
+    m_Localized: Open the class
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487624
+    m_Localized: 'The class could not be opened: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487625
+    m_Localized: 'Seats join over the school''s network with the code shown here. Windows may ask once to let the program use the network: allow it for private networks.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487626
+    m_Localized: 'Code: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487627
+    m_Localized: 'Address: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487628
+    m_Localized: 'Seats: {0} of {1}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487629
+    m_Localized: 'Results received: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487630
+    m_Localized: Start an exercise
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487631
+    m_Localized: Pause all
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487632
+    m_Localized: Resume all
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487633
+    m_Localized: 'Attention: on'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487634
+    m_Localized: 'Attention: off'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487635
+    m_Localized: Everyone to the menu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487636
+    m_Localized: Close the class
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487637
+    m_Localized: 'No seat has joined yet. On each seat: Student, then Join the class.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487638
+    m_Localized: HAND UP
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487639
+    m_Localized: 'Leaving: not allowed'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487640
+    m_Localized: 'Leaving: allowed'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487641
+    m_Localized: Press an exercise to start it on the seat {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487642
+    m_Localized: Press an exercise to start it on every seat
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487643
+    m_Localized: 'Started on {0} seats: {1}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487644
+    m_Localized: Start again
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487645
+    m_Localized: Resume
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487646
+    m_Localized: To the menu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487647
+    m_Localized: Hand seen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487648
+    m_Localized: 'Wind: {0} m/s'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487649
+    m_Localized: 'Failure: positioning lost'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487650
+    m_Localized: 'Failure: one motor weak'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487651
+    m_Localized: 'Failure: video lost'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487652
+    m_Localized: Clear the failures
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487653
+    m_Localized: Send
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487654
+    m_Localized: Join the class
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224085487655
+    m_Localized: 'Joined: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224089681920
+    m_Localized: "Joining\u2026"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224089681921
+    m_Localized: "The teacher's PC does not answer. Trying again\u2026"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224089681922
+    m_Localized: The teacher can now start exercises on this seat and sees a small picture of the simulator, never of anything else on this PC. F2 raises your hand.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224089681923
+    m_Localized: Lower my hand
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224089681924
+    m_Localized: Raise my hand
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224089681925
+    m_Localized: Leave the class
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224089681926
+    m_Localized: Wrong code
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224089681927
+    m_Localized: This is not the class this seat joined before. Ask the teacher.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224089681928
+    m_Localized: 'Classes found on the network: press yours'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224089681929
+    m_Localized: "Looking for classes on the network\u2026"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224089681930
+    m_Localized: Or type the address the teacher's screen shows
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224089681931
+    m_Localized: Type the code on the teacher's screen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224089681932
+    m_Localized: Look at the teacher
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224089681933
+    m_Localized: Paused by the teacher
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6941224089681934
+    m_Localized: Hand raised (F2 to lower)
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

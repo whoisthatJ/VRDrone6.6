@@ -283,6 +283,15 @@ namespace Ushqyr.UI
                 return;
             }
 
+            // The class link: this seat joins the teacher's class over the school's network.
+            Button join = UiKit.Button(p, EduClassroom.Active && EduClassroom.Instance.Joined ? L.F("Joined: {0}", EduClassroom.Instance.ClassName) : L.T("Join the class"),
+                new Vector2(Width - Margin - 300f - 20f - 420f, -35f), new Vector2(420f, 70f), () =>
+                {
+                    _tMessage = "";
+                    ShowJoinClass();
+                }, 26f);
+            if (EduClassroom.Active && EduClassroom.Instance.Joined) UiKit.SetButtonColor(join, UiKit.SelectedColor);
+
             // The teacher's console, behind the teacher's password.
             UiKit.Button(p, L.T("Teacher"), new Vector2(Width - Margin - 300f, -35f), new Vector2(300f, 70f), () =>
             {

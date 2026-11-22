@@ -900,3 +900,50 @@ seats", live control, the grid with small pictures, messages); attendance; simul
 
 **Not done here:** assists allowed and weather as settings of an assignment (the exercise's own are used);
 "start on all seats now" and lock mode belong to the classroom link, next. 471 tests pass.
+
+### 22 November 2026, evening: the class link
+
+**What exists.**
+- **The link** (`ClassLink.cs`, plain sockets, no engine code): the teacher's PC listens on TCP 47810 and announces
+  the class by UDP broadcast on 47811; a seat finds it in a list or types the address, and types the six-digit code
+  from the teacher's screen. A seat sends its status twice a second, a small picture three times a second, and each
+  finished attempt; the teacher's PC sends signed commands.
+- **The teacher's Class tab:** the code and address; a grid of seats (eighteen to a page) with the live picture, who
+  is flying, what they are doing and the score; a raised hand lights the seat up. For all seats: start an exercise
+  (with an attempt limit, and "leaving not allowed"), pause, resume, "attention" (the seats go black and say "look
+  at the teacher"), everyone to the menu. For one seat: a larger picture, start, start again, pause, resume, wind,
+  three failures, clear them, and a short message.
+- **A seat:** "Join the class" on "Who is flying?"; F2 raises a hand. The class list of names arrives from the
+  teacher's PC (names only), so a student finds their name on any seat.
+- **Results:** a finished attempt waits in the seat's outbox until the teacher's PC confirms it has the recording,
+  and is sent again whenever the link comes back; a recording already stored is not stored twice.
+
+- **D49. Teacher commands are signed with a key made with the class** (RSA 2048, PKCS#1 with SHA-256, the one
+  signature the ED0 spike showed working in a build). The key lives in the class database on the teacher's PC; a seat
+  remembers its fingerprint for the class's address and refuses another. A command carries the session and a number
+  that only grows, and the seat it is for, so it cannot be replayed later or to another seat.
+- **D50. The teacher's PC grades every attempt again from the recording.** A seat's own score is not trusted: in
+  the check below a seat claimed 3 for a flight; the journal stored 100, which is what the recording earns.
+- **D51. The class link listens on the school network, not only on this PC,** unlike the program's other local
+  servers: seats are other PCs. It is guarded by the class code and the signed commands. The code is six digits
+  and the link is not encrypted: it keeps a neighbouring classroom out; it is not proof against someone recording
+  the school's network. Written down for school IT in `Docs/edu/class_link.md`.
+- **D52. Lock mode is "leaving not allowed"** inside our program: the pilot cannot leave the exercise the teacher
+  started until the teacher sends everyone to the menu or starts another. Nothing outside the program is touched.
+
+**Measured on this PC (one program being teacher and seat, plus simulated seats, over loopback):**
+
+| Requirement of section 9 | Measured | Note |
+|---|---|---|
+| An assignment starts on every seat within 5 s | 30 simulated seats heard the command inside the test's 5 s limit; a real seat showed the briefing about 8 s after the command, almost all of it loading the field | Not met when the seat must load a place first. Not yet measured on a second PC |
+| The grid updates at 2 frames a second or more | 3 pictures a second sent and received (174 of 174 in one flight) | |
+| A weather change takes effect within 0.5 s | wind 6 m/s was on the seat's drone at the next check, 2 s later | Not timed finer than that |
+| Streaming costs under 5% CPU per seat | 0.6 ms a picture, three a second: about 0.2% of one core | It was 8 to 18 ms with a blocking read; the picture is now fetched from the graphics card without waiting |
+| The journal shows an attempt within 3 s | stored when it arrives | |
+| After a seat disconnects and returns, nothing is lost | the outbox and the "stored" answer exist and are tested piece by piece; **not tried as a whole** by pulling a seat off the network | |
+
+**Not done, and not claimed:** nothing has been tried between two PCs (it needs a second PC: a stop-and-ask point);
+watching a seat's flight live with a free camera and the stick overlay (the grid shows the seat's own picture
+instead); "stuck" and "off-task" alerts; attendance; a seat map laid out like the room; assists and weather as
+settings of an assignment; a seat practising alone does not yet fetch its assignments from the teacher's PC.
+479 tests pass.

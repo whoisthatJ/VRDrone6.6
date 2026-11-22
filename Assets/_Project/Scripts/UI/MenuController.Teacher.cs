@@ -16,7 +16,7 @@ namespace Ushqyr.UI
     /// </summary>
     public sealed partial class MenuController
     {
-        private static readonly string[] TeacherTabs = { "Journal", "Students", "Tasks", "Reports", "Settings" };
+        private static readonly string[] TeacherTabs = { "Journal", "Students", "Tasks", "Class", "Reports", "Settings" };
 
         private bool _teacherIn;
         private int _tTab, _tGroup, _tBlock, _tPage;
@@ -35,8 +35,9 @@ namespace Ushqyr.UI
             }
             if (_tTab == 1) ShowTeacherStudents();
             else if (_tTab == 2) ShowTeacherTasks();
-            else if (_tTab == 3) ShowTeacherReports();
-            else if (_tTab == 4) ShowTeacherSettings();
+            else if (_tTab == 3) ShowTeacherClass();
+            else if (_tTab == 4) ShowTeacherReports();
+            else if (_tTab == 5) ShowTeacherSettings();
             else ShowTeacherJournal();
         }
 
@@ -111,7 +112,7 @@ namespace Ushqyr.UI
         {
             RectTransform p = NewPage(L.T("Teacher"));
             BackButton(p, back ?? ShowMain);
-            const float w = 218f;
+            const float w = 180f;
             for (int i = 0; i < TeacherTabs.Length; i++)
             {
                 int tab = i;
@@ -122,7 +123,7 @@ namespace Ushqyr.UI
                     _tArmed = 0;
                     _tMessage = "";
                     ShowTeacher();
-                }, 26f);
+                }, 24f);
                 if (back == null && i == _tTab) UiKit.SetButtonColor(b, UiKit.SelectedColor);
             }
             return p;

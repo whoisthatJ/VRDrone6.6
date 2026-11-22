@@ -390,6 +390,25 @@ namespace Ushqyr.Edu
             return diff == 0;
         }
 
+        /// <summary>
+        /// The class key with its private half (see <see cref="Edu.ClassKey"/>): made on the teacher's PC the first
+        /// time the class is opened, and kept here. A backup of this database carries it, so a restored class is
+        /// still recognised by its seats.
+        /// </summary>
+        public string ClassKey
+        {
+            get => _db.Setting("class_key");
+            set => _db.SetSetting("class_key", value);
+        }
+
+        /// <summary>A stored setting of this PC's class data, or null.</summary>
+        public string Setting(string key) => _db.Setting(key);
+
+        public void SetSetting(string key, string value) => _db.SetSetting(key, value);
+
+        /// <summary>True when a recording with this content is already stored (an attempt sent twice is kept once).</summary>
+        public bool HasReplay(string hash) => _db.Sql.Query("select 1 from replays where hash = ?1 limit 1", hash).Count > 0;
+
         /// <summary>The school's name, printed at the top of the reports; empty when not set.</summary>
         public string SchoolName
         {
