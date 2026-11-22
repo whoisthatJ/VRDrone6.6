@@ -95,6 +95,22 @@ namespace Ushqyr.UI
                 }, 26f);
 
             if (store != null) UiKit.Button(p, L.T("My flights"), new Vector2(Width - Margin - 300f, -(Height - 110f)), new Vector2(300f, 70f), ShowFlights, 28f);
+            // What the teacher has given this student (or everyone): a way straight to those exercises.
+            if (store != null && user != 0)
+            {
+                List<Assignment> given = store.AssignmentsFor(user);
+                int left = 0;
+                foreach (Assignment a in given)
+                {
+                    CourseEntry entry = course.Find(a.ActivityId);
+                    if (entry != null && !entry.Passed) left++;
+                }
+                if (given.Count > 0)
+                {
+                    Button tasks = UiKit.Button(p, L.F("My tasks: {0} to do", left), new Vector2(Margin + 270f, -(Height - 110f)), new Vector2(520f, 70f), ShowMyTasks, 28f);
+                    if (left > 0) UiKit.SetButtonColor(tasks, UiKit.SelectedColor);
+                }
+            }
 
             // The blocks.
             float tab = (ContentWidth - 4f * 12f) / 5f;
@@ -142,6 +158,45 @@ namespace Ushqyr.UI
                     RectTransform star = UiKit.Rect(row.transform, "Star", new Vector2(ContentWidth - 160f + s * 44f, -21f), new Vector2(34f, 34f));
                     UiKit.Image(star, s < e.Stars ? new Color(1f, 0.8f, 0.15f) : new Color(1f, 1f, 1f, 0.12f));
                 }
+                y -= 86f;
+            }
+        }
+
+        /// <summary>The exercises the teacher has given this student, in the order given, with what is left of each.</summary>
+        private void ShowMyTasks()
+        {
+            RectTransform p = NewPage(L.T("My tasks"));
+            BackButton(p, ShowTraining);
+            EduStore store = Students(out _);
+            EduUser who = null;
+            try { who = EduSession.CurrentUser; } catch (Exception) { /* nothing to show */ }
+            if (store == null || who == null) return;
+            UiKit.Label(p, StudentLabel(), new Vector2(Width - Margin - 700f, -40f), new Vector2(700f, 60f), 28f, TextAlignmentOptions.MidlineRight, UiKit.DimTextColor);
+            var course = new Course(EduSession.Activities.Values, store, who.Id);
+            List<Assignment> given = store.AssignmentsFor(who.Id);
+            float y = -130f;
+            for (int i = 0; i < given.Count && i < 8; i++)
+            {
+                Assignment a = given[i];
+                CourseEntry entry = course.Find(a.ActivityId);
+                if (entry == null) continue;
+                int used = store.AttemptsUsed(a, who.Id);
+                bool may = a.AttemptLimit <= 0 || used < a.AttemptLimit;
+                ActivityDefinition activity = entry.Activity;
+                Button row = UiKit.Button(p, "", new Vector2(Margin, y), new Vector2(ContentWidth, 76f), () =>
+                {
+                    if (!may) return;
+                    EduActivityRunner.SetPendingAssignment(a);
+                    StartExercise(activity, true);
+                }, 30f);
+                if (!may) UiKit.SetButtonColor(row, new Color(0.12f, 0.13f, 0.16f, 1f));
+                UiKit.Label(row.transform, (a.Lesson.Length > 0 ? a.Lesson + "  ·  " : "") + activity.Number + "   " + L.T(activity.Title), new Vector2(24f, 0f),
+                    new Vector2(ContentWidth - 640f, 76f), 30f, TextAlignmentOptions.MidlineLeft, may ? UiKit.TextColor : UiKit.DimTextColor);
+                string attempts = a.AttemptLimit > 0 ? L.F("Attempts: {0} of {1}", used, a.AttemptLimit) : L.F("Attempts: {0}", used);
+                UiKit.Label(row.transform, attempts, new Vector2(ContentWidth - 600f, 0f), new Vector2(300f, 76f), 24f, TextAlignmentOptions.MidlineLeft, UiKit.DimTextColor);
+                string best = entry.Best == null ? L.T("not flown") : entry.Best.Value.ToString("0", System.Globalization.CultureInfo.InvariantCulture);
+                UiKit.Label(row.transform, entry.Passed ? L.T("Passed") + "   " + best : best, new Vector2(ContentWidth - 300f, 0f), new Vector2(280f, 76f), 28f,
+                    TextAlignmentOptions.MidlineRight, entry.Passed ? new Color(0.4f, 0.95f, 0.5f) : UiKit.DimTextColor);
                 y -= 86f;
             }
         }

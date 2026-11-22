@@ -16,7 +16,7 @@ namespace Ushqyr.UI
     /// </summary>
     public sealed partial class MenuController
     {
-        private static readonly string[] TeacherTabs = { "Journal", "Students", "Reports", "Settings" };
+        private static readonly string[] TeacherTabs = { "Journal", "Students", "Tasks", "Reports", "Settings" };
 
         private bool _teacherIn;
         private int _tTab, _tGroup, _tBlock, _tPage;
@@ -34,8 +34,9 @@ namespace Ushqyr.UI
                 return;
             }
             if (_tTab == 1) ShowTeacherStudents();
-            else if (_tTab == 2) ShowTeacherReports();
-            else if (_tTab == 3) ShowTeacherSettings();
+            else if (_tTab == 2) ShowTeacherTasks();
+            else if (_tTab == 3) ShowTeacherReports();
+            else if (_tTab == 4) ShowTeacherSettings();
             else ShowTeacherJournal();
         }
 
@@ -110,7 +111,7 @@ namespace Ushqyr.UI
         {
             RectTransform p = NewPage(L.T("Teacher"));
             BackButton(p, back ?? ShowMain);
-            const float w = 270f;
+            const float w = 218f;
             for (int i = 0; i < TeacherTabs.Length; i++)
             {
                 int tab = i;
@@ -121,7 +122,7 @@ namespace Ushqyr.UI
                     _tArmed = 0;
                     _tMessage = "";
                     ShowTeacher();
-                }, 28f);
+                }, 26f);
                 if (back == null && i == _tTab) UiKit.SetButtonColor(b, UiKit.SelectedColor);
             }
             return p;
@@ -458,6 +459,200 @@ namespace Ushqyr.UI
             };
             if (!list) field.onSubmit.AddListener(_ => add());
             UiKit.Button(p, L.T("Add"), new Vector2(Width - Margin - 300f, -(Height - 110f)), new Vector2(300f, 70f), add, 30f);
+            TeacherNote(p);
+        }
+
+        // ---------- what the class has been given ----------
+
+        private static readonly int[] AttemptChoices = { 0, 1, 2, 3, 5, 10 };
+        private int _tLimit;
+        private readonly List<string> _tPlan = new List<string>();
+
+        private string[] AttemptNames()
+        {
+            var names = new string[AttemptChoices.Length];
+            for (int i = 0; i < names.Length; i++)
+                names[i] = AttemptChoices[i] == 0 ? L.T("Attempts: no limit") : L.F("Attempts: {0}", AttemptChoices[i]);
+            return names;
+        }
+
+        private static string ExerciseName(string activityId)
+        {
+            return EduSession.Activities.TryGetValue(activityId, out ActivityDefinition a) ? a.Number + ". " + L.T(a.Title) : activityId;
+        }
+
+        private void ShowTeacherTasks()
+        {
+            RectTransform p = TeacherPage();
+            EduStore store = Students(out string error);
+            if (store == null) { _tMessage = L.F("The class data could not be opened: {0}", error); TeacherNote(p); return; }
+            long? groupId = TeacherGroup(p, store, Margin, 760f, ShowTeacherTasks, out _);
+            float bw = (ContentWidth - 790f - 10f) / 2f;
+            UiKit.Button(p, L.T("Give an exercise"), new Vector2(Margin + 790f, -125f), new Vector2(bw, 60f), () => { _tPage = 0; ShowTeacherGive(); }, 24f);
+            UiKit.Button(p, L.T("Lesson plans"), new Vector2(Margin + 790f + bw + 10f, -125f), new Vector2(bw, 60f), () => { _tPage = 0; _tArmed = 0; ShowTeacherLessons(); }, 24f);
+
+            List<Assignment> given = store.AssignmentsOf(groupId);
+            Journal j = EduTeacher.ReadJournal(groupId);
+            j.Rows.RemoveAll(r => r.User.Role != "student");
+            if (given.Count == 0)
+                UiKit.Label(p, groupId != null ? L.T("Nothing has been given to this group yet.") : L.T("Nothing has been given to everyone yet. Choose a group, or give an exercise to all."),
+                    new Vector2(Margin, -215f), new Vector2(ContentWidth, 60f), 28f, TextAlignmentOptions.MidlineLeft, UiKit.DimTextColor);
+            const int rows = 8;
+            int pages = Mathf.Max(1, (given.Count + rows - 1) / rows);
+            _tPage = Mathf.Clamp(_tPage, 0, pages - 1);
+            float y = -205f;
+            for (int i = _tPage * rows; i < given.Count && i < (_tPage + 1) * rows; i++)
+            {
+                Assignment a = given[i];
+                int column = j.Activities.FindIndex(x => x.Id == a.ActivityId), done = 0;
+                if (column >= 0)
+                    foreach (JournalRow r in j.Rows)
+                        if (r.Cells[column].Passed) done++;
+                RectTransform row = UiKit.Rect(p, "Task", new Vector2(Margin, y), new Vector2(ContentWidth, 70f));
+                UiKit.Image(row, new Color(1f, 1f, 1f, 0.05f));
+                UiKit.Label(row, (a.Lesson.Length > 0 ? a.Lesson + "  ·  " : "") + ExerciseName(a.ActivityId), new Vector2(20f, 0f), new Vector2(760f, 70f), 26f, TextAlignmentOptions.MidlineLeft);
+                UiKit.Label(row, a.AttemptLimit == 0 ? L.T("Attempts: no limit") : L.F("Attempts: {0}", a.AttemptLimit), new Vector2(790f, 0f), new Vector2(250f, 70f), 22f,
+                    TextAlignmentOptions.MidlineLeft, UiKit.DimTextColor);
+                UiKit.Label(row, L.F("Passed by {0} of {1}", done, j.Rows.Count), new Vector2(1040f, 0f), new Vector2(230f, 70f), 22f, TextAlignmentOptions.MidlineLeft,
+                    j.Rows.Count > 0 && done == j.Rows.Count ? new Color(0.4f, 0.95f, 0.5f) : UiKit.DimTextColor);
+                UiKit.Button(row, L.T("Take back"), new Vector2(ContentWidth - 200f, -6f), new Vector2(190f, 58f), () =>
+                {
+                    store.Unassign(a.Id);
+                    ShowTeacherTasks();
+                }, 22f);
+                y -= 78f;
+            }
+            TeacherNote(p);
+            TeacherPager(p, pages, ShowTeacherTasks);
+        }
+
+        /// <summary>Choosing an exercise to give to the chosen group (or to everyone), with how many attempts it gets.</summary>
+        private void ShowTeacherGive()
+        {
+            RectTransform p = TeacherPage(ShowTeacherTasks);
+            EduStore store = Students(out _);
+            List<EduGroup> groups = store.Groups();
+            EduGroup group = _tGroup > 0 && _tGroup <= groups.Count ? groups[_tGroup - 1] : null;
+            var blocks = new string[Course.Blocks.Length];
+            for (int i = 0; i < blocks.Length; i++) blocks[i] = Course.Blocks[i] + ".  " + L.T(Course.BlockNames[i]);
+            Stepper(p, Margin, 760f, blocks, _tBlock, i => { _tBlock = i; ShowTeacherGive(); });
+            Stepper(p, Margin + 790f, ContentWidth - 790f, AttemptNames(), _tLimit, i => { _tLimit = i; ShowTeacherGive(); });
+            UiKit.Label(p, group != null ? L.F("Press an exercise to give it to the group {0}", group.Name) : L.T("Press an exercise to give it to everyone"), new Vector2(Margin, -200f),
+                new Vector2(ContentWidth, 50f), 26f, TextAlignmentOptions.MidlineLeft, UiKit.DimTextColor);
+            var course = new Course(EduSession.Activities.Values);
+            float y = -260f;
+            foreach (CourseEntry e in course.In(Course.Blocks[_tBlock]))
+            {
+                ActivityDefinition activity = e.Activity;
+                UiKit.Button(p, activity.Number + ".  " + L.T(activity.Title), new Vector2(Margin, y), new Vector2(ContentWidth, 68f), () =>
+                {
+                    store.Assign(activity, group != null ? group.Id : (long?)null, null, AttemptChoices[_tLimit]);
+                    _tMessage = L.F("Given: {0}", activity.Number + ". " + L.T(activity.Title));
+                    ShowTeacherTasks();
+                }, 28f);
+                y -= 76f;
+                if (y < -(Height - 190f)) break;
+            }
+            TeacherNote(p);
+        }
+
+        private void ShowTeacherLessons()
+        {
+            RectTransform p = TeacherPage(ShowTeacherTasks);
+            EduStore store = Students(out _);
+            List<EduGroup> groups = store.Groups();
+            EduGroup group = _tGroup > 0 && _tGroup <= groups.Count ? groups[_tGroup - 1] : null;
+            UiKit.Label(p, L.T("Lesson plans"), new Vector2(Margin, -125f), new Vector2(500f, 60f), 34f, TextAlignmentOptions.MidlineLeft, UiKit.AccentColor);
+            Stepper(p, Margin + 520f, 520f, AttemptNames(), _tLimit, i => { _tLimit = i; ShowTeacherLessons(); });
+            UiKit.Button(p, L.T("New lesson plan"), new Vector2(Width - Margin - 400f, -125f), new Vector2(400f, 60f), () =>
+            {
+                _tText = "";
+                _tPlan.Clear();
+                ShowTeacherLessonEdit();
+            }, 24f);
+            List<LessonPlan> plans = store.Lessons();
+            if (plans.Count == 0)
+                UiKit.Label(p, L.T("No lesson plans yet. A plan is a list of exercises in the order they are to be done."), new Vector2(Margin, -215f), new Vector2(ContentWidth, 60f), 28f,
+                    TextAlignmentOptions.MidlineLeft, UiKit.DimTextColor);
+            const int rows = 7;
+            int pages = Mathf.Max(1, (plans.Count + rows - 1) / rows);
+            _tPage = Mathf.Clamp(_tPage, 0, pages - 1);
+            float y = -205f;
+            for (int i = _tPage * rows; i < plans.Count && i < (_tPage + 1) * rows; i++)
+            {
+                LessonPlan plan = plans[i];
+                var numbers = new List<string>();
+                foreach (string id in plan.Activities)
+                    numbers.Add(EduSession.Activities.TryGetValue(id, out ActivityDefinition a) ? a.Number.ToString(CultureInfo.InvariantCulture) : "?");
+                RectTransform row = UiKit.Rect(p, "Plan", new Vector2(Margin, y), new Vector2(ContentWidth, 76f));
+                UiKit.Image(row, new Color(1f, 1f, 1f, 0.05f));
+                UiKit.Label(row, plan.Name, new Vector2(20f, 0f), new Vector2(520f, 76f), 28f, TextAlignmentOptions.MidlineLeft);
+                UiKit.Label(row, string.Join(", ", numbers), new Vector2(550f, 0f), new Vector2(330f, 76f), 22f, TextAlignmentOptions.MidlineLeft, UiKit.DimTextColor);
+                UiKit.Button(row, group != null ? L.F("Give to {0}", group.Name) : L.T("Give to everyone"), new Vector2(ContentWidth - 590f, -8f), new Vector2(330f, 60f), () =>
+                {
+                    int n = store.AssignLesson(plan, EduSession.Activities, group != null ? group.Id : (long?)null, null, AttemptChoices[_tLimit]);
+                    _tMessage = L.F("Exercises given: {0}", n);
+                    ShowTeacherTasks();
+                }, 22f);
+                bool armed = _tArmed == plan.Id;
+                Button del = UiKit.Button(row, armed ? L.T("Press again") : L.T("Delete"), new Vector2(ContentWidth - 250f, -8f), new Vector2(240f, 60f), () =>
+                {
+                    if (_tArmed != plan.Id) _tArmed = plan.Id;
+                    else
+                    {
+                        _tArmed = 0;
+                        store.DeleteLesson(plan.Id);
+                    }
+                    ShowTeacherLessons();
+                }, 22f);
+                if (armed) UiKit.SetButtonColor(del, new Color(0.42f, 0.2f, 0.16f, 1f));
+                y -= 86f;
+            }
+            TeacherNote(p);
+            TeacherPager(p, pages, ShowTeacherLessons);
+        }
+
+        /// <summary>A new lesson plan: its name, and the exercises pressed in the order they are to be done.</summary>
+        private void ShowTeacherLessonEdit()
+        {
+            RectTransform p = TeacherPage(ShowTeacherLessons);
+            InputBox(p, new Vector2(Margin, -125f), new Vector2(760f, 60f), _tText, v => _tText = v, false, false, 60);
+            var blocks = new string[Course.Blocks.Length];
+            for (int i = 0; i < blocks.Length; i++) blocks[i] = Course.Blocks[i] + ".  " + L.T(Course.BlockNames[i]);
+            Stepper(p, Margin + 790f, ContentWidth - 790f, blocks, _tBlock, i => { _tBlock = i; ShowTeacherLessonEdit(); });
+            UiKit.Label(p, L.T("Type the plan's name above, then press the exercises in the order of the lesson. Press one again to take it out."), new Vector2(Margin, -195f),
+                new Vector2(ContentWidth, 50f), 22f, TextAlignmentOptions.MidlineLeft, UiKit.DimTextColor);
+            var course = new Course(EduSession.Activities.Values);
+            float y = -250f;
+            foreach (CourseEntry e in course.In(Course.Blocks[_tBlock]))
+            {
+                string id = e.Activity.Id;
+                int place = _tPlan.IndexOf(id);
+                Button b = UiKit.Button(p, (place >= 0 ? "[" + (place + 1) + "]   " : "") + e.Activity.Number + ".  " + L.T(e.Activity.Title), new Vector2(Margin, y),
+                    new Vector2(ContentWidth, 64f), () =>
+                    {
+                        if (!_tPlan.Remove(id)) _tPlan.Add(id);
+                        ShowTeacherLessonEdit();
+                    }, 26f);
+                if (place >= 0) UiKit.SetButtonColor(b, UiKit.SelectedColor);
+                y -= 72f;
+                if (y < -(Height - 190f)) break;
+            }
+            UiKit.Button(p, L.F("Save the plan ({0})", _tPlan.Count), new Vector2(Width - Margin - 400f, -(Height - 110f)), new Vector2(400f, 70f), () =>
+            {
+                try
+                {
+                    Students(out _).SaveLesson(_tText, _tPlan);
+                    _tText = "";
+                    _tPlan.Clear();
+                    ShowTeacherLessons();
+                }
+                catch (ArgumentException)
+                {
+                    _tMessage = L.T("A plan needs a name and at least one exercise");
+                    ShowTeacherLessonEdit();
+                }
+            }, 26f);
             TeacherNote(p);
         }
 

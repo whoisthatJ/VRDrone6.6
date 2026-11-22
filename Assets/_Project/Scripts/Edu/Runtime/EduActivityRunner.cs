@@ -36,6 +36,24 @@ namespace Ushqyr.Edu
         }
 
         private static AttemptRecord _pendingReplay;
+        private static Assignment _pendingAssignment;
+        private Assignment _assignment;
+
+        /// <summary>The assignment the next exercise is flown for (set with its activity): its attempt limit is kept.</summary>
+        public static void SetPendingAssignment(Assignment assignment) => _pendingAssignment = assignment;
+
+        /// <summary>
+        /// Attempts left on the assignment this exercise is flown for; -1 when there is no limit (or no assignment).
+        /// </summary>
+        public int AttemptsLeft
+        {
+            get
+            {
+                if (_assignment == null || _assignment.AttemptLimit <= 0) return -1;
+                try { return Mathf.Max(0, _assignment.AttemptLimit - EduSession.Store.AttemptsUsed(_assignment, EduSession.CurrentUserId)); }
+                catch (Exception) { return -1; }
+            }
+        }
 
         /// <summary>
         /// A stored attempt to show instead of flying (set by the replay library together with its activity): the
@@ -129,6 +147,8 @@ namespace Ushqyr.Edu
             L.Changed += Redraw;
             AttemptRecord stored = _pendingReplay;
             _pendingReplay = null;
+            _assignment = _pendingAssignment != null && _pendingAssignment.ActivityId == Activity.Id ? _pendingAssignment : null;
+            _pendingAssignment = null;
             if (stored != null && stored.ActivityId == Activity.Id && WatchStored(stored)) return;
             ShowBriefing();
         }
@@ -193,7 +213,9 @@ namespace Ushqyr.Edu
                 y += 30f;
             }
             if (Activity.TimeLimit > 0)
-                EduUi.Text(p, L.F("Time limit: {0}", EduUi.Clock((float)Activity.TimeLimit)), 30f, 452f, 500f, 28f, 21f, EduUi.Dim);
+                EduUi.Text(p, L.F("Time limit: {0}", EduUi.Clock((float)Activity.TimeLimit)), 30f, 452f, 400f, 28f, 21f, EduUi.Dim);
+            int left = AttemptsLeft;
+            if (left >= 0) EduUi.Text(p, L.F("Attempts left: {0}", left), 440f, 452f, 430f, 28f, 21f, left > 0 ? EduUi.Dim : EduUi.Accent, TextAlignmentOptions.MidlineRight);
             EduUi.Button(p, L.T("Start") + "  (Space)", 30f, 492f, 270f, 50f, StartFlying, 23f);
             // The exercise flown as it should be, to watch before trying.
             if (EduSession.Reference(Activity) != null) EduUi.Button(p, L.T("Show me") + "  (D)", 315f, 492f, 270f, 50f, WatchDemonstration, 23f);
@@ -204,6 +226,8 @@ namespace Ushqyr.Edu
         public void StartFlying()
         {
             if (State == Phase.Flying) return;
+            // An assignment with no attempts left is not flown again; the briefing says so.
+            if (AttemptsLeft == 0) return;
             ClearPanel();
             State = Phase.Flying;
             Result = null;

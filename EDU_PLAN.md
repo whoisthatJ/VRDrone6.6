@@ -882,3 +882,21 @@ boxes by hand (they were filled by code); a school logo in the header is not don
 **Still to build in ED4:** assignments and lesson plans; the classroom link over the LAN (seats, "start on all
 seats", live control, the grid with small pictures, messages); attendance; simulated seats to reach thirty.
 470 tests pass.
+
+### 22 November 2026, later: assignments and lesson plans
+
+- **Tasks** is the console's fifth tab. The teacher gives an exercise to a group or to everyone, with an attempt
+  limit (none, 1, 2, 3, 5 or 10); the list shows how many of the group have passed each one, and "take back".
+- **Lesson plans:** a name and exercises pressed in the order of the lesson; a plan is given to a group in one press.
+- **The student** sees "My tasks: n to do" in the training hub: the exercises given, in order, with attempts used and
+  the result. A given exercise opens whatever block it is in. The briefing shows the attempts left; with none left
+  the exercise does not start.
+- The class database moved to layout 2 (lesson plans; an older file is upgraded when it is opened).
+
+- **D47. An exercise given again to the same people replaces the earlier one,** and the attempt count starts
+  afresh. What a student is given directly outranks what their group is given, which outranks "everyone".
+- **D48. The teacher's mark decides the pass everywhere.** Found on the screen: an attempt marked 45 by the teacher
+  was "not passed" in the journal but still "passed" in the student's hub. Both now follow the mark (test added).
+
+**Not done here:** assists allowed and weather as settings of an assignment (the exercise's own are used);
+"start on all seats now" and lock mode belong to the classroom link, next. 471 tests pass.

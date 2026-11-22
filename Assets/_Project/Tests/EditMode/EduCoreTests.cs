@@ -467,6 +467,9 @@ namespace Ushqyr.Tests
                 b = Journal.Build(store, all, group).Rows.Find(r => r.User.Id == bolat);
                 Assert.AreEqual(40, b.Cells[0].Best.Value, 1e-9);
                 Assert.IsFalse(b.Cells[0].Passed);
+                CourseEntry asTheStudentSeesIt = new Course(all, store, bolat).Find("a01-controls");
+                Assert.IsFalse(asTheStudentSeesIt.Passed, "the training hub says the same as the journal");
+                Assert.AreEqual(40, asTheStudentSeesIt.Best.Value, 1e-9);
 
                 // Everyone: the fourth student too, and the seat after the students because something was flown on it.
                 Journal everyone = Journal.Build(store, all);

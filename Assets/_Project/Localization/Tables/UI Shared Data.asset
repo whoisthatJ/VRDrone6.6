@@ -4185,6 +4185,106 @@ MonoBehaviour:
     m_Key: 'Not restored: {0}'
     m_Metadata:
       m_Items: []
+  - m_Id: 6936315793506304
+    m_Key: Tasks
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6936315860615168
+    m_Key: 'Attempts: no limit'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6936315860615169
+    m_Key: 'Attempts: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6936315860615170
+    m_Key: 'Attempts: {0} of {1}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6936315860615171
+    m_Key: 'Attempts left: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6936315860615172
+    m_Key: Give an exercise
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6936315860615173
+    m_Key: Lesson plans
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6936315860615174
+    m_Key: Nothing has been given to this group yet.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6936315860615175
+    m_Key: Nothing has been given to everyone yet. Choose a group, or give an exercise to all.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6936315860615176
+    m_Key: Passed by {0} of {1}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6936315860615177
+    m_Key: Take back
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6936315860615178
+    m_Key: Press an exercise to give it to the group {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6936315860615179
+    m_Key: Press an exercise to give it to everyone
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6936315860615180
+    m_Key: 'Given: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6936315860615181
+    m_Key: New lesson plan
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6936315860615182
+    m_Key: No lesson plans yet. A plan is a list of exercises in the order they are to be done.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6936315860615183
+    m_Key: Give to {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6936315860615184
+    m_Key: Give to everyone
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6936315860615185
+    m_Key: 'Exercises given: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6936315860615186
+    m_Key: Press again
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6936315860615187
+    m_Key: Type the plan's name above, then press the exercises in the order of the lesson. Press one again to take it out.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6936315860615188
+    m_Key: Save the plan ({0})
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6936315860615189
+    m_Key: A plan needs a name and at least one exercise
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6936315860615190
+    m_Key: 'My tasks: {0} to do'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6936315860615191
+    m_Key: My tasks
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

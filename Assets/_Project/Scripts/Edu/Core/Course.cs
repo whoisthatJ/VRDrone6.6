@@ -43,7 +43,9 @@ namespace Ushqyr.Edu
                     {
                         entry.Attempts++;
                         if (entry.Best == null || attempt.Final > entry.Best) entry.Best = attempt.Final;
-                        if (attempt.Passed)
+                        // The teacher's own mark, when there is one, decides the pass as well as the grade.
+                        bool passed = attempt.ManualScore != null ? attempt.ManualScore.Value >= a.PassMark : attempt.Passed;
+                        if (passed)
                         {
                             entry.Passed = true;
                             if (attempt.Stars > entry.Stars) entry.Stars = attempt.Stars;
