@@ -272,6 +272,17 @@ namespace Ushqyr.UI
             }
 
             if (host)
+            {
+                // The start and the timing: the game's own 3-2-1, or the FAI rules (one tone, and the host keeps the timing).
+                Button start = UiKit.Button(p, L.T("Start") + ":  " + (OnlineFlow.Fai ? L.T("FAI: one tone after 2-4 s") : L.T("Countdown 3-2-1")),
+                    new Vector2(Width - Margin - 520f, -(Height - 310f)), new Vector2(520f, 70f), () =>
+                    {
+                        OnlineFlow.Fai = !OnlineFlow.Fai;
+                        ShowOnlineLobby();
+                    }, 24f);
+                if (OnlineFlow.Fai) UiKit.SetButtonColor(start, UiKit.SelectedColor);
+            }
+            if (host)
                 UiKit.Button(p, L.T("START RACE"), new Vector2(Width - Margin - 520f, -(Height - 220f)), new Vector2(520f, 100f), () =>
                 {
                     CommitIfDirty();

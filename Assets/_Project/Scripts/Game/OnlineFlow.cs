@@ -65,6 +65,9 @@ namespace Ushqyr.Game
         /// <summary>Laps the host picked in the lobby; 0 = the track's own.</summary>
         public static int Laps { get; set; }
 
+        /// <summary>The host's choice: the race is started and timed by the FAI rules.</summary>
+        public static bool Fai { get; set; }
+
         /// <summary>Host: everyone loads the lobby's track.</summary>
         public static void HostStart(string trackId)
         {
@@ -73,7 +76,7 @@ namespace Ushqyr.Game
             _ = OnlineLobby.SetRacingAsync(true);
             var data = GameFlow.Catalog != null ? GameFlow.Resolve(GameFlow.Catalog, trackId) : null;
             if (data != null && data.Environment == "steppe") OnlineStrikeDriver.HostAnnounce(net, net.RaceId + 1, SaveSystem.Settings.Strike);
-            net.StartRace(trackId, Laps);
+            net.StartRace(trackId, Laps, Fai);
         }
 
         /// <summary>Host: everyone back to the lobby page (the race is listed again).</summary>

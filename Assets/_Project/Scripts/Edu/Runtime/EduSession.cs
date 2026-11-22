@@ -59,7 +59,10 @@ namespace Ushqyr.Edu
         }
 
         /// <summary>The name of this place when nobody is named: the computer's own name.</summary>
-        public static string SeatName => SystemInfo.deviceName;
+        public static string SeatName => string.IsNullOrEmpty(SeatNameOverride) ? SystemInfo.deviceName : SeatNameOverride;
+
+        /// <summary>Another name for this seat than the computer's (several copies of the program on one PC, each a seat).</summary>
+        public static string SeatNameOverride { get; set; }
 
         /// <summary>Flies as the seat, with no person named.</summary>
         public static void UseSeat() => CurrentUserId = Store.SeatUser(SeatName);

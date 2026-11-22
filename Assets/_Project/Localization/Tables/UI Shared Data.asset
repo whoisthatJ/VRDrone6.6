@@ -4797,6 +4797,10 @@ MonoBehaviour:
     m_Key: 'New track from the teacher: {0}'
     m_Metadata:
       m_Items: []
+  - m_Id: 6967723031265280
+    m_Key: RACE RESULT
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

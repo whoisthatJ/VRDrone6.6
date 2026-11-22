@@ -44,6 +44,8 @@ namespace Ushqyr.Game
             auto._autostart = int.Parse(BenchmarkRunner.Arg(args, "-online-autostart", "2"), CultureInfo.InvariantCulture);
             OnlineFlow.Laps = int.Parse(BenchmarkRunner.Arg(args, "-online-laps", "0"), CultureInfo.InvariantCulture);
             auto._quit = Array.Exists(args, a => string.Equals(a, "-online-quit", StringComparison.OrdinalIgnoreCase));
+            // -online-fai: the race is started and timed by the FAI rules (the host's choice).
+            OnlineFlow.Fai = Array.Exists(args, a => string.Equals(a, "-online-fai", StringComparison.OrdinalIgnoreCase));
             // The autopilot is tuned for the stock racer: fly that (in memory only, the saved choice is untouched).
             string quad = BenchmarkRunner.Arg(args, "-online-quad", "race5");
             if (!string.IsNullOrEmpty(quad)) Ushqyr.Core.SaveSystem.Settings.QuadId = quad;

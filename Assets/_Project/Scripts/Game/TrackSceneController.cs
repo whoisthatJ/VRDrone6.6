@@ -88,7 +88,12 @@ namespace Ushqyr.Game
             if (views != null) views.Apply((ViewMode)settings.Camera.ViewMode);
             if (Ushqyr.Net.NetRace.InRace && Track != null && PrepareStrike(settings))
                 gameObject.AddComponent<OnlineStrikeDriver>().Configure(this, vehicle, Strike, buildMaterials, QuadSize(settings));
-            else if (Ushqyr.Net.NetRace.InRace && Track != null) gameObject.AddComponent<OnlineRaceDriver>().Configure(this, vehicle, race, buildMaterials);
+            else if (Ushqyr.Net.NetRace.InRace && Track != null)
+            {
+                gameObject.AddComponent<OnlineRaceDriver>().Configure(this, vehicle, race, buildMaterials);
+                // A race the host started by the FAI rules: the tone, and one timing kept by the host.
+                if (Ushqyr.Net.NetRace.Instance.FaiStart) gameObject.AddComponent<FaiRaceLink>().Configure(race);
+            }
             // A short showdown of the track before the pilot's view (not for online races: the host starts those).
             else if (Track != null && SetupStrike(settings)) { }
             else if (Track != null)

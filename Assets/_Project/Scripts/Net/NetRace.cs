@@ -41,6 +41,11 @@ namespace Ushqyr.Net
         public int RaceId { get; private set; }
         /// <summary>Laps chosen by the host; 0 = the track's own lap count.</summary>
         public int Laps { get; private set; }
+        /// <summary>
+        /// The race is started and timed by the FAI rules: one tone 2 to 4 seconds after everyone is on the grid, no
+        /// countdown, and the host keeps the timing from every pilot's gate passes. Chosen by the host.
+        /// </summary>
+        public bool FaiStart { get; private set; }
         /// <summary>GO on the server clock (valid once <see cref="GoReceived"/> fired).</summary>
         public double GoServerTime { get; private set; }
 
@@ -211,13 +216,14 @@ namespace Ushqyr.Net
         // ---------- host actions ----------
 
         /// <summary>Host: everyone loads <paramref name="trackId"/> (<paramref name="laps"/> 0 = the track's); GO follows once all are on the grid.</summary>
-        public void StartRace(string trackId, int laps = 0)
+        public void StartRace(string trackId, int laps = 0, bool fai = false)
         {
             if (!IsHost) return;
             using var w = Writer();
             w.WriteValueSafe(RaceId + 1);
             w.WriteValueSafe(trackId ?? "");
             w.WriteValueSafe(Mathf.Clamp(laps, 0, 10));
+            w.WriteValueSafe(fai);
             ToAll(MsgLoad, w);
         }
 
@@ -272,10 +278,12 @@ namespace Ushqyr.Net
 
         private void SendGo()
         {
-            Debug.Log("[Ushqyr] Online: everyone is on the grid, GO in " + OnlineRules.StartLead + " s");
+            // FAI: the tone comes at a moment nobody can foresee, 2 to 4 seconds after the arm call.
+            double lead = FaiStart ? UnityEngine.Random.Range(2f, 4f) : OnlineRules.StartLead;
+            Debug.Log("[Ushqyr] Online: everyone is on the grid, GO in " + lead.ToString("0.00") + " s");
             using var w = Writer();
             w.WriteValueSafe(RaceId);
-            w.WriteValueSafe(ServerTime + OnlineRules.StartLead);
+            w.WriteValueSafe(ServerTime + lead);
             ToAll(MsgGo, w);
         }
 
@@ -350,9 +358,11 @@ namespace Ushqyr.Net
             r.ReadValueSafe(out int raceId);
             r.ReadValueSafe(out string trackId);
             r.ReadValueSafe(out int laps);
+            r.ReadValueSafe(out bool fai);
             RaceId = raceId;
             TrackId = trackId;
             Laps = laps;
+            FaiStart = fai;
             Phase = OnlinePhase.Loading;
             _loadStarted = Time.unscaledTime;
             foreach (var p in Pilots.Values) p.ResetRace();

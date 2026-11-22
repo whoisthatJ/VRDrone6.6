@@ -4800,6 +4800,10 @@ MonoBehaviour:
     m_Localized: 'New track from the teacher: {0}'
     m_Metadata:
       m_Items: []
+  - m_Id: 6967723031265280
+    m_Localized: RACE RESULT
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

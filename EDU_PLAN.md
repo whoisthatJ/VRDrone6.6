@@ -1070,3 +1070,46 @@ track sent to the seats. **Not built:** a LAN race of up to 8 that uses the FAI 
 itself (it needs a decision on how such a race is carried, and more than one PC to try); the ten tracks with medal
 times, bot lines and ghosts; the race director's and spectators' views; the big-screen mode; brackets for 32 and 64.
 498 tests pass.
+
+### 22 November 2026, afternoon: trials with two programs on one PC; the LAN race timed by the FAI rules
+
+The owner has one PC, so the trials that the plan gives to a second PC were made with two programs on this one: the
+editor and a built copy (`Builds/EduTrial`, not a release, version unchanged), or two built copies, talking over
+loopback. **This is not a second PC:** it tries the programs against each other, not a school network, a switch,
+Windows Firewall between machines, or two graphics cards.
+
+**A seat that runs itself** (`EduAutomation`), for these trials and for filling a room with simulated seats later:
+`-edu-folder`, `-edu-seat`, `-edu-join HOST:PORT:CODE`, `-edu-user`, `-edu-autofly`. Without them the program is
+untouched.
+
+**Class link, editor as teacher and a built copy as seat PC-01:**
+
+| What | Result |
+|---|---|
+| Joining with the code | joined; the class list arrived and the seat chose its student by name |
+| "Start" to the briefing on the seat | **1.0 s** from the menu, **0.3 s** when the place was already loaded (the 8 s measured before was the editor loading the scene; the target is 5 s) |
+| The seat's flight | flown by the exercise's reference; state and pictures shown on the teacher's side throughout |
+| The result | stored on the teacher's side under the student, graded there as 99.5, marked with the seat's name |
+
+**LAN race by the FAI rules.** A LAN race can now be started "FAI" from the lobby (or `-online-fai`): everyone gets
+the arm call and one tone 2 to 4 seconds later; each pilot's PC measures its own gate passes from the tone to a
+thousandth of a second and sends them to the host; the host keeps the one timing (false start, missed gates, three
+minutes) and sends the result to everyone, and every PC shows the same table. When the pilots are exactly those of
+the next race of a tournament in the host's class data, the race is timed as that race needs (qualification from the
+timing gate, others from the tone) and its result is recorded into the tournament by itself.
+
+- **D59. The host confirms the times by being the only one who turns passes into a result.** A pilot's PC sends gate
+  and time; laps, voids, the false start and the placing are decided once, on the host.
+
+**Two built copies raced each other twice** (host and joiner, both flown by the race autopilot, tone after 3.21 s and
+3.40 s). Both times the two programs logged **the same result line, to the millisecond** (for example
+"1. 1 laps 138.920 135.496 | 2. 1 laps 178.117 174.601" on both). **What these races did not show:** nobody
+finished three laps. The race autopilot flies at a gentle 8 m/s and takes about 140 s a lap, and on the field track
+it waits before gate 7 until its watchdog moves it, so the three minutes ran out with one lap each. The time limit
+and the placing by laps were therefore tried for real; a full three-lap race, a false start between two programs, and
+the recording into a tournament were **not** tried between programs (the first two are tested in the timing's own
+tests and in the editor; the third only by reading). Both pilots were also called "Pilot", which is exactly the case
+in which a race is not matched to a tournament.
+
+**Still open in ED5:** a host who directs without flying (the teacher's PC), pilots named from the class list,
+starting such a race from the class link, the ten tracks, the big-screen view. 498 tests pass.
