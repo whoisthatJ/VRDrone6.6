@@ -161,7 +161,11 @@ namespace Ushqyr.Game
         {
             var source = _vehicle.gameObject.AddComponent<ScriptedInputSource>();
             _vehicle.InputSource = source;
-            _vehicle.gameObject.AddComponent<RaceAutopilot>().Configure(_race, _vehicle, source, gates);
+            var autopilot = _vehicle.gameObject.AddComponent<RaceAutopilot>();
+            autopilot.Configure(_race, _vehicle, source, gates);
+            // -online-speed N: the autopilot's cruise speed in m/s (its own gentle 8 takes over two minutes a lap).
+            string speed = BenchmarkRunner.Arg(Environment.GetCommandLineArgs(), "-online-speed", null);
+            if (speed != null && float.TryParse(speed, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out float mps)) autopilot.CruiseSpeed = mps;
         }
 
         private static bool HasArg(string name) =>

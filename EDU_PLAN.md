@@ -1113,3 +1113,15 @@ in which a race is not matched to a tournament.
 
 **Still open in ED5:** a host who directs without flying (the teacher's PC), pilots named from the class list,
 starting such a race from the class link, the ten tracks, the big-screen view. 498 tests pass.
+
+### 22 November 2026, afternoon, later: a race between two programs recorded into a tournament
+
+- A pilot in a LAN race now flies under the name chosen in "Who is flying?" (their callsign otherwise), so a race can
+  be matched to a tournament made from the class list.
+- **Tried with two built copies:** a tournament of two pilots was put into the host's class data; the two programs
+  raced under those names on the stadium oval with the FAI start (tone after 2.31 s). The host said "timed from the
+  timing gate, Q1-1"; both programs logged the same result, "1. Әлия 129.687 | 2. Болат 155.036"; the race ended when
+  both had finished; and the tournament read back afterwards held Q1-1 with those times, the ranking, and the final
+  as the next race.
+- The race was **one lap**, set as a local rule for the trial: the race autopilot cannot fly three laps of that track
+  in three minutes (at higher speeds it finished no lap at all). A three-lap race between programs is still untried.

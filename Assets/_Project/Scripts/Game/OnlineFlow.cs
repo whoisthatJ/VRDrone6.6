@@ -43,6 +43,16 @@ namespace Ushqyr.Game
             if (net == null) return;
             var s = SaveSystem.Settings;
             net.LocalName = string.IsNullOrWhiteSpace(s.PilotName) ? "Pilot" : s.PilotName;
+            // In a class the pilot races under the name chosen in "Who is flying?", so a race can be matched to a
+            // tournament made from the class list. (-online-name gives a name for trials.)
+            try
+            {
+                Ushqyr.Edu.EduUser student = Ushqyr.Edu.EduSession.CurrentUserId != 0 ? Ushqyr.Edu.EduSession.CurrentUser : null;
+                if (student != null && student.Role == "student") net.LocalName = student.Name;
+            }
+            catch (System.Exception) { /* no class data: the callsign stays */ }
+            string given = BenchmarkRunner.Arg(System.Environment.GetCommandLineArgs(), "-online-name", null);
+            if (!string.IsNullOrWhiteSpace(given)) net.LocalName = given;
             net.LocalBuildJson = LocalBuild(s.QuadId).ToJson();
         }
 
