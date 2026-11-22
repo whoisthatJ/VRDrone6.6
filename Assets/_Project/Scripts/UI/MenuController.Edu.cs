@@ -94,6 +94,8 @@ namespace Ushqyr.UI
                     ShowTraining();
                 }, 26f);
 
+            if (store != null) UiKit.Button(p, L.T("My flights"), new Vector2(Width - Margin - 300f, -(Height - 110f)), new Vector2(300f, 70f), ShowFlights, 28f);
+
             // The blocks.
             float tab = (ContentWidth - 4f * 12f) / 5f;
             for (int i = 0; i < Course.Blocks.Length; i++)
@@ -142,6 +144,68 @@ namespace Ushqyr.UI
                 }
                 y -= 86f;
             }
+        }
+
+        private int _flightsPage;
+
+        /// <summary>The replay library: the student's own attempts, newest first, each to be watched again.</summary>
+        private void ShowFlights()
+        {
+            RectTransform p = NewPage(L.T("My flights"));
+            BackButton(p, ShowTraining);
+            EduStore store = Students(out string error);
+            EduUser who = null;
+            try { who = EduSession.CurrentUser; } catch (Exception) { /* reported just below */ }
+            if (store == null || who == null)
+            {
+                UiKit.Label(p, error != null ? L.F("The class data could not be opened: {0}", error) : L.T("No flights recorded yet."), new Vector2(Margin, -140f),
+                    new Vector2(ContentWidth, 200f), 30f, TextAlignmentOptions.TopLeft, UiKit.DimTextColor);
+                return;
+            }
+            UiKit.Label(p, StudentLabel(), new Vector2(Width - Margin - 700f, -40f), new Vector2(700f, 60f), 28f, TextAlignmentOptions.MidlineRight, UiKit.DimTextColor);
+            List<AttemptRecord> attempts = store.Attempts(who.Id);
+            if (attempts.Count == 0)
+                UiKit.Label(p, L.T("No flights recorded yet."), new Vector2(Margin, -140f), new Vector2(ContentWidth, 60f), 30f, TextAlignmentOptions.MidlineLeft, UiKit.DimTextColor);
+            const int rows = 8;
+            int pages = Mathf.Max(1, (attempts.Count + rows - 1) / rows);
+            _flightsPage = Mathf.Clamp(_flightsPage, 0, pages - 1);
+            var inv = System.Globalization.CultureInfo.InvariantCulture;
+            float y = -130f;
+            for (int i = _flightsPage * rows; i < attempts.Count && i < (_flightsPage + 1) * rows; i++)
+            {
+                AttemptRecord attempt = attempts[i];
+                EduSession.Activities.TryGetValue(attempt.ActivityId, out ActivityDefinition activity);
+                // It can be watched when its exercise is still shipped and its recording is still on the disk.
+                bool there = activity != null && !string.IsNullOrEmpty(attempt.ReplayPath) && System.IO.File.Exists(store.ReplayFile(attempt.ReplayPath));
+                Button row = UiKit.Button(p, "", new Vector2(Margin, y), new Vector2(ContentWidth, 76f), () => WatchFlight(attempt, activity, there), 30f);
+                if (!there) UiKit.SetButtonColor(row, new Color(0.12f, 0.13f, 0.16f, 1f));
+                string when = DateTime.TryParse(attempt.Started, inv, System.Globalization.DateTimeStyles.AdjustToUniversal | System.Globalization.DateTimeStyles.AssumeUniversal, out DateTime at)
+                    ? at.ToLocalTime().ToString("dd.MM.yyyy   HH:mm", inv) : attempt.Started;
+                UiKit.Label(row.transform, when, new Vector2(24f, 0f), new Vector2(330f, 76f), 28f, TextAlignmentOptions.MidlineLeft, UiKit.DimTextColor);
+                UiKit.Label(row.transform, activity != null ? activity.Number + "   " + L.T(activity.Title) : attempt.ActivityId, new Vector2(370f, 0f),
+                    new Vector2(ContentWidth - 620f, 76f), 30f, TextAlignmentOptions.MidlineLeft, there ? UiKit.TextColor : UiKit.DimTextColor);
+                UiKit.Label(row.transform, attempt.Final.ToString("0", inv), new Vector2(ContentWidth - 240f, 0f), new Vector2(120f, 76f), 32f, TextAlignmentOptions.MidlineRight,
+                    attempt.Passed ? new Color(0.4f, 0.95f, 0.5f) : UiKit.DimTextColor);
+                UiKit.Label(row.transform, EduUi.Clock((float)attempt.Duration), new Vector2(ContentWidth - 110f, 0f), new Vector2(90f, 76f), 26f, TextAlignmentOptions.MidlineRight, UiKit.DimTextColor);
+                y -= 86f;
+            }
+            if (pages > 1)
+            {
+                UiKit.Button(p, "<", new Vector2(Width - Margin - 400f, -(Height - 110f)), new Vector2(90f, 70f), () => { _flightsPage--; ShowFlights(); });
+                UiKit.Label(p, (_flightsPage + 1) + " / " + pages, new Vector2(Width - Margin - 300f, -(Height - 110f)), new Vector2(200f, 70f), 30f, TextAlignmentOptions.Midline, UiKit.DimTextColor);
+                UiKit.Button(p, ">", new Vector2(Width - Margin - 90f, -(Height - 110f)), new Vector2(90f, 70f), () => { _flightsPage++; ShowFlights(); });
+            }
+        }
+
+        private void WatchFlight(AttemptRecord attempt, ActivityDefinition activity, bool there)
+        {
+            if (!there) return;
+            CommitIfDirty();
+            EduActivityRunner.SetPending(activity);
+            EduActivityRunner.SetPendingReplay(attempt);
+            if (GameFlow.Activity(tracks, activity.Setup.Place)) return;
+            EduActivityRunner.SetPending(null);
+            EduActivityRunner.SetPendingReplay(null);
         }
 
         private void StartExercise(ActivityDefinition activity, bool open)

@@ -3904,6 +3904,18 @@ MonoBehaviour:
     m_Localized: 'Time: gold 80 s, silver 120 s, bronze 170 s'
     m_Metadata:
       m_Items: []
+  - m_Id: 6928053337587712
+    m_Localized: My flights
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6928053396307968
+    m_Localized: No flights recorded yet.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6928053396307969
+    m_Localized: Show me
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

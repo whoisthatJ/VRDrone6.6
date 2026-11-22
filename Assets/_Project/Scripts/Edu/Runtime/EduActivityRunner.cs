@@ -35,7 +35,18 @@ namespace Ushqyr.Edu
             return a;
         }
 
+        private static AttemptRecord _pendingReplay;
+
+        /// <summary>
+        /// A stored attempt to show instead of flying (set by the replay library together with its activity): the
+        /// scene is laid out as for the exercise, the replay plays, and closing it leaves.
+        /// </summary>
+        public static void SetPendingReplay(AttemptRecord attempt) => _pendingReplay = attempt;
+
         public static EduActivityRunner Current { get; private set; }
+
+        /// <summary>True while a replay or the demonstration is on the screen.</summary>
+        public bool Watching { get; private set; }
 
         private QuadVehicle _vehicle;
         private EduFlight _flight;
@@ -116,6 +127,9 @@ namespace Ushqyr.Edu
             _canvas = EduUi.Canvas("Activity Screen", 600);
             _canvas.transform.SetParent(transform, false);
             L.Changed += Redraw;
+            AttemptRecord stored = _pendingReplay;
+            _pendingReplay = null;
+            if (stored != null && stored.ActivityId == Activity.Id && WatchStored(stored)) return;
             ShowBriefing();
         }
 
@@ -154,6 +168,7 @@ namespace Ushqyr.Edu
 
         private void Redraw()
         {
+            if (Watching) return;
             if (State == Phase.Briefing) ShowBriefing();
             else if (State == Phase.Result) ShowResult();
         }
@@ -179,8 +194,10 @@ namespace Ushqyr.Edu
             }
             if (Activity.TimeLimit > 0)
                 EduUi.Text(p, L.F("Time limit: {0}", EduUi.Clock((float)Activity.TimeLimit)), 30f, 452f, 500f, 28f, 21f, EduUi.Dim);
-            EduUi.Button(p, L.T("Start") + "  (Space)", 30f, 492f, 300f, 50f, StartFlying, 24f);
-            EduUi.Button(p, L.T("Leave") + "  (Esc)", 570f, 492f, 300f, 50f, Leave, 24f);
+            EduUi.Button(p, L.T("Start") + "  (Space)", 30f, 492f, 270f, 50f, StartFlying, 23f);
+            // The exercise flown as it should be, to watch before trying.
+            if (EduSession.Reference(Activity) != null) EduUi.Button(p, L.T("Show me") + "  (D)", 315f, 492f, 270f, 50f, WatchDemonstration, 23f);
+            EduUi.Button(p, L.T("Leave") + "  (Esc)", 600f, 492f, 270f, 50f, Leave, 23f);
         }
 
         /// <summary>The pilot is ready: the recording starts and the drone is free.</summary>
@@ -301,19 +318,22 @@ namespace Ushqyr.Edu
         private void Update()
         {
             Keyboard kb = Keyboard.current;
-            bool viewer = EduReplayViewer.Current != null;
+            // A gamepad works the two screens too: A goes on, B leaves, X shows the demonstration, Y the replay.
+            // (In flight its buttons belong to the drone.)
+            Gamepad pad = Gamepad.current;
+            if (Watching || EduReplayViewer.Current != null) return;
             if (State == Phase.Briefing)
             {
-                if (kb != null && (kb.spaceKey.wasPressedThisFrame || kb.enterKey.wasPressedThisFrame)) StartFlying();
-                else if (kb != null && kb.escapeKey.wasPressedThisFrame) Leave();
+                if ((kb != null && (kb.spaceKey.wasPressedThisFrame || kb.enterKey.wasPressedThisFrame)) || (pad != null && pad.buttonSouth.wasPressedThisFrame)) StartFlying();
+                else if ((kb != null && kb.dKey.wasPressedThisFrame) || (pad != null && pad.buttonWest.wasPressedThisFrame)) WatchDemonstration();
+                else if ((kb != null && kb.escapeKey.wasPressedThisFrame) || (pad != null && pad.buttonEast.wasPressedThisFrame)) Leave();
                 return;
             }
             if (State == Phase.Result)
             {
-                if (kb == null || viewer) return;
-                if (kb.rKey.wasPressedThisFrame) ShowBriefing();
-                else if (kb.lKey.wasPressedThisFrame) WatchReplay();
-                else if (kb.escapeKey.wasPressedThisFrame) Leave();
+                if ((kb != null && kb.rKey.wasPressedThisFrame) || (pad != null && pad.buttonSouth.wasPressedThisFrame)) ShowBriefing();
+                else if ((kb != null && kb.lKey.wasPressedThisFrame) || (pad != null && pad.buttonNorth.wasPressedThisFrame)) WatchReplay();
+                else if ((kb != null && kb.escapeKey.wasPressedThisFrame) || (pad != null && pad.buttonEast.wasPressedThisFrame)) Leave();
                 return;
             }
 
@@ -420,13 +440,49 @@ namespace Ushqyr.Edu
         /// <summary>The replay of the attempt, with the activity's reference flight beside it when it has one.</summary>
         public void WatchReplay()
         {
-            if (_recorder == null || _recorder.Recording == null || _recorder.Recording.Samples.Count < 2) return;
+            if (_recorder == null || _recorder.Recording == null) return;
+            Watch(_recorder.Recording, true, null);
+        }
+
+        /// <summary>The exercise flown as it should be (its reference flight), to watch before trying.</summary>
+        public void WatchDemonstration()
+        {
             FlightRecording reference = EduSession.Reference(Activity);
+            if (reference != null) Watch(reference.PlacedAt(_frame), false, null);
+        }
+
+        /// <summary>A stored attempt from the replay library; closing it leaves the scene.</summary>
+        private bool WatchStored(AttemptRecord attempt)
+        {
+            try
+            {
+                FlightRecording flight = FlightRecording.Load(EduSession.Store.ReplayFile(attempt.ReplayPath));
+                return Watch(flight.PlacedAt(_frame), true, Leave);
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning("[Edu] the stored replay could not be opened: " + e.Message);
+                return false;
+            }
+        }
+
+        private bool Watch(FlightRecording flight, bool withReference, Action closed)
+        {
+            if (flight == null || flight.Samples.Count < 2) return false;
+            FlightRecording reference = withReference ? EduSession.Reference(Activity) : null;
             // The reference was flown somewhere of its own: bring it to where this activity is laid out.
             if (reference != null) reference = reference.PlacedAt(_frame);
+            _vehicle.HoldAtSpawn = true;
             _canvas.enabled = false;
-            EduReplayViewer viewer = EduReplayViewer.Open(_vehicle, _recorder.Recording, reference, L.T(Activity.Title));
-            viewer.Closed += () => { if (_canvas != null) _canvas.enabled = true; };
+            Watching = true;
+            EduReplayViewer viewer = EduReplayViewer.Open(_vehicle, flight, reference, L.T(Activity.Title));
+            viewer.Closed += () =>
+            {
+                Watching = false;
+                if (_canvas != null) _canvas.enabled = true;
+                closed?.Invoke();
+            };
+            return true;
         }
 
         public void Leave()

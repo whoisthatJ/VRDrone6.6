@@ -829,3 +829,21 @@ for the school and the teacher to sign. Russian, Kazakh and English, with the fo
 
 Left in ED3: a demonstration of the reference in the briefing, the replay library, and gamepad or radio control of
 the exercise screens. 469 tests pass.
+
+### 22 November 2026, midday: the demonstration, the replay library, a gamepad on the exercise screens. ED3 is built
+
+- **"Show me"** in the briefing (key D) plays the exercise's reference flight in the replay viewer before the student
+  tries. Closing it returns to the briefing.
+- **"My flights"** in the training hub lists the student's own attempts, newest first, eight to a page: when, which
+  exercise, the score, the time. Choosing one lays the exercise out again and plays the stored recording beside the
+  reference; closing it returns to the menu. A flight whose exercise is no longer shipped, or whose recording is gone
+  from the disk, is shown but cannot be opened.
+- **A gamepad works the briefing and the result:** A starts or flies again, B leaves, X shows the demonstration, Y the
+  replay. In flight the gamepad's buttons stay the drone's (Start arms). A radio has no such buttons: with a radio the
+  screens are worked with the keyboard or mouse.
+
+**ED3 as built:** 30 exercises in five blocks, each with a reference flight scoring 95.6 to 100; the hub with blocks
+that open in order; briefing, guided steps, result with tips; the demonstration; the replay with the reference beside
+it; the library; the certificate. **Not done, and said so:** the loss-of-positioning drill has no automatic reference
+(left out); nothing has been flown by a person yet, so the pass marks and the star times are guesses to be set in the
+classroom pilot (ED10); the Kazakh texts need a native review. 469 tests pass.
