@@ -898,6 +898,41 @@ EXERCISES.append({
     'reference': ref,
 })
 
+# ---------------------------------------------------------------- E30
+out = [(0, 1, 12, 0, 3, 2), (6, 1, 24, 0, 3, 2), (-6, 1, 36, 0, 3, 2)]
+back = [(8, 1, 30, 180, 3, 2), (8, 1, 12, 180, 3, 2)]
+steps, ref = course(out, speed=5)
+steps += [
+    {'say': t('Climb to 12 m', '12 м биіктікке көтеріліңіз', 'Наберите высоту 12 м'), 'height': 12, 'tolerance': 3},
+    {'say': t('One full roll', 'Бір толық бөшке', 'Одна полная бочка'), 'roll': 360},
+    {'say': t('One full flip', 'Бір толық сальто', 'Один полный флип'), 'flip': 360},
+]
+ref += [{'goto': [-6, 12, 46], 'heading': 0, 'until_step': 4}, {'goto': [-6, 12, 46], 'heading': 0, 'wait': 2.5},
+        {'sticks': {'throttle': 0.25, 'roll': 1}, 'until_step': 5},
+        {'hold': True, 'heading': 0, 'wait': 2}, {'goto': [-6, 12, 46], 'heading': 0, 'wait': 3},
+        {'sticks': {'throttle': 0.25, 'pitch': PULL}, 'until_step': 6},
+        {'hold': True, 'heading': 180, 'wait': 2}]
+for i, (x, y, z, h, w, hh) in enumerate(back):
+    steps.append({'say': t('Gate %d' % (i + 4), '%d-қақпа' % (i + 4), 'Ворота %d' % (i + 4)), 'gate': through(x, y, z, w, hh, h)})
+    ref += [{'goto': [x, y + hh / 2, z + 4], 'heading': h, 'speed': 5, 'until_near': True},
+            {'goto': [x, y + hh / 2, z - 4], 'heading': h, 'speed': 5, 'until_step': len(steps)}]
+steps.append(LAND_HOME)
+ref += HOME_AGAIN[1:]
+EXERCISES.append({
+    'format': 1, 'id': 'e30-check-ride', 'type': 'exercise',
+    'title': t('Check ride', 'Бақылау ұшуы', 'Контрольный полёт'),
+    'briefing': t('Everything from the course in one flight, in acro mode: three gates out, a climb to 12 m, one roll and one flip, two gates back, and a landing on the pad you started from. The time counts. Passing this flight completes the course and opens your certificate.',
+                  'Курстағының бәрі бір ұшуда, акро режимінде: алға қарай үш қақпа, 12 м-ге көтерілу, бір бөшке мен бір сальто, кері қарай екі қақпа және ұшып шыққан алаңшаға қону. Уақыт есептеледі. Бұл ұшуды тапсыру курсты аяқтап, сертификатыңызды ашады.',
+                  'Всё из курса в одном полёте, в режиме акро: трое ворот туда, набор 12 м, одна бочка и один флип, двое ворот обратно и посадка на площадку, с которой взлетели. Время учитывается. Сдав этот полёт, вы завершаете курс и открываете свой сертификат.'),
+    'pass': 60, 'time_limit': 300, 'stars': [60, 78, 92],
+    'setup': dict(RACE, drone='freestyle5', objects=[PAD] + [gate('g%d' % (i + 1), x, y, z, w, hh, h) for i, (x, y, z, h, w, hh) in enumerate(out + back)]),
+    'rubric': [steps_line(steps, 60),
+               {'id': 'time', 'metric': 'duration', 'label': t('Time: gold 80 s, silver 120 s, bronze 170 s', 'Уақыт: алтын 80 с, күміс 120 с, қола 170 с', 'Время: золото 80 с, серебро 120 с, бронза 170 с'),
+                'tip': HEIGHT_TIP, 'weight': 25, 'best': 80, 'worst': 260},
+               landing_line(15)],
+    'reference': ref,
+})
+
 
 def main():
     OUT.mkdir(parents=True, exist_ok=True)

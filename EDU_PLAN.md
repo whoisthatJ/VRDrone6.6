@@ -810,3 +810,22 @@ whichever way it faces. Rocking back and forth cancels out, and a flip is not co
 
 **Twenty-nine of thirty exercises exist.** Left in ED3: 30 check ride with its certificate, a demonstration of the
 reference in the briefing, the replay library, and gamepad or radio control of the exercise screens. 467 tests pass.
+
+### 22 November 2026, morning: the check ride and the certificate. All thirty exercises exist
+
+**Exercise 30, the check ride:** three gates out, a climb to 12 m, one roll, one flip, two gates back and a landing
+where the flight began, in acro, with the time deciding the stars. Reference (autopilot for the gates, sticks for the
+roll and flip): 100, in 50 seconds.
+
+**The certificate** appears as a button in the training hub once the check ride is passed. It is one A4 page saved as
+a PDF in the class data folder on that PC (`certificates`) and opened in the PC's own PDF reader to be printed. It
+gives the student's name, exercises passed, the check ride's score, the average score, the stars, the date, and lines
+for the school and the teacher to sign. Russian, Kazakh and English, with the font inside the file.
+
+- **D42. The certificate says what it is.** Its small print reads: the flights were flown in the simulator; the
+  certificate records training and is not a permit to fly a drone.
+- **D43. A seat profile's certificate has an empty line for the name.** A seat names a PC, not a person; the teacher
+  writes the name by hand.
+
+Left in ED3: a demonstration of the reference in the briefing, the replay library, and gamepad or radio control of
+the exercise screens. 469 tests pass.

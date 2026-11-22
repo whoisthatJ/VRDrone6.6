@@ -357,6 +357,60 @@ namespace Ushqyr.Tests
         }
 
         [Test]
+        public void Certificate_IsEarnedByTheCheckRide_AndPrintsInEveryLanguage()
+        {
+            var all = new List<ActivityDefinition>();
+            foreach (string file in Directory.GetFiles(Path.Combine(Application.streamingAssetsPath, "Edu/Activities"), "*.json"))
+                all.Add(ActivityDefinition.Parse(File.ReadAllText(file)));
+            var course = new Course(all);
+            Assert.IsNotNull(course.Find(Certificate.CheckRideId), "the course has its check ride");
+            Assert.IsFalse(Certificate.Earned(course));
+            Assert.IsNull(Certificate.From(course, "Айгерім", DateTime.Now), "no certificate before the check ride is passed");
+
+            // Everything flown at 80 with two stars, the check ride at 91.
+            int count = 0;
+            foreach (string block in Course.Blocks)
+                foreach (CourseEntry e in course.In(block))
+                {
+                    e.Passed = true;
+                    e.Best = e.Activity.Id == Certificate.CheckRideId ? 91 : 80;
+                    e.Stars = 2;
+                    count++;
+                }
+            Assert.IsTrue(Certificate.Earned(course));
+            Certificate c = Certificate.From(course, "Әлішер Қожахметұлы", new DateTime(2026, 11, 22));
+            Assert.AreEqual(count, c.Passed);
+            Assert.AreEqual(count, c.Total);
+            Assert.AreEqual(2 * count, c.Stars);
+            Assert.AreEqual(3 * count, c.MaxStars);
+            Assert.AreEqual(91, c.CheckRide, 1e-9);
+            Assert.AreEqual((80.0 * (count - 1) + 91) / count, c.Average, 1e-9);
+
+            // The page's texts are in the language sheet, and the font prints each of them in all three languages.
+            var sheet = new Dictionary<string, string[]>();
+            foreach (string path in Directory.GetFiles(Path.Combine(Application.dataPath, "_Project/Localization/Text"), "*.tsv"))
+                foreach (string line in File.ReadAllLines(path))
+                {
+                    string[] cells = line.Split('\t');
+                    if (cells.Length == 3 && !line.StartsWith("#")) sheet[cells[0]] = cells;
+                }
+            byte[] font = File.ReadAllBytes(Path.Combine(Application.streamingAssetsPath, "Edu/LiberationSans-Regular.ttf"));
+            foreach (string key in Certificate.Texts) Assert.IsTrue(sheet.ContainsKey(key), "not in the language sheets: " + key);
+            for (int language = 0; language < 3; language++)
+            {
+                int column = language;
+                Func<string, string> text = key => sheet[key][column];
+                Assert.AreEqual("", c.Missing(font, text));
+                var ms = new MemoryStream();
+                c.Write(font, text).Save(ms);
+                StringAssert.StartsWith("%PDF-1.7", Encoding.ASCII.GetString(ms.ToArray(), 0, 8));
+                Assert.Greater(ms.Length, 20000, "the font is inside the file");
+            }
+            // A seat is not a person: the name line is left empty to be written by hand.
+            Assert.AreEqual(1, Certificate.From(course, "", DateTime.Now).Write(font, key => key).PageCount);
+        }
+
+        [Test]
         public void SeatProfile_NamesNoPerson_AndIsMadeOnce()
         {
             using (var db = new EduDatabase(Path.Combine(_dir, "class.db")))

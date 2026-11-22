@@ -49,6 +49,7 @@ namespace Ushqyr.UI
         // ---------- the training hub ----------
 
         private string _trainingBlock = "A";
+        private string _trainingNotice;
 
         /// <summary>
         /// The training hub (EDU_PLAN §4): the exercises in their blocks, what the student has reached on each, and
@@ -74,7 +75,24 @@ namespace Ushqyr.UI
             course.Progress(out int passed, out int total);
             UiKit.Button(p, StudentLabel(), new Vector2(Width - Margin - 560f, -35f), new Vector2(560f, 70f), ShowStudents, 26f);
             UiKit.Label(p, error != null ? L.F("The class data could not be opened: {0}", error) : L.F("Passed: {0} of {1}", passed, total),
-                new Vector2(Margin + 420f, -40f), new Vector2(500f, 60f), 28f, TextAlignmentOptions.MidlineLeft, UiKit.DimTextColor);
+                new Vector2(Margin + 420f, -40f), new Vector2(error != null ? 500f : 250f, 60f), 28f, TextAlignmentOptions.MidlineLeft, UiKit.DimTextColor);
+            // The check ride passed: the certificate can be saved and printed.
+            if (store != null && Certificate.Earned(course))
+                UiKit.Button(p, L.T("Certificate"), new Vector2(Margin + 680f, -35f), new Vector2(220f, 70f), () =>
+                {
+                    EduUser who = EduSession.CurrentUser;
+                    try
+                    {
+                        string file = EduCertificates.Save(course, who);
+                        _trainingNotice = L.F("Certificate saved: {0}", file);
+                        EduCertificates.Open(file);
+                    }
+                    catch (Exception e)
+                    {
+                        _trainingNotice = L.F("The certificate was not saved: {0}", e.Message);
+                    }
+                    ShowTraining();
+                }, 26f);
 
             // The blocks.
             float tab = (ContentWidth - 4f * 12f) / 5f;
@@ -95,8 +113,11 @@ namespace Ushqyr.UI
             }
             int index = Mathf.Max(0, Array.IndexOf(Course.Blocks, _trainingBlock));
             bool blockOpen = course.Open(_trainingBlock, EduSession.EverythingUnlocked);
-            UiKit.Label(p, _trainingBlock + ".  " + L.T(Course.BlockNames[index]) + (blockOpen ? "" : "     " + L.T("Opens when the block before it is passed")),
-                new Vector2(Margin, -200f), new Vector2(ContentWidth, 56f), 34f, TextAlignmentOptions.MidlineLeft, blockOpen ? UiKit.AccentColor : UiKit.DimTextColor);
+            // What just happened (the certificate was saved, and where) is shown once in place of the block's name.
+            string heading = _trainingNotice ?? _trainingBlock + ".  " + L.T(Course.BlockNames[index]) + (blockOpen ? "" : "     " + L.T("Opens when the block before it is passed"));
+            UiKit.Label(p, heading, new Vector2(Margin, -200f), new Vector2(ContentWidth, 56f), _trainingNotice != null ? 24f : 34f, TextAlignmentOptions.MidlineLeft,
+                blockOpen || _trainingNotice != null ? UiKit.AccentColor : UiKit.DimTextColor);
+            _trainingNotice = null;
 
             IReadOnlyList<CourseEntry> entries = course.In(_trainingBlock);
             if (entries.Count == 0)

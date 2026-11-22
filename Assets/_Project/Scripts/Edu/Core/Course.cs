@@ -57,6 +57,15 @@ namespace Ushqyr.Edu
 
         public IReadOnlyList<CourseEntry> In(string block) => _blocks.TryGetValue(block, out List<CourseEntry> list) ? list : new List<CourseEntry>();
 
+        /// <summary>The exercise with this id, or null.</summary>
+        public CourseEntry Find(string activityId)
+        {
+            foreach (List<CourseEntry> list in _blocks.Values)
+                foreach (CourseEntry e in list)
+                    if (e.Activity.Id == activityId) return e;
+            return null;
+        }
+
         /// <summary>True when every exercise of the block has been passed (a block with no exercises counts as done).</summary>
         public bool Done(string block)
         {

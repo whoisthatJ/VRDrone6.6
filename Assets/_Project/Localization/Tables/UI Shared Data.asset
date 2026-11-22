@@ -3817,6 +3817,90 @@ MonoBehaviour:
     m_Key: 'The two moves every freestyle trick is built from. Climb to 12 m. For each move: a short burst of throttle, then lower the throttle, push the right stick fully over and hold it until the horizon comes round again, then centre the stick and catch the drone with the throttle.'
     m_Metadata:
       m_Items: []
+  - m_Id: 6926043406139392
+    m_Key: CERTIFICATE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6926043414528000
+    m_Key: of the drone pilot training course
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6926043414528001
+    m_Key: This certifies that
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6926043414528002
+    m_Key: has completed the training course of 30 exercises
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6926043414528003
+    m_Key: and passed the check ride.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6926043414528004
+    m_Key: Exercises passed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6926043414528005
+    m_Key: Average score
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6926043414528006
+    m_Key: Stars
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6926043414528007
+    m_Key: '{0} of {1}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6926043414528008
+    m_Key: Date
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6926043414528009
+    m_Key: School
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6926043414528010
+    m_Key: Teacher
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6926043414528011
+    m_Key: The flights were flown in the Ushqyr simulator. This certificate records training; it is not a permit to fly a drone.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6926043414528012
+    m_Key: Certificate
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6926043414528013
+    m_Key: 'Certificate saved: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6926043414528014
+    m_Key: 'The certificate was not saved: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6926043418722304
+    m_Key: One full roll
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6926043418722305
+    m_Key: One full flip
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6926043422916608
+    m_Key: Check ride
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6926043422916609
+    m_Key: 'Everything from the course in one flight, in acro mode: three gates out, a climb to 12 m, one roll and one flip, two gates back, and a landing on the pad you started from. The time counts. Passing this flight completes the course and opens your certificate.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6926043422916610
+    m_Key: 'Time: gold 80 s, silver 120 s, bronze 170 s'
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

@@ -84,3 +84,19 @@ Camera-drone proficiency	Камералы дронды меңгеру	Масте
 FPV basics	FPV негіздері	Основы FPV
 Racing and freestyle technique	Жарыс және фристайл техникасы	Техника гонок и фристайла
 All steps done	Барлық қадам орындалды	Все шаги выполнены
+CERTIFICATE	СЕРТИФИКАТ	СЕРТИФИКАТ
+of the drone pilot training course	дрон ұшқышын даярлау курсының	курса подготовки пилота дрона
+This certifies that	Осы сертификат мынаны растайды:	Настоящий сертификат подтверждает, что
+has completed the training course of 30 exercises	30 жаттығудан тұратын оқу курсын аяқтады	прошёл(а) учебный курс из 30 упражнений
+and passed the check ride.	және бақылау ұшуын тапсырды.	и сдал(а) контрольный полёт.
+Exercises passed	Тапсырылған жаттығулар	Сдано упражнений
+Average score	Орташа балл	Средний балл
+Stars	Жұлдыздар	Звёзды
+{0} of {1}	{1} ішінен {0}	{0} из {1}
+Date	Күні	Дата
+School	Мектеп	Школа
+Teacher	Оқытушы	Преподаватель
+The flights were flown in the Ushqyr simulator. This certificate records training; it is not a permit to fly a drone.	Ұшулар Ushqyr симуляторында орындалды. Бұл сертификат оқудан өткенін растайды; ол дронды ұшыруға рұқсат емес.	Полёты выполнены в симуляторе Ushqyr. Сертификат подтверждает прохождение обучения и не является разрешением на полёты дрона.
+Certificate	Сертификат	Сертификат
+Certificate saved: {0}	Сертификат сақталды: {0}	Сертификат сохранён: {0}
+The certificate was not saved: {0}	Сертификат сақталмады: {0}	Сертификат не сохранён: {0}
