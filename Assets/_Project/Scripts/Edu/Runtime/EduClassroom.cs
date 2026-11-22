@@ -109,6 +109,9 @@ namespace Ushqyr.Edu
             return Send(seat, new Dictionary<string, object> { ["do"] = "track", ["name"] = name ?? "", ["json"] = trackJson, ["race"] = race });
         }
 
+        /// <summary>Calls a seat into the LAN race the teacher's PC is hosting on this port.</summary>
+        public bool CallToRace(string seat, int port) => Send(seat, new Dictionary<string, object> { ["do"] = "race", ["port"] = (double)port }) > 0;
+
         /// <summary>The names of the teacher's commands.</summary>
         public const string DoPause = "pause", DoResume = "resume", DoRestart = "restart", DoLeave = "leave", DoAttention = "attention", DoMessage = "message",
             DoWeather = "weather", DoFailure = "failure";
@@ -277,6 +280,8 @@ namespace Ushqyr.Edu
         /// race on it at once.
         /// </summary>
         public static event Func<string, string, bool, string> TrackReceived;
+        /// <summary>The teacher calls this seat into a LAN race at this address ("host:port").</summary>
+        public static event Action<string> RaceRequested;
         /// <summary>The teacher sent everyone back to the menu.</summary>
         public static event Action LeaveRequested;
 
@@ -524,6 +529,11 @@ namespace Ushqyr.Edu
                         break;
                     case "failure":
                         if (r != null) r.TeacherFailure(Json.Str(c, "name", ""), (float)Json.Num(c, "value", 0));
+                        break;
+                    case "race":
+                        SetPaused(false);
+                        EduActivityRunner.LeaveBlocked = false;
+                        RaceRequested?.Invoke(_address + ":" + ((int)Json.Num(c, "port", 0)).ToString());
                         break;
                     case "track":
                     {

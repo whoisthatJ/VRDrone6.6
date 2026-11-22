@@ -4804,6 +4804,14 @@ MonoBehaviour:
     m_Localized: RACE RESULT
     m_Metadata:
       m_Items: []
+  - m_Id: 6975320648056832
+    m_Localized: Fly it on the seats
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6975320715165696
+    m_Localized: 'Not on a seat of the class: {0}'
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

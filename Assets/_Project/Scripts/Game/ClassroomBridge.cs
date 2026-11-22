@@ -18,6 +18,18 @@ namespace Ushqyr.Game
             EduClassroom.LeaveRequested += Leave;
             EduClassroom.TrackReceived -= TakeTrack;
             EduClassroom.TrackReceived += TakeTrack;
+            EduClassroom.RaceRequested -= JoinRace;
+            EduClassroom.RaceRequested += JoinRace;
+        }
+
+        /// <summary>Joins the LAN race the teacher's PC hosts, under the student's own name.</summary>
+        private static void JoinRace(string address)
+        {
+            Time.timeScale = 1f;
+            EduActivityRunner runner = EduActivityRunner.Current;
+            if (runner != null) runner.Leave();
+            if (Ushqyr.Net.OnlineLobby.JoinDirect(address)) OnlineFlow.PrepareLocalPilot();
+            else Debug.LogWarning("[Edu] could not join the teacher's race at " + address + ": " + Ushqyr.Net.OnlineLobby.LastError);
         }
 
         /// <summary>

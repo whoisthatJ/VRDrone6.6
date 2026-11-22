@@ -46,6 +46,11 @@ namespace Ushqyr.Net
         /// countdown, and the host keeps the timing from every pilot's gate passes. Chosen by the host.
         /// </summary>
         public bool FaiStart { get; private set; }
+        /// <summary>
+        /// This PC hosts the race without flying in it (the race director: the teacher's PC). Set before hosting; it
+        /// is not announced as a pilot, takes no place on the grid, and watches.
+        /// </summary>
+        public bool Director { get; set; }
         /// <summary>GO on the server clock (valid once <see cref="GoReceived"/> fired).</summary>
         public double GoServerTime { get; private set; }
 
@@ -167,7 +172,7 @@ namespace Ushqyr.Net
 
         private void OnClientConnected(ulong clientId)
         {
-            if (clientId == _net.LocalClientId) SendHello();
+            if (clientId == _net.LocalClientId && !(Director && _net.IsServer)) SendHello();
         }
 
         private void OnClientDisconnected(ulong clientId)
@@ -271,6 +276,7 @@ namespace Ushqyr.Net
         private void TryStartRace()
         {
             if (!IsHost || Phase != OnlinePhase.Loading) return;
+            if (Pilots.Count == 0) return;
             foreach (var p in Pilots.Values)
                 if (!p.Ready) return;
             SendGo();

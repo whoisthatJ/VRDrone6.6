@@ -93,6 +93,8 @@ namespace Ushqyr.Game
                 gameObject.AddComponent<OnlineRaceDriver>().Configure(this, vehicle, race, buildMaterials);
                 // A race the host started by the FAI rules: the tone, and one timing kept by the host.
                 if (Ushqyr.Net.NetRace.Instance.FaiStart) gameObject.AddComponent<FaiRaceLink>().Configure(race);
+                // The race director does not fly: no pilot's instruments on the screen.
+                if (Ushqyr.Net.NetRace.Instance.Director && Ushqyr.Net.NetRace.Instance.IsHost && hud != null) hud.SetActive(false);
             }
             // A short showdown of the track before the pilot's view (not for online races: the host starts those).
             else if (Track != null && SetupStrike(settings)) { }

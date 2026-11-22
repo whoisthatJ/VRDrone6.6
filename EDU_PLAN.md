@@ -1125,3 +1125,23 @@ starting such a race from the class link, the ten tracks, the big-screen view. 4
   as the next race.
 - The race was **one lap**, set as a local rule for the trial: the race autopilot cannot fly three laps of that track
   in three minutes (at higher speeds it finished no lap at all). A three-lap race between programs is still untried.
+
+### 22 November 2026, evening: the teacher directs a tournament race flown on the seats
+
+- **Race director.** A PC can host a LAN race without flying in it: it is not on the grid and not in the result; its
+  screen follows the leader (Tab: the next pilot; Backspace: the leader again; O: the view over the start) and shows
+  a **timing tower** from the host's own timing: the race clock, positions, laps, the gap to the leader.
+- **"Fly it on the seats"** on a tournament's page (when the class is open): the teacher's PC hosts the race as
+  director with the FAI start and the tournament's laps, the seats on which that race's pilots sit are called into it
+  over the class link and join under their own names, and the usual lobby opens for the teacher to pick the track and
+  start. A pilot who is on no seat is named instead. The result goes into the tournament by itself.
+
+**Tried with three programs on this PC** (the editor as teacher and director, two built copies as seats flown by the
+race autopilot): both seats joined the class and chose their students; called into the race, the lobby held exactly
+those two pilots and the teacher as director; the race started with the FAI tone; the director's screen followed a
+pilot and showed the tower; one seat finished its lap in 133.456 s and the other's autopilot stopped after four gates;
+when the three minutes were up both seats logged the same result, and the tournament on the teacher's side held Q1-1
+with it and the final as the next race.
+
+**Not tried:** people at the sticks; more than two pilots; two real PCs. **Left in ED5:** the ten tracks with medal
+times, bot lines and ghosts; the big-screen mode with automatic camera switching; brackets for 32 and 64.

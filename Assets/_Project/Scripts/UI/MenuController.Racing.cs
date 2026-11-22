@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using Ushqyr.Core;
 using Ushqyr.Edu;
+using Ushqyr.Game;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -154,6 +155,12 @@ namespace Ushqyr.UI
                     UiKit.Label(p, (i + 1) + ".   " + next.Pilots[i], new Vector2(Margin + 20f, y), new Vector2(lw - 20f, 44f), 28f, TextAlignmentOptions.MidlineLeft);
                     y -= 46f;
                 }
+                // With the class open: call this race's pilots, on their seats, into a LAN race this PC directs.
+                if (EduClassroom.Active && EduClassroom.Instance.Host != null)
+                {
+                    UiKit.Button(p, L.T("Fly it on the seats"), new Vector2(Margin, y - 14f), new Vector2(lw, 70f), () => FlyOnSeats(next), 28f);
+                    y -= 80f;
+                }
                 UiKit.Button(p, L.T("Enter the result"), new Vector2(Margin, y - 14f), new Vector2(lw, 70f), () =>
                 {
                     _rHeat = next.Id;
@@ -217,6 +224,42 @@ namespace Ushqyr.UI
                 ShowTeacherRacing();
             }, _tArmed == -2);
             TeacherNote(p);
+        }
+
+        /// <summary>
+        /// Hosts a LAN race on this PC as its director (FAI start, the tournament's laps), calls the seats of the
+        /// race's pilots into it, and shows the lobby: the teacher picks the track and starts when everyone is in.
+        /// The result goes into the tournament by itself.
+        /// </summary>
+        private void FlyOnSeats(RaceHeat heat)
+        {
+            EduClassroom room = EduClassroom.Instance;
+            var seatOf = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            foreach (ClassSeatInfo seat in room.Host.Seats())
+                if (seat.Connected && seat.User.Length > 0) seatOf[seat.User] = seat.Name;
+            var missing = new List<string>();
+            foreach (string pilot in heat.Pilots)
+                if (!seatOf.ContainsKey(pilot)) missing.Add(pilot);
+            if (missing.Count > 0)
+            {
+                _tMessage = L.F("Not on a seat of the class: {0}", string.Join(", ", missing));
+                ShowRacingEvent();
+                return;
+            }
+            GameFlow.Catalog = tracks;
+            Ushqyr.Net.NetRace.Ensure().Director = true;
+            OnlineFlow.Fai = true;
+            OnlineFlow.Laps = Mathf.Clamp(_rT.Settings.Laps, 1, 5);
+            var list = OnlineTracks();
+            if (list.Count == 0 || !Ushqyr.Net.OnlineLobby.HostDirect(list[0].Id, list[0].DisplayName))
+            {
+                _tMessage = Ushqyr.Net.OnlineLobby.LastError;
+                ShowRacingEvent();
+                return;
+            }
+            foreach (string pilot in heat.Pilots) room.CallToRace(seatOf[pilot], Ushqyr.Net.NetRace.DefaultPort);
+            StartOnline();
+            ShowOnlineLobby();
         }
 
         // ---------- entering a result by hand ----------

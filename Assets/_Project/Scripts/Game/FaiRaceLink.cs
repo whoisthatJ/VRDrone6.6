@@ -40,7 +40,9 @@ namespace Ushqyr.Game
         private readonly Dictionary<string, string> _names = new Dictionary<string, string>();
         private long _tournamentId;
         private string _heatId = "";
-        private Canvas _canvas;
+        private Canvas _canvas, _towerCanvas;
+        private TextMeshProUGUI _tower;
+        private float _towerAt;
 
         public void Configure(RaceSession race) => _race = race;
 
@@ -185,7 +187,13 @@ namespace Ushqyr.Game
 
         private void Update()
         {
-            if (_net == null || !_net.IsHost || Timing == null || _sent) return;
+            if (_net == null || !_net.IsHost || Timing == null) return;
+            if (_net.Director && Time.unscaledTime >= _towerAt)
+            {
+                _towerAt = Time.unscaledTime + 0.25f;
+                ShowTower();
+            }
+            if (_sent) return;
             Timing.Tick(_net.ServerTime - _net.GoServerTime);
             if (!Timing.Over) return;
             _sent = true;
@@ -227,6 +235,33 @@ namespace Ushqyr.Game
                 Debug.Log($"[Ushqyr] FAI race: recorded as {heat.Id} of \"{t.Name}\"; next: {(t.Next != null ? t.Next.Id : "none")}");
             }
             catch (Exception e) { Debug.LogWarning("[Ushqyr] FAI race: the result was not recorded into the tournament: " + e.Message); }
+        }
+
+        /// <summary>The timing tower of the race director: position, pilot, laps, the gap to the leader, the last lap.</summary>
+        private void ShowTower()
+        {
+            if (_tower == null)
+            {
+                _towerCanvas = EduUi.Canvas("Timing Tower", 650);
+                _towerCanvas.transform.SetParent(transform, false);
+                RectTransform p = EduUi.Panel(_towerCanvas.transform, "Tower", 0f, 0f, 520f, 60f + Timing.Pilots.Count * 40f, new Color(0.05f, 0.06f, 0.08f, 0.85f));
+                p.anchorMin = p.anchorMax = p.pivot = new Vector2(0f, 1f);
+                p.anchoredPosition = new Vector2(30f, -30f);
+                _tower = EduUi.Text(p, "", 20f, 12f, 480f, 40f + Timing.Pilots.Count * 40f, 26f, Color.white, TextAlignmentOptions.TopLeft);
+            }
+            var b = new StringBuilder();
+            double clock = Math.Max(0, _net.ServerTime - _net.GoServerTime);
+            b.Append(RaceReports.Clock(Math.Min(clock, Timing.FlightTime))).Append('\n');
+            foreach (PilotTiming p in Timing.Order())
+            {
+                double gap = Timing.Gap(p.Pilot);
+                string note = p.Disqualified ? Tournament.DisqMark : p.Finished ? RaceReports.Clock(p.RaceTime)
+                    // No figure for a pilot who was ahead at their last gate and has been passed since: it would be negative.
+                    : p.Position == 1 || double.IsNaN(gap) || gap < 0 ? "" : "+" + gap.ToString("0.000", CultureInfo.InvariantCulture);
+                b.Append(p.Position).Append("  ").Append(_names.TryGetValue(p.Pilot, out string name) ? name : p.Pilot).Append("   ")
+                    .Append(Math.Min(p.Laps.Count, Timing.Laps)).Append('/').Append(Timing.Laps).Append("   ").Append(note).Append('\n');
+            }
+            _tower.text = b.ToString();
         }
 
         // ---------- everyone: the result ----------

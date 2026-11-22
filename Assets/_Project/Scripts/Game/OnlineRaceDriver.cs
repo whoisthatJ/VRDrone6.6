@@ -30,6 +30,10 @@ namespace Ushqyr.Game
         private readonly Dictionary<ulong, RemotePilotView> _views = new Dictionary<ulong, RemotePilotView>();
         private float _sendTimer;
         private bool _sentFinish;
+        private bool _director;
+
+        /// <summary>This PC directs the race and does not fly in it.</summary>
+        public bool Directing => _director;
 
         public IEnumerable<RemotePilotView> Views => _views.Values;
         public RaceSession Race => _race;
@@ -62,6 +66,15 @@ namespace Ushqyr.Game
             _race.ExternalStart = true;
             int laps = _net.Laps > 0 ? _net.Laps : track.Data.Laps;
             _race.SetCourse(track.Gates, slotPoint, track.Data.Id, laps, track.Data.Name);
+            _director = _net.Director && _net.IsHost;
+            if (_director)
+            {
+                // The director's own quad stays on the ground, unseen and unheard; the director watches the others.
+                _vehicle.HoldAtSpawn = true;
+                foreach (Renderer r in _vehicle.GetComponentsInChildren<Renderer>(true)) r.enabled = false;
+                foreach (AudioSource a in _vehicle.GetComponentsInChildren<AudioSource>(true)) a.mute = true;
+                gameObject.AddComponent<DirectorCamera>().Configure(this, track.Spawn);
+            }
 
             _remoteRoot = new GameObject("Online Pilots").transform;
             SyncViews();
@@ -72,7 +85,8 @@ namespace Ushqyr.Game
             if (HasArg("-online-autopilot")) StartAutopilot(track.Gates);
 
             // GO already given (we loaded after the host's timeout): join in straight away.
-            if (_net.Phase == OnlinePhase.Racing) OnGo(_net.GoServerTime);
+            if (_director) { /* not on the grid: the race starts when the pilots are */ }
+            else if (_net.Phase == OnlinePhase.Racing) OnGo(_net.GoServerTime);
             else _net.SendReady();
             Debug.Log($"[Ushqyr] Online race on '{track.Data.Name}': grid slot {slot + 1}, {_net.Pilots.Count} pilots");
         }
@@ -90,6 +104,7 @@ namespace Ushqyr.Game
 
         private void OnGo(double goServerTime)
         {
+            if (_director) return;
             double goLocal = _race.Now + (goServerTime - _net.ServerTime);
             _race.ScheduleStart(goLocal);
         }
@@ -105,6 +120,11 @@ namespace Ushqyr.Game
         private void Update()
         {
             if (!NetRace.Active) return;
+            if (_director)
+            {
+                _vehicle.HoldAtSpawn = true;
+                return;
+            }
             var local = _net.Local;
             float progress = _race.Progress;
             int lap = _race.Timer != null ? _race.Timer.CurrentLap : 0;
