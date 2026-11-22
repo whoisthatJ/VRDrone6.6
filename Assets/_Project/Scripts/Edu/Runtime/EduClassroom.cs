@@ -50,6 +50,13 @@ namespace Ushqyr.Edu
         /// <summary>Raised when a seat joined, left or changed (for the teacher's screen to draw itself again).</summary>
         public event Action SeatsChanged;
         public string LastProblem { get; private set; } = "";
+        /// <summary>The activity last started on every seat; empty when none was (or everyone was sent to the menu).</summary>
+        public string StartedOnAll { get; private set; } = "";
+        private readonly Dictionary<string, KeyValuePair<double, float>> _progress = new Dictionary<string, KeyValuePair<double, float>>();
+        private readonly HashSet<string> _present = new HashSet<string>();
+
+        /// <summary>Seconds a flying seat has gone without finishing a step (0 when it is not flying a guided exercise).</summary>
+        public float NoProgressFor(string seat) => _progress.TryGetValue(seat, out KeyValuePair<double, float> p) ? Time.unscaledTime - p.Value : 0f;
 
         /// <summary>Opens the class on this PC. The class key is made the first time and kept in the class database.</summary>
         public void OpenClass(int port = ClassWire.DefaultPort, int beaconPort = ClassWire.DefaultBeaconPort, bool thisPcOnly = false)
@@ -88,6 +95,7 @@ namespace Ushqyr.Edu
             {
                 ["do"] = "start", ["activity"] = Json.Write(activity.Raw), ["attempts"] = (double)attemptLimit, ["lock"] = locked,
             };
+            if (string.IsNullOrEmpty(seat)) StartedOnAll = activity.Id;
             return Send(seat, c);
         }
 
@@ -99,6 +107,7 @@ namespace Ushqyr.Edu
         public int Command(string seat, string what, string name = null, double value = 0, string text = null)
         {
             var c = new Dictionary<string, object> { ["do"] = what, ["value"] = value };
+            if (what == DoLeave && string.IsNullOrEmpty(seat)) StartedOnAll = "";
             if (name != null) c["name"] = name;
             if (text != null) c["text"] = text;
             return Send(seat, c);
@@ -128,11 +137,37 @@ namespace Ushqyr.Edu
                     if (Json.Flag(e.Data, "up")) Hands.Add(e.Seat);
                     else Hands.Remove(e.Seat);
                 }
-                else if (e.Kind == "left") Hands.Remove(e.Seat);
+                else if (e.Kind == "left")
+                {
+                    Hands.Remove(e.Seat);
+                    _progress.Remove(e.Seat);
+                }
+                else if (e.Kind == "status") NoteStatus(e);
                 else if (e.Kind == "joined") SendRoster(e.Seat);
                 else if (e.Kind == "attempt") StoreAttempt(e);
             }
             if (changed) SeatsChanged?.Invoke();
+        }
+
+        /// <summary>Follows a seat's progress (for the "no progress" alert) and notes the student as present today.</summary>
+        private void NoteStatus(ClassEvent e)
+        {
+            bool flying = Json.Str(e.Data, "state", "") == "flying" && e.Data.ContainsKey("steps");
+            double steps = Json.Num(e.Data, "steps", 0);
+            if (!flying) _progress.Remove(e.Seat);
+            else if (!_progress.TryGetValue(e.Seat, out KeyValuePair<double, float> p) || p.Key != steps)
+                _progress[e.Seat] = new KeyValuePair<double, float>(steps, Time.unscaledTime);
+
+            string user = Json.Str(e.Data, "user", "").Trim();
+            string day = DateTime.Now.ToString("yyyy-MM-dd");
+            if (user.Length == 0 || !_present.Add(day + "|" + user)) return;
+            try
+            {
+                EduStore store = EduSession.Store;
+                foreach (EduUser u in store.Users())
+                    if (u.Role == "student" && string.Equals(u.Name, user, StringComparison.OrdinalIgnoreCase)) store.MarkPresent(u.Id, day, e.Seat);
+            }
+            catch (Exception x) { LastProblem = x.Message; }
         }
 
         /// <summary>The names of the class (no PINs, nothing else), so a seat's "Who is flying?" shows the same list.</summary>
@@ -149,7 +184,30 @@ namespace Ushqyr.Edu
                         if (u.Role == "student") names.Add(u.Name);
                     groups.Add(new Dictionary<string, object> { ["name"] = g.Name, ["students"] = names });
                 }
-                Host.Send(seat, new Dictionary<string, object> { ["do"] = "roster", ["groups"] = groups });
+                // What the class has been given, so "My tasks" on a seat shows it.
+                var groupNames = new Dictionary<long, string>();
+                foreach (EduGroup g in store.Groups()) groupNames[g.Id] = g.Name;
+                var tasks = new List<object>();
+                foreach (Assignment a in store.Assignments())
+                {
+                    var t = new Dictionary<string, object>
+                    {
+                        ["activity"] = a.ActivityId, ["attempts"] = (double)a.AttemptLimit, ["lesson"] = a.Lesson, ["position"] = (double)a.Position, ["group"] = "", ["student"] = "",
+                    };
+                    if (a.GroupId != null)
+                    {
+                        if (!groupNames.TryGetValue(a.GroupId.Value, out string group)) continue;
+                        t["group"] = group;
+                    }
+                    else if (a.UserId != null)
+                    {
+                        EduUser u = store.User(a.UserId.Value);
+                        if (u == null || u.Role != "student") continue;
+                        t["student"] = u.Name;
+                    }
+                    tasks.Add(t);
+                }
+                Host.Send(seat, new Dictionary<string, object> { ["do"] = "roster", ["groups"] = groups, ["tasks"] = tasks });
             }
             catch (Exception e) { LastProblem = e.Message; }
         }
@@ -451,7 +509,10 @@ namespace Ushqyr.Edu
                     case "failure":
                         if (r != null) r.TeacherFailure(Json.Str(c, "name", ""), (float)Json.Num(c, "value", 0));
                         break;
-                    case "roster": TakeRoster(c); break;
+                    // A PC that is itself holding a class keeps its own lists and tasks.
+                    case "roster":
+                        if (Host == null) TakeRoster(c);
+                        break;
                 }
             }
             catch (Exception e) { Debug.LogWarning("[Edu] the teacher's command \"" + what + "\" could not be done: " + e.Message); }
@@ -477,6 +538,34 @@ namespace Ushqyr.Edu
                 foreach (object s in students)
                     if (s is string student && student.IndexOf('\n') < 0) lines.Append(student).Append('\n');
                 store.ImportList(id, lines.ToString());
+            }
+
+            // The class's tasks take the place of whatever this seat held before: a seat follows its class.
+            List<object> tasks = Json.Arr(c, "tasks");
+            if (tasks == null) return;
+            foreach (Assignment old in store.Assignments()) store.Unassign(old.Id);
+            var groupIds = new Dictionary<string, long>(StringComparer.OrdinalIgnoreCase);
+            foreach (EduGroup g in store.Groups()) groupIds[g.Name] = g.Id;
+            List<EduUser> users = store.Users();
+            foreach (object o in tasks)
+            {
+                if (!(o is Dictionary<string, object> t)) continue;
+                if (!EduSession.Activities.TryGetValue(Json.Str(t, "activity", ""), out ActivityDefinition activity)) continue;
+                string group = Json.Str(t, "group", ""), student = Json.Str(t, "student", "");
+                long? groupId = null, userId = null;
+                if (group.Length > 0)
+                {
+                    if (!groupIds.TryGetValue(group, out long id)) continue;
+                    groupId = id;
+                }
+                else if (student.Length > 0)
+                {
+                    EduUser u = users.Find(x => x.Role == "student" && string.Equals(x.Name, student, StringComparison.OrdinalIgnoreCase));
+                    if (u == null) continue;
+                    userId = u.Id;
+                }
+                int limit = Mathf.Clamp((int)Json.Num(t, "attempts", 0), 0, 99);
+                store.Assign(activity, groupId, userId, limit, Json.Str(t, "lesson", ""), (int)Json.Num(t, "position", 0));
             }
         }
 

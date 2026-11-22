@@ -59,6 +59,12 @@ namespace Ushqyr.UI
             {
                 case "flying":
                     colour = new Color(0.45f, 0.8f, 1f);
+                    // A minute in the air without finishing a step: the student may need a hint.
+                    if (EduClassroom.Instance.NoProgressFor(seat.Name) > 60f)
+                    {
+                        colour = new Color(1f, 0.8f, 0.3f);
+                        return number + L.T("no progress") + "   " + EduUi.Clock((float)Json.Num(seat.Status, "clock", 0));
+                    }
                     return number + L.T("flying") + (seat.Status.ContainsKey("steps") ? "  " + Json.Num(seat.Status, "steps", 0).ToString("0", inv) + "/" + Json.Num(seat.Status, "of", 0).ToString("0", inv) : "") +
                            "   " + EduUi.Clock((float)Json.Num(seat.Status, "clock", 0));
                 case "crashed":
@@ -70,7 +76,14 @@ namespace Ushqyr.UI
                 case "briefing":
                     colour = UiKit.TextColor;
                     return number + L.T("reading the task");
-                default: return L.T("in the menu");
+                default:
+                    // An exercise was started on every seat, and this one is not in it.
+                    if (EduClassroom.Instance.StartedOnAll.Length > 0)
+                    {
+                        colour = new Color(1f, 0.8f, 0.3f);
+                        return L.T("not in the task");
+                    }
+                    return L.T("in the menu");
             }
         }
 

@@ -326,7 +326,8 @@ namespace Ushqyr.UI
             if (row != null)
                 UiKit.Label(p, L.T("Passed") + ": " + row.Passed + " / " + j.Activities.Count + "        " + L.T("Average score") + ": " +
                                (row.Flown > 0 ? row.Average.ToString("0", CultureInfo.InvariantCulture) : "—") + "        " + L.T("Attempts") + ": " + row.Attempts +
-                               "        " + L.T("Time, min") + ": " + (row.Seconds / 60.0).ToString("0", CultureInfo.InvariantCulture),
+                               "        " + L.T("Time, min") + ": " + (row.Seconds / 60.0).ToString("0", CultureInfo.InvariantCulture) +
+                               "        " + L.T("Lessons attended") + ": " + store.DaysPresent(userId).Count + " / " + store.LessonDays().Count,
                     new Vector2(Margin, -195f), new Vector2(ContentWidth, 50f), 28f);
             float y = -290f;
             void Row(string text, UnityEngine.Events.UnityAction act, bool danger = false)

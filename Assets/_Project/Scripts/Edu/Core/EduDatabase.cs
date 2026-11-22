@@ -44,6 +44,12 @@ namespace Ushqyr.Edu
                 "create index assignments_by_group on assignments(group_id)",
                 "create index assignments_by_user on assignments(user_id)",
             },
+            // 3: who was in which lesson (a day), noted when a student is seen on a seat of the class.
+            new[]
+            {
+                "create table attendance(day text not null, user_id integer not null references users(id) on delete cascade," +
+                " seat text, first text not null, primary key(day, user_id))",
+            },
         };
 
         private readonly SqliteDb _db;

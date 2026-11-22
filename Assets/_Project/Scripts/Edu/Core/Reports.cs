@@ -16,6 +16,7 @@ namespace Ushqyr.Edu
         {
             "Gradebook", "Exercises", "Group", "Everyone", "Date", "Student", "Passed", "Average score", "Attempts", "Time, min", "Stars",
             "Exercise", "Flown by", "Passed by", "Average attempts", "Student progress", "Best", "yes", "no", "School", "Teacher", "Seat {0}",
+            "Attendance", "Lessons attended",
         };
 
         private static string Name(EduUser user, Func<string, string> text) =>
@@ -27,6 +28,32 @@ namespace Ushqyr.Edu
         /// The gradebook: one sheet with a line per student and a column per exercise (best grades as numbers, so a
         /// teacher can sort and average them), and a second sheet with how the group did on each exercise.
         /// </summary>
+        public static XlsxWriter Gradebook(Journal j, Func<string, string> text, string school, DateTime date, EduStore attendance)
+        {
+            XlsxWriter x = Gradebook(j, text, school, date);
+            if (attendance == null) return x;
+            // A third sheet: students down, lesson days across, "+" where the student was seen in the class.
+            List<string> days = attendance.LessonDays();
+            var widths = new double[days.Count + 2];
+            widths[0] = 30;
+            for (int i = 1; i < widths.Length; i++) widths[i] = 11;
+            x.AddSheet(Sheet(text("Attendance")), widths);
+            var head = new List<object> { text("Student") };
+            foreach (string day in days) head.Add(day);
+            head.Add(text("Lessons attended"));
+            x.AddRow(head.ToArray());
+            foreach (JournalRow row in j.Rows)
+            {
+                if (row.User.Role != "student") continue;
+                HashSet<string> present = attendance.DaysPresent(row.User.Id);
+                var cells = new List<object> { row.User.Name };
+                foreach (string day in days) cells.Add(present.Contains(day) ? "+" : "");
+                cells.Add(present.Count);
+                x.AddRow(cells.ToArray());
+            }
+            return x;
+        }
+
         public static XlsxWriter Gradebook(Journal j, Func<string, string> text, string school, DateTime date)
         {
             var x = new XlsxWriter();

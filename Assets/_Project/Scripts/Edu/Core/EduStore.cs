@@ -360,6 +360,28 @@ namespace Ushqyr.Edu
             return n;
         }
 
+        // ------------------------------------------------------------ attendance
+
+        /// <summary>Notes that the student was in the lesson of this day ("2026-11-22"); once a day is enough.</summary>
+        public void MarkPresent(long userId, string day, string seat = null) =>
+            _db.Sql.Execute("insert or ignore into attendance(day, user_id, seat, first) values(?1, ?2, ?3, ?4)", day, userId, seat, Now());
+
+        /// <summary>The days on which anyone was present, oldest first.</summary>
+        public List<string> LessonDays()
+        {
+            var days = new List<string>();
+            foreach (object[] r in _db.Sql.Query("select distinct day from attendance order by day")) days.Add((string)r[0]);
+            return days;
+        }
+
+        /// <summary>The days this student was present.</summary>
+        public HashSet<string> DaysPresent(long userId)
+        {
+            var days = new HashSet<string>();
+            foreach (object[] r in _db.Sql.Query("select day from attendance where user_id = ?1", userId)) days.Add((string)r[0]);
+            return days;
+        }
+
         // ------------------------------------------------------------ the teacher
 
         /// <summary>True when a teacher's password has been set on this PC.</summary>

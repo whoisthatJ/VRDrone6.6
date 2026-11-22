@@ -48,7 +48,7 @@ namespace Ushqyr.Edu
             string file = Free(Path.Combine(ReportsFolder, "gradebook-" + Safe(j.Group) + "-" + Stamp + (csv ? ".csv" : ".xlsx")));
             // UTF-8 with a byte-order mark: a spreadsheet then reads the Cyrillic letters correctly.
             if (csv) File.WriteAllText(file, Reports.GradebookCsv(j, L.T), new UTF8Encoding(true));
-            else Reports.Gradebook(j, L.T, EduSession.Store.SchoolName, DateTime.Now).Save(file);
+            else Reports.Gradebook(j, L.T, EduSession.Store.SchoolName, DateTime.Now, EduSession.Store).Save(file);
             return file;
         }
 

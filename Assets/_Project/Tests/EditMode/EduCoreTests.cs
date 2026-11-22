@@ -518,6 +518,21 @@ namespace Ushqyr.Tests
                 Journal big = Journal.Build(store, many, group);
                 Assert.AreEqual(2, Reports.StudentProgress(big, big.Rows[0], font, key => key, "", DateTime.Now).PageCount);
 
+                // Attendance: a third sheet, and the days counted per student.
+                store.MarkPresent(aliya, "2026-11-20", "PC-07");
+                store.MarkPresent(aliya, "2026-11-22", "PC-07");
+                store.MarkPresent(aliya, "2026-11-22", "PC-09");
+                store.MarkPresent(bolat, "2026-11-22", "PC-08");
+                Assert.AreEqual(new[] { "2026-11-20", "2026-11-22" }, store.LessonDays().ToArray());
+                Assert.AreEqual(2, store.DaysPresent(aliya).Count, "seen twice on one day is once");
+                Assert.AreEqual(1, store.DaysPresent(bolat).Count);
+                Assert.AreEqual(0, store.DaysPresent(odd).Count);
+                var withDays = new MemoryStream();
+                Reports.Gradebook(j, key => key, "", new DateTime(2026, 11, 22), store).Save(withDays);
+                var plain = new MemoryStream();
+                Reports.Gradebook(j, key => key, "", new DateTime(2026, 11, 22)).Save(plain);
+                Assert.Greater(withDays.Length, plain.Length, "the attendance sheet is in the file");
+
                 // The teacher's password and the school's name.
                 Assert.IsFalse(store.HasTeacherPassword);
                 Assert.IsFalse(store.CheckTeacherPassword(""), "no password set: nothing opens the console");

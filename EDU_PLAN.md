@@ -940,10 +940,30 @@ seats", live control, the grid with small pictures, messages); attendance; simul
 | A weather change takes effect within 0.5 s | wind 6 m/s was on the seat's drone at the next check, 2 s later | Not timed finer than that |
 | Streaming costs under 5% CPU per seat | 0.6 ms a picture, three a second: about 0.2% of one core | It was 8 to 18 ms with a blocking read; the picture is now fetched from the graphics card without waiting |
 | The journal shows an attempt within 3 s | stored when it arrives | |
-| After a seat disconnects and returns, nothing is lost | the outbox and the "stored" answer exist and are tested piece by piece; **not tried as a whole** by pulling a seat off the network | |
+| After a seat disconnects and returns, nothing is lost | tried as a whole on loopback: the teacher's end was closed in the middle of a flight; the flight was finished (99.5) and waited in the outbox; when the teacher's end came back the seat rejoined by itself within 10 s and the recording arrived; the outbox was empty | Not tried by pulling a network cable |
 
 **Not done, and not claimed:** nothing has been tried between two PCs (it needs a second PC: a stop-and-ask point);
 watching a seat's flight live with a free camera and the stick overlay (the grid shows the seat's own picture
 instead); "stuck" and "off-task" alerts; attendance; a seat map laid out like the room; assists and weather as
 settings of an assignment; a seat practising alone does not yet fetch its assignments from the teacher's PC.
 479 tests pass.
+
+### 22 November 2026, late evening: what was left of ED4 that one PC can do
+
+- **Tasks reach the seats.** When a seat joins, it receives the class's names and what each group and student has
+  been given (exercise ids, attempt limits, lesson and place in it), and "My tasks" on the seat shows it. An
+  exercise the seat's version does not ship is left out. A PC that is itself holding a class ignores this.
+- **Two alerts in the grid:** "no progress" when a flying seat has gone a minute without finishing a step, and "not
+  in the task" when an exercise was started on every seat and this one is in the menu.
+- **Attendance:** a student seen on a seat of an open class is noted as present that day. The student's page in the
+  console shows lessons attended, and the gradebook (XLSX) has a third sheet, students by days. The class database
+  moved to layout 3.
+
+- **D53. A seat follows its class:** the tasks sent on joining replace the tasks the seat held before.
+
+**ED4 as built:** the console (journal with marks and replays, class lists with import, tasks and lesson plans,
+reports, backup and restore) and the class link (seats, pictures, start on all, live control, results, tasks,
+attendance, alerts). **Open, and said so:** a trial between two real PCs and on a school network (needs a second
+PC); watching a seat's flight with a free camera and stick overlay; a seat map shaped like the room; assists and
+weather as settings of an assignment; a school logo on reports; the XLSX opened in Excel or LibreOffice;
+the "5 seconds to start" figure on real seats. 479 tests pass.

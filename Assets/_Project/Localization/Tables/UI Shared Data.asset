@@ -4509,6 +4509,22 @@ MonoBehaviour:
     m_Key: Hand raised (F2 to lower)
     m_Metadata:
       m_Items: []
+  - m_Id: 6944425585147904
+    m_Key: Attendance
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6944425643868160
+    m_Key: Lessons attended
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6944425643868161
+    m_Key: no progress
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6944425643868162
+    m_Key: not in the task
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

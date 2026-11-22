@@ -4512,6 +4512,22 @@ MonoBehaviour:
     m_Localized: Hand raised (F2 to lower)
     m_Metadata:
       m_Items: []
+  - m_Id: 6944425585147904
+    m_Localized: Attendance
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6944425643868160
+    m_Localized: Lessons attended
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6944425643868161
+    m_Localized: no progress
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6944425643868162
+    m_Localized: not in the task
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []
